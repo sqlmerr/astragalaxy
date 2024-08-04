@@ -1,9 +1,10 @@
 [package]
 name = "lib-core"
-version = "0.1.0"
+version = "0.1.1"
 edition = "2021"
 
 [dependencies]
+lib-auth.workspace = true
 mongodb = "3.0.1"
 serde = { workspace = true }
 thiserror = { workspace = true }

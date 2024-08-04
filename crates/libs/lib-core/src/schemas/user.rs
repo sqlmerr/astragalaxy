@@ -15,11 +15,13 @@ pub struct UserSchema {
 #[derive(Clone, Deserialize, Serialize)]
 pub struct CreateUserSchema {
     pub username: String,
+    pub password: String,
 }
 
 #[derive(Clone, Deserialize, Serialize)]
 pub struct UpdateUserSchema {
     pub username: Option<String>,
+    pub password: Option<String>,
 }
 
 impl From<User> for UserSchema {
