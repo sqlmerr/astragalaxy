@@ -1,0 +1,10 @@
+[package]
+name = "api"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+axum = "0.7.5"
+tokio = { workspace = true, features = ["full"] }
+lib-core = { path = "../../libs/lib-core" }
+dotenvy = "0.15.7"

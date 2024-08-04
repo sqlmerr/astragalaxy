@@ -1,0 +1,15 @@
+[workspace]
+resolver = "2"
+members = [
+    "crates/libs/lib-auth",
+    "crates/libs/lib-core",
+    "crates/libs/lib-utils",
+    "crates/services/api",
+]
+default-members = ["crates/services/api"]
+
+[workspace.dependencies]
+thiserror = "1.0.63"
+serde = { version = "1.0.204", features = ["derive"] }
+tokio = { version = "1.39.2", features = ["full"] }
+tracing = "0.1.40"

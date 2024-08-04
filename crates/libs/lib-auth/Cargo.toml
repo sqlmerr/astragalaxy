@@ -1,0 +1,12 @@
+[package]
+name = "lib-auth"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+bcrypt = "0.15.1"
+chrono = "0.4.38"
+jsonwebtoken = "9.3.0"
+once_cell = "1.19.0"
+serde.workspace = true
+thiserror.workspace = true

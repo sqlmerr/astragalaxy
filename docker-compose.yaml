@@ -1,0 +1,30 @@
+services:
+    db:
+        image: mongo:6-jammy
+        ports:
+            - "27017:27017"
+        volumes:
+            - db-data:/data/db
+        env_file:
+            - .env
+        environment:
+            - POSTGRES_PASSWORD=password
+        networks:
+            - backend
+    # api:
+    #     build:
+    #         context: .
+    #     env_file:
+    #         - .env
+    #     ports:
+    #         - "8000:8000"
+    #     depends_on:
+    #         - db
+    #     networks:
+    #         - backend
+volumes:
+    db-data:
+
+networks:
+    backend:
+        driver: bridge
