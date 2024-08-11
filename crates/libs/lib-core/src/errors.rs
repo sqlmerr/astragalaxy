@@ -11,8 +11,10 @@ pub enum CoreError {
     CantCreateUser,
     #[error("Server error")]
     ServerError,
-    #[error("User not found")]
-    UserNotFound,
+    #[error("Entity not found")]
+    NotFound,
     #[error(transparent)]
     AuthError(#[from] AuthError),
+    #[error("You already have an account with this address")]
+    AddressAlreadyOccupied,
 }

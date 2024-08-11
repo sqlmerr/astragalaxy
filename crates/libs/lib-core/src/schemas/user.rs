@@ -3,25 +3,27 @@ use serde::{Deserialize, Serialize};
 
 use crate::models::User;
 
-#[derive(Clone, Deserialize, Serialize)]
+#[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct UserSchema {
-    #[serde(rename = "id")]
+    #[serde(
+        rename = "id",
+        serialize_with = "mongodb::bson::serde_helpers::serialize_object_id_as_hex_string"
+    )]
     pub _id: ObjectId,
     pub username: String,
     pub spaceship_id: Option<ObjectId>,
+    #[serde(serialize_with = "mongodb::bson::serde_helpers::serialize_object_id_as_hex_string")]
     pub location_id: ObjectId,
 }
 
-#[derive(Clone, Deserialize, Serialize)]
+#[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct CreateUserSchema {
     pub username: String,
-    pub password: String,
 }
 
-#[derive(Clone, Deserialize, Serialize)]
+#[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct UpdateUserSchema {
     pub username: Option<String>,
-    pub password: Option<String>,
 }
 
 impl From<User> for UserSchema {

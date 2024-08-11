@@ -1,5 +1,6 @@
 use chrono::{Duration, Utc};
 use jsonwebtoken::{DecodingKey, EncodingKey};
+use lib_ton::PAYLOAD_TTL;
 
 pub struct Keys {
     pub encoding: EncodingKey,
@@ -17,17 +18,17 @@ impl Keys {
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct Claims {
-    /// Username
-    pub sub: String,
+    /// Ton address
+    pub address: String,
     /// Expiration
     pub exp: usize,
 }
 
 impl Claims {
-    pub fn new(username: String) -> Self {
+    pub fn new(address: String) -> Self {
         Self {
-            sub: username,
-            exp: (Utc::now() + Duration::days(1)).timestamp() as usize,
+            address,
+            exp: (Utc::now() + Duration::seconds(PAYLOAD_TTL as i64)).timestamp() as usize,
         }
     }
 }

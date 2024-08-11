@@ -1,0 +1,9 @@
+[package]
+name = "initial-data"
+version = "0.2.0"
+edition = "2021"
+
+[dependencies]
+dotenvy = "0.15.7"
+lib-core.workspace = true
+tokio.workspace = true

@@ -4,6 +4,7 @@ use axum::{
     Json,
 };
 use lib_core::errors::CoreError;
+use lib_ton::error::Error as TonError;
 
 pub type Result<T> = std::result::Result<T, ApiError>;
 
@@ -11,11 +12,13 @@ pub type Result<T> = std::result::Result<T, ApiError>;
 pub enum ApiError {
     #[error(transparent)]
     CoreError(#[from] CoreError),
+    #[error("ton error: {0}")]
+    TonError(TonError),
 }
 
 impl IntoResponse for ApiError {
     fn into_response(self) -> axum::response::Response {
-        let msg = self.to_string();
+        let _msg = self.to_string();
 
         let (status_code, message) = match self {
             ApiError::CoreError(core_error) => {
@@ -25,6 +28,10 @@ impl IntoResponse for ApiError {
                     CoreError::UsernameAlreadyOccupied => (StatusCode::FORBIDDEN, message),
                     _ => (StatusCode::INTERNAL_SERVER_ERROR, message),
                 }
+            }
+            ApiError::TonError(ton_error) => {
+                let message = ton_error.0;
+                (StatusCode::INTERNAL_SERVER_ERROR, message)
             }
         };
 

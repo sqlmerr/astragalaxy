@@ -5,7 +5,7 @@ use axum::{
     middleware::Next,
 };
 use lib_auth::{errors::AuthError, jwt::decode_token};
-use lib_core::{errors::CoreError, schemas::user::UserSchema};
+use lib_core::errors::CoreError;
 
 use crate::{errors::ApiError, state::AppState};
 
@@ -26,18 +26,19 @@ pub async fn auth_middleware(
         header.next(),
         header
             .next()
-            .ok_or(CoreError::from(AuthError::InvalidToken))?,
+            .ok_or::<ApiError>(CoreError::from(AuthError::InvalidToken).into())?,
     );
 
     let token_data = decode_token(token).map_err(|_| CoreError::from(AuthError::InvalidToken))?;
     request.extensions_mut().insert(token_data.claims.clone());
 
-    let user: UserSchema = state
+    let user = state
         .user_service
-        .find_one_user_by_username(token_data.claims.sub)
-        .await
-        .map_err(|_| CoreError::from(AuthError::InvalidToken))?;
-    request.extensions_mut().insert(user);
+        .find_one_user_by_address(token_data.claims.address)
+        .await;
+    if let Ok(user) = user {
+        request.extensions_mut().insert(user);
+    }
 
     Ok(next.run(request).await)
 }

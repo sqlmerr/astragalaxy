@@ -12,12 +12,11 @@ pub struct UserRepository {
 
 pub struct CreateUserDTO {
     pub username: String,
-    pub hashed_password: String,
+    pub address: String,
 }
 
 pub struct UpdateUserDTO {
     pub username: Option<String>,
-    pub hashed_password: Option<String>,
 }
 
 impl UserRepository {
@@ -30,7 +29,7 @@ impl UserRepository {
             .collection
             .insert_one(User {
                 username: data.username,
-                password: data.hashed_password,
+                ton_address: data.address,
                 ..Default::default()
             })
             .await
@@ -57,6 +56,13 @@ impl UserRepository {
             .map_err(|_| CoreError::ServerError)
     }
 
+    pub async fn find_one_filters(&self, filters: Document) -> Result<Option<User>> {
+        self.collection
+            .find_one(filters)
+            .await
+            .map_err(|_| CoreError::ServerError)
+    }
+
     pub async fn find_all(&self) -> Vec<User> {
         todo!()
     }
@@ -75,10 +81,6 @@ impl UserRepository {
 
         if let Some(username) = data.username {
             update.insert("username", Bson::String(username));
-        }
-
-        if let Some(password) = data.hashed_password {
-            update.insert("password", Bson::String(password));
         }
 
         self.collection

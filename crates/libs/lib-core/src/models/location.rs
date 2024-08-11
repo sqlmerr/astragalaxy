@@ -1,7 +1,9 @@
+use mongodb::bson::oid::ObjectId;
 use serde::{Deserialize, Serialize};
 
-#[derive(Clone, Debug, Deserialize, Serialize)]
+#[derive(Default, Clone, Debug, Deserialize, Serialize)]
 pub struct Location {
-    code: String,
-    multiplayer: bool,
+    pub _id: ObjectId,
+    pub code: String,
+    pub multiplayer: bool,
 }

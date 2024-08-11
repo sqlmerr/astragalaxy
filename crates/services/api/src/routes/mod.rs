@@ -1,11 +1,14 @@
 mod auth;
+mod ton_proof;
 
+use axum::http::HeaderValue;
 use axum::{http::StatusCode, response::IntoResponse, Json, Router};
 use lib_core::{
-    create_mongodb_client, mongodb::Database, repositories::user::UserRepository,
+    mongodb::Database, repositories::user::UserRepository,
     services::user::UserService,
 };
 use serde_json::json;
+use tower_http::cors::Any;
 
 use crate::state::AppState;
 
@@ -17,7 +20,18 @@ pub async fn app(database: Database) -> Router {
 
     Router::new()
         .nest("/auth", auth::router(state.clone()))
+        .nest("/ton-proof", ton_proof::router(state.clone()))
         .layer(tower_http::trace::TraceLayer::new_for_http())
+        .layer(
+            tower_http::cors::CorsLayer::new()
+                .allow_origin(
+                    "https://astragalaxy.vercel.app"
+                        .parse::<HeaderValue>()
+                        .unwrap(),
+                )
+                .allow_headers(Any)
+                .allow_methods(Any),
+        )
         .fallback(handler_404)
         .with_state(state)
 }

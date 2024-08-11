@@ -5,7 +5,7 @@ pub mod schemas;
 pub mod services;
 
 pub(crate) use errors::Result;
-use models::User;
+use models::{location::Location, User};
 pub use mongodb;
 use mongodb::{bson::doc, options::IndexOptions, Client, IndexModel};
 
@@ -22,6 +22,18 @@ pub async fn startup(client: &Client) {
     client
         .database("astragalaxy")
         .collection::<User>("users")
+        .create_index(model)
+        .await
+        .expect("error while creating index");
+
+    let options = IndexOptions::builder().unique(true).build();
+    let model = IndexModel::builder()
+        .keys(doc! {"code": 1})
+        .options(options)
+        .build();
+    client
+        .database("astragalaxy")
+        .collection::<Location>("locations")
         .create_index(model)
         .await
         .expect("error while creating index");
