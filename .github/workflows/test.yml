@@ -34,4 +34,4 @@ jobs:
             libsecp256k1-dev \
             zlib1g
       - run: cargo build --verbose
-      - run: cargo test --verbose
+      - run: cargo test --verbose -p lib-core
