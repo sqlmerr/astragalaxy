@@ -11,8 +11,7 @@ jobs:
           libssl-dev \
           libsodium23 \
           libsecp256k1-dev \
-          zlib1g \
-          && sudoapt clean
+          zlib1g
 
       - uses: actions/checkout@v2
       - name: Run tests
