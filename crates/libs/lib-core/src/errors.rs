@@ -15,6 +15,4 @@ pub enum CoreError {
     NotFound,
     #[error(transparent)]
     AuthError(#[from] AuthError),
-    #[error("You already have an account with this address")]
-    AddressAlreadyOccupied,
 }

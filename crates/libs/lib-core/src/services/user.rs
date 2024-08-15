@@ -1,4 +1,9 @@
-use mongodb::bson::doc;
+use lib_auth::{
+    errors::AuthError,
+    jwt::create_token,
+    password::{hash_password, verify_password},
+    schemas::Claims,
+};
 use mongodb::bson::oid::ObjectId;
 
 use crate::{
@@ -21,7 +26,6 @@ impl<R: UserRepository> UserService<R> {
     pub async fn register(
         &self,
         data: CreateUserSchema,
-        address: String,
         location_id: ObjectId,
     ) -> Result<UserSchema> {
         if let Some(_) = self
@@ -32,17 +36,11 @@ impl<R: UserRepository> UserService<R> {
             return Err(CoreError::UsernameAlreadyOccupied);
         }
 
-        if let Some(_) = self
-            .repository
-            .find_one_filters(doc! {"ton_address": address.clone()})
-            .await?
-        {
-            return Err(CoreError::AddressAlreadyOccupied);
-        }
+        let hashed_password = hash_password(data.password);
 
         let dto = CreateUserDTO {
             username: data.username,
-            address,
+            password: hashed_password,
             location_id,
         };
         let user_id = self.repository.create(dto).await?;
@@ -54,8 +52,24 @@ impl<R: UserRepository> UserService<R> {
         }
     }
 
-    pub async fn login(&self, _username: String, _password: String) -> Result<String> {
-        todo!()
+    pub async fn login(&self, username: String, password: String) -> Result<String> {
+        let user = self
+            .repository
+            .find_one_by_username(username.clone())
+            .await?;
+        match user {
+            None => Err(AuthError::WrongCredentials.into()),
+            Some(u) => {
+                if !verify_password(password, u.password) {
+                    return Err(AuthError::WrongCredentials.into());
+                }
+
+                let claims = Claims::new(username);
+                let token = create_token(&claims).map_err(|_| AuthError::TokenCreation)?;
+
+                Ok(token)
+            }
+        }
     }
 
     pub async fn find_one_user(&self, oid: ObjectId) -> Result<UserSchema> {
@@ -77,25 +91,22 @@ impl<R: UserRepository> UserService<R> {
     }
 
     pub async fn update_user(&self, oid: ObjectId, data: UpdateUserSchema) -> Result<()> {
+        let hashed_password;
+        if let Some(password) = data.password {
+            hashed_password = Some(hash_password(password))
+        } else {
+            hashed_password = None
+        }
+
         let dto = UpdateUserDTO {
             username: data.username,
+            password: hashed_password,
         };
         self.repository.update(oid, dto).await
     }
 
     pub async fn find_one_user_by_username(&self, username: String) -> Result<UserSchema> {
         let user = self.repository.find_one_by_username(username).await?;
-        if let Some(u) = user {
-            return Ok(u.into());
-        }
-        Err(CoreError::NotFound)
-    }
-
-    pub async fn find_one_user_by_address(&self, address: String) -> Result<UserSchema> {
-        let user = self
-            .repository
-            .find_one_filters(doc! {"ton_address": address})
-            .await?;
         if let Some(u) = user {
             return Ok(u.into());
         }

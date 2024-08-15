@@ -2,9 +2,10 @@
 resolver = "2"
 members = [
     "crates/libs/lib-auth",
-    "crates/libs/lib-core", "crates/libs/lib-ton",
+    "crates/libs/lib-core",
     "crates/libs/lib-utils",
-    "crates/services/api", "crates/tools/initial-data",
+    "crates/services/api",
+    "crates/tools/initial-data",
 ]
 default-members = ["crates/services/api"]
 
@@ -15,4 +16,3 @@ tokio = { version = "1.39.2", features = ["full"] }
 tracing = "0.1.40"
 lib-core = { path = "crates/libs/lib-core" }
 lib-auth = { path = "crates/libs/lib-auth" }
-lib-ton = { path = "crates/libs/lib-ton" }

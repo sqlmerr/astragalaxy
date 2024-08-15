@@ -1,6 +1,6 @@
 [package]
 name = "api"
-version = "0.2.2"
+version = "0.2.3"
 edition = "2021"
 
 [dependencies]
@@ -15,4 +15,3 @@ lib-auth.workspace = true
 tracing.workspace = true
 tracing-subscriber = { version = "0.3.18", features = ["env-filter"] }
 tower-http = { version = "0.5.2", features = ["trace", "cors"] }
-lib-ton.workspace = true

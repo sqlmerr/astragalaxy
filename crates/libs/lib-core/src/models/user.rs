@@ -4,8 +4,8 @@ use serde::{Deserialize, Serialize};
 #[derive(Clone, Debug, Deserialize, Serialize, Default)]
 pub struct User {
     pub _id: ObjectId,
-    pub ton_address: String,
     pub username: String,
+    pub password: String,
     pub spaceship_id: Option<ObjectId>,
     pub location_id: ObjectId,
 }

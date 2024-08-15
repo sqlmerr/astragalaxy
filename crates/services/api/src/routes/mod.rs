@@ -1,7 +1,6 @@
 mod auth;
-mod ton_proof;
-
 use axum::http::HeaderValue;
+use axum::routing::get;
 use axum::{http::StatusCode, response::IntoResponse, Json, Router};
 use lib_core::mongodb::Database;
 use serde_json::json;
@@ -14,8 +13,11 @@ pub async fn app(database: Database) -> Router {
     let state = create_state(&database);
 
     Router::new()
+        .route(
+            "/",
+            get(|| async move { (StatusCode::OK, Json(json!({"message": "Hello World!"}))) }),
+        )
         .nest("/auth", auth::router(state.clone()))
-        .nest("/ton-proof", ton_proof::router(state.clone()))
         .layer(tower_http::trace::TraceLayer::new_for_http())
         .layer(
             tower_http::cors::CorsLayer::new()

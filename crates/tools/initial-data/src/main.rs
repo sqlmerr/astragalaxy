@@ -1,6 +1,6 @@
 use lib_core::{
     create_mongodb_client,
-    repositories::location::{LocationRepository, MongoLocationRepository},
+    repositories::location::MongoLocationRepository,
     schemas::location::CreateLocationSchema,
     services::location::LocationService,
     // startup,

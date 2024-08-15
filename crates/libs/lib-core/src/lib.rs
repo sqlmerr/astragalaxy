@@ -9,9 +9,6 @@ use models::{location::Location, User};
 pub use mongodb;
 use mongodb::{bson::doc, options::IndexOptions, Client, IndexModel};
 
-#[cfg(feature = "utoipa")]
-use utoipa::openapi::{Object, ObjectBuilder};
-
 pub async fn create_mongodb_client(uri: String) -> Client {
     Client::with_uri_str(uri.as_str()).await.unwrap()
 }
@@ -40,12 +37,4 @@ pub async fn startup(client: &Client) {
         .create_index(model)
         .await
         .expect("error while creating index");
-}
-
-#[cfg(feature = "utoipa")]
-pub(crate) fn object_id_openapi() -> Object {
-    ObjectBuilder::new()
-        .schema_type(utoipa::openapi::SchemaType::String)
-        .description(Some("ObjectId"))
-        .build()
 }

@@ -34,7 +34,7 @@ pub async fn auth_middleware(
 
     let user = state
         .user_service
-        .find_one_user_by_address(token_data.claims.address)
+        .find_one_user_by_username(token_data.claims.sub)
         .await;
     if let Ok(user) = user {
         request.extensions_mut().insert(user);

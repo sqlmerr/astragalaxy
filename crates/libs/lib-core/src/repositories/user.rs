@@ -13,12 +13,13 @@ pub struct MongoUserRepository {
 
 pub struct CreateUserDTO {
     pub username: String,
-    pub address: String,
+    pub password: String,
     pub location_id: ObjectId,
 }
 
 pub struct UpdateUserDTO {
     pub username: Option<String>,
+    pub password: Option<String>,
 }
 
 #[async_trait]
@@ -45,7 +46,7 @@ impl UserRepository for MongoUserRepository {
             .collection
             .insert_one(User {
                 username: data.username,
-                ton_address: data.address,
+                password: data.password,
                 location_id: data.location_id,
                 ..Default::default()
             })

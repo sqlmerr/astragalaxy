@@ -9,5 +9,3 @@ pub enum AuthError {
     #[error("Invalid token")]
     InvalidToken,
 }
-
-pub(crate) type Result<T> = std::result::Result<T, AuthError>;

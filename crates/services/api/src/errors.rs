@@ -3,8 +3,8 @@ use axum::{
     response::IntoResponse,
     Json,
 };
+use lib_auth::errors::AuthError;
 use lib_core::errors::CoreError;
-use lib_ton::error::Error as TonError;
 
 pub type Result<T> = std::result::Result<T, ApiError>;
 
@@ -12,8 +12,6 @@ pub type Result<T> = std::result::Result<T, ApiError>;
 pub enum ApiError {
     #[error(transparent)]
     CoreError(#[from] CoreError),
-    #[error("ton error: {0}")]
-    TonError(TonError),
 }
 
 impl IntoResponse for ApiError {
@@ -26,12 +24,15 @@ impl IntoResponse for ApiError {
                 match core_error {
                     CoreError::ServerError => (StatusCode::INTERNAL_SERVER_ERROR, message),
                     CoreError::UsernameAlreadyOccupied => (StatusCode::FORBIDDEN, message),
+                    CoreError::NotFound => (StatusCode::NOT_FOUND, message),
+                    CoreError::AuthError(auth_error) => match auth_error {
+                        AuthError::WrongCredentials => (StatusCode::UNAUTHORIZED, message),
+                        AuthError::MissingCredentials => (StatusCode::UNAUTHORIZED, message),
+                        AuthError::TokenCreation => (StatusCode::INTERNAL_SERVER_ERROR, message),
+                        AuthError::InvalidToken => (StatusCode::FORBIDDEN, message),
+                    },
                     _ => (StatusCode::INTERNAL_SERVER_ERROR, message),
                 }
-            }
-            ApiError::TonError(ton_error) => {
-                let message = ton_error.0;
-                (StatusCode::INTERNAL_SERVER_ERROR, message)
             }
         };
 
