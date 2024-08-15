@@ -18,7 +18,6 @@ pub struct CreateLocationDTO {
 
 #[async_trait]
 pub trait LocationRepository {
-    fn new(collection: Collection<Location>) -> Self;
     async fn create(&self, data: CreateLocationDTO) -> Result<ObjectId>;
     async fn find_one(&self, oid: ObjectId) -> Result<Option<Location>>;
     async fn find_one_by_code(&self, code: String) -> Result<Option<Location>>;
@@ -26,12 +25,14 @@ pub trait LocationRepository {
     async fn delete(&self, oid: ObjectId) -> Result<()>;
 }
 
-#[async_trait]
-impl LocationRepository for MongoLocationRepository {
-    fn new(collection: Collection<Location>) -> Self {
+impl MongoLocationRepository {
+    pub fn new(collection: Collection<Location>) -> Self {
         Self { collection }
     }
+}
 
+#[async_trait]
+impl LocationRepository for MongoLocationRepository {
     async fn create(&self, data: CreateLocationDTO) -> Result<ObjectId> {
         let id = self
             .collection

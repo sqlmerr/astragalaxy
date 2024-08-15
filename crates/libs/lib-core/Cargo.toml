@@ -1,6 +1,6 @@
 [package]
 name = "lib-core"
-version = "0.2.1"
+version = "0.2.2"
 edition = "2021"
 
 [dependencies]
@@ -9,3 +9,4 @@ lib-auth.workspace = true
 mongodb = "3.0.1"
 serde = { workspace = true }
 thiserror = { workspace = true }
+tokio.workspace = true
