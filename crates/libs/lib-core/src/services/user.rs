@@ -9,16 +9,21 @@ use crate::{
 };
 
 #[derive(Clone)]
-pub struct UserService {
-    repository: UserRepository,
+pub struct UserService<R: UserRepository> {
+    repository: R,
 }
 
-impl UserService {
-    pub fn new(repository: UserRepository) -> Self {
+impl<R: UserRepository> UserService<R> {
+    pub fn new(repository: R) -> Self {
         Self { repository }
     }
 
-    pub async fn register(&self, data: CreateUserSchema, address: String) -> Result<UserSchema> {
+    pub async fn register(
+        &self,
+        data: CreateUserSchema,
+        address: String,
+        location_id: ObjectId,
+    ) -> Result<UserSchema> {
         if let Some(_) = self
             .repository
             .find_one_by_username(data.username.clone())
@@ -38,6 +43,7 @@ impl UserService {
         let dto = CreateUserDTO {
             username: data.username,
             address,
+            location_id,
         };
         let user_id = self.repository.create(dto).await?;
         let user = self.repository.find_one(user_id).await?;

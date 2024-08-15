@@ -1,3 +1,4 @@
+use async_trait::async_trait;
 use mongodb::{
     bson::{doc, oid::ObjectId, Bson, Document},
     Collection,
@@ -6,30 +7,46 @@ use mongodb::{
 use crate::{errors::CoreError, models::User, Result};
 
 #[derive(Clone)]
-pub struct UserRepository {
+pub struct MongoUserRepository {
     collection: Collection<User>,
 }
 
 pub struct CreateUserDTO {
     pub username: String,
     pub address: String,
+    pub location_id: ObjectId,
 }
 
 pub struct UpdateUserDTO {
     pub username: Option<String>,
 }
 
-impl UserRepository {
+#[async_trait]
+pub trait UserRepository {
+    async fn create(&self, data: CreateUserDTO) -> Result<ObjectId>;
+    async fn find_one(&self, oid: ObjectId) -> Result<Option<User>>;
+    async fn find_one_by_username(&self, username: String) -> Result<Option<User>>;
+    async fn find_one_filters(&self, filters: Document) -> Result<Option<User>>;
+    async fn find_all(&self) -> Vec<User>;
+    async fn delete(&self, oid: ObjectId) -> Result<()>;
+    async fn update(&self, oid: ObjectId, data: UpdateUserDTO) -> Result<()>;
+}
+
+impl MongoUserRepository {
     pub fn new(collection: Collection<User>) -> Self {
         Self { collection }
     }
+}
 
-    pub async fn create(&self, data: CreateUserDTO) -> Result<ObjectId> {
+#[async_trait]
+impl UserRepository for MongoUserRepository {
+    async fn create(&self, data: CreateUserDTO) -> Result<ObjectId> {
         let user_id = self
             .collection
             .insert_one(User {
                 username: data.username,
                 ton_address: data.address,
+                location_id: data.location_id,
                 ..Default::default()
             })
             .await
@@ -42,32 +59,32 @@ impl UserRepository {
         }
     }
 
-    pub async fn find_one(&self, oid: ObjectId) -> Result<Option<User>> {
+    async fn find_one(&self, oid: ObjectId) -> Result<Option<User>> {
         self.collection
             .find_one(doc! {"_id": oid})
             .await
             .map_err(|_| CoreError::ServerError)
     }
 
-    pub async fn find_one_by_username(&self, username: String) -> Result<Option<User>> {
+    async fn find_one_by_username(&self, username: String) -> Result<Option<User>> {
         self.collection
             .find_one(doc! {"username": username})
             .await
             .map_err(|_| CoreError::ServerError)
     }
 
-    pub async fn find_one_filters(&self, filters: Document) -> Result<Option<User>> {
+    async fn find_one_filters(&self, filters: Document) -> Result<Option<User>> {
         self.collection
             .find_one(filters)
             .await
             .map_err(|_| CoreError::ServerError)
     }
 
-    pub async fn find_all(&self) -> Vec<User> {
+    async fn find_all(&self) -> Vec<User> {
         todo!()
     }
 
-    pub async fn delete(&self, oid: ObjectId) -> Result<()> {
+    async fn delete(&self, oid: ObjectId) -> Result<()> {
         self.collection
             .find_one_and_delete(doc! {"_id": oid})
             .await
@@ -76,7 +93,7 @@ impl UserRepository {
         Ok(())
     }
 
-    pub async fn update(&self, oid: ObjectId, data: UpdateUserDTO) -> Result<()> {
+    async fn update(&self, oid: ObjectId, data: UpdateUserDTO) -> Result<()> {
         let mut update = Document::new();
 
         if let Some(username) = data.username {

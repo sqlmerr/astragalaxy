@@ -2,6 +2,7 @@ import { SendTransactionRequest, TonConnect, UserRejectsError, WalletInfo, Walle
 import { notification } from 'antd';
 import { isMobile, openLink } from './utils';
 
+
 const dappMetadata = { manifestUrl: 'https://astragalaxy.vercel.app/tonconnect-manifest.json' };
 
 export const connector = new TonConnect(dappMetadata);

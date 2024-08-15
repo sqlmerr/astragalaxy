@@ -7,10 +7,10 @@ use axum::{
 use lib_auth::{errors::AuthError, jwt::decode_token};
 use lib_core::errors::CoreError;
 
-use crate::{errors::ApiError, state::AppState};
+use crate::{errors::ApiError, state::ApplicationState};
 
 pub async fn auth_middleware(
-    State(state): State<AppState>,
+    State(state): State<ApplicationState>,
     mut request: Request,
     next: Next,
 ) -> Result<Response<Body>, ApiError> {

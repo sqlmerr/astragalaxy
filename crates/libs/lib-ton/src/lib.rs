@@ -120,7 +120,10 @@ pub async fn check_ton_proof(
     }
 
     if payload.proof.domain.value != domain {
-        return Err(Error(format!("wrong domain. got {}, expected {}", payload.proof.domain.value, domain)));
+        return Err(Error(format!(
+            "wrong domain. got {}, expected {}",
+            payload.proof.domain.value, domain
+        )));
     }
 
     if payload.proof.domain.length_bytes != payload.proof.domain.value.len() as u64 {

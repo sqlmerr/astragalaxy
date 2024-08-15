@@ -56,7 +56,7 @@ dependencies = [
 
 [[package]]
 name = "api"
-version = "0.2.0"
+version = "0.2.1"
 dependencies = [
  "axum",
  "dotenvy",
@@ -1091,7 +1091,7 @@ dependencies = [
 
 [[package]]
 name = "initial-data"
-version = "0.2.0"
+version = "0.2.1"
 dependencies = [
  "dotenvy",
  "lib-core",
@@ -1163,7 +1163,7 @@ checksum = "bbd2bcb4c963f2ddae06a2efc7e9f3591312473c50c6685e1f298068316e66fe"
 
 [[package]]
 name = "lib-auth"
-version = "0.2.0"
+version = "0.2.1"
 dependencies = [
  "bcrypt",
  "chrono",
@@ -1176,8 +1176,9 @@ dependencies = [
 
 [[package]]
 name = "lib-core"
-version = "0.2.0"
+version = "0.2.1"
 dependencies = [
+ "async-trait",
  "lib-auth",
  "mongodb",
  "serde",

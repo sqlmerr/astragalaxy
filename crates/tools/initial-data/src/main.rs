@@ -1,6 +1,9 @@
 use lib_core::{
-    create_mongodb_client, repositories::location::LocationRepository,
-    schemas::location::CreateLocationSchema, services::location::LocationService, startup,
+    create_mongodb_client,
+    repositories::location::{LocationRepository, MongoLocationRepository},
+    schemas::location::CreateLocationSchema,
+    services::location::LocationService,
+    // startup,
 };
 
 #[tokio::main]
@@ -11,7 +14,7 @@ async fn main() {
     let database = client.database("astragalaxy");
     // startup(&client).await
 
-    let location_repo = LocationRepository::new(database.collection("locations"));
+    let location_repo = MongoLocationRepository::new(database.collection("locations"));
     let location_service = LocationService::new(location_repo);
 
     let location = location_service
