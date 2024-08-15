@@ -7,7 +7,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Download libraries
-        run: sudo apt update && apt install -y \
+        run: apt update && apt install -y \
           libssl-dev \
           libsodium23 \
           libsecp256k1-dev \
