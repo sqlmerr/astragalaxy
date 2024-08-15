@@ -6,6 +6,15 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
+      - name: Download libraries
+        run: apt update && apt install -y \
+          libssl-dev \
+          libsodium23 \
+          libsecp256k1-dev \
+          zlib1g \
+          && apt clean \
+          && rm -rf /var/lib/apt/lists/*
+
       - uses: actions/checkout@v2
       - name: Run tests
         run: make test
