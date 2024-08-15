@@ -20,5 +20,18 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - run: rustup update ${{ matrix.toolchain }} && rustup default ${{ matrix.toolchain }}
+      - run: |
+          sudo apt update && sudo apt install -y \
+            build-essential \
+            cmake \
+            libsodium-dev \
+            libsecp256k1-dev \
+            lz4 \
+            liblz4-dev \
+            zlib1g-dev \
+            libssl-dev \
+            libsodium23 \
+            libsecp256k1-dev \
+            zlib1g
       - run: cargo build --verbose
       - run: cargo test --verbose
