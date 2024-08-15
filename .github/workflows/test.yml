@@ -1,18 +1,24 @@
-name: Run tests
+name: Cargo Build & Test
 
-on: [push]
+on:
+  push:
+  pull_request:
+
+env:
+  CARGO_TERM_COLOR: always
 
 jobs:
-  test:
+  build_and_test:
+    name: Rust project - latest
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        toolchain:
+          - stable
+          - beta
+          - nightly
     steps:
-      - name: Download libraries
-        run: apt update && apt install -y \
-          libssl-dev \
-          libsodium23 \
-          libsecp256k1-dev \
-          zlib1g
-
-      - uses: actions/checkout@v2
-      - name: Run tests
-        run: make test
+      - uses: actions/checkout@v4
+      - run: rustup update ${{ matrix.toolchain }} && rustup default ${{ matrix.toolchain }}
+      - run: cargo build --verbose
+      - run: cargo test --verbose
