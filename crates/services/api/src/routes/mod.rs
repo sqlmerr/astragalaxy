@@ -6,11 +6,11 @@ use lib_core::mongodb::Database;
 use serde_json::json;
 use tower_http::cors::Any;
 
+use crate::config::Config;
 use crate::state::create_state;
 
-pub async fn app(database: Database) -> Router {
-    let domain = format!("https://{}", std::env::var("TON_DOMAIN").unwrap());
-    let state = create_state(&database);
+pub async fn app(database: Database, config: Config) -> Router {
+    let state = create_state(&database, config.clone());
 
     Router::new()
         .route(
@@ -21,7 +21,7 @@ pub async fn app(database: Database) -> Router {
         .layer(tower_http::trace::TraceLayer::new_for_http())
         .layer(
             tower_http::cors::CorsLayer::new()
-                .allow_origin(domain.parse::<HeaderValue>().unwrap())
+                .allow_origin(config.domain.parse::<HeaderValue>().unwrap())
                 .allow_headers(Any)
                 .allow_methods(Any),
         )

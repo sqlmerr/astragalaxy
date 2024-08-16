@@ -2,11 +2,12 @@ use lib_core::{create_mongodb_client, startup};
 use routes::app;
 use tokio::net::TcpListener;
 
+pub(crate) mod config;
 pub mod errors;
 pub mod middlewares;
 mod routes;
 pub(crate) mod schemas;
-pub mod state;
+pub(crate) mod state;
 
 #[tokio::main]
 async fn main() {
@@ -24,11 +25,13 @@ async fn main() {
         .finish();
     tracing::subscriber::set_global_default(subscriber).unwrap();
 
-    let client = create_mongodb_client(std::env::var("MONGODB_URI").unwrap()).await;
+    let config = config::Config::from_env();
+
+    let client = create_mongodb_client(config.clone().mongodb_uri).await;
     startup(&client).await;
     let database = client.database("astragalaxy");
 
-    let app = app(database).await;
+    let app = app(database, config).await;
     let listener = TcpListener::bind("0.0.0.0:8000").await.unwrap();
     tracing::info!("Starting api on http://127.0.0.1:8000");
     axum::serve(listener, app).await.unwrap();

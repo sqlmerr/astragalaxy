@@ -5,7 +5,8 @@ use serde::{Deserialize, Serialize};
 pub struct User {
     pub _id: ObjectId,
     pub username: String,
-    pub password: String,
+    pub discord_id: Option<i64>,
+    pub password: Option<String>,
     pub spaceship_id: Option<ObjectId>,
     pub location_id: ObjectId,
 }

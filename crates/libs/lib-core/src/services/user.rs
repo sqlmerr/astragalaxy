@@ -4,7 +4,7 @@ use lib_auth::{
     password::{hash_password, verify_password},
     schemas::Claims,
 };
-use mongodb::bson::oid::ObjectId;
+use mongodb::bson::{doc, oid::ObjectId};
 
 use crate::{
     errors::CoreError,
@@ -40,9 +40,40 @@ impl<R: UserRepository> UserService<R> {
 
         let dto = CreateUserDTO {
             username: data.username,
-            password: hashed_password,
+            password: Some(hashed_password),
+            location_id,
+            ..Default::default()
+        };
+        let user_id = self.repository.create(dto).await?;
+        let user = self.repository.find_one(user_id).await?;
+
+        match user {
+            Some(user) => Ok(UserSchema::from(user)),
+            None => Err(CoreError::CantCreateUser),
+        }
+    }
+
+    pub async fn register_from_discord(
+        &self,
+        discord_id: i64,
+        username: String,
+        location_id: ObjectId,
+    ) -> Result<UserSchema> {
+        if let Some(_) = self
+            .repository
+            .find_one_by_username(username.clone())
+            .await?
+        {
+            return Err(CoreError::UsernameAlreadyOccupied);
+        }
+
+        let dto = CreateUserDTO {
+            username,
+            password: None,
+            discord_id: Some(discord_id),
             location_id,
         };
+
         let user_id = self.repository.create(dto).await?;
         let user = self.repository.find_one(user_id).await?;
 
@@ -57,10 +88,15 @@ impl<R: UserRepository> UserService<R> {
             .repository
             .find_one_by_username(username.clone())
             .await?;
+
         match user {
             None => Err(AuthError::WrongCredentials.into()),
             Some(u) => {
-                if !verify_password(password, u.password) {
+                if u.password.is_none() {
+                    return Err(AuthError::WrongCredentials.into());
+                }
+
+                if !verify_password(password, u.password.unwrap()) {
                     return Err(AuthError::WrongCredentials.into());
                 }
 
@@ -75,6 +111,17 @@ impl<R: UserRepository> UserService<R> {
     pub async fn find_one_user(&self, oid: ObjectId) -> Result<UserSchema> {
         let user = self.repository.find_one(oid).await?;
 
+        match user {
+            Some(u) => Ok(UserSchema::from(u)),
+            None => Err(CoreError::NotFound),
+        }
+    }
+
+    pub async fn find_one_user_by_discord_id(&self, discord_id: i64) -> Result<UserSchema> {
+        let user = self
+            .repository
+            .find_one_filters(doc! { "discord_id": discord_id })
+            .await?;
         match user {
             Some(u) => Ok(UserSchema::from(u)),
             None => Err(CoreError::NotFound),

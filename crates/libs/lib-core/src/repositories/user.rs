@@ -11,9 +11,11 @@ pub struct MongoUserRepository {
     collection: Collection<User>,
 }
 
+#[derive(Default)]
 pub struct CreateUserDTO {
     pub username: String,
-    pub password: String,
+    pub discord_id: Option<i64>,
+    pub password: Option<String>,
     pub location_id: ObjectId,
 }
 
@@ -47,6 +49,7 @@ impl UserRepository for MongoUserRepository {
             .insert_one(User {
                 username: data.username,
                 password: data.password,
+                discord_id: data.discord_id,
                 location_id: data.location_id,
                 ..Default::default()
             })

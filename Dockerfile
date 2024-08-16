@@ -19,6 +19,14 @@ RUN cargo build --release
 
 FROM debian:bookworm-slim AS runtime
 
+RUN apt update && apt install -y \
+    libssl-dev \
+    libsodium23 \
+    libsecp256k1-dev \
+    zlib1g \
+    && apt clean \
+    && rm -rf /var/lib/apt/lists/*
+
 COPY --from=builder /app/.env .env
 COPY --from=builder /app/target/release/api api
 

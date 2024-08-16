@@ -4,15 +4,21 @@ use lib_core::repositories::user::{MongoUserRepository, UserRepository};
 use lib_core::services::location::LocationService;
 use lib_core::services::user::UserService;
 
+use crate::config::Config;
+
 pub type ApplicationState = AppState<MongoUserRepository, MongoLocationRepository>;
 
 #[derive(Clone)]
 pub struct AppState<U: UserRepository, L: LocationRepository> {
     pub user_service: UserService<U>,
     pub location_service: LocationService<L>,
+    pub config: Config,
 }
 
-pub fn create_state(database: &Database) -> AppState<MongoUserRepository, MongoLocationRepository> {
+pub fn create_state(
+    database: &Database,
+    config: Config,
+) -> AppState<MongoUserRepository, MongoLocationRepository> {
     let user_repository = MongoUserRepository::new(database.collection("users"));
     let user_service = UserService::new(user_repository);
 
@@ -22,5 +28,6 @@ pub fn create_state(database: &Database) -> AppState<MongoUserRepository, MongoL
     AppState {
         user_service,
         location_service,
+        config,
     }
 }
