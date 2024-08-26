@@ -19,9 +19,12 @@ pub struct CreateUserDTO {
     pub location_id: ObjectId,
 }
 
+#[derive(Default)]
 pub struct UpdateUserDTO {
     pub username: Option<String>,
     pub password: Option<String>,
+    pub x: Option<i64>,
+    pub y: Option<i64>,
 }
 
 #[async_trait]
@@ -67,21 +70,27 @@ impl UserRepository for MongoUserRepository {
         self.collection
             .find_one(doc! {"_id": oid})
             .await
-            .map_err(|_| CoreError::ServerError)
+            .map_err(|e| {
+                eprintln!("{}", e);
+                CoreError::ServerError
+            })
     }
 
     async fn find_one_by_username(&self, username: String) -> Result<Option<User>> {
         self.collection
             .find_one(doc! {"username": username})
             .await
-            .map_err(|_| CoreError::ServerError)
+            .map_err(|e| {
+                eprintln!("{}", e);
+                CoreError::ServerError
+            })
     }
 
     async fn find_one_filters(&self, filters: Document) -> Result<Option<User>> {
-        self.collection
-            .find_one(filters)
-            .await
-            .map_err(|_| CoreError::ServerError)
+        self.collection.find_one(filters).await.map_err(|e| {
+            eprintln!("{}", e);
+            CoreError::ServerError
+        })
     }
 
     async fn find_all(&self) -> Vec<User> {
@@ -92,7 +101,10 @@ impl UserRepository for MongoUserRepository {
         self.collection
             .find_one_and_delete(doc! {"_id": oid})
             .await
-            .map_err(|_| CoreError::ServerError)?;
+            .map_err(|e| {
+                eprintln!("{}", e);
+                CoreError::ServerError
+            })?;
 
         Ok(())
     }
@@ -104,10 +116,25 @@ impl UserRepository for MongoUserRepository {
             update.insert("username", Bson::String(username));
         }
 
+        if let Some(password) = data.password {
+            update.insert("password", Bson::String(password));
+        }
+
+        if let Some(x) = data.x {
+            update.insert("x", Bson::Int64(x));
+        }
+
+        if let Some(y) = data.y {
+            update.insert("y", Bson::Int64(y));
+        }
+
         self.collection
             .find_one_and_update(doc! {"_id": oid}, doc! {"$set": update})
             .await
-            .map_err(|_| CoreError::ServerError)?;
+            .map_err(|e| {
+                eprintln!("{}", e);
+                CoreError::ServerError
+            })?;
 
         Ok(())
     }

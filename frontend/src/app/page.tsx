@@ -1,20 +1,19 @@
 "use client";
 
 import { Auth } from "@/components/auth";
+import useLocalStorage from "@/hooks/useLocalStorage";
 import { getMe } from "@/lib/api";
-import { useCookies } from "next-client-cookies";
 import dynamic from "next/dynamic";
 import { useEffect, useState } from "react";
 
-const Game = dynamic(() => import("@/components/Game"), {
+const Game = dynamic(() => import("@/components/game"), {
   ssr: false,
 });
 
 export default function Home() {
-  const cookies = useCookies();
-  const token = cookies.get("access-token");
   const [loading, setLoading] = useState(true);
   const [unAuthorized, setUnAuthorized] = useState(false);
+  const [token, setToken] = useLocalStorage("access-token", "");
 
   useEffect(() => {
     async function action() {

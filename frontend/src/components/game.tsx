@@ -2,8 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import { Stage, Layer, Rect, Group, Circle } from "react-konva";
-
-// Определяем интерфейсы для позиции игрока и смещения камеры
+import { socket } from "@/socket";
 
 interface Position {
   x: number;
@@ -37,7 +36,6 @@ const Grid = ({
 }) => {
   const gridLines = [];
 
-  // Устанавливаем диапазон линий, которые необходимо отрисовать на основе положения камеры
   const left = Math.floor(cameraX / cellSize) * cellSize;
   const right =
     left + cellSize * Math.ceil(window.innerWidth / cellSize) + cellSize;
@@ -45,7 +43,6 @@ const Grid = ({
   const bottom =
     top + cellSize * Math.ceil(window.innerHeight / cellSize) + cellSize;
 
-  // Рисуем вертикальные линии
   for (let x = left; x < right; x += cellSize) {
     gridLines.push(
       <Rect
@@ -59,7 +56,6 @@ const Grid = ({
     );
   }
 
-  // Рисуем горизонтальные линии
   for (let y = top; y < bottom; y += cellSize) {
     gridLines.push(
       <Rect
@@ -80,7 +76,9 @@ export default function Game() {
   const stageRef = useRef<any>(null);
   const [position, setPosition] = useState<Position>({ x: 0, y: 0 });
   const [pressedKeys, setPressedKeys] = useState<Set<string>>(new Set());
-  const speed = 10; // Скорость движения игрока
+  const [isConnected, setIsConnected] = useState(false);
+  const [transport, setTransport] = useState("N/A");
+  const speed = 10;
   console.log(position);
 
   const updatePosition = (dx: number, dy: number) => {
@@ -99,16 +97,48 @@ export default function Game() {
     if (pressedKeys.has("KeyA")) dx = -speed;
     if (pressedKeys.has("KeyD")) dx = speed;
 
-    // Обновляем позицию игрока
     if (dx !== 0 || dy !== 0) {
       const length = Math.sqrt(dx * dx + dy * dy);
       if (length > 0) {
         const normalizedX = ((dx / length) * speed) / 50;
         const normalizedY = ((dy / length) * speed) / 50;
         updatePosition(normalizedX, normalizedY);
+        socket.emit("message", {
+          action: "move",
+          x: normalizedX,
+          y: normalizedY,
+        });
       }
     }
   };
+
+  useEffect(() => {
+    if (socket.connected) {
+      onConnect();
+    }
+
+    function onConnect() {
+      setIsConnected(true);
+      setTransport(socket.io.engine.transport.name);
+
+      socket.io.engine.on("upgrade", (transport) => {
+        setTransport(transport.name);
+      });
+    }
+
+    function onDisconnect() {
+      setIsConnected(false);
+      setTransport("N/A");
+    }
+
+    socket.on("connect", onConnect);
+    socket.on("disconnect", onDisconnect);
+
+    return () => {
+      socket.off("connect", onConnect);
+      socket.off("disconnect", onDisconnect);
+    };
+  }, []);
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
@@ -153,6 +183,9 @@ export default function Game() {
     }
   }, [position]);
 
+  if (!isConnected) {
+    return <p>Restart the game</p>;
+  }
   return (
     <Stage width={window.innerWidth} height={window.innerHeight} ref={stageRef}>
       <Layer>

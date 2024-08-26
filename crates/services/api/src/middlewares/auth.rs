@@ -14,6 +14,9 @@ pub async fn auth_middleware(
     mut request: Request,
     next: Next,
 ) -> Result<Response<Body>, ApiError> {
+    let headers = request.headers();
+    println!("headers: {:?}", headers);
+
     let auth_header = match request.headers_mut().get(axum::http::header::AUTHORIZATION) {
         None => return Err(CoreError::from(AuthError::InvalidToken).into()),
         Some(header) => header

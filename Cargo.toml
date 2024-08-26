@@ -4,7 +4,7 @@ members = [
     "crates/libs/lib-auth",
     "crates/libs/lib-core",
     "crates/libs/lib-utils",
-    "crates/services/api",
+    "crates/services/api", "crates/services/dsbot",
     "crates/tools/initial-data",
 ]
 default-members = ["crates/services/api"]

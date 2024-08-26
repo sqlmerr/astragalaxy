@@ -9,4 +9,6 @@ pub struct User {
     pub password: Option<String>,
     pub spaceship_id: Option<ObjectId>,
     pub location_id: ObjectId,
+    pub x: i64,
+    pub y: i64,
 }

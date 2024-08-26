@@ -1,24 +1,22 @@
 "use client";
 
+import useLocalStorage from "@/hooks/useLocalStorage";
 import { request } from "@/lib/api";
-import { useCookies } from "next-client-cookies";
-import { redirect, useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 
 export default function DiscordAuth() {
-  const cookies = useCookies();
-  const [loaded, setLoaded] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const params = useSearchParams();
   const code = params.get("code");
-
-  // const state = router.query.state;
+  const [token, setToken] = useLocalStorage("access-token", "");
 
   useEffect(() => {
     async function action() {
-      if (code && !loaded) {
+      if (code && !isLoading) {
+        setIsLoading(true);
         const body = JSON.stringify({
           code: code,
-          state: "123",
         });
 
         console.log(code, body);
@@ -34,9 +32,9 @@ export default function DiscordAuth() {
           console.log(response);
           return;
         }
-        setLoaded(true);
+        setIsLoading(false);
         const json: { access_token: string } = await response.json();
-        cookies.set("access-token", json.access_token);
+        setToken(json.access_token);
         return;
       }
     }
@@ -44,9 +42,9 @@ export default function DiscordAuth() {
     action();
   }, []);
 
-  if (code && !loaded) {
+  if (isLoading) {
     return <div>Loading...</div>;
   }
 
-  redirect("/");
+  // redirect("/");
 }

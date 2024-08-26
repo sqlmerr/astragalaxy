@@ -1,4 +1,6 @@
 mod auth;
+mod websocket;
+
 use axum::http::HeaderValue;
 use axum::routing::get;
 use axum::{http::StatusCode, response::IntoResponse, Json, Router};
@@ -18,6 +20,7 @@ pub async fn app(database: Database, config: Config) -> Router {
             get(|| async move { (StatusCode::OK, Json(json!({"message": "Hello World!"}))) }),
         )
         .nest("/auth", auth::router(state.clone()))
+        .nest("/websockets", websocket::router(state.clone()))
         .layer(tower_http::trace::TraceLayer::new_for_http())
         .layer(
             tower_http::cors::CorsLayer::new()

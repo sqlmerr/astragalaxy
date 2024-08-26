@@ -24,7 +24,6 @@ impl AuthBody {
 #[derive(Serialize, Deserialize)]
 pub struct DiscordAuthPayload {
     pub code: String,
-    pub state: String,
 }
 
 #[derive(Serialize, Deserialize)]

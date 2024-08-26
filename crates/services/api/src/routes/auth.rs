@@ -5,7 +5,7 @@ use axum::{
     routing::{get, post},
     Extension, Json, Router,
 };
-use lib_auth::{jwt::create_token, schemas::Claims};
+use lib_auth::{errors::AuthError, jwt::create_token, schemas::Claims};
 use lib_core::{
     errors::CoreError,
     schemas::user::{CreateUserSchema, UserSchema},
@@ -63,7 +63,6 @@ async fn discord_callback(
     State(state): State<ApplicationState>,
     Json(payload): Json<DiscordAuthPayload>,
 ) -> Result<Json<AuthBody>> {
-    println!("aa");
     let response: DiscordAuthBody = request(
         "https://discord.com/api/v10/oauth2/token".to_string(),
         "POST".parse().unwrap(),
@@ -91,6 +90,10 @@ async fn discord_callback(
     .await
     .map_err(|_| CoreError::ServerError)?;
 
+    println!("{:?}", serde_json::to_string_pretty(&response).unwrap());
+
+    // return Err(CoreError::ServerError.into());
+
     let discord_user: Value = request(
         "https://discord.com/api/v10/users/@me".to_string(),
         "GET".parse().unwrap(),
@@ -108,16 +111,21 @@ async fn discord_callback(
     .await
     .map_err(|_| CoreError::ServerError)?;
 
+    println!("{}", serde_json::to_string_pretty(&discord_user).unwrap());
+
     let user = state
         .user_service
         .find_one_user_by_discord_id(discord_user["id"].as_str().unwrap().parse::<i64>().unwrap())
         .await;
+    println!("{:?}", user);
+
     let user = match user {
         Err(_) => {
             let location = state
                 .location_service
                 .find_one_location_by_code("space_station".to_string())
                 .await?;
+            println!("hh");
 
             state
                 .user_service
@@ -130,7 +138,8 @@ async fn discord_callback(
         }
         Ok(user) => user,
     };
-    let token = create_token(&Claims::new(user.username)).map_err(|_| CoreError::ServerError)?;
+    let token = create_token(&Claims::new(user.username))
+        .map_err(|_| CoreError::AuthError(AuthError::TokenCreation))?;
 
     Ok(Json(AuthBody::new(token)))
 }

@@ -148,6 +148,7 @@ impl<R: UserRepository> UserService<R> {
         let dto = UpdateUserDTO {
             username: data.username,
             password: hashed_password,
+            ..Default::default()
         };
         self.repository.update(oid, dto).await
     }
@@ -162,5 +163,14 @@ impl<R: UserRepository> UserService<R> {
 
     pub async fn delete_user(&self, oid: ObjectId) -> Result<()> {
         self.repository.delete(oid).await
+    }
+
+    pub async fn move_user(&self, oid: ObjectId, x: i64, y: i64) -> Result<()> {
+        let dto = UpdateUserDTO {
+            x: Some(x),
+            y: Some(y),
+            ..Default::default()
+        };
+        self.repository.update(oid, dto).await
     }
 }
