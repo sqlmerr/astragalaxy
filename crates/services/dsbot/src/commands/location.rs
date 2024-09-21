@@ -2,7 +2,10 @@ use lib_core::schemas::user::UserSchema;
 use lib_utils::snake_case_to_normal;
 
 use poise::CreateReply;
-use serenity::all::{colours, CreateEmbed};
+use serenity::all::{
+    colours, ButtonStyle, CreateActionRow, CreateButton, CreateEmbed, CreateInteractionResponse,
+    CreateInteractionResponseMessage,
+};
 
 use crate::{Context, Error, InvocationData};
 
@@ -22,16 +25,55 @@ pub async fn location(ctx: Context<'_>) -> Result<(), Error> {
         .find_one_location(user.location_id)
         .await?;
     let location_name = snake_case_to_normal(location.code.as_str());
+    let players_count = ctx
+        .data()
+        .user_service
+        .get_users_count_by_location(user.location_id)
+        .await;
 
-    ctx.send(
+    let reply = {
+        let components = vec![CreateActionRow::Buttons(vec![CreateButton::new("button")
+            .label("Button")
+            .style(ButtonStyle::Primary)])];
+
+        let title;
+        if location.multiplayer {
+            title = format!("{location_name} - {players_count} players");
+        } else {
+            title = location_name
+        }
         CreateReply::default()
             .embed(
                 CreateEmbed::new()
-                    .title(format!("You are in {}", location_name))
+                    .title(title)
                     .color(colours::branding::FUCHSIA),
             )
-            .ephemeral(true),
-    )
-    .await?;
+            .components(components)
+    };
+
+    ctx.send(reply).await?;
+
+    while let Some(interaction) =
+        poise::serenity_prelude::ComponentInteractionCollector::new(ctx.serenity_context())
+            .timeout(std::time::Duration::from_secs(120))
+            .filter(move |interaction| interaction.data.custom_id == "button")
+            .await
+    {
+        match interaction
+            .create_response(
+                &ctx,
+                CreateInteractionResponse::UpdateMessage(
+                    CreateInteractionResponseMessage::default()
+                        .add_embed(CreateEmbed::new().field("sus", "asas", false))
+                        .button(CreateButton::new_link("https://google.com").label("sus")),
+                ),
+            )
+            .await
+        {
+            Err(_) => return Ok(()),
+            Ok(_) => {}
+        };
+    }
+
     Ok(())
 }

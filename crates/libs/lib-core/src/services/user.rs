@@ -128,14 +128,14 @@ impl<R: UserRepository> UserService<R> {
         }
     }
 
-    pub async fn find_all_users(&self) -> Vec<UserSchema> {
-        self.repository
-            .find_all()
-            .await
-            .iter()
-            .map(|v| UserSchema::from(v.clone()))
-            .collect()
-    }
+    // pub async fn find_all_users(&self, filters: Doc) -> Vec<UserSchema> {
+    //     self.repository
+    //         .find_all()
+    //         .await
+    //         .iter()
+    //         .map(|v| UserSchema::from(v.clone()))
+    //         .collect()
+    // }
 
     pub async fn update_user(&self, oid: ObjectId, data: UpdateUserSchema) -> Result<()> {
         let hashed_password;
@@ -172,5 +172,16 @@ impl<R: UserRepository> UserService<R> {
             ..Default::default()
         };
         self.repository.update(oid, dto).await
+    }
+
+    pub async fn get_users_count_by_location(&self, location_id: ObjectId) -> u64 {
+        match self
+            .repository
+            .get_count_filters(doc! { "location_id": location_id })
+            .await
+        {
+            Ok(count) => count,
+            Err(_) => 0,
+        }
     }
 }

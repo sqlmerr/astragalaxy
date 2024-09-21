@@ -33,7 +33,8 @@ pub trait UserRepository {
     async fn find_one(&self, oid: ObjectId) -> Result<Option<User>>;
     async fn find_one_by_username(&self, username: String) -> Result<Option<User>>;
     async fn find_one_filters(&self, filters: Document) -> Result<Option<User>>;
-    async fn find_all(&self) -> Vec<User>;
+    async fn find_all(&self, filters: Document) -> Vec<User>;
+    async fn get_count_filters(&self, filters: Document) -> Result<u64>;
     async fn delete(&self, oid: ObjectId) -> Result<()>;
     async fn update(&self, oid: ObjectId, data: UpdateUserDTO) -> Result<()>;
 }
@@ -93,8 +94,15 @@ impl UserRepository for MongoUserRepository {
         })
     }
 
-    async fn find_all(&self) -> Vec<User> {
+    async fn find_all(&self, _filters: Document) -> Vec<User> {
         todo!()
+    }
+
+    async fn get_count_filters(&self, filters: Document) -> Result<u64> {
+        self.collection.count_documents(filters).await.map_err(|e| {
+            eprintln!("{}", e);
+            CoreError::ServerError
+        })
     }
 
     async fn delete(&self, oid: ObjectId) -> Result<()> {
