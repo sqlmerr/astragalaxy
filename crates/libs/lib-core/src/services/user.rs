@@ -148,6 +148,7 @@ impl<R: UserRepository> UserService<R> {
         let dto = UpdateUserDTO {
             username: data.username,
             password: hashed_password,
+            spaceship_id: data.spaceship_id,
             ..Default::default()
         };
         self.repository.update(oid, dto).await

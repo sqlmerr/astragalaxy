@@ -61,13 +61,13 @@ impl PlanetRepository for MongoPlanetRepository {
     }
 
     async fn find_one(&self, oid: ObjectId) -> Result<Option<Planet>> {
-        let system = self
+        let planet = self
             .collection
             .find_one(doc! {"_id": oid})
             .await
             .map_err(|_| CoreError::ServerError)?;
 
-        Ok(system)
+        Ok(planet)
     }
 
     async fn find_all(&self, filter: Document) -> Result<Vec<Planet>> {

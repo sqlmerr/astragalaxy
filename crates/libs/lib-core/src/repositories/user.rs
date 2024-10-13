@@ -23,6 +23,7 @@ pub struct CreateUserDTO {
 pub struct UpdateUserDTO {
     pub username: Option<String>,
     pub password: Option<String>,
+    pub spaceship_id: Option<ObjectId>,
     pub x: Option<i64>,
     pub y: Option<i64>,
 }
@@ -126,6 +127,10 @@ impl UserRepository for MongoUserRepository {
 
         if let Some(password) = data.password {
             update.insert("password", Bson::String(password));
+        }
+
+        if let Some(spaceship_id) = data.spaceship_id {
+            update.insert("spaceship_id", Bson::ObjectId(spaceship_id));
         }
 
         if let Some(x) = data.x {

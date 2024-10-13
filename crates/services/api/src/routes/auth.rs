@@ -8,7 +8,10 @@ use axum::{
 use lib_auth::{errors::AuthError, jwt::create_token, schemas::Claims};
 use lib_core::{
     errors::CoreError,
-    schemas::user::{CreateUserSchema, UserSchema},
+    schemas::{
+        spaceship::CreateSpaceshipSchema,
+        user::{CreateUserSchema, UpdateUserSchema, UserSchema},
+    },
 };
 use lib_utils::request;
 use serde_json::{json, Value};
@@ -39,6 +42,28 @@ async fn register(
         .find_one_location_by_code("space_station".to_string())
         .await?;
     let user = state.user_service.register(user, location._id).await?;
+    let spaceship = state
+        .spaceship_service
+        .create_spaceship(CreateSpaceshipSchema {
+            name: "initial".to_string(),
+            user_id: user._id,
+            location_id: location._id,
+        })
+        .await?;
+
+    state
+        .user_service
+        .update_user(
+            user._id,
+            UpdateUserSchema {
+                username: None,
+                password: None,
+                spaceship_id: Some(spaceship._id),
+            },
+        )
+        .await?;
+
+    let user = state.user_service.find_one_user(user._id).await?;
 
     Ok((StatusCode::CREATED, Json(user)))
 }

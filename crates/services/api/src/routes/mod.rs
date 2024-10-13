@@ -1,4 +1,5 @@
 mod auth;
+mod players;
 mod websocket;
 
 use axum::http::HeaderValue;
@@ -21,6 +22,7 @@ pub async fn app(database: Database, config: Config) -> Router {
         )
         .nest("/auth", auth::router(state.clone()))
         .nest("/websockets", websocket::router(state.clone()))
+        .nest("/players", players::router(state.clone()))
         .layer(tower_http::trace::TraceLayer::new_for_http())
         .layer(
             tower_http::cors::CorsLayer::new()
