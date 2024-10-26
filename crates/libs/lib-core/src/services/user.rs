@@ -27,6 +27,7 @@ impl<R: UserRepository> UserService<R> {
         &self,
         data: CreateUserSchema,
         location_id: ObjectId,
+        system_id: ObjectId,
     ) -> Result<UserSchema> {
         if let Some(_) = self
             .repository
@@ -42,6 +43,7 @@ impl<R: UserRepository> UserService<R> {
             username: data.username,
             password: Some(hashed_password),
             location_id,
+            system_id,
             ..Default::default()
         };
         let user_id = self.repository.create(dto).await?;
@@ -58,6 +60,7 @@ impl<R: UserRepository> UserService<R> {
         discord_id: i64,
         username: String,
         location_id: ObjectId,
+        system_id: ObjectId,
     ) -> Result<UserSchema> {
         if let Some(_) = self
             .repository
@@ -72,6 +75,7 @@ impl<R: UserRepository> UserService<R> {
             password: None,
             discord_id: Some(discord_id),
             location_id,
+            system_id,
         };
 
         let user_id = self.repository.create(dto).await?;
@@ -184,5 +188,43 @@ impl<R: UserRepository> UserService<R> {
             Ok(count) => count,
             Err(_) => 0,
         }
+    }
+
+    pub async fn board_spaceship(&self, user: UserSchema) -> Result<()> {
+        if user.spaceship_id.is_none() {
+            return Err(CoreError::PlayerHasNoSpaceship);
+        }
+
+        if user.in_spaceship == true {
+            return Err(CoreError::PlayerAlreadyInSpaceship);
+        }
+
+        let dto = UpdateUserDTO {
+            in_spaceship: Some(true),
+            ..Default::default()
+        };
+
+        self.repository.update(user._id, dto).await?;
+
+        Ok(())
+    }
+
+    pub async fn get_out_of_spaceship(&self, user: UserSchema) -> Result<()> {
+        if user.spaceship_id.is_none() {
+            return Err(CoreError::PlayerHasNoSpaceship);
+        }
+
+        if user.in_spaceship == false {
+            return Err(CoreError::PlayerAlreadyInSpaceship);
+        }
+
+        let dto = UpdateUserDTO {
+            in_spaceship: Some(false),
+            ..Default::default()
+        };
+
+        self.repository.update(user._id, dto).await?;
+
+        Ok(())
     }
 }

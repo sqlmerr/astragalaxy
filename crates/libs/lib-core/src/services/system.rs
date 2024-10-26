@@ -54,4 +54,11 @@ impl<R: SystemRepository> SystemService<R> {
 
         self.repository.update(oid, dto).await
     }
+
+    pub async fn find_one_system_by_name(&self, name: String) -> Result<SystemSchema> {
+        match self.repository.find_one_by_name(name).await? {
+            Some(s) => Ok(s.into()),
+            None => Err(CoreError::NotFound),
+        }
+    }
 }

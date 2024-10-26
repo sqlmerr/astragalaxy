@@ -62,7 +62,7 @@ dependencies = [
 
 [[package]]
 name = "api"
-version = "0.3.3"
+version = "0.4.0"
 dependencies = [
  "axum",
  "config",
@@ -1361,7 +1361,7 @@ dependencies = [
 
 [[package]]
 name = "lib-core"
-version = "0.3.3"
+version = "0.4.0"
 dependencies = [
  "async-trait",
  "futures",

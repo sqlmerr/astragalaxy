@@ -41,7 +41,15 @@ async fn register(
         .location_service
         .find_one_location_by_code("space_station".to_string())
         .await?;
-    let user = state.user_service.register(user, location._id).await?;
+
+    let system = state
+        .system_service
+        .find_one_system_by_name(String::from("initial_system"))
+        .await?;
+    let user = state
+        .user_service
+        .register(user, location._id, system._id)
+        .await?;
     let spaceship = state
         .spaceship_service
         .create_spaceship(CreateSpaceshipSchema {
@@ -150,7 +158,10 @@ async fn discord_callback(
                 .location_service
                 .find_one_location_by_code("space_station".to_string())
                 .await?;
-            println!("hh");
+            let system = state
+                .system_service
+                .find_one_system_by_name(String::from("initial_system"))
+                .await?;
 
             state
                 .user_service
@@ -158,6 +169,7 @@ async fn discord_callback(
                     discord_user["id"].as_str().unwrap().parse::<i64>().unwrap(),
                     discord_user["username"].as_str().unwrap().to_string(),
                     location._id,
+                    system._id,
                 )
                 .await?
         }

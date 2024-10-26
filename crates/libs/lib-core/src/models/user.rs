@@ -8,7 +8,9 @@ pub struct User {
     pub discord_id: Option<i64>,
     pub password: Option<String>,
     pub spaceship_id: Option<ObjectId>,
+    pub in_spaceship: bool,
     pub location_id: ObjectId,
+    pub system_id: ObjectId,
     pub x: i64,
     pub y: i64,
 }

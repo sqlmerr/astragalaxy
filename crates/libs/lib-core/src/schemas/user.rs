@@ -17,8 +17,11 @@ pub struct UserSchema {
     pub username: String,
     #[serde_as(as = "Option<DisplayFromStr>")]
     pub spaceship_id: Option<ObjectId>,
+    pub in_spaceship: bool,
     #[serde(serialize_with = "mongodb::bson::serde_helpers::serialize_object_id_as_hex_string")]
     pub location_id: ObjectId,
+    #[serde(serialize_with = "mongodb::bson::serde_helpers::serialize_object_id_as_hex_string")]
+    pub system_id: ObjectId,
 }
 
 #[derive(Debug, Clone, Deserialize, Serialize)]
@@ -40,7 +43,9 @@ impl From<User> for UserSchema {
             _id: value._id,
             username: value.username,
             spaceship_id: value.spaceship_id,
+            in_spaceship: value.in_spaceship,
             location_id: value.location_id,
+            system_id: value.system_id,
         }
     }
 }

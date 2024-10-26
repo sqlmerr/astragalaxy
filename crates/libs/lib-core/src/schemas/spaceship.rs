@@ -12,12 +12,12 @@ pub struct SpaceshipSchema {
     pub _id: ObjectId,
     pub name: String,
     #[serde(
-        rename = "id",
+        rename = "user_id",
         serialize_with = "mongodb::bson::serde_helpers::serialize_object_id_as_hex_string"
     )]
     pub user_id: ObjectId,
     #[serde(
-        rename = "id",
+        rename = "location_id",
         serialize_with = "mongodb::bson::serde_helpers::serialize_object_id_as_hex_string"
     )]
     pub location_id: ObjectId,
@@ -27,12 +27,12 @@ pub struct SpaceshipSchema {
 pub struct CreateSpaceshipSchema {
     pub name: String,
     #[serde(
-        rename = "id",
+        rename = "user_id",
         serialize_with = "mongodb::bson::serde_helpers::serialize_object_id_as_hex_string"
     )]
     pub user_id: ObjectId,
     #[serde(
-        rename = "id",
+        rename = "location_id",
         serialize_with = "mongodb::bson::serde_helpers::serialize_object_id_as_hex_string"
     )]
     pub location_id: ObjectId,

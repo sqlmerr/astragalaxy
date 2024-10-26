@@ -15,4 +15,8 @@ pub enum CoreError {
     NotFound,
     #[error(transparent)]
     AuthError(#[from] AuthError),
+    #[error("Player hasn't a spaceship")]
+    PlayerHasNoSpaceship,
+    #[error("Player is already in a spaceship")]
+    PlayerAlreadyInSpaceship,
 }

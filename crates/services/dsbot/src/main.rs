@@ -45,66 +45,66 @@ async fn main() {
     let client = create_mongodb_client(std::env::var("MONGODB_URI").unwrap()).await;
     let database = client.database("astragalaxy");
 
-    let options = poise::FrameworkOptions {
-        command_check: Some(|ctx: Context| {
-            Box::pin(async move {
-                let user_id = ctx.author().id.get() as i64;
+    // let options = poise::FrameworkOptions {
+    //     command_check: Some(|ctx: Context| {
+    //         Box::pin(async move {
+    //             let user_id = ctx.author().id.get() as i64;
 
-                let location = &ctx
-                    .data()
-                    .location_service
-                    .find_one_location_by_code("space_station".to_string())
-                    .await
-                    .unwrap();
+    //             let location = &ctx
+    //                 .data()
+    //                 .location_service
+    //                 .find_one_location_by_code("space_station".to_string())
+    //                 .await
+    //                 .unwrap();
 
-                let user_service = &ctx.data().user_service;
-                let user = match user_service.find_one_user_by_discord_id(user_id).await {
-                    Ok(u) => u,
-                    Err(_) => {
-                        let u = user_service
-                            .register_from_discord(user_id, ctx.author().name.clone(), location._id)
-                            .await;
-                        match u {
-                            Ok(_) => {}
-                            Err(_) => return Ok(false),
-                        }
+    //             let user_service = &ctx.data().user_service;
+    //             let user = match user_service.find_one_user_by_discord_id(user_id).await {
+    //                 Ok(u) => u,
+    //                 Err(_) => {
+    //                     let u = user_service
+    //                         .register_from_discord(user_id, ctx.author().name.clone(), location._id)
+    //                         .await;
+    //                     match u {
+    //                         Ok(_) => {}
+    //                         Err(_) => return Ok(false),
+    //                     }
 
-                        u.unwrap()
-                    }
-                };
+    //                     u.unwrap()
+    //                 }
+    //             };
 
-                ctx.set_invocation_data(InvocationData { user }).await;
+    //             ctx.set_invocation_data(InvocationData { user }).await;
 
-                Ok(true)
-            })
-        }),
-        commands: vec![commands::ping(), commands::location()],
-        ..Default::default()
-    };
+    //             Ok(true)
+    //         })
+    //     }),
+    //     commands: vec![commands::ping(), commands::location()],
+    //     ..Default::default()
+    // };
 
-    let framework = poise::Framework::builder()
-        .setup(move |ctx, ready, framework| {
-            Box::pin(async move {
-                info!("Logged in as {}", ready.user.name);
-                poise::builtins::register_globally(ctx, &framework.options().commands).await?;
-                Ok(create_data(database))
-            })
-        })
-        .options(options)
-        .build();
+    // let framework = poise::Framework::builder()
+    //     .setup(move |ctx, ready, framework| {
+    //         Box::pin(async move {
+    //             info!("Logged in as {}", ready.user.name);
+    //             poise::builtins::register_globally(ctx, &framework.options().commands).await?;
+    //             Ok(create_data(database))
+    //         })
+    //     })
+    //     .options(options)
+    //     .build();
 
-    let token = std::env::var("DISCORD_BOT_TOKEN").expect("Expected a token in the environment");
+    // let token = std::env::var("DISCORD_BOT_TOKEN").expect("Expected a token in the environment");
 
-    let intents = GatewayIntents::GUILD_MESSAGES
-        | GatewayIntents::DIRECT_MESSAGES
-        | GatewayIntents::MESSAGE_CONTENT;
+    // let intents = GatewayIntents::GUILD_MESSAGES
+    //     | GatewayIntents::DIRECT_MESSAGES
+    //     | GatewayIntents::MESSAGE_CONTENT;
 
-    let mut client = Client::builder(&token, intents)
-        .framework(framework)
-        .await
-        .expect("Err creating client");
+    // let mut client = Client::builder(&token, intents)
+    //     .framework(framework)
+    //     .await
+    //     .expect("Err creating client");
 
-    if let Err(why) = client.start().await {
-        println!("Client error: {why:?}");
-    }
+    // if let Err(why) = client.start().await {
+    //     println!("Client error: {why:?}");
+    // }
 }

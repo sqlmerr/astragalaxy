@@ -26,6 +26,7 @@ pub struct UpdateSystemDTO {
 pub trait SystemRepository {
     async fn create(&self, data: CreateSystemDTO) -> Result<ObjectId>;
     async fn find_one(&self, oid: ObjectId) -> Result<Option<System>>;
+    async fn find_one_by_name(&self, name: String) -> Result<Option<System>>;
     async fn find_all(&self, filter: Document) -> Result<Vec<System>>;
     async fn delete(&self, oid: ObjectId) -> Result<()>;
     async fn update(&self, oid: ObjectId, data: UpdateSystemDTO) -> Result<()>;
@@ -60,6 +61,16 @@ impl SystemRepository for MongoSystemRepository {
         let system = self
             .collection
             .find_one(doc! {"_id": oid})
+            .await
+            .map_err(|_| CoreError::ServerError)?;
+
+        Ok(system)
+    }
+
+    async fn find_one_by_name(&self, name: String) -> Result<Option<System>> {
+        let system = self
+            .collection
+            .find_one(doc! {"name": name})
             .await
             .map_err(|_| CoreError::ServerError)?;
 

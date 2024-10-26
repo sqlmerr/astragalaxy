@@ -1,6 +1,7 @@
 mod auth;
+mod flights;
 mod players;
-mod websocket;
+mod spaceships;
 
 use axum::http::HeaderValue;
 use axum::routing::get;
@@ -18,11 +19,17 @@ pub async fn app(database: Database, config: Config) -> Router {
     Router::new()
         .route(
             "/",
-            get(|| async move { (StatusCode::OK, Json(json!({"message": "Hello World!"}))) }),
+            get(|| async move {
+                (
+                    StatusCode::OK,
+                    Json(json!({"message": "Hello World!", "ok": true})),
+                )
+            }),
         )
         .nest("/auth", auth::router(state.clone()))
-        .nest("/websockets", websocket::router(state.clone()))
         .nest("/players", players::router(state.clone()))
+        .nest("/spaceships", spaceships::router(state.clone()))
+        .nest("/flights", flights::router(state.clone()))
         .layer(tower_http::trace::TraceLayer::new_for_http())
         .layer(
             tower_http::cors::CorsLayer::new()
