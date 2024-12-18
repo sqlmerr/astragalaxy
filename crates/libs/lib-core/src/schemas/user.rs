@@ -15,6 +15,7 @@ pub struct UserSchema {
     )]
     pub _id: ObjectId,
     pub username: String,
+    pub telegram_id: i64,
     #[serde_as(as = "Option<DisplayFromStr>")]
     pub spaceship_id: Option<ObjectId>,
     pub in_spaceship: bool,
@@ -27,13 +28,12 @@ pub struct UserSchema {
 #[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct CreateUserSchema {
     pub username: String,
-    pub password: String,
+    pub telegram_id: i64,
 }
 
 #[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct UpdateUserSchema {
     pub username: Option<String>,
-    pub password: Option<String>,
     pub spaceship_id: Option<ObjectId>,
 }
 
@@ -43,6 +43,7 @@ impl From<User> for UserSchema {
             _id: value._id,
             username: value.username,
             spaceship_id: value.spaceship_id,
+            telegram_id: value.telegram_id,
             in_spaceship: value.in_spaceship,
             location_id: value.location_id,
             system_id: value.system_id,

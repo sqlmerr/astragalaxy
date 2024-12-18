@@ -8,8 +8,7 @@ pub struct AuthBody {
 
 #[derive(Serialize, Deserialize)]
 pub struct AuthPayload {
-    pub username: String,
-    pub password: String,
+    pub token: String,
 }
 
 impl AuthBody {

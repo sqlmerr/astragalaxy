@@ -1,5 +1,7 @@
 import asyncio
 
+from aiogram_i18n import I18nMiddleware
+from aiogram_i18n.cores import FluentRuntimeCore
 from loguru import logger
 from aiogram import Bot, Dispatcher
 from aiogram.client.default import DefaultBotProperties
@@ -14,7 +16,7 @@ from config_reader import config
 async def main() -> None:
     api = Api(ApiBase())
     if not (await api.ping()):
-        logger.error("Api not responding :(")
+        logger.error("Api isn't responding :(\nCan't start application")
         return
     logger.info("Api is working!")
 
@@ -22,6 +24,13 @@ async def main() -> None:
     dp = Dispatcher(api=api)
     dp.startup.register(startup)
     dp.include_routers(*[basic.router])
+
+    i18n_middleware = I18nMiddleware(
+        core=FluentRuntimeCore(
+            path="locales/{locale}",
+        )
+    )
+    i18n_middleware.setup(dp)
 
     logger.info("Starting bot...")
     await dp.start_polling(bot)

@@ -1,4 +1,3 @@
-use lib_core::models::Planet;
 use lib_core::mongodb::Database;
 use lib_core::repositories::location::{LocationRepository, MongoLocationRepository};
 use lib_core::repositories::planet::{MongoPlanetRepository, PlanetRepository};

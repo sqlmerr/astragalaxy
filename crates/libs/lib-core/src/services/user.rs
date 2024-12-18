@@ -1,9 +1,4 @@
-use lib_auth::{
-    errors::AuthError,
-    jwt::create_token,
-    password::{hash_password, verify_password},
-    schemas::Claims,
-};
+use lib_auth::{errors::AuthError, jwt::create_token, schemas::Claims};
 use mongodb::bson::{doc, oid::ObjectId};
 
 use crate::{
@@ -37,13 +32,11 @@ impl<R: UserRepository> UserService<R> {
             return Err(CoreError::UsernameAlreadyOccupied);
         }
 
-        let hashed_password = hash_password(data.password);
-
         let dto = CreateUserDTO {
             username: data.username,
-            password: Some(hashed_password),
             location_id,
             system_id,
+            telegram_id: data.telegram_id,
             ..Default::default()
         };
         let user_id = self.repository.create(dto).await?;
@@ -55,56 +48,52 @@ impl<R: UserRepository> UserService<R> {
         }
     }
 
-    pub async fn register_from_discord(
-        &self,
-        discord_id: i64,
-        username: String,
-        location_id: ObjectId,
-        system_id: ObjectId,
-    ) -> Result<UserSchema> {
-        if let Some(_) = self
-            .repository
-            .find_one_by_username(username.clone())
-            .await?
-        {
-            return Err(CoreError::UsernameAlreadyOccupied);
-        }
+    // pub async fn register_from_discord(
+    //     &self,
+    //     discord_id: i64,
+    //     username: String,
+    //     location_id: ObjectId,
+    //     system_id: ObjectId,
+    // ) -> Result<UserSchema> {
+    //     if let Some(_) = self
+    //         .repository
+    //         .find_one_by_username(username.clone())
+    //         .await?
+    //     {
+    //         return Err(CoreError::UsernameAlreadyOccupied);
+    //     }
 
-        let dto = CreateUserDTO {
-            username,
-            password: None,
-            discord_id: Some(discord_id),
-            location_id,
-            system_id,
-        };
+    //     let dto = CreateUserDTO {
+    //         username,
+    //         password: None,
+    //         discord_id: Some(discord_id),
+    //         location_id,
+    //         system_id,
+    //     };
 
-        let user_id = self.repository.create(dto).await?;
-        let user = self.repository.find_one(user_id).await?;
+    //     let user_id = self.repository.create(dto).await?;
+    //     let user = self.repository.find_one(user_id).await?;
 
-        match user {
-            Some(user) => Ok(UserSchema::from(user)),
-            None => Err(CoreError::CantCreateUser),
-        }
-    }
+    //     match user {
+    //         Some(user) => Ok(UserSchema::from(user)),
+    //         None => Err(CoreError::CantCreateUser),
+    //     }
+    // }
 
-    pub async fn login(&self, username: String, password: String) -> Result<String> {
+    pub async fn login(&self, telegram_id: i64, token: String) -> Result<String> {
         let user = self
             .repository
-            .find_one_by_username(username.clone())
+            .find_one_filters(doc! {"telegram_id": telegram_id})
             .await?;
 
         match user {
             None => Err(AuthError::WrongCredentials.into()),
             Some(u) => {
-                if u.password.is_none() {
+                if u.token != token {
                     return Err(AuthError::WrongCredentials.into());
                 }
 
-                if !verify_password(password, u.password.unwrap()) {
-                    return Err(AuthError::WrongCredentials.into());
-                }
-
-                let claims = Claims::new(username);
+                let claims = Claims::new(u._id.to_string());
                 let token = create_token(&claims).map_err(|_| AuthError::TokenCreation)?;
 
                 Ok(token)
@@ -142,16 +131,8 @@ impl<R: UserRepository> UserService<R> {
     // }
 
     pub async fn update_user(&self, oid: ObjectId, data: UpdateUserSchema) -> Result<()> {
-        let hashed_password;
-        if let Some(password) = data.password {
-            hashed_password = Some(hash_password(password))
-        } else {
-            hashed_password = None
-        }
-
         let dto = UpdateUserDTO {
             username: data.username,
-            password: hashed_password,
             spaceship_id: data.spaceship_id,
             ..Default::default()
         };

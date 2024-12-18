@@ -25,9 +25,7 @@ class ApiBase:
         raw: bool = False,
         **kwargs,
     ) -> Any | dict:
-        return await self.request(
-            "POST", path, json=json, raw=raw, **kwargs
-        )
+        return await self.request("POST", path, json=json, raw=raw, **kwargs)
 
     async def get(
         self,
@@ -36,9 +34,7 @@ class ApiBase:
         raw: bool = False,
         **kwargs,
     ) -> Any | dict:
-        return await self.request(
-            "GET", path, params=params, raw=raw, **kwargs
-        )
+        return await self.request("GET", path, params=params, raw=raw, **kwargs)
 
     async def put(
         self,
@@ -47,9 +43,7 @@ class ApiBase:
         raw: bool = False,
         **kwargs,
     ) -> Any | dict:
-        return await self.request(
-            "PUT", path, data=data, raw=raw, **kwargs
-        )
+        return await self.request("PUT", path, data=data, raw=raw, **kwargs)
 
     async def delete(
         self,
@@ -58,6 +52,4 @@ class ApiBase:
         raw: bool = False,
         **kwargs,
     ) -> Any | dict:
-        return await self.request(
-            "DELETE", path, params=params, raw=raw, **kwargs
-        )
+        return await self.request("DELETE", path, params=params, raw=raw, **kwargs)

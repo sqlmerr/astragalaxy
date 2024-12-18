@@ -7,6 +7,7 @@ pub struct Config {
     pub discord_client_id: String,
     pub discord_client_secret: String,
     pub domain: String,
+    pub secret_token: String,
 }
 
 impl Config {

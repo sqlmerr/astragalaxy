@@ -62,7 +62,7 @@ dependencies = [
 
 [[package]]
 name = "api"
-version = "0.4.0"
+version = "0.4.1"
 dependencies = [
  "axum",
  "config",
@@ -1361,11 +1361,12 @@ dependencies = [
 
 [[package]]
 name = "lib-core"
-version = "0.4.0"
+version = "0.4.1"
 dependencies = [
  "async-trait",
  "futures",
  "lib-auth",
+ "lib-utils",
  "mongodb",
  "serde",
  "serde_with",
@@ -1375,8 +1376,9 @@ dependencies = [
 
 [[package]]
 name = "lib-utils"
-version = "0.3.2"
+version = "0.4.1"
 dependencies = [
+ "rand",
  "reqwest 0.12.7",
 ]
 

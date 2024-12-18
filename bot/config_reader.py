@@ -12,7 +12,11 @@ from pydantic_settings import (
 class Settings(BaseSettings):
     bot_token: str
     api_url: str
+    secret_token: str
 
-    model_config = SettingsConfigDict(env_ignore_empty=True)
+    admins: tuple[int] = (1341947575,)
+
+    model_config = SettingsConfigDict(env_ignore_empty=True, env_file=".env")
+
 
 config = Settings()

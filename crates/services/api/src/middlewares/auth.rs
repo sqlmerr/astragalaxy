@@ -45,3 +45,24 @@ pub async fn auth_middleware(
 
     Ok(next.run(request).await)
 }
+
+pub async fn protection_middleware(
+    State(state): State<ApplicationState>,
+    mut request: Request,
+    next: Next,
+) -> Result<Response<Body>, ApiError> {
+    let secret_token_header = match request.headers_mut().get("secret-token") {
+        None => return Err(CoreError::from(AuthError::InvalidToken).into()),
+        Some(header) => header
+            .to_str()
+            .map_err(|_| CoreError::from(AuthError::InvalidToken))?,
+    };
+
+    if secret_token_header != state.config.secret_token {
+        return Err(CoreError::from(AuthError::InvalidToken).into());
+    }
+
+    tracing::info!("Protect asdsa");
+
+    Ok(next.run(request).await)
+}

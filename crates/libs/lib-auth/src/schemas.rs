@@ -17,7 +17,7 @@ impl Keys {
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct Claims {
-    /// Username
+    /// User id
     pub sub: String,
     /// Expiration
     pub exp: usize,

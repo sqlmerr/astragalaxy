@@ -1,4 +1,5 @@
 use async_trait::async_trait;
+use lib_utils::generate_token;
 use mongodb::{
     bson::{doc, oid::ObjectId, Bson, Document},
     Collection,
@@ -15,7 +16,7 @@ pub struct MongoUserRepository {
 pub struct CreateUserDTO {
     pub username: String,
     pub discord_id: Option<i64>,
-    pub password: Option<String>,
+    pub telegram_id: i64,
     pub location_id: ObjectId,
     pub system_id: ObjectId,
 }
@@ -23,7 +24,6 @@ pub struct CreateUserDTO {
 #[derive(Default)]
 pub struct UpdateUserDTO {
     pub username: Option<String>,
-    pub password: Option<String>,
     pub spaceship_id: Option<ObjectId>,
     pub in_spaceship: Option<bool>,
     pub system_id: Option<ObjectId>,
@@ -56,11 +56,12 @@ impl UserRepository for MongoUserRepository {
             .collection
             .insert_one(User {
                 username: data.username,
-                password: data.password,
                 discord_id: data.discord_id,
+                telegram_id: data.telegram_id,
                 location_id: data.location_id,
                 system_id: data.system_id,
                 in_spaceship: false,
+                token: generate_token(32),
                 ..Default::default()
             })
             .await
@@ -128,10 +129,6 @@ impl UserRepository for MongoUserRepository {
 
         if let Some(username) = data.username {
             update.insert("username", Bson::String(username));
-        }
-
-        if let Some(password) = data.password {
-            update.insert("password", Bson::String(password));
         }
 
         if let Some(spaceship_id) = data.spaceship_id {
