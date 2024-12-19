@@ -13,6 +13,7 @@ class Settings(BaseSettings):
     bot_token: str
     api_url: str
     secret_token: str
+    redis_url: str
 
     admins: tuple[int] = (1341947575,)
 

@@ -1,6 +1,6 @@
 from aiogram.filters import CommandStart, Command
 from aiogram.types import Message, ErrorEvent, LinkPreviewOptions
-from aiogram_dialog import DialogManager, setup_dialogs
+from aiogram_dialog import DialogManager, setup_dialogs, StartMode
 from aiogram_i18n import I18nContext
 from loguru import logger
 from aiogram import Router, F
@@ -10,8 +10,6 @@ from config_reader import config
 from dialogs.setlang import dialog, SetLangDialogState
 
 router = Router()
-router.include_router(dialog)
-setup_dialogs(router=router)
 
 
 @router.message(CommandStart())
@@ -23,7 +21,7 @@ async def start_cmd(message: Message, api: Api) -> None:
 
 @router.message(Command("lang", "setlang", "language", "setlanguage"))
 async def set_lang(message: Message, dialog_manager: DialogManager) -> None:
-    await dialog_manager.start(state=SetLangDialogState.select_language)
+    await dialog_manager.start(state=SetLangDialogState.select_language, mode=StartMode.RESET_STACK)
 
 
 @router.error(F.update.message.as_("message"))
