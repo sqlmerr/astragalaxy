@@ -24,7 +24,7 @@ services:
         networks:
             - backend
     redis:
-        image: bitnami/redis:latest
+        image: redis:7.4.1
         volumes:
         - redis:/var/lib/redis
         - redis-config:/usr/local/etc/redis/redis.conf

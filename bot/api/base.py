@@ -1,22 +1,23 @@
-import aiohttp
-
 from typing import Any
+
+import httpx
+from httpx import Response
+
 from config_reader import config
 
 
 class ApiBase:
     def __init__(self) -> None:
         self.url = config.api_url
+        self.client = httpx.AsyncClient(base_url=self.url)
 
-    async def request(self, method: str, path: str, raw: bool, **kwargs) -> Any | dict:
-        async with aiohttp.ClientSession(self.url) as session:
-            async with session.request(method, path, **kwargs) as response:
-                if raw:
-                    return response
-                try:
-                    return await response.json()
-                except aiohttp.ContentTypeError:
-                    return response.content
+    async def request(
+        self, method: str, path: str, raw: bool, **kwargs
+    ) -> Response | dict | Any:
+        response = await self.client.request(method, path, **kwargs)
+        if raw:
+            return response
+        return response.json()
 
     async def post(
         self,
@@ -24,7 +25,7 @@ class ApiBase:
         json: Any = None,
         raw: bool = False,
         **kwargs,
-    ) -> Any | dict:
+    ) -> Response | dict | Any:
         return await self.request("POST", path, json=json, raw=raw, **kwargs)
 
     async def get(
@@ -33,7 +34,7 @@ class ApiBase:
         params: Any = None,
         raw: bool = False,
         **kwargs,
-    ) -> Any | dict:
+    ) -> Response | dict | Any:
         return await self.request("GET", path, params=params, raw=raw, **kwargs)
 
     async def put(
@@ -42,7 +43,7 @@ class ApiBase:
         data: Any = None,
         raw: bool = False,
         **kwargs,
-    ) -> Any | dict:
+    ) -> Response | dict | Any:
         return await self.request("PUT", path, data=data, raw=raw, **kwargs)
 
     async def delete(
@@ -51,5 +52,5 @@ class ApiBase:
         params: Any = None,
         raw: bool = False,
         **kwargs,
-    ) -> Any | dict:
+    ) -> Response | dict | Any:
         return await self.request("DELETE", path, params=params, raw=raw, **kwargs)

@@ -1,5 +1,5 @@
 use axum::{
-    extract::State,
+    extract::{Query, State},
     http::StatusCode,
     middleware,
     routing::{get, post},
@@ -18,7 +18,7 @@ use lib_utils::parse_token;
 use crate::{
     errors::Result,
     middlewares::auth::{auth_middleware, protection_middleware},
-    schemas::auth::{AuthBody, AuthPayload},
+    schemas::auth::{AuthBody, AuthPayload, GetTokenSchema, UserTokenSchema},
     state::ApplicationState,
 };
 
@@ -30,7 +30,11 @@ pub(super) fn router(state: ApplicationState) -> Router<ApplicationState> {
         .route("/register", post(register))
         .route(
             "/register/telegram",
-            post(register_from_telegram).layer(protection_middleware),
+            post(register_from_telegram).layer(protection_middleware.clone()),
+        )
+        .route(
+            "/token/sudo",
+            get(get_user_token_telegram_sudo).layer(protection_middleware),
         )
         .route("/login", post(login))
         // .route("/discord", post(discord_callback))
@@ -228,4 +232,18 @@ async fn register_from_telegram(
     let user = state.user_service.find_one_user(user._id).await?;
 
     Ok((StatusCode::CREATED, Json(user)))
+}
+
+async fn get_user_token_telegram_sudo(
+    State(state): State<ApplicationState>,
+    Query(payload): Query<GetTokenSchema>,
+) -> Result<Json<UserTokenSchema>> {
+    let user = state
+        .user_service
+        .find_one_raw_user_by_telegram_id(payload.telegram_id)
+        .await?;
+
+    let token = user.token;
+
+    Ok(Json(UserTokenSchema { token }))
 }

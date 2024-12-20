@@ -33,3 +33,13 @@ pub struct DiscordAuthBody {
     pub refresh_token: String,
     pub scope: String,
 }
+
+#[derive(Serialize, Deserialize)]
+pub struct GetTokenSchema {
+    pub telegram_id: i64,
+}
+
+#[derive(Serialize, Deserialize)]
+pub struct UserTokenSchema {
+    pub token: String,
+}

@@ -3,6 +3,7 @@ use mongodb::bson::{doc, oid::ObjectId};
 
 use crate::{
     errors::CoreError,
+    models::User,
     repositories::user::{CreateUserDTO, UpdateUserDTO, UserRepository},
     schemas::user::{CreateUserSchema, UpdateUserSchema, UserSchema},
     Result,
@@ -143,6 +144,17 @@ impl<R: UserRepository> UserService<R> {
         let user = self.repository.find_one_by_username(username).await?;
         if let Some(u) = user {
             return Ok(u.into());
+        }
+        Err(CoreError::NotFound)
+    }
+
+    pub async fn find_one_raw_user_by_telegram_id(&self, telegram_id: i64) -> Result<User> {
+        let user = self
+            .repository
+            .find_one_filters(doc! {"telegram_id": telegram_id})
+            .await?;
+        if let Some(u) = user {
+            return Ok(u);
         }
         Err(CoreError::NotFound)
     }
