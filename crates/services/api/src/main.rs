@@ -33,6 +33,6 @@ async fn main() {
 
     let app = app(database, config).await;
     let listener = TcpListener::bind("0.0.0.0:8000").await.unwrap();
-    tracing::info!("Starting api on http://127.0.0.1:8000");
+    tracing::info!("Starting api on http://0.0.0.0:8000");
     axum::serve(listener, app).await.unwrap();
 }
