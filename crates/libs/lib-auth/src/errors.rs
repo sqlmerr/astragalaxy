@@ -8,4 +8,6 @@ pub enum AuthError {
     TokenCreation,
     #[error("Invalid token")]
     InvalidToken,
+    #[error("Authorization failed")]
+    Failed,
 }

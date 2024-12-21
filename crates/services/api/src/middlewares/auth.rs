@@ -5,7 +5,7 @@ use axum::{
     middleware::Next,
 };
 use lib_auth::{errors::AuthError, jwt::decode_token};
-use lib_core::errors::CoreError;
+use lib_core::{errors::CoreError, mongodb::bson::oid::ObjectId};
 
 use crate::{errors::ApiError, state::ApplicationState};
 
@@ -15,7 +15,7 @@ pub async fn auth_middleware(
     next: Next,
 ) -> Result<Response<Body>, ApiError> {
     let headers = request.headers();
-    println!("headers: {:?}", headers);
+    tracing::debug!("headers: {:?}", headers);
 
     let auth_header = match request.headers_mut().get(axum::http::header::AUTHORIZATION) {
         None => return Err(CoreError::from(AuthError::InvalidToken).into()),
@@ -37,11 +37,13 @@ pub async fn auth_middleware(
 
     let user = state
         .user_service
-        .find_one_user_by_username(token_data.claims.sub)
+        .find_one_user(ObjectId::parse_str(token_data.claims.sub).unwrap())
         .await;
-    if let Ok(user) = user {
-        request.extensions_mut().insert(user);
-    }
+
+    match user {
+        Ok(user) => request.extensions_mut().insert(user),
+        Err(_) => return Err(CoreError::from(AuthError::Failed).into()),
+    };
 
     Ok(next.run(request).await)
 }

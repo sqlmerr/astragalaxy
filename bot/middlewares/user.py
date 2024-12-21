@@ -47,6 +47,9 @@ class UserMiddleware(BaseMiddleware):
                 token_pair = TokenPair(user_token=user_token, jwt_token=jwt_token)
                 await token_manager.set_user_token(user_id, token_pair.user_token)
 
+        user = await api.get_me(token_pair.jwt_token)
+
         data["token_pair"] = token_pair
+        data["user"] = user
 
         return await handler(event, data)

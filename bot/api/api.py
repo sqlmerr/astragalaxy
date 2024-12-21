@@ -1,4 +1,5 @@
 from api.base import ApiBase
+from api.exceptions import AuthError
 from api.types.token import TokenPair
 from api.types.user import User
 from config_reader import config
@@ -50,3 +51,17 @@ class Api:
         jwt_token = await self.api.post("/auth/login", json={"token": token})
 
         return TokenPair(user_token=token, jwt_token=jwt_token["access_token"])
+
+
+    async def get_me(self, jwt_token: str) -> User:
+        response = await self.api.get("/auth/me", headers={"Authorization": f"Bearer {jwt_token}"}, raw=True)
+
+        if response.status_code != 200:
+            json: dict = response.json()
+            message = json.get("message", None)
+            print(message)
+            raise AuthError(message=message, status_code=response.status_code)
+
+        json: dict = response.json()
+        user = User.model_validate(json)
+        return user

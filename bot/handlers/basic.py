@@ -6,9 +6,13 @@ from loguru import logger
 from aiogram import Router, F
 
 from api import Api
+from api.exceptions import APIError
 from api.types.token import TokenPair
+from api.types.user import User
 from config_reader import config
 from dialogs.setlang import dialog, SetLangDialogState
+from filters.admin import AdminFilter
+from utils.notifications import notify_admins_error
 
 router = Router()
 
@@ -30,21 +34,18 @@ async def set_lang(message: Message, dialog_manager: DialogManager) -> None:
     )
 
 
+@router.message(Command("error"), AdminFilter())
+async def raise_error(message: Message) -> None:
+    raise ZeroDivisionError()
+
+
 @router.error(F.update.message.as_("message"))
 async def error_handler(
-    error: ErrorEvent, message: Message, i18n: I18nContext, **kwargs
+    error: ErrorEvent, message: Message, i18n: I18nContext,**kwargs
 ) -> None:
     await message.reply(i18n.unexpected_error())
 
-    for admin in config.admins:
-        with i18n.use_locale(
-            await i18n.manager.locale_getter(event=message, **kwargs)
-        ) as i18n:
-            await message.bot.send_message(
-                admin,
-                text=i18n.error_admin_notification(
-                    user=f"<a href='tg://user?id={message.from_user.id}'>{message.from_user.first_name}</a>",
-                    error=str(error.exception),
-                ),
-                link_preview_options=LinkPreviewOptions(is_disabled=True),
-            )
+    with i18n.use_locale(
+        "ru"
+    ) as i18n:
+        await notify_admins_error(message.bot, error.exception, i18n, message.from_user)

@@ -13,7 +13,7 @@ class SetLangDialogState(StatesGroup):
 
 
 async def set_lang(
-        callback: CallbackQuery, button: Button, dialog_manager: DialogManager
+    callback: CallbackQuery, button: Button, dialog_manager: DialogManager
 ):
     i18n: I18nContext = dialog_manager.middleware_data.get("i18n")
     lang = button.widget_id

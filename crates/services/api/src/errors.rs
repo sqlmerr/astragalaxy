@@ -30,6 +30,7 @@ impl IntoResponse for ApiError {
                         AuthError::MissingCredentials => (StatusCode::UNAUTHORIZED, message),
                         AuthError::TokenCreation => (StatusCode::INTERNAL_SERVER_ERROR, message),
                         AuthError::InvalidToken => (StatusCode::FORBIDDEN, message),
+                        AuthError::Failed => (StatusCode::FORBIDDEN, message),
                     },
                     _ => (StatusCode::INTERNAL_SERVER_ERROR, message),
                 }
