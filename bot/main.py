@@ -15,8 +15,8 @@ from redis.asyncio import Redis
 from api import Api
 from api.base import ApiBase
 from config_reader import config
-from dialogs import setlang
-from handlers import basic
+from dialogs import setlang, main_menu
+from handlers import basic, spaceship
 from middlewares import UserMiddleware
 from utils.token_manager import TokenManager
 
@@ -38,7 +38,8 @@ async def main() -> None:
     bot = Bot(config.bot_token, default=DefaultBotProperties(parse_mode=ParseMode.HTML))
     dp = Dispatcher(api=api, storage=storage, redis=redis, token_manager=token_manager)
     dp.startup.register(startup)
-    dp.include_routers(*[basic.router, setlang.dialog])
+    dp.include_routers(basic.router, spaceship.router)
+    dp.include_routers(setlang.dialog, *main_menu.dialogs())
     setup_dialogs(router=dp)
     dp.message.middleware(UserMiddleware())
     dp.callback_query.middleware(UserMiddleware())

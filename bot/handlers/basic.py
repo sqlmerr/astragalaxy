@@ -1,16 +1,12 @@
 from aiogram.filters import CommandStart, Command
-from aiogram.types import Message, ErrorEvent, LinkPreviewOptions
-from aiogram_dialog import DialogManager, setup_dialogs, StartMode, ShowMode
+from aiogram.types import Message, ErrorEvent
+from aiogram_dialog import DialogManager, StartMode
 from aiogram_i18n import I18nContext
-from loguru import logger
 from aiogram import Router, F
 
-from api import Api
-from api.exceptions import APIError
 from api.types.token import TokenPair
-from api.types.user import User
-from config_reader import config
-from dialogs.setlang import dialog, SetLangDialogState
+from dialogs.main_menu import MainMenuSG
+from dialogs.setlang import SetLangDialogState
 from filters.admin import AdminFilter
 from utils.notifications import notify_admins_error
 
@@ -18,8 +14,8 @@ router = Router()
 
 
 @router.message(CommandStart())
-async def start_cmd(message: Message) -> None:
-    await message.answer("Hii")
+async def start_cmd(message: Message, dialog_manager: DialogManager) -> None:
+    await dialog_manager.start(MainMenuSG.main, mode=StartMode.RESET_STACK)
 
 
 @router.message(Command("token"))
@@ -41,11 +37,9 @@ async def raise_error(message: Message) -> None:
 
 @router.error(F.update.message.as_("message"))
 async def error_handler(
-    error: ErrorEvent, message: Message, i18n: I18nContext,**kwargs
+    error: ErrorEvent, message: Message, i18n: I18nContext, **kwargs
 ) -> None:
     await message.reply(i18n.unexpected_error())
 
-    with i18n.use_locale(
-        "ru"
-    ) as i18n:
+    with i18n.use_locale("ru") as i18n:
         await notify_admins_error(message.bot, error.exception, i18n, message.from_user)

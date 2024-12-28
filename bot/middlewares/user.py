@@ -5,6 +5,7 @@ from aiogram.types import Message, CallbackQuery
 from aiogram_i18n import I18nContext
 
 from api import Api
+from api.exceptions import AuthError
 from api.types.token import TokenPair
 from utils.token_manager import TokenManager
 
@@ -47,7 +48,12 @@ class UserMiddleware(BaseMiddleware):
                 token_pair = TokenPair(user_token=user_token, jwt_token=jwt_token)
                 await token_manager.set_user_token(user_id, token_pair.user_token)
 
-        user = await api.get_me(token_pair.jwt_token)
+        try:
+            user = await api.get_me(token_pair.jwt_token)
+        except AuthError:
+            token_pair = await api.login_user(user_id, token=token_pair.user_token)
+            await token_manager.set_jwt_token(user_id, token_pair.jwt_token)
+            user = await api.get_me(token_pair.jwt_token)
 
         data["token_pair"] = token_pair
         data["user"] = user

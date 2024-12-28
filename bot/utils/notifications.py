@@ -6,7 +6,9 @@ from aiogram.types import User
 from config_reader import config
 
 
-async def notify_admins_error(bot: Bot, exc: Exception, i18n: I18nContext, user: User) -> None:
+async def notify_admins_error(
+    bot: Bot, exc: Exception, i18n: I18nContext, user: User
+) -> None:
     print(exc)
     await notify_admins(
         bot,

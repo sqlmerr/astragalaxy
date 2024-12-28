@@ -1,5 +1,6 @@
 from api.base import ApiBase
-from api.exceptions import AuthError
+from api.exceptions import AuthError, APIError
+from api.types.spaceship import Spaceship
 from api.types.token import TokenPair
 from api.types.user import User
 from config_reader import config
@@ -52,9 +53,10 @@ class Api:
 
         return TokenPair(user_token=token, jwt_token=jwt_token["access_token"])
 
-
     async def get_me(self, jwt_token: str) -> User:
-        response = await self.api.get("/auth/me", headers={"Authorization": f"Bearer {jwt_token}"}, raw=True)
+        response = await self.api.get(
+            "/auth/me", headers={"Authorization": f"Bearer {jwt_token}"}, raw=True
+        )
 
         if response.status_code != 200:
             json: dict = response.json()
@@ -65,3 +67,47 @@ class Api:
         json: dict = response.json()
         user = User.model_validate(json)
         return user
+
+    async def get_my_spaceship(self, jwt_token: str) -> Spaceship:
+        response = await self.api.get(
+            "/spaceships/my", headers={"Authorization": f"Bearer {jwt_token}"}, raw=True
+        )
+
+        json: dict = response.json()
+        if response.status_code != 200:
+            message = json.get("message", None)
+            print(message)
+            raise APIError(message=message, status_code=response.status_code)
+
+        spaceship = Spaceship.model_validate(json)
+        return spaceship
+
+    async def get_out_of_my_spaceship(self, jwt_token: str) -> bool:
+        response = await self.api.post(
+            "/spaceships/my/getOut",
+            headers={"Authorization": f"Bearer {jwt_token}"},
+            raw=True,
+        )
+
+        json: dict = response.json()
+        if response.status_code != 200:
+            message = json.get("message", None)
+            raise APIError(message=message, status_code=response.status_code)
+
+        ok = json["ok"]
+        return ok
+
+    async def enter_my_spaceship(self, jwt_token: str) -> bool:
+        response = await self.api.post(
+            "/spaceships/my/enter",
+            headers={"Authorization": f"Bearer {jwt_token}"},
+            raw=True,
+        )
+
+        json: dict = response.json()
+        if response.status_code != 200:
+            message = json.get("message", None)
+            raise APIError(message=message, status_code=response.status_code)
+
+        ok = json["ok"]
+        return ok
