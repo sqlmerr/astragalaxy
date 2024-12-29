@@ -18,6 +18,7 @@ from utils.validators import validate_string
 from . import MainMenuSG
 from .states import SpaceshipSG
 from .. import I18NFormat
+from ..widgets.copy_button import CopyButton
 
 
 async def return_to_main(
@@ -69,9 +70,6 @@ async def change_name(message: Message,
     i18n: I18nContext = dialog_manager.middleware_data["i18n"]
     api: Api = dialog_manager.middleware_data["api"]
     token_pair: TokenPair = dialog_manager.middleware_data["token_pair"]
-    if not validate_string(data):
-        await message.reply(i18n.invalid_spaceship_name())
-        return
     response = await api.rename_my_spaceship(token_pair.jwt_token, data)
     if response == 2:
         await message.reply(i18n.invalid_spaceship_name())
@@ -102,6 +100,7 @@ dialog = Dialog(
     Window(
         I18NFormat("spaceship_menu_enter_name", keys={"name": "name"}),
         TextInput(id="enter_spaceship_name", on_success=change_name),
+        CopyButton(I18NFormat("spaceship_menu_copy_name", keys={"name": "name"}), id="copy_spaceship_name", copy_text_key="name"),
         SwitchTo(Const("←"), id="to_spaceship", state=SpaceshipSG.info),
         state=SpaceshipSG.rename,
         getter=getter
