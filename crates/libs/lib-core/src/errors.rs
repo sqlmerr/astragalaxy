@@ -19,4 +19,10 @@ pub enum CoreError {
     PlayerHasNoSpaceship,
     #[error("Player is already in a spaceship")]
     PlayerAlreadyInSpaceship,
+    #[error("Spaceship is already flying")]
+    SpaceshipAlreadyFlying,
+    #[error("Planet is in another system")]
+    PlanetIsInAnotherSystem,
+    #[error("Spaceship is already in this planet")]
+    SpaceshipIsAlreadyInThisPlanet,
 }

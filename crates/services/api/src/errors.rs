@@ -32,6 +32,7 @@ impl IntoResponse for ApiError {
                         AuthError::InvalidToken => (StatusCode::FORBIDDEN, message),
                         AuthError::Failed => (StatusCode::FORBIDDEN, message),
                     },
+                    CoreError::SpaceshipAlreadyFlying => (StatusCode::BAD_REQUEST, message),
                     _ => (StatusCode::INTERNAL_SERVER_ERROR, message),
                 }
             }

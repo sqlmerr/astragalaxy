@@ -99,8 +99,7 @@ async fn rename_my_spaceship(
             user.spaceship_id.unwrap(),
             UpdateSpaceshipSchema {
                 name: Some(name),
-                user_id: None,
-                location_id: None,
+                ..Default::default()
             },
         )
         .await?;

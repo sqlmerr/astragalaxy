@@ -64,6 +64,7 @@ async fn register(
             name: "initial".to_string(),
             user_id: user._id,
             location_id: location._id,
+            system_id: system._id,
         })
         .await?;
 
@@ -215,6 +216,7 @@ async fn register_from_telegram(
             name: "initial".to_string(),
             user_id: user._id,
             location_id: location._id,
+            system_id: system._id,
         })
         .await?;
 

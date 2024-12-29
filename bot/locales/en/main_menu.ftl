@@ -11,6 +11,6 @@ spaceship_menu_enter_name = 💠 <b><i>send new name</i></b>
 invalid_spaceship_name = ❌ <b><i>name is invalid:</i></b>
       - it's lenght must be more than 3 but less than 32
       - contains no gaps
-      - it contains only Russian letters, Latin letters, numbers, @, #, $, %, !, *
+      - it contains only Russian letters, Latin letters, numbers, @, #, $, %, !, *, _, -
       - it cannot be only numbers
 spaceship_menu_copy_name = copy name

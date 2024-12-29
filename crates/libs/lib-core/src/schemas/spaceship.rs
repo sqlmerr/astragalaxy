@@ -1,8 +1,11 @@
+use chrono::NaiveDateTime;
 use mongodb::bson::oid::ObjectId;
 use serde::{Deserialize, Serialize};
+use serde_with::{serde_as, DisplayFromStr};
 
 use crate::models::Spaceship;
 
+#[serde_as]
 #[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct SpaceshipSchema {
     #[serde(
@@ -11,38 +14,38 @@ pub struct SpaceshipSchema {
     )]
     pub _id: ObjectId,
     pub name: String,
-    #[serde(
-        rename = "user_id",
-        serialize_with = "mongodb::bson::serde_helpers::serialize_object_id_as_hex_string"
-    )]
+    #[serde(serialize_with = "mongodb::bson::serde_helpers::serialize_object_id_as_hex_string")]
     pub user_id: ObjectId,
-    #[serde(
-        rename = "location_id",
-        serialize_with = "mongodb::bson::serde_helpers::serialize_object_id_as_hex_string"
-    )]
+    #[serde(serialize_with = "mongodb::bson::serde_helpers::serialize_object_id_as_hex_string")]
     pub location_id: ObjectId,
+    pub flown_out_at: Option<NaiveDateTime>,
+    pub flying: bool,
+    #[serde(serialize_with = "mongodb::bson::serde_helpers::serialize_object_id_as_hex_string")]
+    pub system_id: ObjectId,
+    #[serde_as(as = "Option<DisplayFromStr>")]
+    pub planet_id: Option<ObjectId>,
 }
 
 #[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct CreateSpaceshipSchema {
     pub name: String,
-    #[serde(
-        rename = "user_id",
-        serialize_with = "mongodb::bson::serde_helpers::serialize_object_id_as_hex_string"
-    )]
+    #[serde(serialize_with = "mongodb::bson::serde_helpers::serialize_object_id_as_hex_string")]
     pub user_id: ObjectId,
-    #[serde(
-        rename = "location_id",
-        serialize_with = "mongodb::bson::serde_helpers::serialize_object_id_as_hex_string"
-    )]
+    #[serde(serialize_with = "mongodb::bson::serde_helpers::serialize_object_id_as_hex_string")]
     pub location_id: ObjectId,
+    #[serde(serialize_with = "mongodb::bson::serde_helpers::serialize_object_id_as_hex_string")]
+    pub system_id: ObjectId,
 }
 
-#[derive(Debug, Clone, Deserialize, Serialize)]
+#[derive(Default, Debug, Clone, Deserialize, Serialize)]
 pub struct UpdateSpaceshipSchema {
     pub name: Option<String>,
     pub user_id: Option<ObjectId>,
     pub location_id: Option<ObjectId>,
+    pub flown_out_at: Option<Option<NaiveDateTime>>,
+    pub flying: Option<bool>,
+    pub system_id: Option<ObjectId>,
+    pub planet_id: Option<Option<ObjectId>>,
 }
 
 impl From<Spaceship> for SpaceshipSchema {
@@ -52,6 +55,10 @@ impl From<Spaceship> for SpaceshipSchema {
             name: value.name,
             user_id: value.user_id,
             location_id: value.location_id,
+            flown_out_at: value.flown_out_at,
+            flying: value.flying,
+            system_id: value.system_id,
+            planet_id: value.planet_id,
         }
     }
 }

@@ -33,7 +33,7 @@ where
     pub location_service: LocationService<L>,
     pub planet_service: PlanetService<P>,
     pub system_service: SystemService<Sy>,
-    pub spaceship_service: SpaceshipService<Sp>,
+    pub spaceship_service: SpaceshipService<Sp, P>,
     pub config: Config,
 }
 
@@ -51,7 +51,7 @@ pub fn create_state(database: &Database, config: Config) -> ApplicationState {
     let system_service = SystemService::new(system_repository);
 
     let spaceship_repository = MongoSpaceshipRepository::new(database.collection("spaceships"));
-    let spaceship_service = SpaceshipService::new(spaceship_repository);
+    let spaceship_service = SpaceshipService::new(spaceship_repository, planet_service.clone());
 
     AppState {
         user_service,
