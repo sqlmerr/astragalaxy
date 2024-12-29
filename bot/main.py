@@ -3,10 +3,12 @@ import asyncio
 from aiogram import Bot, Dispatcher
 from aiogram.client.default import DefaultBotProperties
 from aiogram.enums import ParseMode
+from aiogram.filters import ExceptionTypeFilter
 from aiogram.fsm.storage.base import DefaultKeyBuilder
 from aiogram.fsm.storage.redis import RedisStorage
-from aiogram.types import BotCommand, BotCommandScopeDefault
+from aiogram.types import BotCommand, BotCommandScopeDefault, ErrorEvent
 from aiogram_dialog import setup_dialogs
+from aiogram_dialog.api.exceptions import UnknownIntent, OutdatedIntent
 from aiogram_i18n import I18nMiddleware
 from aiogram_i18n.cores import FluentRuntimeCore
 from loguru import logger
@@ -38,6 +40,7 @@ async def main() -> None:
     bot = Bot(config.bot_token, default=DefaultBotProperties(parse_mode=ParseMode.HTML))
     dp = Dispatcher(api=api, storage=storage, redis=redis, token_manager=token_manager)
     dp.startup.register(startup)
+    dp.error.register(dialog_errors_handler, ExceptionTypeFilter(UnknownIntent, OutdatedIntent))
     dp.include_routers(basic.router, spaceship.router)
     dp.include_routers(setlang.dialog, *main_menu.dialogs())
     setup_dialogs(router=dp)
@@ -61,8 +64,15 @@ async def startup() -> None:
     logger.info("Bot successfully started")
 
 
+async def dialog_errors_handler(error: ErrorEvent):
+    update = error.update
+    if hasattr(update, "callback_query"):
+        await update.callback_query.answer()
+        await update.callback_query.message.edit_reply_markup(reply_markup=None)
+
+
 async def set_commands(bot: Bot) -> None:
-    commands = {"start": "Restart bot", "lang": "Changle language"}
+    commands = {"start": "main menu", "spaceship": "your spaceship", "lang": "change language"}
 
     cmds = [BotCommand(command=cmd, description=desc) for cmd, desc in commands.items()]
 

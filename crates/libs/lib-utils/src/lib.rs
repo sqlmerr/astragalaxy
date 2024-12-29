@@ -1,3 +1,6 @@
+pub mod validators;
+pub use validators::validate_string;
+
 use rand::{distributions::Alphanumeric, Rng};
 use reqwest::{Client, Method, RequestBuilder};
 

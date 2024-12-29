@@ -1,0 +1,3 @@
+STICKERS = {
+    "spaceship_menu": "CAACAgEAAxkBAAENZ0pncBwQmQTuHtYXIA0eUJRIMdEoVAACSgMAAm_XGETUUhY0_9qHgzYE"
+}

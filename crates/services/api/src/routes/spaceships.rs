@@ -8,11 +8,17 @@ use axum::{
 use lib_core::{
     errors::CoreError,
     mongodb::bson::oid::ObjectId,
-    schemas::{spaceship::SpaceshipSchema, user::UserSchema},
+    schemas::{
+        spaceship::{SpaceshipSchema, UpdateSpaceshipSchema},
+        user::UserSchema,
+    },
 };
+use lib_utils::validate_string;
 
 use crate::{
-    errors::Result, middlewares::auth::auth_middleware, schemas::responses::OkResponse,
+    errors::Result,
+    middlewares::auth::auth_middleware,
+    schemas::{responses::OkResponse, spaceship::SpaceshipRenameSchema},
     state::ApplicationState,
 };
 
@@ -24,6 +30,7 @@ pub(super) fn router(state: ApplicationState) -> Router<ApplicationState> {
         .route("/my", get(get_my_spaceship))
         .route("/my/enter", post(enter_my_spaceship))
         .route("/my/getOut", post(get_out_of_my_spaceship))
+        .route("/my/rename", post(rename_my_spaceship))
         .layer(auth_middleware)
 }
 
@@ -71,4 +78,32 @@ async fn get_out_of_my_spaceship(
     let ok = state.user_service.get_out_of_spaceship(user).await.is_ok();
 
     Ok(Json(OkResponse::new(ok)))
+}
+
+async fn rename_my_spaceship(
+    Extension(user): Extension<UserSchema>,
+    State(state): State<ApplicationState>,
+    Json(data): Json<SpaceshipRenameSchema>,
+) -> Result<Json<OkResponse>> {
+    if let None = user.spaceship_id {
+        return Err(CoreError::PlayerHasNoSpaceship.into());
+    }
+
+    let name = data.name;
+    if !validate_string(name.clone()) {
+        return Ok(Json(OkResponse::new(false).status(2)));
+    }
+    state
+        .spaceship_service
+        .update_spaceship(
+            user.spaceship_id.unwrap(),
+            UpdateSpaceshipSchema {
+                name: Some(name),
+                user_id: None,
+                location_id: None,
+            },
+        )
+        .await?;
+
+    Ok(Json(OkResponse::new(true).status(1)))
 }

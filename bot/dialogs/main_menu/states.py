@@ -7,3 +7,4 @@ class MainMenuSG(StatesGroup):
 
 class SpaceshipSG(StatesGroup):
     info = State()
+    rename = State()

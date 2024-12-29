@@ -111,3 +111,14 @@ class Api:
 
         ok = json["ok"]
         return ok
+
+    async def rename_my_spaceship(self, jwt_token: str, name: str) -> int:
+        response = await self.api.post("/spaceships/my/rename", headers={"Authorization": f"Bearer {jwt_token}"}, json={"name": name}, raw=True)
+
+        json: dict = response.json()
+        if response.status_code != 200:
+            message = json.get("message", None)
+            raise APIError(message=message, status_code=response.status_code)
+
+        custom_status_code = json["custom_status_code"]
+        return custom_status_code
