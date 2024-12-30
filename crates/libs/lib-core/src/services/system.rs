@@ -20,9 +20,24 @@ impl<R: SystemRepository> SystemService<R> {
     pub async fn create_system(&self, data: CreateSystemSchema) -> Result<SystemSchema> {
         let dto = CreateSystemDTO {
             name: data.name,
-            neighbours: data.neighbours,
+            neighbours: data.neighbours.clone(),
         };
         let system_id = self.repository.create(dto).await?;
+        for neighbour in data.neighbours {
+            let other_system = self.find_one_system(neighbour).await?;
+            let mut n = other_system.neighbours.clone();
+            n.push(system_id);
+            self.repository
+                .update(
+                    neighbour,
+                    UpdateSystemDTO {
+                        neighbours: Some(n),
+                        name: None,
+                    },
+                )
+                .await?;
+        }
+
         let system = self.find_one_system(system_id).await?;
 
         Ok(system)
@@ -42,8 +57,8 @@ impl<R: SystemRepository> SystemService<R> {
 
     pub async fn update_system(&self, oid: ObjectId, data: UpdateSystemSchema) -> Result<()> {
         if let Some(neighbours) = data.neighbours.clone() {
-            while let Some(oid) = neighbours.iter().next() {
-                self.find_one_system(*oid).await?;
+            for neighbour in neighbours {
+                self.find_one_system(neighbour).await?;
             }
         }
 

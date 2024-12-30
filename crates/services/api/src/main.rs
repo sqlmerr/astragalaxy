@@ -1,5 +1,6 @@
-use lib_core::{create_mongodb_client, startup};
+use lib_core::{create_mongodb_client, mongodb::bson::doc, startup};
 use routes::app;
+use state::create_state;
 use tokio::net::TcpListener;
 
 pub(crate) mod config;
@@ -30,8 +31,8 @@ async fn main() {
     let client = create_mongodb_client(config.clone().mongodb_uri).await;
     startup(&client).await;
     let database = client.database("astragalaxy");
-
-    let app = app(database, config).await;
+    let state = create_state(&database, config.clone());
+    let app = app(state, database, config).await;
     let listener = TcpListener::bind("0.0.0.0:8000").await.unwrap();
     tracing::info!("Starting api on http://0.0.0.0:8000");
     axum::serve(listener, app).await.unwrap();

@@ -1,7 +1,9 @@
 mod auth;
 mod flights;
+mod planets;
 mod players;
 mod spaceships;
+mod systems;
 
 use axum::http::HeaderValue;
 use axum::routing::get;
@@ -11,10 +13,10 @@ use serde_json::json;
 use tower_http::cors::Any;
 
 use crate::config::Config;
-use crate::state::create_state;
+use crate::state::{create_state, ApplicationState};
 
-pub async fn app(database: Database, config: Config) -> Router {
-    let state = create_state(&database, config.clone());
+pub async fn app(state: ApplicationState, database: Database, config: Config) -> Router {
+    // let state = create_state(&database, config.clone());
 
     Router::new()
         .route(
@@ -30,6 +32,8 @@ pub async fn app(database: Database, config: Config) -> Router {
         .nest("/players", players::router(state.clone()))
         .nest("/spaceships", spaceships::router(state.clone()))
         .nest("/flights", flights::router(state.clone()))
+        .nest("/planets", planets::router(state.clone()))
+        .nest("/systems", systems::router(state.clone()))
         .layer(tower_http::trace::TraceLayer::new_for_http())
         .layer(
             tower_http::cors::CorsLayer::new()

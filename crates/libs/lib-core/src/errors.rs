@@ -25,4 +25,6 @@ pub enum CoreError {
     PlanetIsInAnotherSystem,
     #[error("Spaceship is already in this planet")]
     SpaceshipIsAlreadyInThisPlanet,
+    #[error("Spaceship is already in this system")]
+    SpaceshipIsAlreadyInThisSystem,
 }

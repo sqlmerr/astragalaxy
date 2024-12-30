@@ -1,4 +1,4 @@
-use chrono::NaiveDateTime;
+use chrono::{DateTime, Utc};
 use mongodb::bson::oid::ObjectId;
 use serde::{Deserialize, Serialize};
 use serde_with::{serde_as, DisplayFromStr};
@@ -18,7 +18,7 @@ pub struct SpaceshipSchema {
     pub user_id: ObjectId,
     #[serde(serialize_with = "mongodb::bson::serde_helpers::serialize_object_id_as_hex_string")]
     pub location_id: ObjectId,
-    pub flown_out_at: Option<NaiveDateTime>,
+    pub flown_out_at: Option<DateTime<Utc>>,
     pub flying: bool,
     #[serde(serialize_with = "mongodb::bson::serde_helpers::serialize_object_id_as_hex_string")]
     pub system_id: ObjectId,
@@ -42,7 +42,7 @@ pub struct UpdateSpaceshipSchema {
     pub name: Option<String>,
     pub user_id: Option<ObjectId>,
     pub location_id: Option<ObjectId>,
-    pub flown_out_at: Option<Option<NaiveDateTime>>,
+    pub flown_out_at: Option<Option<DateTime<Utc>>>,
     pub flying: Option<bool>,
     pub system_id: Option<ObjectId>,
     pub planet_id: Option<Option<ObjectId>>,
@@ -50,12 +50,16 @@ pub struct UpdateSpaceshipSchema {
 
 impl From<Spaceship> for SpaceshipSchema {
     fn from(value: Spaceship) -> Self {
+        let flown_out_at = match value.flown_out_at {
+            None => None,
+            Some(t) => DateTime::from_timestamp(t, 0),
+        };
         Self {
             _id: value._id,
             name: value.name,
             user_id: value.user_id,
             location_id: value.location_id,
-            flown_out_at: value.flown_out_at,
+            flown_out_at,
             flying: value.flying,
             system_id: value.system_id,
             planet_id: value.planet_id,

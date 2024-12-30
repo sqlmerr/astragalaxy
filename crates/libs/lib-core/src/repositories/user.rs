@@ -1,9 +1,10 @@
 use async_trait::async_trait;
 use lib_utils::generate_token;
 use mongodb::{
-    bson::{doc, oid::ObjectId, Bson, Document},
+    bson::{doc, oid::ObjectId, Document},
     Collection,
 };
+use serde::Serialize;
 
 use crate::{errors::CoreError, models::User, Result};
 
@@ -21,13 +22,19 @@ pub struct CreateUserDTO {
     pub system_id: ObjectId,
 }
 
-#[derive(Default)]
+#[derive(Default, Serialize)]
 pub struct UpdateUserDTO {
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub username: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub spaceship_id: Option<ObjectId>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub in_spaceship: Option<bool>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub system_id: Option<ObjectId>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub x: Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub y: Option<i64>,
 }
 
@@ -127,28 +134,12 @@ impl UserRepository for MongoUserRepository {
     async fn update(&self, oid: ObjectId, data: UpdateUserDTO) -> Result<()> {
         let mut update = Document::new();
 
-        if let Some(username) = data.username {
-            update.insert("username", Bson::String(username));
-        }
-
-        if let Some(spaceship_id) = data.spaceship_id {
-            update.insert("spaceship_id", Bson::ObjectId(spaceship_id));
-        }
-
-        if let Some(in_spaceship) = data.in_spaceship {
-            update.insert("in_spaceship", Bson::Boolean(in_spaceship));
-        }
-
-        if let Some(system_id) = data.system_id {
-            update.insert("system_id", Bson::ObjectId(system_id));
-        }
-
-        if let Some(x) = data.x {
-            update.insert("x", Bson::Int64(x));
-        }
-
-        if let Some(y) = data.y {
-            update.insert("y", Bson::Int64(y));
+        let serialized_data = bson::to_document(&data).map_err(|_| CoreError::ServerError)?;
+        for (key, value) in serialized_data {
+            let val = match key.as_str() {
+                _ => value,
+            };
+            update.insert(key, val);
         }
 
         self.collection

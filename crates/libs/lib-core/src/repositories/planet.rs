@@ -1,9 +1,10 @@
 use async_trait::async_trait;
 use futures::stream::TryStreamExt;
 use mongodb::{
-    bson::{doc, oid::ObjectId, Bson, Document},
+    bson::{doc, oid::ObjectId, Document},
     Collection,
 };
+use serde::Serialize;
 
 use crate::{
     errors::CoreError,
@@ -21,8 +22,11 @@ pub struct CreatePlanetDTO {
     pub threat: PlanetThreat,
 }
 
+#[derive(Serialize)]
 pub struct UpdatePlanetDTO {
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub system_id: Option<ObjectId>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub threat: Option<PlanetThreat>,
 }
 
@@ -94,12 +98,12 @@ impl PlanetRepository for MongoPlanetRepository {
     async fn update(&self, oid: ObjectId, data: UpdatePlanetDTO) -> Result<()> {
         let mut update = Document::new();
 
-        if let Some(system_id) = data.system_id {
-            update.insert("system_id", Bson::ObjectId(system_id));
-        }
-
-        if let Some(threat) = data.threat {
-            update.insert("threat", Bson::String(threat.to_string()));
+        let serialized_data = bson::to_document(&data).map_err(|_| CoreError::ServerError)?;
+        for (key, value) in serialized_data {
+            let val = match key.as_str() {
+                _ => value,
+            };
+            update.insert(key, val);
         }
 
         self.collection

@@ -1,4 +1,3 @@
-use chrono::NaiveDateTime;
 use mongodb::bson::oid::ObjectId;
 use serde::{Deserialize, Serialize};
 
@@ -8,7 +7,7 @@ pub struct Spaceship {
     pub name: String,
     pub user_id: ObjectId,
     pub location_id: ObjectId,
-    pub flown_out_at: Option<NaiveDateTime>,
+    pub flown_out_at: Option<i64>, // timestamp
     pub flying: bool,
     pub system_id: ObjectId,
     pub planet_id: Option<ObjectId>,

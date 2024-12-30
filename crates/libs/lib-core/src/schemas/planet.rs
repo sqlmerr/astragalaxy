@@ -10,20 +10,14 @@ pub struct PlanetSchema {
         serialize_with = "mongodb::bson::serde_helpers::serialize_object_id_as_hex_string"
     )]
     pub _id: ObjectId,
-    #[serde(
-        rename = "id",
-        serialize_with = "mongodb::bson::serde_helpers::serialize_object_id_as_hex_string"
-    )]
+    #[serde(serialize_with = "mongodb::bson::serde_helpers::serialize_object_id_as_hex_string")]
     pub system_id: ObjectId,
     pub threat: PlanetThreat,
 }
 
 #[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct CreatePlanetSchema {
-    #[serde(
-        rename = "id",
-        serialize_with = "mongodb::bson::serde_helpers::serialize_object_id_as_hex_string"
-    )]
+    #[serde(serialize_with = "mongodb::bson::serde_helpers::serialize_object_id_as_hex_string")]
     pub system_id: ObjectId,
     pub threat: PlanetThreat,
 }

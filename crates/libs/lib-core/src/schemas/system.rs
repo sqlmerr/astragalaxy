@@ -20,7 +20,7 @@ pub struct CreateSystemSchema {
     pub neighbours: Vec<ObjectId>,
 }
 
-#[derive(Debug, Clone, Deserialize, Serialize)]
+#[derive(Default, Debug, Clone, Deserialize, Serialize)]
 pub struct UpdateSystemSchema {
     pub name: Option<String>,
     pub neighbours: Option<Vec<ObjectId>>,

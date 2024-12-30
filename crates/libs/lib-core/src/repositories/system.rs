@@ -4,6 +4,7 @@ use mongodb::{
     bson::{doc, oid::ObjectId, Bson, Document},
     Collection,
 };
+use serde::Serialize;
 
 use crate::{errors::CoreError, models::System, Result};
 
@@ -17,6 +18,7 @@ pub struct CreateSystemDTO {
     pub neighbours: Vec<ObjectId>,
 }
 
+#[derive(Serialize)]
 pub struct UpdateSystemDTO {
     pub name: Option<String>,
     pub neighbours: Option<Vec<ObjectId>>,

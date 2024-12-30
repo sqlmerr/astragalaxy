@@ -33,6 +33,9 @@ impl IntoResponse for ApiError {
                         AuthError::Failed => (StatusCode::FORBIDDEN, message),
                     },
                     CoreError::SpaceshipAlreadyFlying => (StatusCode::BAD_REQUEST, message),
+                    CoreError::SpaceshipIsAlreadyInThisPlanet => (StatusCode::BAD_REQUEST, message),
+                    CoreError::PlanetIsInAnotherSystem => (StatusCode::BAD_REQUEST, message),
+                    CoreError::PlayerHasNoSpaceship => (StatusCode::BAD_REQUEST, message),
                     _ => (StatusCode::INTERNAL_SERVER_ERROR, message),
                 }
             }
