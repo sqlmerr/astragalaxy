@@ -26,6 +26,19 @@ services:
             - MONGODB_USERNAME=mongodb
         networks:
             - backend
+    postgres:
+        image: postgres:16.2-alpine
+        command: -p 5432
+        expose:
+            - 5432
+        ports:
+            - '5432:5432'
+        volumes:
+            - app-db-data:/var/lib/postgresql/
+        env_file:
+            - .env
+        environment:
+            - PGDATA=/var/lib/postgresql/data/pgdata
     api:
         build:
             context: .
@@ -49,6 +62,7 @@ services:
         networks:
             - backend
 volumes:
+    app-db-data:
     db-data:
     redis:
     redis-config:
