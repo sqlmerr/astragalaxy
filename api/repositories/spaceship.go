@@ -35,6 +35,15 @@ func (r *SpaceshipRepository) FindOne(ID uuid.UUID) (*models.Spaceship, error) {
 	return &m, nil
 }
 
+func (r *SpaceshipRepository) FindAll(filter *models.Spaceship) ([]models.Spaceship, error) {
+	var m []models.Spaceship
+
+	if err := r.db.Where(&filter).Find(&m).Error; err != nil {
+		return nil, err
+	}
+	return m, nil
+}
+
 func (r *SpaceshipRepository) Delete(ID uuid.UUID) error {
 	return r.db.Delete(&models.Spaceship{}, ID).Error
 }

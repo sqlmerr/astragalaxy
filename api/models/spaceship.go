@@ -12,6 +12,6 @@ type Spaceship struct {
 	Flying     bool `gorm:"not null;default:false"`
 	SystemID   uuid.UUID
 	System     System
-	PlanetID   uuid.UUID
+	PlanetID   uuid.UUID `gorm:"default:null"`
 	Planet     Planet
 }

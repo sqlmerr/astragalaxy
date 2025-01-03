@@ -51,6 +51,28 @@ func (s *SpaceshipService) FindOne(ID uuid.UUID) (*schemas.SpaceshipSchema, erro
 	}, nil
 }
 
+func (s *SpaceshipService) FindAll(filter *models.Spaceship) ([]schemas.SpaceshipSchema, error) {
+	response, err := s.r.FindAll(filter)
+	if err != nil {
+		return nil, err
+	}
+	var spaceships []schemas.SpaceshipSchema
+	for _, sp := range response {
+		spaceships = append(spaceships,
+			schemas.SpaceshipSchema{
+				ID:         sp.ID,
+				Name:       sp.Name,
+				UserID:     sp.UserID,
+				LocationID: sp.LocationID,
+				FlownOutAt: sp.FlownOutAt,
+				Flying:     sp.Flying,
+				SystemID:   sp.SystemID,
+				PlanetID:   sp.PlanetID,
+			})
+	}
+	return spaceships, nil
+}
+
 func (s *SpaceshipService) Delete(ID uuid.UUID) error {
 	return s.r.Delete(ID)
 }

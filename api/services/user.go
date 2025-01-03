@@ -114,3 +114,19 @@ func (s *UserService) Update(ID uuid.UUID, data schemas.UpdateUserSchema) error 
 
 	return s.r.Update(&user)
 }
+
+func (s *UserService) AddSpaceship(userID uuid.UUID, spaceship schemas.SpaceshipSchema) error {
+	user, err := s.FindOne(userID)
+	if err != nil {
+		return err
+	} else if user == nil {
+		return utils.ErrUserNotFound
+	}
+
+	user.Spaceships = append(user.Spaceships, spaceship)
+	s.Update(userID, schemas.UpdateUserSchema{
+		Spaceships: user.Spaceships,
+	})
+
+	return nil
+}

@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"astragalaxy/models"
 	"astragalaxy/schemas"
 	"astragalaxy/utils"
 	"errors"
@@ -33,6 +34,24 @@ func (h *Handler) RegisterFromTelegram(c *fiber.Ctx) error {
 		return c.Status(http.StatusInternalServerError).JSON(utils.NewError(utils.ErrServerError))
 	}
 
+	spaceship, err := h.spaceshipService.Create(schemas.CreateSpaceshipSchema{
+		Name: "initial", UserID: user.ID, LocationID: location.ID, SystemID: system.ID,
+	})
+	if err != nil || spaceship == nil {
+		return c.Status(http.StatusInternalServerError).JSON(utils.NewError(utils.ErrServerError))
+	}
+
+	err = h.userService.AddSpaceship(user.ID, *spaceship)
+	if err != nil {
+		return c.Status(http.StatusInternalServerError).JSON(utils.NewError(utils.ErrServerError))
+	}
+
+	spaceships, err := h.spaceshipService.FindAll(&models.Spaceship{UserID: user.ID})
+	if err != nil {
+		return c.Status(http.StatusInternalServerError).JSON(utils.NewError(utils.ErrServerError))
+	}
+	user.Spaceships = spaceships
+
 	return c.Status(http.StatusCreated).JSON(&user)
 }
 
@@ -59,6 +78,11 @@ func (h *Handler) Login(c *fiber.Ctx) error {
 
 func (h *Handler) GetMe(c *fiber.Ctx) error {
 	user := c.Locals("user").(*schemas.UserSchema)
+	spaceships, err := h.spaceshipService.FindAll(&models.Spaceship{UserID: user.ID})
+	if err != nil {
+		return c.Status(http.StatusInternalServerError).JSON(utils.NewError(utils.ErrServerError))
+	}
+	user.Spaceships = spaceships
 
 	return c.JSON(&user)
 }

@@ -7,6 +7,8 @@ var (
 	ErrServerError       = errors.New("server error")
 	ErrInvalidToken      = errors.New("invalid token")
 	ErrUnauthorized      = errors.New("unauthorized")
+	ErrSpaceshipNotFound = errors.New("spaceship not found")
+	ErrUserNotFound      = errors.New("user not found")
 )
 
 type Error struct {
