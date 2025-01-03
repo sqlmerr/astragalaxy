@@ -12,6 +12,10 @@ type UserRepository struct {
 	db gorm.DB
 }
 
+func NewUserRepostiory(db gorm.DB) UserRepository {
+	return UserRepository{db: db}
+}
+
 func (r *UserRepository) Create(u *models.User) (*uuid.UUID, error) {
 	if err := r.db.Create(&u).Error; err != nil {
 		return nil, err
@@ -32,9 +36,10 @@ func (r *UserRepository) FindOne(ID uuid.UUID) (*models.User, error) {
 	return &m, nil
 }
 
-func (r *UserRepository) FindOneByUsername(username string) (*models.User, error) {
+func (r *UserRepository) FindOneFilter(filter *models.User) (*models.User, error) {
 	var m models.User
-	if err := r.db.Where(models.User{Username: username}).First(&m).Error; err != nil {
+
+	if err := r.db.Where(&filter).First(&m).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, nil
 		}
@@ -44,11 +49,22 @@ func (r *UserRepository) FindOneByUsername(username string) (*models.User, error
 	return &m, nil
 }
 
+func (r *UserRepository) FindOneByUsername(username string) (*models.User, error) {
+	return r.FindOneFilter(&models.User{Username: username})
+}
+
 func (r *UserRepository) FindAll() []models.User {
 	var users []models.User
 	r.db.Find(&users)
 
 	return users
+}
+
+func (r *UserRepository) GetCount(filter *models.User) int64 {
+	var count int64
+	r.db.Model(&models.User{}).Where(&filter).Count(&count)
+
+	return count
 }
 
 func (r *UserRepository) Delete(ID uuid.UUID) error {

@@ -12,6 +12,10 @@ type PlanetService struct {
 	r repositories.PlanetRepository
 }
 
+func NewPlanetService(r repositories.PlanetRepository) PlanetService {
+	return PlanetService{r: r}
+}
+
 func (s *PlanetService) Create(data schemas.CreatePlanetSchema) (*schemas.PlanetSchema, error) {
 	response, err := s.r.Create(&models.Planet{SystemID: data.SystemID, Threat: data.Threat})
 	if err != nil {

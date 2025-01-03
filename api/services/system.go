@@ -12,6 +12,10 @@ type SystemService struct {
 	r repositories.SystemRepository
 }
 
+func NewSystemService(r repositories.SystemRepository) SystemService {
+	return SystemService{r: r}
+}
+
 func (s *SystemService) Create(data schemas.CreateSystemSchema) (*schemas.SystemSchema, error) {
 	response, err := s.r.Create(&models.System{Name: data.Name})
 	if err != nil {
@@ -23,6 +27,15 @@ func (s *SystemService) Create(data schemas.CreateSystemSchema) (*schemas.System
 
 func (s *SystemService) FindOne(ID uuid.UUID) (*schemas.SystemSchema, error) {
 	response, err := s.r.FindOne(ID)
+	if err != nil {
+		return nil, err
+	}
+	schema := schemas.SystemSchema(*response)
+	return &schema, nil
+}
+
+func (s *SystemService) FindOneByName(name string) (*schemas.SystemSchema, error) {
+	response, err := s.r.FindOneByName(name)
 	if err != nil {
 		return nil, err
 	}

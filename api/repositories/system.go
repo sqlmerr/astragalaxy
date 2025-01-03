@@ -12,6 +12,10 @@ type SystemRepository struct {
 	db gorm.DB
 }
 
+func NewSystemRepository(db gorm.DB) SystemRepository {
+	return SystemRepository{db: db}
+}
+
 func (r *SystemRepository) Create(s *models.System) (*uuid.UUID, error) {
 	m := models.System{
 		Name: s.Name,

@@ -12,6 +12,10 @@ type LocationRepository struct {
 	db gorm.DB
 }
 
+func NewLocationRepository(db gorm.DB) LocationRepository {
+	return LocationRepository{db: db}
+}
+
 func (r *LocationRepository) Create(l *models.Location) (*uuid.UUID, error) {
 	m := models.Location{
 		Code:        l.Code,

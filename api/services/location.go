@@ -12,6 +12,10 @@ type LocationService struct {
 	r repositories.LocationRepository
 }
 
+func NewLocationService(r repositories.LocationRepository) LocationService {
+	return LocationService{r: r}
+}
+
 func (s *LocationService) Create(data schemas.CreateLocationSchema) (*schemas.LocationSchema, error) {
 	l := models.Location{
 		Code:        data.Code,

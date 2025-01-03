@@ -12,6 +12,10 @@ type PlanetRepository struct {
 	db gorm.DB
 }
 
+func NewPlanetRepository(db gorm.DB) PlanetRepository {
+	return PlanetRepository{db: db}
+}
+
 func (r *PlanetRepository) Create(p *models.Planet) (*uuid.UUID, error) {
 	m := models.Planet{
 		SystemID: p.SystemID,

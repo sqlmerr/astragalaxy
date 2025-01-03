@@ -12,6 +12,10 @@ type SpaceshipRepository struct {
 	db gorm.DB
 }
 
+func NewSpaceshipRepository(db gorm.DB) SpaceshipRepository {
+	return SpaceshipRepository{db: db}
+}
+
 func (r *SpaceshipRepository) Create(s *models.Spaceship) (*uuid.UUID, error) {
 	if err := r.db.Create(&s).Error; err != nil {
 		return nil, err
