@@ -8,7 +8,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
-func (h *Handler) CreatePlanet(c *fiber.Ctx) error {
+func (h *Handler) createPlanet(c *fiber.Ctx) error {
 	req := &schemas.CreatePlanetSchema{}
 
 	if err := utils.BodyParser(&req, c); err != nil {

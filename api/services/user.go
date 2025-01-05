@@ -12,11 +12,12 @@ import (
 )
 
 type UserService struct {
-	r repositories.UserRepository
+	r                repositories.UserRepository
+	spaceshipService SpaceshipService
 }
 
-func NewUserService(r repositories.UserRepository) UserService {
-	return UserService{r: r}
+func NewUserService(r repositories.UserRepository, spaceshipService SpaceshipService) UserService {
+	return UserService{r: r, spaceshipService: spaceshipService}
 }
 
 func (s *UserService) Register(data schemas.CreateUserSchema, locationID uuid.UUID, systemID uuid.UUID) (*schemas.UserSchema, error) {
@@ -129,4 +130,37 @@ func (s *UserService) AddSpaceship(userID uuid.UUID, spaceship schemas.Spaceship
 	})
 
 	return nil
+}
+
+func (s *UserService) EnterSpaceship(user schemas.UserSchema, spaceshipID uuid.UUID) error {
+	var spaceship schemas.SpaceshipSchema
+	for _, sp := range user.Spaceships {
+		if sp.ID == spaceship.ID {
+			if sp.PlayerSitIn || user.InSpaceship {
+				return utils.ErrPlayerAlreadyInSpaceship
+			}
+			err := s.Update(user.ID, schemas.UpdateUserSchema{InSpaceship: true})
+			if err != nil {
+				return err
+			}
+			return s.spaceshipService.Update(sp.ID, schemas.UpdateSpaceshipSchema{PlayerSitIn: true})
+		}
+	}
+
+	return utils.ErrSpaceshipNotFound
+}
+
+func (s *UserService) ExitSpaceship(user schemas.UserSchema, spaceshipID uuid.UUID) error {
+	var spaceship schemas.SpaceshipSchema
+	for _, sp := range user.Spaceships {
+		if sp.ID == spaceship.ID {
+			err := s.Update(user.ID, schemas.UpdateUserSchema{InSpaceship: false})
+			if err != nil {
+				return err
+			}
+			return s.spaceshipService.Update(sp.ID, schemas.UpdateSpaceshipSchema{PlayerSitIn: false})
+		}
+	}
+
+	return utils.ErrSpaceshipNotFound
 }

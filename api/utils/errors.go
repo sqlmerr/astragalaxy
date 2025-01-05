@@ -29,6 +29,8 @@ var (
 	ErrSpaceshipAlreadyFlying         = New("spaceship is already flying", http.StatusBadRequest)
 	ErrSpaceshipIsInAnotherSystem     = New("spaceship is in another system", http.StatusBadRequest)
 	ErrSpaceshipIsAlreadyInThisPlanet = New("spaceship is already in this planet", http.StatusBadRequest)
+	ErrPlayerAlreadyInSpaceship       = New("player already in spaceship", http.StatusBadRequest)
+	ErrPlayerNotInSpaceship           = New("player not in spaceship", http.StatusBadRequest)
 )
 
 type Error struct {

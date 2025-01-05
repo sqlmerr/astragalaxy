@@ -17,9 +17,6 @@ type Handler struct {
 }
 
 func NewHandler(db gorm.DB) Handler {
-	userRepository := repositories.NewUserRepostiory(db)
-	userService := services.NewUserService(userRepository)
-
 	planetRepository := repositories.NewPlanetRepository(db)
 	planetService := services.NewPlanetService(planetRepository)
 
@@ -31,6 +28,9 @@ func NewHandler(db gorm.DB) Handler {
 
 	spaceshipRepository := repositories.NewSpaceshipRepository(db)
 	spaceshipService := services.NewSpaceshipService(spaceshipRepository, planetService, systemService)
+
+	userRepository := repositories.NewUserRepostiory(db)
+	userService := services.NewUserService(userRepository, spaceshipService)
 
 	return Handler{
 		userService:      userService,
@@ -50,13 +50,15 @@ func (h *Handler) Register(app *fiber.App) {
 	spaceships := app.Group("/spaceships", h.JwtMiddleware())
 	spaceships.Get("/my", h.UserGetter, h.getMySpaceships)
 	spaceships.Post("/my/rename", h.UserGetter, h.renameMySpaceship)
+	spaceships.Post("/my/:id/enter", h.UserGetter, h.enterMySpaceship)
+	spaceships.Post("/my/:id/exit", h.UserGetter, h.exitMySpaceship)
 	spaceships.Get("/:id", h.getSpaceshipByID)
 
 	systems := app.Group("/systems")
-	systems.Post("/", h.SudoMiddleware, h.CreateSystem)
+	systems.Post("/", h.SudoMiddleware, h.createSystem)
 
 	planets := app.Group("/planets")
-	planets.Post("/", h.SudoMiddleware, h.CreatePlanet)
+	planets.Post("/", h.SudoMiddleware, h.createPlanet)
 
 	flights := app.Group("/flights", h.JwtMiddleware())
 	flights.Post("/planet", h.UserGetter, h.flightToPlanet)

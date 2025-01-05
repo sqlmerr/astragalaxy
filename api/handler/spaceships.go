@@ -39,6 +39,44 @@ func (h *Handler) getMySpaceships(c *fiber.Ctx) error {
 	return c.JSON(spaceships)
 }
 
+func (h *Handler) enterMySpaceship(c *fiber.Ctx) error {
+	ID, err := uuid.Parse(c.Params("id"))
+	if err != nil {
+		return c.Status(http.StatusBadRequest).JSON(utils.NewError(errors.New("id must be an uuid type")))
+	}
+
+	user := c.Locals("user").(*schemas.UserSchema)
+
+	err = h.userService.EnterSpaceship(*user, ID)
+	if err != nil {
+		apiErr, ok := err.(*utils.APIError)
+		if ok {
+			return c.Status(apiErr.Status).JSON(utils.NewError(apiErr))
+		}
+		return c.Status(http.StatusInternalServerError).JSON(utils.NewError(err))
+	}
+	return c.JSON(schemas.OkResponseSchema{Ok: true, CustomStatusCode: 1})
+}
+
+func (h *Handler) exitMySpaceship(c *fiber.Ctx) error {
+	ID, err := uuid.Parse(c.Params("id"))
+	if err != nil {
+		return c.Status(http.StatusBadRequest).JSON(utils.NewError(errors.New("id must be an uuid type")))
+	}
+
+	user := c.Locals("user").(*schemas.UserSchema)
+
+	err = h.userService.ExitSpaceship(*user, ID)
+	if err != nil {
+		apiErr, ok := err.(*utils.APIError)
+		if ok {
+			return c.Status(apiErr.Status).JSON(utils.NewError(apiErr))
+		}
+		return c.Status(http.StatusInternalServerError).JSON(utils.NewError(err))
+	}
+	return c.JSON(schemas.OkResponseSchema{Ok: true, CustomStatusCode: 1})
+}
+
 func (h *Handler) renameMySpaceship(c *fiber.Ctx) error {
 	req := &schemas.RenameSpaceshipSchema{}
 	if err := utils.BodyParser(req, c); err != nil {

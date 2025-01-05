@@ -103,6 +103,8 @@ func (s *SpaceshipService) Fly(ID uuid.UUID, planetID uuid.UUID) error {
 		return utils.ErrSpaceshipAlreadyFlying
 	} else if spaceship.Flying && spaceship.FlownOutAt == 0 {
 		return utils.ErrServerError
+	} else if !spaceship.PlayerSitIn {
+		return utils.ErrPlayerNotInSpaceship
 	}
 
 	if spaceship.FlownOutAt != 0 {
