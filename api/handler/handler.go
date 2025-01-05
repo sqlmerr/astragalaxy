@@ -49,5 +49,12 @@ func (h *Handler) Register(app *fiber.App) {
 
 	spaceships := app.Group("/spaceships", h.JwtMiddleware())
 	spaceships.Get("/my", h.UserGetter, h.GetMySpaceships)
+	spaceships.Post("/my/rename", h.UserGetter, h.RenameMySpaceship)
 	spaceships.Get("/:id", h.GetSpaceshipByID)
+
+	systems := app.Group("/systems")
+	systems.Post("/", h.SudoMiddleware, h.CreateSystem)
+
+	planets := app.Group("/planets")
+	planets.Post("/", h.SudoMiddleware, h.CreatePlanet)
 }

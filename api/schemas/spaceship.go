@@ -31,3 +31,8 @@ type UpdateSpaceshipSchema struct {
 	SystemID   uuid.UUID `json:"system_id"`
 	PlanetID   uuid.UUID `json:"planet_id"`
 }
+
+type RenameSpaceshipSchema struct {
+	SpaceshipID uuid.UUID `json:"spaceship_id"`
+	Name        string    `json:"name"`
+}

@@ -49,5 +49,5 @@ func (r *SpaceshipRepository) Delete(ID uuid.UUID) error {
 }
 
 func (r *SpaceshipRepository) Update(s *models.Spaceship) error {
-	return r.db.Model(&s).Save(&s).Error
+	return r.db.Model(&s).Updates(&s).Error
 }
