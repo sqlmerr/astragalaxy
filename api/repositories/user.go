@@ -24,22 +24,13 @@ func (r *UserRepository) Create(u *models.User) (*uuid.UUID, error) {
 }
 
 func (r *UserRepository) FindOne(ID uuid.UUID) (*models.User, error) {
-	var m models.User
-
-	if err := r.db.Find(&m, ID).Error; err != nil {
-		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return nil, nil
-		}
-		return nil, err
-	}
-
-	return &m, nil
+	return r.FindOneFilter(&models.User{ID: ID})
 }
 
 func (r *UserRepository) FindOneFilter(filter *models.User) (*models.User, error) {
 	var m models.User
 
-	if err := r.db.Where(&filter).First(&m).Error; err != nil {
+	if err := r.db.Preload("Spaceships").Where(&filter).First(&m).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, nil
 		}

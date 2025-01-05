@@ -4,6 +4,8 @@ import (
 	"astragalaxy/models"
 	"astragalaxy/repositories"
 	"astragalaxy/schemas"
+	"astragalaxy/utils"
+	"time"
 
 	"github.com/google/uuid"
 )
@@ -91,13 +93,48 @@ func (s *SpaceshipService) Update(ID uuid.UUID, data schemas.UpdateSpaceshipSche
 	return s.r.Update(&spaceship)
 }
 
-// func (s *SpaceshipService) Fly(ID uuid.UUID, planetID uuid.UUID) error {
-// 	spaceship, err := s.FindOne(ID)
-// 	if err != nil {
-// 		return err
-// 	}
+func (s *SpaceshipService) Fly(ID uuid.UUID, planetID uuid.UUID) error {
+	spaceship, err := s.FindOne(ID)
+	if err != nil {
+		return err
+	}
 
-// 	if spaceship.Flying && spaceship.FlownOutAt != 0 {
+	if spaceship.Flying && spaceship.FlownOutAt != 0 {
+		return utils.ErrSpaceshipAlreadyFlying
+	} else if spaceship.Flying && spaceship.FlownOutAt == 0 {
+		return utils.ErrServerError
+	}
 
-// 	}
-// }
+	if spaceship.FlownOutAt != 0 {
+		now := time.Now()
+		flownOutAt := time.Unix(spaceship.FlownOutAt, 0)
+		if now.Sub(flownOutAt).Minutes() > 1 {
+			sp := models.Spaceship{
+				Flying:     false,
+				FlownOutAt: 0,
+			}
+			s.r.Update(&sp)
+		} else {
+			return utils.ErrSpaceshipAlreadyFlying
+		}
+	}
+
+	planet, err := s.planetService.FindOne(planetID)
+	if err != nil || planet == nil {
+		return utils.ErrPlanetNotFound
+	}
+	if planet.SystemID != spaceship.SystemID {
+		return utils.ErrSpaceshipIsInAnotherSystem
+	}
+
+	if planet.ID == spaceship.PlanetID {
+		return utils.ErrSpaceshipIsAlreadyInThisPlanet
+	}
+
+	sp := schemas.UpdateSpaceshipSchema{
+		Flying:     true,
+		FlownOutAt: time.Now().Unix(),
+		PlanetID:   planet.ID,
+	}
+	return s.Update(ID, sp)
+}

@@ -8,7 +8,7 @@ type Spaceship struct {
 	UserID     uuid.UUID
 	LocationID uuid.UUID
 	Location   Location
-	FlownOutAt int
+	FlownOutAt int64
 	Flying     bool `gorm:"not null;default:false"`
 	SystemID   uuid.UUID
 	System     System

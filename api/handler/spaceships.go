@@ -12,7 +12,7 @@ import (
 	"gorm.io/gorm"
 )
 
-func (h *Handler) GetSpaceshipByID(c *fiber.Ctx) error {
+func (h *Handler) getSpaceshipByID(c *fiber.Ctx) error {
 	ID, err := uuid.Parse(c.Params("id"))
 	if err != nil {
 		return c.Status(http.StatusBadRequest).JSON(utils.NewError(errors.New("id must be an uuid type")))
@@ -29,7 +29,7 @@ func (h *Handler) GetSpaceshipByID(c *fiber.Ctx) error {
 	return c.JSON(&spaceship)
 }
 
-func (h *Handler) GetMySpaceships(c *fiber.Ctx) error {
+func (h *Handler) getMySpaceships(c *fiber.Ctx) error {
 	user := c.Locals("user").(*schemas.UserSchema)
 	spaceships, err := h.spaceshipService.FindAll(&models.Spaceship{UserID: user.ID})
 	if err != nil {
@@ -39,7 +39,7 @@ func (h *Handler) GetMySpaceships(c *fiber.Ctx) error {
 	return c.JSON(spaceships)
 }
 
-func (h *Handler) RenameMySpaceship(c *fiber.Ctx) error {
+func (h *Handler) renameMySpaceship(c *fiber.Ctx) error {
 	req := &schemas.RenameSpaceshipSchema{}
 	if err := utils.BodyParser(req, c); err != nil {
 		return c.Status(http.StatusUnprocessableEntity).JSON(utils.NewError(err))

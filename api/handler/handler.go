@@ -43,18 +43,21 @@ func NewHandler(db gorm.DB) Handler {
 
 func (h *Handler) Register(app *fiber.App) {
 	auth := app.Group("/auth")
-	auth.Post("/register", h.SudoMiddleware, h.RegisterFromTelegram)
-	auth.Post("/login", h.Login)
-	auth.Get("/me", h.JwtMiddleware(), h.UserGetter, h.GetMe)
+	auth.Post("/register", h.SudoMiddleware, h.registerFromTelegram)
+	auth.Post("/login", h.login)
+	auth.Get("/me", h.JwtMiddleware(), h.UserGetter, h.getMe)
 
 	spaceships := app.Group("/spaceships", h.JwtMiddleware())
-	spaceships.Get("/my", h.UserGetter, h.GetMySpaceships)
-	spaceships.Post("/my/rename", h.UserGetter, h.RenameMySpaceship)
-	spaceships.Get("/:id", h.GetSpaceshipByID)
+	spaceships.Get("/my", h.UserGetter, h.getMySpaceships)
+	spaceships.Post("/my/rename", h.UserGetter, h.renameMySpaceship)
+	spaceships.Get("/:id", h.getSpaceshipByID)
 
 	systems := app.Group("/systems")
 	systems.Post("/", h.SudoMiddleware, h.CreateSystem)
 
 	planets := app.Group("/planets")
 	planets.Post("/", h.SudoMiddleware, h.CreatePlanet)
+
+	flights := app.Group("/flights", h.JwtMiddleware())
+	flights.Post("/planet", h.UserGetter, h.flightToPlanet)
 }

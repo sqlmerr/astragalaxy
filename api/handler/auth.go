@@ -10,7 +10,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
-func (h *Handler) RegisterFromTelegram(c *fiber.Ctx) error {
+func (h *Handler) registerFromTelegram(c *fiber.Ctx) error {
 	req := &schemas.CreateUserSchema{}
 	if err := c.BodyParser(&req); err != nil {
 		return c.Status(http.StatusUnprocessableEntity).JSON(utils.NewError(err))
@@ -55,7 +55,7 @@ func (h *Handler) RegisterFromTelegram(c *fiber.Ctx) error {
 	return c.Status(http.StatusCreated).JSON(&user)
 }
 
-func (h *Handler) Login(c *fiber.Ctx) error {
+func (h *Handler) login(c *fiber.Ctx) error {
 	req := &schemas.AuthPayload{}
 
 	if err := c.BodyParser(&req); err != nil {
@@ -76,13 +76,13 @@ func (h *Handler) Login(c *fiber.Ctx) error {
 	return c.JSON(schemas.AuthBody{AccessToken: *jwt_token, TokenType: "Bearer"})
 }
 
-func (h *Handler) GetMe(c *fiber.Ctx) error {
+func (h *Handler) getMe(c *fiber.Ctx) error {
 	user := c.Locals("user").(*schemas.UserSchema)
-	spaceships, err := h.spaceshipService.FindAll(&models.Spaceship{UserID: user.ID})
-	if err != nil {
-		return c.Status(http.StatusInternalServerError).JSON(utils.NewError(utils.ErrServerError))
-	}
-	user.Spaceships = spaceships
+	// spaceships, err := h.spaceshipService.FindAll(&models.Spaceship{UserID: user.ID})
+	// if err != nil {
+	// 	return c.Status(http.StatusInternalServerError).JSON(utils.NewError(utils.ErrServerError))
+	// }
+	// user.Spaceships = spaceships
 
 	return c.JSON(&user)
 }

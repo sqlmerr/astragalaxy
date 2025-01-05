@@ -1,27 +1,56 @@
 package utils
 
-import "errors"
+import (
+	"net/http"
+)
+
+type APIError struct {
+	Message string
+	Status  int
+}
+
+// Error implements error.
+func (e APIError) Error() string {
+	return e.Message
+}
+
+func New(msg string, status int) APIError {
+	return APIError{Message: msg, Status: status}
+}
 
 var (
-	ErrUserAlreadyExists = errors.New("user with this username already exists")
-	ErrServerError       = errors.New("server error")
-	ErrInvalidToken      = errors.New("invalid token")
-	ErrUnauthorized      = errors.New("unauthorized")
-	ErrSpaceshipNotFound = errors.New("spaceship not found")
-	ErrUserNotFound      = errors.New("user not found")
+	ErrUserAlreadyExists              = New("user with this username already exists", http.StatusConflict)
+	ErrServerError                    = New("server error", http.StatusInternalServerError)
+	ErrInvalidToken                   = New("invalid token", http.StatusForbidden)
+	ErrUnauthorized                   = New("unauthorized", http.StatusUnauthorized)
+	ErrSpaceshipNotFound              = New("spaceship not found", http.StatusNotFound)
+	ErrUserNotFound                   = New("user not found", http.StatusNotFound)
+	ErrPlanetNotFound                 = New("planet not found", http.StatusNotFound)
+	ErrSpaceshipAlreadyFlying         = New("spaceship is already flying", http.StatusBadRequest)
+	ErrSpaceshipIsInAnotherSystem     = New("spaceship is in another system", http.StatusBadRequest)
+	ErrSpaceshipIsAlreadyInThisPlanet = New("spaceship is already in this planet", http.StatusBadRequest)
 )
 
 type Error struct {
-	Errors map[string]interface{} `json:"errors"`
+	Message string `json:"message"`
+	Status  int    `json:"status_code"`
 }
 
-// add switch other variant
 func NewError(err error) Error {
+	apiErr, ok := err.(*APIError)
+	if ok {
+		e := Error{
+			Message: apiErr.Message,
+			Status:  apiErr.Status,
+		}
+		return e
+	}
+
 	e := Error{}
-	e.Errors = make(map[string]interface{})
+	e.Status = 500
 	switch v := err.(type) {
 	default:
-		e.Errors["body"] = v.Error()
+		e.Message = v.Error()
 	}
 	return e
 }
