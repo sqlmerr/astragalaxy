@@ -5,17 +5,21 @@ import (
 )
 
 type APIError struct {
-	Message string
-	Status  int
+	message string
+	status  int
 }
 
 // Error implements error.
 func (e APIError) Error() string {
-	return e.Message
+	return e.message
+}
+
+func (e APIError) Status() int {
+	return e.status
 }
 
 func New(msg string, status int) APIError {
-	return APIError{Message: msg, Status: status}
+	return APIError{message: msg, status: status}
 }
 
 var (
@@ -42,8 +46,8 @@ func NewError(err error) Error {
 	apiErr, ok := err.(*APIError)
 	if ok {
 		e := Error{
-			Message: apiErr.Message,
-			Status:  apiErr.Status,
+			Message: apiErr.message,
+			Status:  apiErr.status,
 		}
 		return e
 	}

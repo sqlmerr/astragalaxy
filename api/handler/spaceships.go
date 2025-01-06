@@ -51,7 +51,7 @@ func (h *Handler) enterMySpaceship(c *fiber.Ctx) error {
 	if err != nil {
 		apiErr, ok := err.(*utils.APIError)
 		if ok {
-			return c.Status(apiErr.Status).JSON(utils.NewError(apiErr))
+			return c.Status(apiErr.Status()).JSON(utils.NewError(apiErr))
 		}
 		return c.Status(http.StatusInternalServerError).JSON(utils.NewError(err))
 	}
@@ -70,7 +70,7 @@ func (h *Handler) exitMySpaceship(c *fiber.Ctx) error {
 	if err != nil {
 		apiErr, ok := err.(*utils.APIError)
 		if ok {
-			return c.Status(apiErr.Status).JSON(utils.NewError(apiErr))
+			return c.Status(apiErr.Status()).JSON(utils.NewError(apiErr))
 		}
 		return c.Status(http.StatusInternalServerError).JSON(utils.NewError(err))
 	}

@@ -23,20 +23,22 @@ services:
         volumes:
             - app-db-data:/var/lib/postgresql/
         env_file:
-            - .env
+            - ./api/.env
         environment:
             - PGDATA=/var/lib/postgresql/data/pgdata
-    # api:
-    #     build:
-    #         context: .
-    #     env_file:
-    #         - .env
-    #     ports:
-    #         - "8000:8000"
-    #     depends_on:
-    #         - db
-    #     networks:
-    #         - backend
+        networks:
+            - backend
+    api:
+        build:
+            ./api
+        env_file:
+            - ./api/.env
+        ports:
+            - "8000:8000"
+        depends_on:
+            - db
+        networks:
+            - backend
     redis:
         image: redis:7.4.1
         volumes:

@@ -7,7 +7,7 @@ type User struct {
 	Username    string    `gorm:"unique;not null"`
 	TelegramID  int64     `gorm:"unique"`
 	Spaceships  []Spaceship
-	InSpaceship bool `gorm:"not null;default:false"`
+	InSpaceship *bool `gorm:"default:false"`
 	LocationID  uuid.UUID
 	Location    Location
 	SystemID    uuid.UUID

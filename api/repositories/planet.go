@@ -42,7 +42,7 @@ func (r *PlanetRepository) FindOne(ID uuid.UUID) (*models.Planet, error) {
 func (r *PlanetRepository) FindAll(filter *models.Planet) ([]models.Planet, error) {
 	var m []models.Planet
 
-	if err := r.db.Find(&m).Error; err != nil {
+	if err := r.db.Where(&filter).Find(&m).Error; err != nil {
 		return nil, err
 	}
 	return m, nil
@@ -53,5 +53,5 @@ func (r *PlanetRepository) Delete(ID uuid.UUID) error {
 }
 
 func (r *PlanetRepository) Update(p *models.Planet) error {
-	return r.db.Model(&p).Save(&p).Error
+	return r.db.Model(&p).Updates(&p).Error
 }

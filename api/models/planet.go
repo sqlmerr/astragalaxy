@@ -2,6 +2,7 @@ package models
 
 import (
 	"database/sql/driver"
+	"fmt"
 
 	"github.com/google/uuid"
 )
@@ -16,7 +17,7 @@ const (
 )
 
 func (ct *PlanetThreat) Scan(value interface{}) error {
-	*ct = PlanetThreat(value.([]byte))
+	*ct = PlanetThreat([]byte(fmt.Sprint(value)))
 	return nil
 }
 

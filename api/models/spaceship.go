@@ -9,10 +9,10 @@ type Spaceship struct {
 	LocationID  uuid.UUID
 	Location    Location
 	FlownOutAt  int64
-	Flying      bool `gorm:"not null;default:false"`
+	Flying      *bool `gorm:"not null;default:false"`
 	SystemID    uuid.UUID
 	System      System
 	PlanetID    uuid.UUID `gorm:"default:null"`
 	Planet      Planet
-	PlayerSitIn bool `gorm:"default:false"`
+	PlayerSitIn *bool `gorm:"default:false"`
 }

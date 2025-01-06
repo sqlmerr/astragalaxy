@@ -34,14 +34,15 @@ func UserSchemaFromUser(val models.User) UserSchema {
 	var spaceships []SpaceshipSchema
 	for _, sp := range val.Spaceships {
 		spaceships = append(spaceships, SpaceshipSchema{
-			ID:         sp.ID,
-			Name:       sp.Name,
-			UserID:     sp.UserID,
-			LocationID: sp.LocationID,
-			FlownOutAt: sp.FlownOutAt,
-			Flying:     sp.Flying,
-			SystemID:   sp.SystemID,
-			PlanetID:   sp.PlanetID,
+			ID:          sp.ID,
+			Name:        sp.Name,
+			UserID:      sp.UserID,
+			LocationID:  sp.LocationID,
+			FlownOutAt:  sp.FlownOutAt,
+			Flying:      *sp.Flying,
+			SystemID:    sp.SystemID,
+			PlanetID:    sp.PlanetID,
+			PlayerSitIn: *sp.PlayerSitIn,
 		})
 	}
 
@@ -50,7 +51,7 @@ func UserSchemaFromUser(val models.User) UserSchema {
 		Username:    val.Username,
 		TelegramID:  val.TelegramID,
 		Spaceships:  spaceships,
-		InSpaceship: val.InSpaceship,
+		InSpaceship: *val.InSpaceship,
 		LocationID:  val.LocationID,
 		SystemID:    val.SystemID,
 	}

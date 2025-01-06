@@ -5,6 +5,7 @@ import (
 	"astragalaxy/repositories"
 	"astragalaxy/schemas"
 	"astragalaxy/utils"
+	"fmt"
 	"time"
 
 	"github.com/google/uuid"
@@ -42,14 +43,15 @@ func (s *SpaceshipService) FindOne(ID uuid.UUID) (*schemas.SpaceshipSchema, erro
 		return nil, err
 	}
 	return &schemas.SpaceshipSchema{
-		ID:         response.ID,
-		Name:       response.Name,
-		UserID:     response.UserID,
-		LocationID: response.LocationID,
-		FlownOutAt: response.FlownOutAt,
-		Flying:     response.Flying,
-		SystemID:   response.SystemID,
-		PlanetID:   response.PlanetID,
+		ID:          response.ID,
+		Name:        response.Name,
+		UserID:      response.UserID,
+		LocationID:  response.LocationID,
+		FlownOutAt:  response.FlownOutAt,
+		Flying:      *response.Flying,
+		SystemID:    response.SystemID,
+		PlanetID:    response.PlanetID,
+		PlayerSitIn: *response.PlayerSitIn,
 	}, nil
 }
 
@@ -67,7 +69,7 @@ func (s *SpaceshipService) FindAll(filter *models.Spaceship) ([]schemas.Spaceshi
 				UserID:     sp.UserID,
 				LocationID: sp.LocationID,
 				FlownOutAt: sp.FlownOutAt,
-				Flying:     sp.Flying,
+				Flying:     *sp.Flying,
 				SystemID:   sp.SystemID,
 				PlanetID:   sp.PlanetID,
 			})
@@ -81,14 +83,15 @@ func (s *SpaceshipService) Delete(ID uuid.UUID) error {
 
 func (s *SpaceshipService) Update(ID uuid.UUID, data schemas.UpdateSpaceshipSchema) error {
 	spaceship := models.Spaceship{
-		ID:         ID,
-		Name:       data.Name,
-		UserID:     data.UserID,
-		LocationID: data.LocationID,
-		FlownOutAt: data.FlownOutAt,
-		Flying:     data.Flying,
-		SystemID:   data.SystemID,
-		PlanetID:   data.PlanetID,
+		ID:          ID,
+		Name:        data.Name,
+		UserID:      data.UserID,
+		LocationID:  data.LocationID,
+		FlownOutAt:  data.FlownOutAt,
+		Flying:      &data.Flying,
+		SystemID:    data.SystemID,
+		PlanetID:    data.PlanetID,
+		PlayerSitIn: &data.PlayerSitIn,
 	}
 	return s.r.Update(&spaceship)
 }
@@ -104,6 +107,7 @@ func (s *SpaceshipService) Fly(ID uuid.UUID, planetID uuid.UUID) error {
 	} else if spaceship.Flying && spaceship.FlownOutAt == 0 {
 		return utils.ErrServerError
 	} else if !spaceship.PlayerSitIn {
+		fmt.Println(spaceship)
 		return utils.ErrPlayerNotInSpaceship
 	}
 
@@ -111,8 +115,9 @@ func (s *SpaceshipService) Fly(ID uuid.UUID, planetID uuid.UUID) error {
 		now := time.Now()
 		flownOutAt := time.Unix(spaceship.FlownOutAt, 0)
 		if now.Sub(flownOutAt).Minutes() > 1 {
+			flying := false
 			sp := models.Spaceship{
-				Flying:     false,
+				Flying:     &flying,
 				FlownOutAt: 0,
 			}
 			s.r.Update(&sp)

@@ -92,14 +92,15 @@ func (s *UserService) Update(ID uuid.UUID, data schemas.UpdateUserSchema) error 
 	var spaceships []models.Spaceship
 	for _, sp := range data.Spaceships {
 		spaceships = append(spaceships, models.Spaceship{
-			ID:         sp.ID,
-			Name:       sp.Name,
-			UserID:     sp.UserID,
-			LocationID: sp.LocationID,
-			FlownOutAt: sp.FlownOutAt,
-			Flying:     sp.Flying,
-			SystemID:   sp.SystemID,
-			PlanetID:   sp.PlanetID,
+			ID:          sp.ID,
+			Name:        sp.Name,
+			UserID:      sp.UserID,
+			LocationID:  sp.LocationID,
+			FlownOutAt:  sp.FlownOutAt,
+			Flying:      &sp.Flying,
+			SystemID:    sp.SystemID,
+			PlanetID:    sp.PlanetID,
+			PlayerSitIn: &sp.PlayerSitIn,
 		})
 	}
 
@@ -108,7 +109,7 @@ func (s *UserService) Update(ID uuid.UUID, data schemas.UpdateUserSchema) error 
 		Username:    data.Username,
 		TelegramID:  data.TelegramID,
 		Spaceships:  spaceships,
-		InSpaceship: data.InSpaceship,
+		InSpaceship: &data.InSpaceship,
 		LocationID:  data.LocationID,
 		SystemID:    data.SystemID,
 	}
@@ -133,9 +134,8 @@ func (s *UserService) AddSpaceship(userID uuid.UUID, spaceship schemas.Spaceship
 }
 
 func (s *UserService) EnterSpaceship(user schemas.UserSchema, spaceshipID uuid.UUID) error {
-	var spaceship schemas.SpaceshipSchema
 	for _, sp := range user.Spaceships {
-		if sp.ID == spaceship.ID {
+		if sp.ID == spaceshipID {
 			if sp.PlayerSitIn || user.InSpaceship {
 				return utils.ErrPlayerAlreadyInSpaceship
 			}
@@ -143,7 +143,7 @@ func (s *UserService) EnterSpaceship(user schemas.UserSchema, spaceshipID uuid.U
 			if err != nil {
 				return err
 			}
-			return s.spaceshipService.Update(sp.ID, schemas.UpdateSpaceshipSchema{PlayerSitIn: true})
+			return s.spaceshipService.Update(spaceshipID, schemas.UpdateSpaceshipSchema{PlayerSitIn: true})
 		}
 	}
 
@@ -151,14 +151,16 @@ func (s *UserService) EnterSpaceship(user schemas.UserSchema, spaceshipID uuid.U
 }
 
 func (s *UserService) ExitSpaceship(user schemas.UserSchema, spaceshipID uuid.UUID) error {
-	var spaceship schemas.SpaceshipSchema
 	for _, sp := range user.Spaceships {
-		if sp.ID == spaceship.ID {
-			err := s.Update(user.ID, schemas.UpdateUserSchema{InSpaceship: false})
+		if sp.ID == spaceshipID {
+			// err := s.Update(user.ID, schemas.UpdateUserSchema{InSpaceship: false})
+			inSpaceship := false
+			err := s.r.Update(&models.User{ID: user.ID, InSpaceship: &inSpaceship})
 			if err != nil {
 				return err
 			}
-			return s.spaceshipService.Update(sp.ID, schemas.UpdateSpaceshipSchema{PlayerSitIn: false})
+			playerSitIn := false
+			return s.spaceshipService.r.Update(&models.Spaceship{ID: spaceshipID, PlayerSitIn: &playerSitIn})
 		}
 	}
 
