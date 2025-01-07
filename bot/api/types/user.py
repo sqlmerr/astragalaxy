@@ -1,11 +1,15 @@
+from uuid import UUID
+
 from pydantic import BaseModel
+
+from api.types.spaceship import Spaceship
 
 
 class User(BaseModel):
-    id: str
+    id: UUID
     username: str
     telegram_id: int
-    spaceship_id: str | None
+    spaceships: list[Spaceship]
     in_spaceship: bool
-    location_id: str
-    system_id: str
+    location_id: UUID
+    system_id: UUID

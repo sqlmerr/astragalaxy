@@ -14,7 +14,7 @@ RUN go mod download
 COPY . .
 
 # Build our application.
-RUN CGO_ENABLED=0 GOOS=linux go build -o web ./cmd/web/main.go
+RUN CGO_ENABLED=0 GOOS=linux go build -o web .
 
 FROM scratch AS run
 

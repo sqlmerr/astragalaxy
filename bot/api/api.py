@@ -1,3 +1,5 @@
+from uuid import UUID
+
 from api.base import ApiBase
 from api.exceptions import AuthError, APIError
 from api.types.spaceship import Spaceship
@@ -68,23 +70,22 @@ class Api:
         user = User.model_validate(json)
         return user
 
-    async def get_my_spaceship(self, jwt_token: str) -> Spaceship:
+    async def get_my_spaceships(self, jwt_token: str) -> list[Spaceship]:
         response = await self.api.get(
             "/spaceships/my", headers={"Authorization": f"Bearer {jwt_token}"}, raw=True
         )
 
-        json: dict = response.json()
+        json: list[dict] | dict = response.json()
         if response.status_code != 200:
             message = json.get("message", None)
             print(message)
             raise APIError(message=message, status_code=response.status_code)
 
-        spaceship = Spaceship.model_validate(json)
-        return spaceship
+        return [Spaceship.model_validate(sp) for sp in json]
 
-    async def get_out_of_my_spaceship(self, jwt_token: str) -> bool:
+    async def _change_sit_status(self, jwt_token: str, spaceship_id: UUID, status: str) -> bool:
         response = await self.api.post(
-            "/spaceships/my/getOut",
+            f"/spaceships/my/{spaceship_id}/{status}",
             headers={"Authorization": f"Bearer {jwt_token}"},
             raw=True,
         )
@@ -97,20 +98,11 @@ class Api:
         ok = json["ok"]
         return ok
 
-    async def enter_my_spaceship(self, jwt_token: str) -> bool:
-        response = await self.api.post(
-            "/spaceships/my/enter",
-            headers={"Authorization": f"Bearer {jwt_token}"},
-            raw=True,
-        )
+    async def exit_my_spaceship(self, jwt_token: str, spaceship_id: UUID) -> bool:
+        return await self._change_sit_status(jwt_token, spaceship_id, "exit")
 
-        json: dict = response.json()
-        if response.status_code != 200:
-            message = json.get("message", None)
-            raise APIError(message=message, status_code=response.status_code)
-
-        ok = json["ok"]
-        return ok
+    async def enter_my_spaceship(self, jwt_token: str, spaceship_id: UUID) -> bool:
+        return await self._change_sit_status(jwt_token, spaceship_id, "enter")
 
     async def rename_my_spaceship(self, jwt_token: str, name: str) -> int:
         response = await self.api.post("/spaceships/my/rename", headers={"Authorization": f"Bearer {jwt_token}"}, json={"name": name}, raw=True)

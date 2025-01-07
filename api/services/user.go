@@ -88,6 +88,16 @@ func (s *UserService) FindOneByTelegramID(telegramID int64) (*schemas.UserSchema
 	return &schema, nil
 }
 
+func (s *UserService) FindOneRawByTelegramID(telegramID int64) (*models.User, error) {
+	user, err := s.r.FindOneFilter(&models.User{
+		TelegramID: telegramID,
+	})
+	if err != nil {
+		return nil, err
+	}
+	return user, nil
+}
+
 func (s *UserService) Update(ID uuid.UUID, data schemas.UpdateUserSchema) error {
 	var spaceships []models.Spaceship
 	for _, sp := range data.Spaceships {

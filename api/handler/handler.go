@@ -46,6 +46,7 @@ func (h *Handler) Register(app *fiber.App) {
 	auth.Post("/register", h.SudoMiddleware, h.registerFromTelegram)
 	auth.Post("/login", h.login)
 	auth.Get("/me", h.JwtMiddleware(), h.UserGetter, h.getMe)
+	auth.Get("/token/sudo", h.SudoMiddleware, h.getUserTokenSudo)
 
 	spaceships := app.Group("/spaceships", h.JwtMiddleware())
 	spaceships.Get("/my", h.UserGetter, h.getMySpaceships)
