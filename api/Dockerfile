@@ -10,8 +10,11 @@ COPY go.mod go.sum ./
 # Get all of our dependencies.
 RUN go mod download
 
+
 # Copy all of our remaining application.
 COPY . .
+
+RUN go install github.com/swaggo/swag/cmd/swag@latest && swag init
 
 # Build our application.
 RUN CGO_ENABLED=0 GOOS=linux go build -o web .
