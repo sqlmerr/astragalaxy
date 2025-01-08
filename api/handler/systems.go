@@ -11,6 +11,19 @@ import (
 	"github.com/google/uuid"
 )
 
+// createSystem godoc
+//
+// @Summary Create system
+// @Description Sudo Token required
+// @Tags systems
+// @Produce json
+// @Param req body schemas.CreateSystemSchema true "create system schema"
+// @Success 201 {object} schemas.SystemSchema
+// @Failure 500 {object} utils.Error
+// @Failure 403 {object} utils.Error
+// @Failure 422 {object} utils.Error
+// @Security SudoToken
+// @Router /systems [post]
 func (h *Handler) createSystem(c *fiber.Ctx) error {
 	req := &schemas.CreateSystemSchema{}
 	if err := utils.BodyParser(req, c); err != nil {
@@ -25,6 +38,19 @@ func (h *Handler) createSystem(c *fiber.Ctx) error {
 	return c.Status(http.StatusCreated).JSON(&system)
 }
 
+// getSystemPlanets godoc
+//
+// @Summary get system planets
+// @Description Jwt Token required
+// @Tags systems
+// @Produce json
+// @Param id path string true "system id"
+// @Success 200 {object} []schemas.PlanetSchema
+// @Failure 500 {object} utils.Error
+// @Failure 403 {object} utils.Error
+// @Failure 422 {object} utils.Error
+// @Security JwtToken
+// @Router /systems/{id} [get]
 func (h *Handler) getSystemPlanets(c *fiber.Ctx) error {
 	ID, err := uuid.Parse(c.Params("id"))
 	if err != nil {

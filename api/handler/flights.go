@@ -8,6 +8,20 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
+// flightToPlanet godoc
+//
+// @Summary Flight to planet
+// @Description Flight to planet. Jwt token required
+// @Tags flights
+// @Accept json
+// @Produce json
+// @Param req body schemas.FlySpaceshipSchema true "fly spaceship schema"
+// @Success 200 {object} schemas.OkResponseSchema
+// @Failure 500 {object} utils.Error
+// @Failure 403 {object} utils.Error
+// @Failure 422 {object} utils.Error
+// @Security JwtAuth
+// @Router /flights/planet [post]
 func (h *Handler) flightToPlanet(c *fiber.Ctx) error {
 	req := &schemas.FlySpaceshipSchema{}
 	if err := utils.BodyParser(req, c); err != nil {
