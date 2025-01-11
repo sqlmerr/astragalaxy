@@ -1,43 +1,31 @@
 package handler
 
 import (
-	"astragalaxy/repositories"
 	"astragalaxy/services"
+	"astragalaxy/state"
 
 	"github.com/gofiber/fiber/v2"
-	"gorm.io/gorm"
 )
 
 type Handler struct {
-	userService      services.UserService
-	spaceshipService services.SpaceshipService
-	planetService    services.PlanetService
-	systemService    services.SystemService
-	locationService  services.LocationService
+	userService      *services.UserService
+	spaceshipService *services.SpaceshipService
+	planetService    *services.PlanetService
+	systemService    *services.SystemService
+	locationService  *services.LocationService
+	itemService      *services.ItemService
+	state            *state.State
 }
 
-func NewHandler(db gorm.DB) Handler {
-	planetRepository := repositories.NewPlanetRepository(db)
-	planetService := services.NewPlanetService(planetRepository)
-
-	systemRepository := repositories.NewSystemRepository(db)
-	systemService := services.NewSystemService(systemRepository)
-
-	locationRepository := repositories.NewLocationRepository(db)
-	locationService := services.NewLocationService(locationRepository)
-
-	spaceshipRepository := repositories.NewSpaceshipRepository(db)
-	spaceshipService := services.NewSpaceshipService(spaceshipRepository, planetService, systemService)
-
-	userRepository := repositories.NewUserRepostiory(db)
-	userService := services.NewUserService(userRepository, spaceshipService)
-
+func NewHandler(state *state.State) Handler {
 	return Handler{
-		userService:      userService,
-		spaceshipService: spaceshipService,
-		planetService:    planetService,
-		systemService:    systemService,
-		locationService:  locationService,
+		userService:      state.UserService,
+		spaceshipService: state.SpaceshipService,
+		planetService:    state.PlanetService,
+		systemService:    state.SystemService,
+		locationService:  state.LocationService,
+		itemService:      state.ItemService,
+		state:            state,
 	}
 }
 
@@ -64,4 +52,8 @@ func (h *Handler) Register(app *fiber.App) {
 
 	flights := app.Group("/flights", h.JwtMiddleware())
 	flights.Post("/planet", h.UserGetter, h.flightToPlanet)
+
+	registry := app.Group("/registry", h.JwtMiddleware())
+	registry.Get("/items/:code", h.getItemByCode)
+	registry.Get("/items", h.getItems)
 }

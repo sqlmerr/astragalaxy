@@ -1,0 +1,22 @@
+[
+    {
+        "code": "teleporter",
+        "emoji": "🪄",
+        "damagePerUse": 2,
+        "rarity": "rare",
+        "action": "teleport"
+    },
+    {
+        "code": "spaceshipCaller",
+        "emoji": "📞",
+        "damagePerUse": 1,
+        "rarity": "common",
+        "action": "callSpaceship"
+    },
+    {
+        "code": "speedUpgrade",
+        "emoji": "⚡️",
+        "damagePerUse": 0,
+        "rarity": "common"
+    }
+]

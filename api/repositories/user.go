@@ -9,10 +9,10 @@ import (
 )
 
 type UserRepository struct {
-	db gorm.DB
+	db *gorm.DB
 }
 
-func NewUserRepostiory(db gorm.DB) UserRepository {
+func NewUserRepository(db *gorm.DB) UserRepository {
 	return UserRepository{db: db}
 }
 

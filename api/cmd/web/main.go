@@ -3,6 +3,7 @@ package main
 import (
 	"astragalaxy/handler"
 	"astragalaxy/models"
+	"astragalaxy/state"
 	"astragalaxy/utils"
 	"log"
 
@@ -43,6 +44,8 @@ func main() {
 	db.AutoMigrate(&models.System{})
 	db.AutoMigrate(&models.Spaceship{})
 	db.AutoMigrate(&models.User{})
+	db.AutoMigrate(&models.Item{})
+	db.AutoMigrate(&models.ItemDataTag{})
 
 	app := fiber.New()
 
@@ -69,8 +72,10 @@ func main() {
 		DocExpansion: "none",
 	}))
 
-	handler := handler.NewHandler(*db)
-	handler.Register(app)
+	stateObj := state.New(db)
+
+	h := handler.NewHandler(stateObj)
+	h.Register(app)
 
 	log.Fatal(app.Listen(":8000"))
 }

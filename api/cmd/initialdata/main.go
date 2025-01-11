@@ -22,6 +22,8 @@ func main() {
 	db.AutoMigrate(&models.System{})
 	db.AutoMigrate(&models.Spaceship{})
 	db.AutoMigrate(&models.User{})
+	db.AutoMigrate(&models.Item{})
+	db.AutoMigrate(&models.ItemDataTag{})
 
 	systemRepository := repositories.NewSystemRepository(*db)
 	systemService := services.NewSystemService(systemRepository)

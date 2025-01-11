@@ -9,10 +9,10 @@ import (
 )
 
 type SystemRepository struct {
-	db gorm.DB
+	db *gorm.DB
 }
 
-func NewSystemRepository(db gorm.DB) SystemRepository {
+func NewSystemRepository(db *gorm.DB) SystemRepository {
 	return SystemRepository{db: db}
 }
 

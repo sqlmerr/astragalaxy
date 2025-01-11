@@ -9,10 +9,10 @@ import (
 )
 
 type LocationRepository struct {
-	db gorm.DB
+	db *gorm.DB
 }
 
-func NewLocationRepository(db gorm.DB) LocationRepository {
+func NewLocationRepository(db *gorm.DB) LocationRepository {
 	return LocationRepository{db: db}
 }
 

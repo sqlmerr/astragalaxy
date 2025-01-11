@@ -9,10 +9,10 @@ import (
 )
 
 type PlanetRepository struct {
-	db gorm.DB
+	db *gorm.DB
 }
 
-func NewPlanetRepository(db gorm.DB) PlanetRepository {
+func NewPlanetRepository(db *gorm.DB) PlanetRepository {
 	return PlanetRepository{db: db}
 }
 

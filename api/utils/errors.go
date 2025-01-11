@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"errors"
 	"net/http"
 )
 
@@ -30,6 +31,8 @@ var (
 	ErrSpaceshipNotFound              = New("spaceship not found", http.StatusNotFound)
 	ErrUserNotFound                   = New("user not found", http.StatusNotFound)
 	ErrPlanetNotFound                 = New("planet not found", http.StatusNotFound)
+	ErrItemNotFound                   = New("item not found", http.StatusNotFound)
+	ErrItemDataTagNotFound            = New("item data tag not found", http.StatusNotFound)
 	ErrSpaceshipAlreadyFlying         = New("spaceship is already flying", http.StatusBadRequest)
 	ErrSpaceshipIsInAnotherSystem     = New("spaceship is in another system", http.StatusBadRequest)
 	ErrSpaceshipIsAlreadyInThisPlanet = New("spaceship is already in this planet", http.StatusBadRequest)
@@ -43,7 +46,8 @@ type Error struct {
 }
 
 func NewError(err error) Error {
-	apiErr, ok := err.(*APIError)
+	var apiErr APIError
+	ok := errors.As(err, &apiErr)
 	if ok {
 		e := Error{
 			Message: apiErr.message,

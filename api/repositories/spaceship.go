@@ -9,10 +9,10 @@ import (
 )
 
 type SpaceshipRepository struct {
-	db gorm.DB
+	db *gorm.DB
 }
 
-func NewSpaceshipRepository(db gorm.DB) SpaceshipRepository {
+func NewSpaceshipRepository(db *gorm.DB) SpaceshipRepository {
 	return SpaceshipRepository{db: db}
 }
 
