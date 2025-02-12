@@ -1,11 +1,11 @@
 package main
 
 import (
-	"astragalaxy/models"
-	"astragalaxy/repositories"
-	"astragalaxy/schemas"
-	"astragalaxy/services"
-	"astragalaxy/utils"
+	"astragalaxy/internal/models"
+	"astragalaxy/internal/repositories"
+	"astragalaxy/internal/schemas"
+	"astragalaxy/internal/services"
+	"astragalaxy/internal/utils"
 	"fmt"
 
 	"gorm.io/driver/postgres"
@@ -25,10 +25,10 @@ func main() {
 	db.AutoMigrate(&models.Item{})
 	db.AutoMigrate(&models.ItemDataTag{})
 
-	systemRepository := repositories.NewSystemRepository(*db)
+	systemRepository := repositories.NewSystemRepository(db)
 	systemService := services.NewSystemService(systemRepository)
 
-	locationRepository := repositories.NewLocationRepository(*db)
+	locationRepository := repositories.NewLocationRepository(db)
 	locationService := services.NewLocationService(locationRepository)
 
 	_, err = systemService.Create(schemas.CreateSystemSchema{

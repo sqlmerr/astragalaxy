@@ -1,10 +1,10 @@
 package main
 
 import (
-	"astragalaxy/handler"
-	"astragalaxy/models"
-	"astragalaxy/state"
-	"astragalaxy/utils"
+	"astragalaxy/internal/handler"
+	"astragalaxy/internal/models"
+	"astragalaxy/internal/state"
+	"astragalaxy/internal/utils"
 	"log"
 
 	_ "astragalaxy/docs"
@@ -18,7 +18,7 @@ import (
 )
 
 // @title Astragalaxy API
-// @version 1.4.88
+// @version 0.1.0
 // @description Astragalaxy API
 // @license.name MIT
 // @host localhost:8000
