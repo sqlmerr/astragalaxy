@@ -4,6 +4,7 @@ import (
 	"astragalaxy/internal/registry"
 	"astragalaxy/internal/repositories"
 	"astragalaxy/internal/services"
+
 	"gorm.io/gorm"
 )
 
@@ -38,12 +39,12 @@ func New(db *gorm.DB) *State {
 	itemService := services.NewItemService(itemRepository, itemDataTagRepository)
 
 	itemRegistry := registry.NewItem()
-	err := itemRegistry.Load("data/items.json")
+	err := itemRegistry.Load("../../data/items.json")
 	if err != nil {
 		panic(err)
 	}
 	tagRegistry := registry.NewTag(itemRegistry)
-	err = tagRegistry.Load("data/tags.json")
+	err = tagRegistry.Load("../../data/tags.json")
 	if err != nil {
 		panic(err)
 	}

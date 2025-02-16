@@ -12,11 +12,11 @@ import (
 )
 
 type UserService struct {
-	r                repositories.UserRepository
+	r                repositories.UserRepo
 	spaceshipService SpaceshipService
 }
 
-func NewUserService(r repositories.UserRepository, spaceshipService SpaceshipService) UserService {
+func NewUserService(r repositories.UserRepo, spaceshipService SpaceshipService) UserService {
 	return UserService{r: r, spaceshipService: spaceshipService}
 }
 

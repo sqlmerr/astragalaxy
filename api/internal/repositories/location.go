@@ -8,6 +8,14 @@ import (
 	"gorm.io/gorm"
 )
 
+type LocationRepo interface {
+	Create(l *models.Location) (*uuid.UUID, error)
+	FindOne(ID uuid.UUID) (*models.Location, error)
+	FindOneByCode(code string) (*models.Location, error)
+	FindAll() []models.Location
+	Delete(ID uuid.UUID) error
+}
+
 type LocationRepository struct {
 	db *gorm.DB
 }
@@ -16,7 +24,7 @@ func NewLocationRepository(db *gorm.DB) LocationRepository {
 	return LocationRepository{db: db}
 }
 
-func (r *LocationRepository) Create(l *models.Location) (*uuid.UUID, error) {
+func (r LocationRepository) Create(l *models.Location) (*uuid.UUID, error) {
 	m := models.Location{
 		Code:        l.Code,
 		Multiplayer: l.Multiplayer,
@@ -27,7 +35,7 @@ func (r *LocationRepository) Create(l *models.Location) (*uuid.UUID, error) {
 	return &m.ID, nil
 }
 
-func (r *LocationRepository) FindOne(ID uuid.UUID) (*models.Location, error) {
+func (r LocationRepository) FindOne(ID uuid.UUID) (*models.Location, error) {
 	var m models.Location
 	if err := r.db.Find(&m, ID).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
@@ -38,7 +46,7 @@ func (r *LocationRepository) FindOne(ID uuid.UUID) (*models.Location, error) {
 	return &m, nil
 }
 
-func (r *LocationRepository) FindOneByCode(code string) (*models.Location, error) {
+func (r LocationRepository) FindOneByCode(code string) (*models.Location, error) {
 	var m models.Location
 	if err := r.db.Where(&models.Location{Code: code}).First(&m).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
@@ -49,12 +57,12 @@ func (r *LocationRepository) FindOneByCode(code string) (*models.Location, error
 	return &m, nil
 }
 
-func (r *LocationRepository) FindAll() []models.Location {
+func (r LocationRepository) FindAll() []models.Location {
 	var locations []models.Location
 	r.db.Find(&locations)
 	return locations
 }
 
-func (r *LocationRepository) Delete(ID uuid.UUID) error {
+func (r LocationRepository) Delete(ID uuid.UUID) error {
 	return r.db.Delete(&models.Location{}, ID).Error
 }

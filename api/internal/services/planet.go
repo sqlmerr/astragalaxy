@@ -9,10 +9,10 @@ import (
 )
 
 type PlanetService struct {
-	r repositories.PlanetRepository
+	r repositories.PlanetRepo
 }
 
-func NewPlanetService(r repositories.PlanetRepository) PlanetService {
+func NewPlanetService(r repositories.PlanetRepo) PlanetService {
 	return PlanetService{r: r}
 }
 

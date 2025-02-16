@@ -22,7 +22,6 @@ from handlers import basic, spaceship
 from middlewares import UserMiddleware
 from utils.token_manager import TokenManager
 
-
 async def main() -> None:
     api = Api(ApiBase())
     if not (await api.ping()):

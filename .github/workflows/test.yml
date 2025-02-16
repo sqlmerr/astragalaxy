@@ -1,37 +1,35 @@
-# name: Cargo Build & Test
-#
-# on:
-#   push:
-#   pull_request:
+name: Upload Go test results
 
-# env:
-#   CARGO_TERM_COLOR: always
+on: [push]
 
-# jobs:
-#   build_and_test:
-#     name: Rust project - latest
-#     runs-on: ubuntu-latest
-#     strategy:
-#       matrix:
-#         toolchain:
-#           - stable
-#           - beta
-#           - nightly
-#     steps:
-#       - uses: actions/checkout@v4
-#       - run: rustup update ${{ matrix.toolchain }} && rustup default ${{ matrix.toolchain }}
-#       - run: |
-#           sudo apt update && sudo apt install -y \
-#             build-essential \
-#             cmake \
-#             libsodium-dev \
-#             libsecp256k1-dev \
-#             lz4 \
-#             liblz4-dev \
-#             zlib1g-dev \
-#             libssl-dev \
-#             libsodium23 \
-#             libsecp256k1-dev \
-#             zlib1g
-#       - run: cargo build --verbose
-#       - run: cargo test --verbose -p lib-core
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        go-version: ["1.21", "1.22", "1.23.x"]
+
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: ${{ matrix.go-version }}
+      - name: Install dependencies
+        run: go get .
+        working-directory: ./api
+
+      - name: Run docker compose
+        run: docker compose -f docker-compose-test.yaml up --build
+
+      - name: Test with Go
+        run: go test -json > TestResults-${{ matrix.go-version }}.json
+
+      - name: Stop docker compose
+        run: docker compose -f docker-compose-test.yaml down
+
+      - name: Upload Go test results
+        uses: actions/upload-artifact@v4
+        with:
+          name: Go-results-${{ matrix.go-version }}
+          path: TestResults-${{ matrix.go-version }}.json

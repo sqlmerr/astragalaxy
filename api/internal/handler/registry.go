@@ -3,6 +3,7 @@ package handler
 import (
 	"astragalaxy/internal/utils"
 	"errors"
+
 	"github.com/gofiber/fiber/v2"
 )
 

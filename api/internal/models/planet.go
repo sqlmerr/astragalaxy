@@ -1,9 +1,6 @@
 package models
 
 import (
-	"database/sql/driver"
-	"fmt"
-
 	"github.com/google/uuid"
 )
 
@@ -16,18 +13,9 @@ const (
 	HEAT      PlanetThreat = "HEAT"
 )
 
-func (ct *PlanetThreat) Scan(value interface{}) error {
-	*ct = PlanetThreat([]byte(fmt.Sprint(value)))
-	return nil
-}
-
-func (ct PlanetThreat) Value() (driver.Value, error) {
-	return string(ct), nil
-}
-
 type Planet struct {
 	ID       uuid.UUID `gorm:"type:uuid;default:gen_random_uuid()"`
 	SystemID uuid.UUID
 	System   System
-	Threat   PlanetThreat `gorm:"type:planet_threat"`
+	Threat   string
 }

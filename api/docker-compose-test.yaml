@@ -1,0 +1,12 @@
+services:
+  db:
+    image: postgres:16.2-alpine
+    command: -p 5433
+    expose:
+        - 5433
+    ports:
+        - '5433:5433'
+    env_file:
+      - .env
+    tmpfs:
+      - /var/lib/posgresql/data

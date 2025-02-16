@@ -9,10 +9,10 @@ import (
 )
 
 type SystemService struct {
-	r repositories.SystemRepository
+	r repositories.SystemRepo
 }
 
-func NewSystemService(r repositories.SystemRepository) SystemService {
+func NewSystemService(r repositories.SystemRepo) SystemService {
 	return SystemService{r: r}
 }
 

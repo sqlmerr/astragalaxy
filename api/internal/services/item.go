@@ -10,12 +10,12 @@ import (
 )
 
 type ItemService struct {
-	i repositories.ItemRepository
-	d repositories.ItemDataTagRepository
+	i repositories.ItemRepo
+	d repositories.ItemDataTagRepo
 	// r registry.ItemRegistry
 }
 
-func NewItemService(i repositories.ItemRepository, d repositories.ItemDataTagRepository) ItemService {
+func NewItemService(i repositories.ItemRepo, d repositories.ItemDataTagRepo) ItemService {
 	return ItemService{i: i, d: d}
 }
 

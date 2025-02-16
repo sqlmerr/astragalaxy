@@ -9,10 +9,10 @@ import (
 )
 
 type LocationService struct {
-	r repositories.LocationRepository
+	r repositories.LocationRepo
 }
 
-func NewLocationService(r repositories.LocationRepository) LocationService {
+func NewLocationService(r repositories.LocationRepo) LocationService {
 	return LocationService{r: r}
 }
 

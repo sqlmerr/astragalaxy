@@ -12,12 +12,12 @@ import (
 )
 
 type SpaceshipService struct {
-	r             repositories.SpaceshipRepository
+	r             repositories.SpaceshipRepo
 	planetService PlanetService
 	systemService SystemService
 }
 
-func NewSpaceshipService(r repositories.SpaceshipRepository, planetService PlanetService, systemService SystemService) SpaceshipService {
+func NewSpaceshipService(r repositories.SpaceshipRepo, planetService PlanetService, systemService SystemService) SpaceshipService {
 	return SpaceshipService{r: r, planetService: planetService, systemService: systemService}
 }
 
