@@ -20,7 +20,7 @@ jobs:
         with:
           go-version: ${{ matrix.go-version }}
       - name: Install dependencies
-        run: cd api && go get .
+        run: ls && go get .
 
       - name: Run docker compose
         run: docker compose -f docker-compose-test.yaml up --build
