@@ -18,7 +18,10 @@ var (
 	app          *fiber.App
 	usr          *schemas.UserSchema
 	userJwtToken string
+	userToken    string
 	sudoToken    string
+	stateObj     *state.State
+	spaceship    *schemas.SpaceshipSchema
 )
 
 func TestMain(m *testing.M) {
@@ -73,6 +76,21 @@ func setup(state *state.State) {
 		panic(err)
 	}
 
+	spcship, err := state.SpaceshipService.Create(schemas.CreateSpaceshipSchema{Name: "initial", UserID: user.ID, LocationID: loc.ID, SystemID: sys.ID})
+	if err != nil {
+		panic(err)
+	}
+	err = state.UserService.AddSpaceship(user.ID, *spcship)
+	if err != nil {
+		panic(err)
+	}
+
+	spaceships, err := state.SpaceshipService.FindAll(&models.Spaceship{UserID: user.ID})
+	if err != nil {
+		panic(err)
+	}
+	user.Spaceships = spaceships
+
 	usrRaw, err := state.UserService.FindOneRawByTelegramID(user.TelegramID)
 	if err != nil {
 		panic(err)
@@ -85,7 +103,9 @@ func setup(state *state.State) {
 	}
 
 	userJwtToken = *jwtToken
-
+	userToken = token
 	usr = user
 	sudoToken = utils.Config("SECRET_TOKEN")
+	stateObj = state
+	spaceship = spcship
 }

@@ -50,7 +50,7 @@ func (h *Handler) createSystem(c *fiber.Ctx) error {
 // @Failure 403 {object} utils.Error
 // @Failure 422 {object} utils.Error
 // @Security JwtToken
-// @Router /systems/{id} [get]
+// @Router /systems/{id}/planets [get]
 func (h *Handler) getSystemPlanets(c *fiber.Ctx) error {
 	ID, err := uuid.Parse(c.Params("id"))
 	if err != nil {

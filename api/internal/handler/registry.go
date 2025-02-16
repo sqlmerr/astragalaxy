@@ -21,7 +21,6 @@ import (
 // @Failure 403 {object} utils.Error
 // @Failure 404 {object} utils.Error
 // @Failure 422 {object} utils.Error
-// @Security JwtAuth
 // @Router /registry/items/{code} [get]
 func (h *Handler) getItemByCode(c *fiber.Ctx) error {
 	code := c.Params("code")
@@ -49,7 +48,6 @@ func (h *Handler) getItemByCode(c *fiber.Ctx) error {
 // @Failure 400 {object} utils.Error
 // @Failure 403 {object} utils.Error
 // @Failure 422 {object} utils.Error
-// @Security JwtAuth
 // @Router /registry/items [get]
 func (h *Handler) getItems(c *fiber.Ctx) error {
 	items := h.state.MasterRegistry.Item.All()

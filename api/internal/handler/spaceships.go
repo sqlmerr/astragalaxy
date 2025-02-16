@@ -90,7 +90,8 @@ func (h *Handler) enterMySpaceship(c *fiber.Ctx) error {
 
 	err = h.userService.EnterSpaceship(*user, ID)
 	if err != nil {
-		apiErr, ok := err.(*utils.APIError)
+		var apiErr *utils.APIError
+		ok := errors.As(err, &apiErr)
 		if ok {
 			return c.Status(apiErr.Status()).JSON(utils.NewError(apiErr))
 		}
@@ -122,7 +123,8 @@ func (h *Handler) exitMySpaceship(c *fiber.Ctx) error {
 
 	err = h.userService.ExitSpaceship(*user, ID)
 	if err != nil {
-		apiErr, ok := err.(*utils.APIError)
+		var apiErr *utils.APIError
+		ok := errors.As(err, &apiErr)
 		if ok {
 			return c.Status(apiErr.Status()).JSON(utils.NewError(apiErr))
 		}
