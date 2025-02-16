@@ -21,12 +21,15 @@ jobs:
 
       - name: Run docker compose
         run: docker compose -f docker-compose-test.yaml up --build
+        working-directory: ./api
 
       - name: Test with Go
         run: go test -json > TestResults-${{ matrix.go-version }}.json
+        working-directory: ./api
 
       - name: Stop docker compose
         run: docker compose -f docker-compose-test.yaml down
+        working-directory: ./api
 
       - name: Upload Go test results
         uses: actions/upload-artifact@v4
