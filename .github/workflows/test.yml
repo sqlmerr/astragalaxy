@@ -25,6 +25,9 @@ jobs:
       - name: Generate docs
         run: swag init -g ./cmd/web/main.go
 
+      - name: Prepare .env
+        run: cp .env.example .env
+
       - name: Run docker compose
         run: docker compose -f docker-compose-test.yaml up --build
 
