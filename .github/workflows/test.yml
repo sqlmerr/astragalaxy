@@ -16,20 +16,16 @@ jobs:
         with:
           go-version: ${{ matrix.go-version }}
       - name: Install dependencies
-        run: go get .
-        working-directory: ./api
+        run: go get ./api
 
       - name: Run docker compose
-        run: docker compose -f docker-compose-test.yaml up --build
-        working-directory: ./api
+        run: docker compose -f ./api/docker-compose-test.yaml up --build
 
       - name: Test with Go
-        run: go test -json > TestResults-${{ matrix.go-version }}.json
-        working-directory: ./api
+        run: cd api && go test -json > TestResults-${{ matrix.go-version }}.json
 
       - name: Stop docker compose
-        run: docker compose -f docker-compose-test.yaml down
-        working-directory: ./api
+        run: docker compose -f ./api/docker-compose-test.yaml down
 
       - name: Upload Go test results
         uses: actions/upload-artifact@v4
