@@ -62,7 +62,7 @@ func (s *UserService) Login(telegramID int64, token string) (*string, error) {
 	claims["sub"] = telegramID
 	claims["exp"] = time.Now().Add(time.Hour * 24).Unix()
 
-	t, err := jwt_token.SignedString([]byte(utils.Config("JWT_SECRET")))
+	t, err := jwt_token.SignedString([]byte(utils.GetEnv("JWT_SECRET")))
 	return &t, err
 }
 

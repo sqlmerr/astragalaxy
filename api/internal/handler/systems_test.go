@@ -2,7 +2,6 @@ package handler
 
 import (
 	"astragalaxy/internal/schemas"
-	"astragalaxy/internal/utils"
 	"bytes"
 	"encoding/json"
 	"fmt"
@@ -20,7 +19,7 @@ func TestCreateSystem(t *testing.T) {
 
 	req := httptest.NewRequest(http.MethodPost, "/systems", bytes.NewBuffer(b))
 	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("secret-token", utils.Config("SECRET_TOKEN"))
+	req.Header.Set("secret-token", stateObj.Config.SecretToken)
 
 	res, err := app.Test(req, -1)
 	assert.NoError(t, err)

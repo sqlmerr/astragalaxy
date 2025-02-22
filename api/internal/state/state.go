@@ -4,6 +4,9 @@ import (
 	"astragalaxy/internal/registry"
 	"astragalaxy/internal/repositories"
 	"astragalaxy/internal/services"
+	"astragalaxy/internal/utils"
+	"fmt"
+	"path/filepath"
 
 	"gorm.io/gorm"
 )
@@ -16,6 +19,7 @@ type State struct {
 	LocationService  *services.LocationService
 	ItemService      *services.ItemService
 	MasterRegistry   *registry.MasterRegistry
+	Config           *utils.Config
 }
 
 func New(db *gorm.DB) *State {
@@ -38,18 +42,24 @@ func New(db *gorm.DB) *State {
 	itemDataTagRepository := repositories.NewItemDataTagRepository(db)
 	itemService := services.NewItemService(itemRepository, itemDataTagRepository)
 
+	projectRoot, err := utils.GetProjectRoot()
+	if err != nil {
+		panic(fmt.Sprintf("Error finding project root: %v", err))
+	}
+
 	itemRegistry := registry.NewItem()
-	err := itemRegistry.Load("data/items.json")
+	err = itemRegistry.Load(filepath.Join(projectRoot, "data", "items.json"))
 	if err != nil {
 		panic(err)
 	}
 	tagRegistry := registry.NewTag(itemRegistry)
-	err = tagRegistry.Load("data/tags.json")
+	err = tagRegistry.Load(filepath.Join(projectRoot, "data", "tags.json"))
 	if err != nil {
 		panic(err)
 	}
 
 	masterRegistry := registry.NewMaster(itemRegistry, tagRegistry)
+	config := utils.NewConfig(".env")
 
 	return &State{
 		UserService:      &userService,
@@ -59,5 +69,6 @@ func New(db *gorm.DB) *State {
 		LocationService:  &locationService,
 		ItemService:      &itemService,
 		MasterRegistry:   &masterRegistry,
+		Config:           &config,
 	}
 }

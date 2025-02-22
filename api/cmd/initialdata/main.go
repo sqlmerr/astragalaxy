@@ -13,7 +13,8 @@ import (
 )
 
 func main() {
-	db, err := gorm.Open(postgres.Open(utils.Config("DATABASE_URL")))
+	config := utils.NewConfig(".env")
+	db, err := gorm.Open(postgres.Open(config.DatabaseURL))
 	if err != nil {
 		panic("failed to connect to database")
 	}

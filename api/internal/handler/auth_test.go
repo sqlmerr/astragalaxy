@@ -2,7 +2,6 @@ package handler
 
 import (
 	"astragalaxy/internal/schemas"
-	"astragalaxy/internal/utils"
 	"bytes"
 	"encoding/json"
 	"fmt"
@@ -21,7 +20,7 @@ func TestRegister(t *testing.T) {
 
 	request := httptest.NewRequest(http.MethodPost, "/auth/register", bytes.NewReader(b))
 	request.Header.Set("Content-Type", "application/json")
-	request.Header.Set("secret-token", utils.Config("SECRET_TOKEN"))
+	request.Header.Set("secret-token", sudoToken)
 
 	res, err := app.Test(request, -1)
 	assert.NoError(t, err)
@@ -70,7 +69,7 @@ func TestLogin(t *testing.T) {
 func TestGetUserTokenSudo(t *testing.T) {
 	request := httptest.NewRequest(http.MethodGet, fmt.Sprintf("/auth/token/sudo?telegram_id=%d", usr.TelegramID), nil)
 	request.Header.Set("Content-Type", "application/json")
-	request.Header.Set("secret-token", utils.Config("SECRET_TOKEN"))
+	request.Header.Set("secret-token", sudoToken)
 
 	res, err := app.Test(request, -1)
 	assert.NoError(t, err)

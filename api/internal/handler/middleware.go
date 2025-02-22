@@ -11,7 +11,7 @@ import (
 
 func (h *Handler) SudoMiddleware(c *fiber.Ctx) error {
 	header := c.Get("secret-token", "")
-	if header != utils.Config("SECRET_TOKEN") {
+	if header != h.state.Config.SecretToken {
 		return c.Status(http.StatusForbidden).JSON(utils.NewError(utils.ErrInvalidToken))
 	}
 
@@ -35,7 +35,7 @@ func (h *Handler) UserGetter(c *fiber.Ctx) error {
 
 func (h *Handler) JwtMiddleware() fiber.Handler {
 	return jwtware.New(jwtware.Config{
-		SigningKey:   jwtware.SigningKey{Key: []byte(utils.Config("JWT_SECRET"))},
+		SigningKey:   jwtware.SigningKey{Key: []byte(h.state.Config.JwtSecret)},
 		ErrorHandler: jwtError,
 		ContextKey:   "jwtToken",
 	})

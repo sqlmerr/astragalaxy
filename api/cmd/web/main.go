@@ -33,7 +33,8 @@ import (
 // @name Authorization
 // @description You need to type "Bearer" before the token
 func main() {
-	db, err := gorm.Open(postgres.Open(utils.Config("DATABASE_URL")), &gorm.Config{})
+	config := utils.NewConfig(".env")
+	db, err := gorm.Open(postgres.Open(config.DatabaseURL), &gorm.Config{})
 	// db, err := gorm.Open(postgres.Open("postgresql://postgres:password@db:5432"), &gorm.Config{})
 	if err != nil {
 		panic("Failed to open database")

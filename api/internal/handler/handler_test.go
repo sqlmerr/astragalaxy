@@ -25,7 +25,7 @@ var (
 )
 
 func TestMain(m *testing.M) {
-	db, err := gorm.Open(postgres.Open(utils.Config("TEST_DATABASE_URL")), &gorm.Config{})
+	db, err := gorm.Open(postgres.Open(utils.GetEnv("TEST_DATABASE_URL")), &gorm.Config{})
 	// db, err := gorm.Open(postgres.Open("postgresql://postgres:password@db:5432"), &gorm.Config{})
 	if err != nil {
 		panic("Failed to open database")
@@ -105,7 +105,7 @@ func setup(state *state.State) {
 	userJwtToken = *jwtToken
 	userToken = token
 	usr = user
-	sudoToken = utils.Config("SECRET_TOKEN")
+	sudoToken = state.Config.SecretToken
 	stateObj = state
 	spaceship = spcship
 }
