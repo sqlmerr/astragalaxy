@@ -20,7 +20,7 @@ class Api:
 
     async def register_user(self, user_id: int) -> User | None:
         response = await self.api.post(
-            "/auth/register/telegram",
+            "/auth/register",
             json={"username": f"id{user_id}", "telegram_id": user_id},
             headers={"secret-token": config.secret_token},
         )
@@ -104,8 +104,8 @@ class Api:
     async def enter_my_spaceship(self, jwt_token: str, spaceship_id: UUID) -> bool:
         return await self._change_sit_status(jwt_token, spaceship_id, "enter")
 
-    async def rename_my_spaceship(self, jwt_token: str, name: str) -> int:
-        response = await self.api.post("/spaceships/my/rename", headers={"Authorization": f"Bearer {jwt_token}"}, json={"name": name}, raw=True)
+    async def rename_my_spaceship(self, jwt_token: str, spaceship_id: UUID, name: str) -> int:
+        response = await self.api.put("/spaceships/my/rename", headers={"Authorization": f"Bearer {jwt_token}"}, json={"name": name, "spaceship_id": str(spaceship_id)}, raw=True)
 
         json: dict = response.json()
         if response.status_code != 200:

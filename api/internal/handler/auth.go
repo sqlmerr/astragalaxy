@@ -151,7 +151,7 @@ func (h *Handler) getUserTokenSudo(c *fiber.Ctx) error {
 	}
 
 	user, err := h.userService.FindOneRawByTelegramID(int64(ID))
-	if err != nil {
+	if err != nil || user == nil {
 		return c.Status(http.StatusInternalServerError).JSON(utils.NewError(utils.ErrServerError))
 	}
 

@@ -4,6 +4,7 @@ import (
 	"astragalaxy/internal/models"
 	"astragalaxy/internal/repositories"
 	"astragalaxy/internal/schemas"
+	"astragalaxy/internal/utils"
 
 	"github.com/google/uuid"
 )
@@ -39,7 +40,10 @@ func (s *LocationService) FindOne(ID uuid.UUID) (*schemas.LocationSchema, error)
 
 func (s *LocationService) FindOneByCode(code string) (*schemas.LocationSchema, error) {
 	response, err := s.r.FindOneByCode(code)
-	if err != nil {
+	if err != nil || response == nil {
+		if response == nil {
+			return nil, utils.ErrServerError
+		}
 		return nil, err
 	}
 	schema := schemas.LocationSchema(*response)

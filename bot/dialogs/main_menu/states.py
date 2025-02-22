@@ -6,5 +6,6 @@ class MainMenuSG(StatesGroup):
 
 
 class SpaceshipSG(StatesGroup):
+    choose = State()
     info = State()
     rename = State()

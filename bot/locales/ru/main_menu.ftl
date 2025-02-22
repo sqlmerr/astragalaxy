@@ -1,9 +1,10 @@
 main_menu = 📋 <b><i>главное меню</i></b>
-spaceship_menu_btn = 🚀 корабль
+spaceship_menu_btn = 🚀 корабли
+spaceship_menu_choose_spaceship = 🚀 <b><i>Выберите корабль:</i></b>
 spaceship_menu =
     <b><i>🚀 твой корабль</i></b>:
       🪪 <i>имя:</i> <code>{ $name }</code>
-spaceship_menu_get_out = ⛔️ выйти
+spaceship_menu_exit = ⛔️ выйти
 spaceship_menu_enter = ❇️ войти
 spaceship_menu_change_name = 💠 переименовать
 spaceship_menu_enter_name = 💠 <b><i>отправьте новое имя</i></b>

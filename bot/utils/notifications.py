@@ -1,3 +1,5 @@
+import traceback
+
 from aiogram import Bot
 from aiogram.types import LinkPreviewOptions
 from aiogram_i18n import I18nContext
@@ -9,7 +11,7 @@ from config_reader import config
 async def notify_admins_error(
     bot: Bot, exc: Exception, i18n: I18nContext, user: User
 ) -> None:
-    print(exc)
+    print(traceback.format_exc())
     await notify_admins(
         bot,
         i18n.error_admin_notification(

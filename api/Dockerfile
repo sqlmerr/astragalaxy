@@ -25,6 +25,8 @@ WORKDIR /app
 
 COPY --from=build /compiler/.env .
 COPY --from=build /compiler/web .
+COPY --from=build /compiler/data/items.json ./data/items.json
+COPY --from=build /compiler/data/tags.json ./data/tags.json
 
 EXPOSE 8000
 CMD ["./web"]

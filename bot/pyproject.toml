@@ -1,27 +1,21 @@
-[tool.poetry]
+[project]
 name = "bot"
 version = "0.4.1"
 description = "AstraGalaxy game telegram bot"
-authors = ["sqlmerr <sqlmerr@ya.ru>"]
-license = "MIT"
 readme = "README.md"
-package-mode = false
+requires-python = ">=3.12"
+dependencies = [
+    "aiogram>=3.18.0",
+    "aiogram-dialog>=2.3.1",
+    "aiogram-i18n>=1.4",
+    "fluent-runtime>=0.4.0",
+    "httpx>=0.28.1",
+    "loguru>=0.7.3",
+    "pydantic-settings>=2.8.0",
+    "redis>=5.2.1",
+]
 
-[tool.poetry.dependencies]
-python = "^3.12"
-aiogram = "^3.16.0"
-aiogram-i18n = "^1.4"
-pydantic-settings = "^2.6.0"
-loguru = "^0.7.2"
-fluent-runtime = "^0.4.0"
-aiogram-dialog = "^2.3.0"
-redis = "^5.2.1"
-httpx = "^0.28.1"
-
-
-[tool.poetry.group.dev.dependencies]
-ruff = "^0.7.1"
-
-[build-system]
-requires = ["poetry-core"]
-build-backend = "poetry.core.masonry.api"
+[dependency-groups]
+dev = [
+    "ruff>=0.9.7",
+]

@@ -28,7 +28,7 @@ dialog = Dialog(
         Button(
             I18NFormat("spaceship_menu_btn"),
             id="spaceship",
-            on_click=start_dialog(SpaceshipSG.info),
+            on_click=start_dialog(SpaceshipSG.choose),
         ),
         state=MainMenuSG.main,
     )
