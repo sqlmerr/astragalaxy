@@ -9,7 +9,8 @@ from aiogram_dialog.widgets.kbd import (
     CurrentPage,
     PrevPage,
     FirstPage,
-    ListGroup, SwitchTo,
+    ListGroup,
+    SwitchTo,
 )
 from aiogram_dialog.widgets.text import Const, Format
 
