@@ -43,6 +43,16 @@ func (s *SystemService) FindOneByName(name string) (*schemas.SystemSchema, error
 	return &schema, nil
 }
 
+func (s *SystemService) FindAll() []schemas.SystemSchema {
+	response := s.r.FindAll()
+	systems := []schemas.SystemSchema{}
+	for _, r := range response {
+		systems = append(systems, schemas.SystemSchema(r))
+	}
+
+	return systems
+}
+
 func (s *SystemService) Delete(ID uuid.UUID) error {
 	return s.r.Delete(ID)
 }

@@ -31,7 +31,9 @@ async def return_to_main(
 async def getter(dialog_manager: DialogManager, **kwargs) -> dict:
     api: Api = dialog_manager.middleware_data["api"]
     token_pair: TokenPair = dialog_manager.middleware_data["token_pair"]
-    spaceship: Spaceship = Spaceship.model_validate(dialog_manager.dialog_data["spaceship"])
+    spaceship: Spaceship = Spaceship.model_validate(
+        dialog_manager.dialog_data["spaceship"]
+    )
 
     in_spaceship = dialog_manager.dialog_data["in_spaceship"]
 
@@ -63,20 +65,25 @@ async def change_spaceship_status(
         manager.dialog_data["in_spaceship"] = True
 
 
-async def change_name(message: Message,
-            widget: ManagedTextInput,
-            dialog_manager: DialogManager,
-            data: str):
+async def change_name(
+    message: Message, widget: ManagedTextInput, dialog_manager: DialogManager, data: str
+):
     i18n: I18nContext = dialog_manager.middleware_data["i18n"]
     api: Api = dialog_manager.middleware_data["api"]
     token_pair: TokenPair = dialog_manager.middleware_data["token_pair"]
-    spaceship: Spaceship = Spaceship.model_validate(dialog_manager.dialog_data["spaceship"])
+    spaceship: Spaceship = Spaceship.model_validate(
+        dialog_manager.dialog_data["spaceship"]
+    )
     response = await api.rename_my_spaceship(token_pair.jwt_token, spaceship.id, data)
     if response == 2:
         await message.reply(i18n.invalid_spaceship_name())
         return
     if response != 1:
-        await notify_admins_error(message.bot, APIError(f"Custom status code = {response}", status_code=response), message.from_user)
+        await notify_admins_error(
+            message.bot,
+            APIError(f"Custom status code = {response}", status_code=response),
+            message.from_user,
+        )
         return
 
     spaceships = await api.get_my_spaceships(token_pair.jwt_token)
@@ -99,7 +106,9 @@ async def spaceships(dialog_manager: DialogManager, **kwargs) -> dict:
     }
 
 
-async def select_spaceship(callback: CallbackQuery, button: Button, manager: DialogManager):
+async def select_spaceship(
+    callback: CallbackQuery, button: Button, manager: DialogManager
+):
     user: User = manager.middleware_data["user"]
     spaceship = list(filter(lambda s: str(s.id) == manager.item_id, user.spaceships))
     if not spaceship:
@@ -121,22 +130,30 @@ dialog = Dialog(
             ),
             id="choose_spaceship",
             item_id_getter=lambda s: s["spaceship"].id,
-            items="spaceships"
+            items="spaceships",
         ),
         Button(Const("←"), id="to_main", on_click=return_to_main),
         state=SpaceshipSG.choose,
-        getter=spaceships
+        getter=spaceships,
     ),
     Window(
         I18NFormat("spaceship_menu", keys={"name": "name"}),
         Button(
             Case(
-                {True: I18NFormat("spaceship_menu_exit"), False: I18NFormat("spaceship_menu_enter")}, selector="in_spaceship"
+                {
+                    True: I18NFormat("spaceship_menu_exit"),
+                    False: I18NFormat("spaceship_menu_enter"),
+                },
+                selector="in_spaceship",
             ),
             id="change_spaceship_status",
             on_click=change_spaceship_status,
         ),
-        SwitchTo(I18NFormat("spaceship_menu_change_name"), id="change_spaceship_name", state=SpaceshipSG.rename),
+        SwitchTo(
+            I18NFormat("spaceship_menu_change_name"),
+            id="change_spaceship_name",
+            state=SpaceshipSG.rename,
+        ),
         SwitchTo(Const("←"), id="to_spaceship", state=SpaceshipSG.choose),
         state=SpaceshipSG.info,
         getter=getter,
@@ -144,10 +161,14 @@ dialog = Dialog(
     Window(
         I18NFormat("spaceship_menu_enter_name", keys={"name": "name"}),
         TextInput(id="enter_spaceship_name", on_success=change_name),
-        CopyButton(I18NFormat("spaceship_menu_copy_name", keys={"name": "name"}), id="copy_spaceship_name", copy_text_key="name"),
+        CopyButton(
+            I18NFormat("spaceship_menu_copy_name", keys={"name": "name"}),
+            id="copy_spaceship_name",
+            copy_text_key="name",
+        ),
         SwitchTo(Const("←"), id="to_spaceship", state=SpaceshipSG.info),
         state=SpaceshipSG.rename,
-        getter=getter
+        getter=getter,
     ),
-    on_start=on_start
+    on_start=on_start,
 )

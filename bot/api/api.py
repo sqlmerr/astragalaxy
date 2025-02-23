@@ -2,7 +2,9 @@ from uuid import UUID
 
 from api.base import ApiBase
 from api.exceptions import AuthError, APIError
+from api.types.planet import Planet
 from api.types.spaceship import Spaceship
+from api.types.system import System
 from api.types.token import TokenPair
 from api.types.user import User
 from config_reader import config
@@ -83,7 +85,9 @@ class Api:
 
         return [Spaceship.model_validate(sp) for sp in json]
 
-    async def _change_sit_status(self, jwt_token: str, spaceship_id: UUID, status: str) -> bool:
+    async def _change_sit_status(
+        self, jwt_token: str, spaceship_id: UUID, status: str
+    ) -> bool:
         response = await self.api.post(
             f"/spaceships/my/{spaceship_id}/{status}",
             headers={"Authorization": f"Bearer {jwt_token}"},
@@ -104,8 +108,15 @@ class Api:
     async def enter_my_spaceship(self, jwt_token: str, spaceship_id: UUID) -> bool:
         return await self._change_sit_status(jwt_token, spaceship_id, "enter")
 
-    async def rename_my_spaceship(self, jwt_token: str, spaceship_id: UUID, name: str) -> int:
-        response = await self.api.put("/spaceships/my/rename", headers={"Authorization": f"Bearer {jwt_token}"}, json={"name": name, "spaceship_id": str(spaceship_id)}, raw=True)
+    async def rename_my_spaceship(
+        self, jwt_token: str, spaceship_id: UUID, name: str
+    ) -> int:
+        response = await self.api.put(
+            "/spaceships/my/rename",
+            headers={"Authorization": f"Bearer {jwt_token}"},
+            json={"name": name, "spaceship_id": str(spaceship_id)},
+            raw=True,
+        )
 
         json: dict = response.json()
         if response.status_code != 200:
@@ -114,3 +125,44 @@ class Api:
 
         custom_status_code = json["custom_status_code"]
         return custom_status_code
+
+    async def get_all_systems(self, jwt_token: str) -> list[System]:
+        response = await self.api.get(
+            "/systems",
+            headers={"Authorization": f"Bearer {jwt_token}"},
+            raw=True,
+        )
+        json: dict = response.json()
+        if response.status_code != 200:
+            message = json.get("message", None)
+            raise APIError(message=message, status_code=response.status_code)
+
+        return [System.model_validate(sp) for sp in json]
+
+    async def get_system_by_id(self, jwt_token: str, system_id: UUID | str) -> System:
+        response = await self.api.get(
+            f"/systems/{system_id}",
+            headers={"Authorization": f"Bearer {jwt_token}"},
+            raw=True,
+        )
+        json: dict = response.json()
+        if response.status_code != 200:
+            message = json.get("message", None)
+            raise APIError(message=message, status_code=response.status_code)
+
+        return System.model_validate(json)
+
+    async def get_system_planets(
+        self, jwt_token: str, system_id: UUID | str
+    ) -> list[Planet]:
+        response = await self.api.get(
+            f"/systems/{system_id}/planets",
+            headers={"Authorization": f"Bearer {jwt_token}"},
+            raw=True,
+        )
+        json: dict = response.json()
+        if response.status_code != 200:
+            message = json.get("message", None)
+            raise APIError(message=message, status_code=response.status_code)
+
+        return [Planet.model_validate(sp) for sp in json]

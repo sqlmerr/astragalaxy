@@ -22,6 +22,7 @@ from handlers import basic, spaceship
 from middlewares import UserMiddleware
 from utils.token_manager import TokenManager
 
+
 async def main() -> None:
     api = Api(ApiBase())
     if not (await api.ping()):
@@ -39,7 +40,9 @@ async def main() -> None:
     bot = Bot(config.bot_token, default=DefaultBotProperties(parse_mode=ParseMode.HTML))
     dp = Dispatcher(api=api, storage=storage, redis=redis, token_manager=token_manager)
     dp.startup.register(startup)
-    dp.error.register(dialog_errors_handler, ExceptionTypeFilter(UnknownIntent, OutdatedIntent))
+    dp.error.register(
+        dialog_errors_handler, ExceptionTypeFilter(UnknownIntent, OutdatedIntent)
+    )
     dp.include_routers(basic.router, spaceship.router)
     dp.include_routers(setlang.dialog, *main_menu.dialogs())
     setup_dialogs(router=dp)
@@ -71,7 +74,11 @@ async def dialog_errors_handler(error: ErrorEvent):
 
 
 async def set_commands(bot: Bot) -> None:
-    commands = {"start": "main menu", "spaceship": "your spaceship", "lang": "change language"}
+    commands = {
+        "start": "main menu",
+        "spaceship": "your spaceship",
+        "lang": "change language",
+    }
 
     cmds = [BotCommand(command=cmd, description=desc) for cmd, desc in commands.items()]
 

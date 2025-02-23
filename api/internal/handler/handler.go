@@ -46,6 +46,8 @@ func (h *Handler) Register(app *fiber.App) {
 	systems := app.Group("/systems")
 	systems.Post("/", h.SudoMiddleware, h.createSystem)
 	systems.Get("/:id/planets", h.JwtMiddleware(), h.getSystemPlanets)
+	systems.Get("/:id", h.JwtMiddleware(), h.getSystemByID)
+	systems.Get("/", h.JwtMiddleware(), h.getAllSystems)
 
 	planets := app.Group("/planets")
 	planets.Post("/", h.SudoMiddleware, h.createPlanet)

@@ -15,6 +15,7 @@ const (
 
 type Planet struct {
 	ID       uuid.UUID `gorm:"type:uuid;default:gen_random_uuid()"`
+	Name     string
 	SystemID uuid.UUID
 	System   System
 	Threat   string

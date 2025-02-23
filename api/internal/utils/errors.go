@@ -26,7 +26,7 @@ func New(msg string, status int) APIError {
 var (
 	ErrUserAlreadyExists              = New("user with this username already exists", http.StatusConflict)
 	ErrServerError                    = New("server error", http.StatusInternalServerError)
-	ErrInvalidToken                   = New("invalid token (for example 123456789:AbCdEf123456xyz7v)", http.StatusForbidden)
+	ErrInvalidToken                   = New("invalid token", http.StatusForbidden)
 	ErrUnauthorized                   = New("unauthorized", http.StatusUnauthorized)
 	ErrSpaceshipNotFound              = New("spaceship not found", http.StatusNotFound)
 	ErrUserNotFound                   = New("user not found", http.StatusNotFound)

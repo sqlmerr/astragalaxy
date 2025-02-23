@@ -4,10 +4,9 @@ from aiogram.fsm.state import State
 from aiogram.types import CallbackQuery
 from aiogram_dialog import Dialog, Window, DialogManager, StartMode
 from aiogram_dialog.widgets.kbd import Button
-from aiogram_dialog.widgets.text import Const
 
-from .states import MainMenuSG, SpaceshipSG
-from . import spaceship
+from .states import MainMenuSG, SpaceshipSG, StarMapSG
+from . import spaceship, starmap
 from .. import I18NFormat
 
 
@@ -30,10 +29,15 @@ dialog = Dialog(
             id="spaceship",
             on_click=start_dialog(SpaceshipSG.choose),
         ),
+        Button(
+            I18NFormat("starmap_menu_btn"),
+            id="starmap",
+            on_click=start_dialog(StarMapSG.select),
+        ),
         state=MainMenuSG.main,
     )
 )
 
 
 def dialogs() -> list[Dialog]:
-    return [dialog, spaceship.dialog]
+    return [dialog, spaceship.dialog, starmap.dialog]
