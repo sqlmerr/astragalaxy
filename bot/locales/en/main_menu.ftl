@@ -16,7 +16,14 @@ invalid_spaceship_name = ❌ <b><i>name is invalid:</i></b>
       - it cannot be only numbers
 spaceship_menu_copy_name = copy name
 
-starmap_menu_btn = 🌃 star map
 starmap_menu = 🌃 <b><i>star map</i></b>
-starmap_system_info = ☀️ <b>System</b> <code>{ $name }</code>
+starmap_system_info = ☀️ <b>system</b> <code>{ $name }</code>
     - <b>id</b>: <code>{ $id }</code>
+starmap_planet = 🪐 <b>planet</b> <code>{ $name }</code>
+    - <b>in the</b> <code>{ $system_name }</code> <b>system</b>
+    <code>............</code>
+    ⚠️ <b>threat:</b> { $threat }
+
+flight-error = error
+flight-success = ✅
+flight-not_in_spaceship = ⚠ You must be in your spaceship!

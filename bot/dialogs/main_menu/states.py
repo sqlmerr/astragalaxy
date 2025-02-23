@@ -14,3 +14,4 @@ class SpaceshipSG(StatesGroup):
 class StarMapSG(StatesGroup):
     select = State()
     info = State()
+    planet = State()

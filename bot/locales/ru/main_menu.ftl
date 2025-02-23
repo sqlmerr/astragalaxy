@@ -16,7 +16,22 @@ invalid_spaceship_name = ❌ <b><i>имя не подходит по крите�
       - не может быть только цифрам🌃и
 spaceship_menu_copy_name = скопировать имя
 
-starmap_menu_btn = 🌃 звездная карта
 starmap_menu = 🌃 <b><i>звездная карта</i></b>
-starmap_system_info = ☀️ <b>Система</b> <code>{ $name }</code>
+starmap_system_info = ☀️ <b>система</b> <code>{ $name }</code>
     - <b>id</b>: <code>{ $id }</code>
+
+starmap_planet = 🪐 <b>планета</b> <code>{ $name }</code>
+    - <b>находится в системе</b> <code>{ $system_name }</code>
+    <code>............</code>
+    ⚠️ <b>опасность:</b> { $threat ->
+        *[other] none
+        [toxins] токсичность
+        [radiation] радиация
+        [heat] жара
+        [freezing] холод
+    }
+
+
+flight-error = error
+flight-success = ✅
+flight-not_in_spaceship = ⚠ Ты должен сидеть в корабле!

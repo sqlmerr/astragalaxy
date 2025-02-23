@@ -30,7 +30,7 @@ dialog = Dialog(
             on_click=start_dialog(SpaceshipSG.choose),
         ),
         Button(
-            I18NFormat("starmap_menu_btn"),
+            I18NFormat("btn-starmap-menu"),
             id="starmap",
             on_click=start_dialog(StarMapSG.select),
         ),

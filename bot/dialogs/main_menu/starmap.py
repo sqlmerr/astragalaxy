@@ -13,10 +13,13 @@ from aiogram_dialog.widgets.kbd import (
     SwitchTo,
 )
 from aiogram_dialog.widgets.text import Const, Format
+from aiogram_i18n import I18nContext
 
 from api import Api
+from api.types.planet import Planet
 from api.types.system import System
 from api.types.token import TokenPair
+from api.types.user import User
 from dialogs import I18NFormat
 from dialogs.main_menu import SpaceshipSG
 from dialogs.main_menu.states import StarMapSG, MainMenuSG
@@ -81,6 +84,57 @@ async def info_getter(dialog_manager: DialogManager, **_kwargs):
     }
 
 
+async def select_planet(callback: CallbackQuery, button: Button, manager: DialogManager) -> None:
+    api: Api = manager.middleware_data["api"]
+    token_pair: TokenPair = manager.middleware_data["token_pair"]
+    system: System = System.model_validate(manager.dialog_data["system"])
+    planet_id = manager.item_id
+    planets = await api.get_system_planets(token_pair.jwt_token, system.id)
+    planet = list(filter(lambda p: str(p.id) == planet_id, planets))
+    if len(planet) == 0:
+        print(planets)
+        await callback.answer("error")
+        return
+
+    planet = planet[0]
+    manager.dialog_data["planet"] = planet.model_dump(mode="json")
+    await manager.switch_to(StarMapSG.planet)
+
+async def planet_getter(dialog_manager: DialogManager, **_kwargs) -> dict:
+    planet: Planet = Planet.model_validate(dialog_manager.dialog_data["planet"])
+    system: System = System.model_validate(dialog_manager.dialog_data["system"])
+
+    return {
+        "name": planet.name,
+        "id": str(planet.id),
+        "threat": planet.threat.name.lower(),
+        "system_name": system.name
+    }
+
+
+async def flight_to_planet(callback: CallbackQuery, button: Button, manager: DialogManager) -> None:
+    i18n: I18nContext = manager.middleware_data["i18n"]
+    api: Api = manager.middleware_data["api"]
+    token_pair: TokenPair = manager.middleware_data["token_pair"]
+    planet: Planet = Planet.model_validate(manager.dialog_data["planet"])
+    user: User = User.model_validate(manager.middleware_data["user"])
+    if not user.in_spaceship:
+        await callback.answer(i18n.flight.not_in_spaceship())
+        return
+
+    sp = [s for s in user.spaceships if s.player_sit_in]
+    if len(sp) == 0:
+        await callback.answer(i18n.flight.error())
+        return
+    spaceship = sp[0]
+
+    ok = await api.flight_to_planet(token_pair.jwt_token, planet.id, spaceship.id)
+    if not ok:
+        await callback.answer(i18n.flight.error())
+        return
+    await callback.answer(i18n.flight.success(), True)
+
+
 dialog = Dialog(
     Window(
         I18NFormat("starmap_menu"),
@@ -121,7 +175,7 @@ dialog = Dialog(
     Window(
         I18NFormat("starmap_system_info", keys={"name": "name", "id": "id"}),
         ListGroup(
-            Button(Format("{item.name}"), id="planet"),
+            Button(Format("{item.name}"), id="planet", on_click=select_planet),
             id="planet_list",
             items="planets",
             item_id_getter=lambda i: i.id,
@@ -130,4 +184,11 @@ dialog = Dialog(
         state=StarMapSG.info,
         getter=info_getter,
     ),
+    Window(
+        I18NFormat("starmap_planet", keys={"name": "name", "threat": "threat", "system_name": "system_name"}),
+        Button(I18NFormat("btn-travel"), id="travel", on_click=flight_to_planet),
+        SwitchTo(Const("←"), id="to_select", state=StarMapSG.info),
+        state=StarMapSG.planet,
+        getter=planet_getter,
+    )
 )

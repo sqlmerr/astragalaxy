@@ -18,7 +18,7 @@ from api import Api
 from api.base import ApiBase
 from config_reader import config
 from dialogs import setlang, main_menu
-from handlers import basic, spaceship
+from handlers import basic, spaceship, starmap
 from middlewares import UserMiddleware
 from utils.token_manager import TokenManager
 
@@ -43,7 +43,7 @@ async def main() -> None:
     dp.error.register(
         dialog_errors_handler, ExceptionTypeFilter(UnknownIntent, OutdatedIntent)
     )
-    dp.include_routers(basic.router, spaceship.router)
+    dp.include_routers(basic.router, spaceship.router, starmap.router)
     dp.include_routers(setlang.dialog, *main_menu.dialogs())
     setup_dialogs(router=dp)
     dp.message.middleware(UserMiddleware())
@@ -77,6 +77,7 @@ async def set_commands(bot: Bot) -> None:
     commands = {
         "start": "main menu",
         "spaceship": "your spaceship",
+        "starmap": "star map",
         "lang": "change language",
     }
 
