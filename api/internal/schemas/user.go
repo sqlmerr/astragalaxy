@@ -12,7 +12,7 @@ type UserSchema struct {
 	TelegramID  int64             `json:"telegram_id"`
 	Spaceships  []SpaceshipSchema `json:"spaceships"`
 	InSpaceship bool              `json:"in_spaceship"`
-	LocationID  uuid.UUID         `json:"location_id"`
+	Location    string            `json:"location"`
 	SystemID    uuid.UUID         `json:"system_id"`
 }
 
@@ -26,7 +26,7 @@ type UpdateUserSchema struct {
 	TelegramID  int64             `json:"telegram_id"`
 	Spaceships  []SpaceshipSchema `json:"spaceships"`
 	InSpaceship bool              `json:"in_spaceship"`
-	LocationID  uuid.UUID         `json:"location_id"`
+	Location    string            `json:"location"`
 	SystemID    uuid.UUID         `json:"system_id"`
 }
 
@@ -37,7 +37,7 @@ func UserSchemaFromUser(val models.User) UserSchema {
 			ID:          sp.ID,
 			Name:        sp.Name,
 			UserID:      sp.UserID,
-			LocationID:  sp.LocationID,
+			Location:    sp.Location,
 			FlownOutAt:  sp.FlownOutAt,
 			Flying:      *sp.Flying,
 			SystemID:    sp.SystemID,
@@ -52,7 +52,7 @@ func UserSchemaFromUser(val models.User) UserSchema {
 		TelegramID:  val.TelegramID,
 		Spaceships:  spaceships,
 		InSpaceship: *val.InSpaceship,
-		LocationID:  val.LocationID,
+		Location:    val.Location,
 		SystemID:    val.SystemID,
 	}
 }

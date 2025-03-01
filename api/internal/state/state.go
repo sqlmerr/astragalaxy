@@ -16,7 +16,6 @@ type State struct {
 	SpaceshipService *services.SpaceshipService
 	PlanetService    *services.PlanetService
 	SystemService    *services.SystemService
-	LocationService  *services.LocationService
 	ItemService      *services.ItemService
 	MasterRegistry   *registry.MasterRegistry
 	Config           *utils.Config
@@ -28,9 +27,6 @@ func New(db *gorm.DB) *State {
 
 	systemRepository := repositories.NewSystemRepository(db)
 	systemService := services.NewSystemService(systemRepository)
-
-	locationRepository := repositories.NewLocationRepository(db)
-	locationService := services.NewLocationService(locationRepository)
 
 	spaceshipRepository := repositories.NewSpaceshipRepository(db)
 	spaceshipService := services.NewSpaceshipService(spaceshipRepository, planetService, systemService)
@@ -57,8 +53,13 @@ func New(db *gorm.DB) *State {
 	if err != nil {
 		panic(err)
 	}
+	locationRegistry := registry.NewLocation()
+	err = locationRegistry.Load(filepath.Join(projectRoot, "data", "locations.json"))
+	if err != nil {
+		panic(err)
+	}
 
-	masterRegistry := registry.NewMaster(itemRegistry, tagRegistry)
+	masterRegistry := registry.NewMaster(itemRegistry, tagRegistry, locationRegistry)
 	config := utils.NewConfig(".env")
 
 	return &State{
@@ -66,7 +67,6 @@ func New(db *gorm.DB) *State {
 		SpaceshipService: &spaceshipService,
 		PlanetService:    &planetService,
 		SystemService:    &systemService,
-		LocationService:  &locationService,
 		ItemService:      &itemService,
 		MasterRegistry:   &masterRegistry,
 		Config:           &config,

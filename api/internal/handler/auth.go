@@ -32,17 +32,12 @@ func (h *Handler) registerFromTelegram(c *fiber.Ctx) error {
 		return c.Status(http.StatusUnprocessableEntity).JSON(utils.NewError(err))
 	}
 
-	location, err := h.locationService.FindOneByCode("space_station")
-	if err != nil || location == nil {
-		return c.Status(http.StatusInternalServerError).JSON(utils.NewError(utils.ErrServerError))
-	}
-
 	system, err := h.systemService.FindOneByName("initial")
 	if err != nil || system == nil {
 		return c.Status(http.StatusInternalServerError).JSON(utils.NewError(utils.ErrServerError))
 	}
 
-	user, err := h.userService.Register(*req, location.ID, system.ID)
+	user, err := h.userService.Register(*req, "space_station", system.ID)
 	if err != nil || user == nil {
 		if errors.Is(err, utils.ErrUserAlreadyExists) {
 			return c.Status(http.StatusForbidden).JSON(utils.NewError(err))
@@ -51,7 +46,7 @@ func (h *Handler) registerFromTelegram(c *fiber.Ctx) error {
 	}
 
 	spaceship, err := h.spaceshipService.Create(schemas.CreateSpaceshipSchema{
-		Name: "initial", UserID: user.ID, LocationID: location.ID, SystemID: system.ID,
+		Name: "initial", UserID: user.ID, Location: "space_station", SystemID: system.ID,
 	})
 	if err != nil || spaceship == nil {
 		return c.Status(http.StatusInternalServerError).JSON(utils.NewError(utils.ErrServerError))

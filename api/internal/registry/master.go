@@ -1,13 +1,15 @@
 package registry
 
 type MasterRegistry struct {
-	Item ItemRegistry
-	Tag  TagRegistry
+	Item     ItemRegistry
+	Tag      TagRegistry
+	Location LocationRegistry
 }
 
-func NewMaster(item ItemRegistry, tag TagRegistry) MasterRegistry {
+func NewMaster(item ItemRegistry, tag TagRegistry, location LocationRegistry) MasterRegistry {
 	return MasterRegistry{
-		Item: item,
-		Tag:  tag,
+		Item:     item,
+		Tag:      tag,
+		Location: location,
 	}
 }

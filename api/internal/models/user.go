@@ -8,8 +8,7 @@ type User struct {
 	TelegramID  int64     `gorm:"unique"`
 	Spaceships  []Spaceship
 	InSpaceship *bool `gorm:"default:false"`
-	LocationID  uuid.UUID
-	Location    Location
+	Location    string
 	SystemID    uuid.UUID
 	System      System
 	Token       string `gorm:"not null"`

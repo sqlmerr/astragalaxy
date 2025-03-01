@@ -8,7 +8,7 @@ type SpaceshipSchema struct {
 	ID          uuid.UUID `json:"id"`
 	Name        string    `json:"name"`
 	UserID      uuid.UUID `json:"user_id"`
-	LocationID  uuid.UUID `json:"location_id"`
+	Location    string    `json:"location"`
 	FlownOutAt  int64     `json:"flown_out_at"`
 	Flying      bool      `json:"flying"`
 	SystemID    uuid.UUID `json:"system_id"`
@@ -17,16 +17,16 @@ type SpaceshipSchema struct {
 }
 
 type CreateSpaceshipSchema struct {
-	Name       string    `json:"name"`
-	UserID     uuid.UUID `json:"user_id"`
-	LocationID uuid.UUID `json:"location_id"`
-	SystemID   uuid.UUID `json:"system_id"`
+	Name     string    `json:"name"`
+	UserID   uuid.UUID `json:"user_id"`
+	Location string    `json:"location"`
+	SystemID uuid.UUID `json:"system_id"`
 }
 
 type UpdateSpaceshipSchema struct {
 	Name        string    `json:"name"`
 	UserID      uuid.UUID `json:"user_id"`
-	LocationID  uuid.UUID `json:"location_id"`
+	Location    string    `json:"location"`
 	FlownOutAt  int64     `json:"flown_out_at"`
 	Flying      bool      `json:"flying"`
 	SystemID    uuid.UUID `json:"system_id"`

@@ -5,11 +5,12 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"github.com/stretchr/testify/assert"
 	"io"
 	"net/http"
 	"net/http/httptest"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestGetMySpaceships(t *testing.T) {
@@ -126,6 +127,7 @@ func TestRenameMySpaceship(t *testing.T) {
 	req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", userJwtToken))
 
 	res, err := app.Test(req, -1)
+	assert.NoError(t, err)
 
 	if assert.Equal(t, http.StatusOK, res.StatusCode) {
 		body, err := io.ReadAll(res.Body)

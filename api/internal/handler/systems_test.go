@@ -5,11 +5,12 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"github.com/stretchr/testify/assert"
 	"io"
 	"net/http"
 	"net/http/httptest"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestCreateSystem(t *testing.T) {
@@ -86,7 +87,7 @@ func TestGetAllSystems(t *testing.T) {
 	system, err := stateObj.SystemService.FindOneByName("initial")
 	assert.NoError(t, err)
 
-	req := httptest.NewRequest(http.MethodGet, fmt.Sprintf("/systems"), nil)
+	req := httptest.NewRequest(http.MethodGet, "/systems", nil)
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("Authorization", fmt.Sprintf("Bearer %v", userJwtToken))
 	res, err := app.Test(req, -1)

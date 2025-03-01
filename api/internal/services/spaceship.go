@@ -23,10 +23,10 @@ func NewSpaceshipService(r repositories.SpaceshipRepo, planetService PlanetServi
 
 func (s *SpaceshipService) Create(data schemas.CreateSpaceshipSchema) (*schemas.SpaceshipSchema, error) {
 	spaceship := models.Spaceship{
-		Name:       data.Name,
-		UserID:     data.UserID,
-		LocationID: data.LocationID,
-		SystemID:   data.SystemID,
+		Name:     data.Name,
+		UserID:   data.UserID,
+		Location: data.Location,
+		SystemID: data.SystemID,
 	}
 
 	response, err := s.r.Create(&spaceship)
@@ -46,7 +46,7 @@ func (s *SpaceshipService) FindOne(ID uuid.UUID) (*schemas.SpaceshipSchema, erro
 		ID:          response.ID,
 		Name:        response.Name,
 		UserID:      response.UserID,
-		LocationID:  response.LocationID,
+		Location:    response.Location,
 		FlownOutAt:  response.FlownOutAt,
 		Flying:      *response.Flying,
 		SystemID:    response.SystemID,
@@ -67,7 +67,7 @@ func (s *SpaceshipService) FindAll(filter *models.Spaceship) ([]schemas.Spaceshi
 				ID:         sp.ID,
 				Name:       sp.Name,
 				UserID:     sp.UserID,
-				LocationID: sp.LocationID,
+				Location:   sp.Location,
 				FlownOutAt: sp.FlownOutAt,
 				Flying:     *sp.Flying,
 				SystemID:   sp.SystemID,
@@ -86,7 +86,7 @@ func (s *SpaceshipService) Update(ID uuid.UUID, data schemas.UpdateSpaceshipSche
 		ID:          ID,
 		Name:        data.Name,
 		UserID:      data.UserID,
-		LocationID:  data.LocationID,
+		Location:    data.Location,
 		FlownOutAt:  data.FlownOutAt,
 		Flying:      &data.Flying,
 		SystemID:    data.SystemID,
@@ -119,6 +119,7 @@ func (s *SpaceshipService) Fly(ID uuid.UUID, planetID uuid.UUID) error {
 			sp := models.Spaceship{
 				Flying:     &flying,
 				FlownOutAt: 0,
+				Location:   "planet",
 			}
 			s.r.Update(&sp)
 		} else {

@@ -3,7 +3,6 @@ package handler
 import (
 	"astragalaxy/internal/schemas"
 	"astragalaxy/internal/utils"
-	"log"
 	"net/http"
 
 	"github.com/gofiber/fiber/v2"
@@ -30,7 +29,10 @@ func (h *Handler) createPlanet(c *fiber.Ctx) error {
 		return c.Status(http.StatusUnprocessableEntity).JSON(utils.NewError(err))
 	}
 
-	log.Println(req.Threat)
+	if !utils.ValidatePlanetThreat(req.Threat) {
+		return c.Status(http.StatusUnprocessableEntity).JSON(utils.New("Invalid threat", http.StatusUnprocessableEntity))
+	}
+
 	planet, err := h.planetService.Create(*req)
 	if err != nil {
 		return c.Status(http.StatusInternalServerError).JSON(utils.NewError(utils.ErrServerError))

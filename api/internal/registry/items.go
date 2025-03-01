@@ -68,5 +68,5 @@ func (r *ItemRegistry) FindOne(code string) (*Item, error) {
 		}
 	}
 
-	return nil, utils.ErrItemNotFound
+	return nil, utils.ErrNotFound
 }

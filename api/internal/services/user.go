@@ -20,7 +20,7 @@ func NewUserService(r repositories.UserRepo, spaceshipService SpaceshipService) 
 	return UserService{r: r, spaceshipService: spaceshipService}
 }
 
-func (s *UserService) Register(data schemas.CreateUserSchema, locationID uuid.UUID, systemID uuid.UUID) (*schemas.UserSchema, error) {
+func (s *UserService) Register(data schemas.CreateUserSchema, location string, systemID uuid.UUID) (*schemas.UserSchema, error) {
 	usr, err := s.r.FindOneByUsername(data.Username)
 	if err != nil {
 		return nil, err
@@ -32,7 +32,7 @@ func (s *UserService) Register(data schemas.CreateUserSchema, locationID uuid.UU
 	u := models.User{
 		Username:   data.Username,
 		TelegramID: data.TelegramID,
-		LocationID: locationID,
+		Location:   location,
 		SystemID:   systemID,
 		Token:      utils.GenerateToken(32),
 	}
@@ -105,7 +105,7 @@ func (s *UserService) Update(ID uuid.UUID, data schemas.UpdateUserSchema) error 
 			ID:          sp.ID,
 			Name:        sp.Name,
 			UserID:      sp.UserID,
-			LocationID:  sp.LocationID,
+			Location:    sp.Location,
 			FlownOutAt:  sp.FlownOutAt,
 			Flying:      &sp.Flying,
 			SystemID:    sp.SystemID,
@@ -120,7 +120,7 @@ func (s *UserService) Update(ID uuid.UUID, data schemas.UpdateUserSchema) error 
 		TelegramID:  data.TelegramID,
 		Spaceships:  spaceships,
 		InSpaceship: &data.InSpaceship,
-		LocationID:  data.LocationID,
+		Location:    data.Location,
 		SystemID:    data.SystemID,
 	}
 

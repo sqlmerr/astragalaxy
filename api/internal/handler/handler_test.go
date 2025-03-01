@@ -32,7 +32,6 @@ func TestMain(m *testing.M) {
 	}
 
 	db.AutoMigrate(&models.Planet{})
-	db.AutoMigrate(&models.Location{})
 	db.AutoMigrate(&models.System{})
 	db.AutoMigrate(&models.Spaceship{})
 	db.AutoMigrate(&models.User{})
@@ -60,23 +59,14 @@ func setup(state *state.State) {
 		panic(err)
 	}
 
-	loc, err := state.LocationService.Create(schemas.CreateLocationSchema{
-		Code:        "space_station",
-		Multiplayer: true,
-	})
-	if err != nil {
-		panic(err)
-	}
-
-	fmt.Println("Initial location:", loc)
 	fmt.Println("Initial system:", sys)
 
-	user, err := state.UserService.Register(schemas.CreateUserSchema{TelegramID: 123456789, Username: "tester"}, loc.ID, sys.ID)
+	user, err := state.UserService.Register(schemas.CreateUserSchema{TelegramID: 123456789, Username: "tester"}, "space_station", sys.ID)
 	if err != nil {
 		panic(err)
 	}
 
-	spcship, err := state.SpaceshipService.Create(schemas.CreateSpaceshipSchema{Name: "initial", UserID: user.ID, LocationID: loc.ID, SystemID: sys.ID})
+	spcship, err := state.SpaceshipService.Create(schemas.CreateSpaceshipSchema{Name: "initial", UserID: user.ID, Location: "space_station", SystemID: sys.ID})
 	if err != nil {
 		panic(err)
 	}

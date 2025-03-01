@@ -28,11 +28,12 @@ var (
 	ErrServerError                    = New("server error", http.StatusInternalServerError)
 	ErrInvalidToken                   = New("invalid token", http.StatusForbidden)
 	ErrUnauthorized                   = New("unauthorized", http.StatusUnauthorized)
-	ErrSpaceshipNotFound              = New("spaceship not found", http.StatusNotFound)
-	ErrUserNotFound                   = New("user not found", http.StatusNotFound)
-	ErrPlanetNotFound                 = New("planet not found", http.StatusNotFound)
-	ErrItemNotFound                   = New("item not found", http.StatusNotFound)
-	ErrItemDataTagNotFound            = New("item data tag not found", http.StatusNotFound)
+	ErrSpaceshipNotFound              = ErrNotFound
+	ErrNotFound                       = New("not found", http.StatusNotFound)
+	ErrUserNotFound                   = ErrNotFound
+	ErrPlanetNotFound                 = ErrNotFound
+	ErrItemNotFound                   = ErrNotFound
+	ErrItemDataTagNotFound            = ErrNotFound
 	ErrSpaceshipAlreadyFlying         = New("spaceship is already flying", http.StatusBadRequest)
 	ErrSpaceshipIsInAnotherSystem     = New("spaceship is in another system", http.StatusBadRequest)
 	ErrSpaceshipIsAlreadyInThisPlanet = New("spaceship is already in this planet", http.StatusBadRequest)

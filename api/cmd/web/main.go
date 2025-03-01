@@ -41,7 +41,6 @@ func main() {
 	}
 
 	db.AutoMigrate(&models.Planet{})
-	db.AutoMigrate(&models.Location{})
 	db.AutoMigrate(&models.System{})
 	db.AutoMigrate(&models.Spaceship{})
 	db.AutoMigrate(&models.User{})

@@ -12,7 +12,6 @@ type Handler struct {
 	spaceshipService *services.SpaceshipService
 	planetService    *services.PlanetService
 	systemService    *services.SystemService
-	locationService  *services.LocationService
 	itemService      *services.ItemService
 	state            *state.State
 }
@@ -23,7 +22,6 @@ func NewHandler(state *state.State) Handler {
 		spaceshipService: state.SpaceshipService,
 		planetService:    state.PlanetService,
 		systemService:    state.SystemService,
-		locationService:  state.LocationService,
 		itemService:      state.ItemService,
 		state:            state,
 	}
@@ -58,4 +56,6 @@ func (h *Handler) Register(app *fiber.App) {
 	registry := app.Group("/registry")
 	registry.Get("/items/:code", h.getItemByCode)
 	registry.Get("/items", h.getItems)
+	registry.Get("/locations/:code", h.getLocationByCode)
+	registry.Get("/locations", h.getLocations)
 }
