@@ -9,19 +9,19 @@ import (
 
 // getItemByCode godoc
 //
-// @Summary Get item from registry by code
-// @Description Jwt Token required
-// @Tags registry
-// @Accept json
-// @Produce json
-// @Param code path string true "Item Code"
-// @Success 200 {object} registry.Item
-// @Failure 500 {object} utils.Error
-// @Failure 400 {object} utils.Error
-// @Failure 403 {object} utils.Error
-// @Failure 404 {object} utils.Error
-// @Failure 422 {object} utils.Error
-// @Router /registry/items/{code} [get]
+//	@Summary		Get item from registry by code
+//	@Description	Jwt Token required
+//	@Tags			registry
+//	@Accept			json
+//	@Produce		json
+//	@Param			code	path		string	true	"Item Code"
+//	@Success		200		{object}	registry.Item
+//	@Failure		500		{object}	utils.Error
+//	@Failure		400		{object}	utils.Error
+//	@Failure		403		{object}	utils.Error
+//	@Failure		404		{object}	utils.Error
+//	@Failure		422		{object}	utils.Error
+//	@Router			/registry/items/{code} [get]
 func (h *Handler) getItemByCode(c *fiber.Ctx) error {
 	code := c.Params("code")
 	if code == "" {
@@ -39,16 +39,16 @@ func (h *Handler) getItemByCode(c *fiber.Ctx) error {
 
 // getItems godoc
 //
-// @Summary Get all items from registry
-// @Description Jwt Token required
-// @Tags registry
-// @Produce json
-// @Success 200 {object} []registry.Item
-// @Failure 500 {object} utils.Error
-// @Failure 400 {object} utils.Error
-// @Failure 403 {object} utils.Error
-// @Failure 422 {object} utils.Error
-// @Router /registry/items [get]
+//	@Summary		Get all items from registry
+//	@Description	Jwt Token required
+//	@Tags			registry
+//	@Produce		json
+//	@Success		200	{object}	[]registry.Item
+//	@Failure		500	{object}	utils.Error
+//	@Failure		400	{object}	utils.Error
+//	@Failure		403	{object}	utils.Error
+//	@Failure		422	{object}	utils.Error
+//	@Router			/registry/items [get]
 func (h *Handler) getItems(c *fiber.Ctx) error {
 	items := h.state.MasterRegistry.Item.All()
 	return c.JSON(items)
@@ -56,16 +56,16 @@ func (h *Handler) getItems(c *fiber.Ctx) error {
 
 // getLocations godoc
 //
-// @Summary Get all locations from registry
-// @Description Jwt Token required
-// @Tags registry
-// @Produce json
-// @Success 200 {object} []registry.Location
-// @Failure 500 {object} utils.Error
-// @Failure 400 {object} utils.Error
-// @Failure 403 {object} utils.Error
-// @Failure 422 {object} utils.Error
-// @Router /registry/locations [get]
+//	@Summary		Get all locations from registry
+//	@Description	Jwt Token required
+//	@Tags			registry
+//	@Produce		json
+//	@Success		200	{object}	[]registry.Location
+//	@Failure		500	{object}	utils.Error
+//	@Failure		400	{object}	utils.Error
+//	@Failure		403	{object}	utils.Error
+//	@Failure		422	{object}	utils.Error
+//	@Router			/registry/locations [get]
 func (h *Handler) getLocations(c *fiber.Ctx) error {
 	locations := h.state.MasterRegistry.Location.All()
 	return c.JSON(locations)
@@ -73,19 +73,19 @@ func (h *Handler) getLocations(c *fiber.Ctx) error {
 
 // getLocationByCode godoc
 //
-// @Summary Get location from registry by code
-// @Description Jwt Token required
-// @Tags registry
-// @Accept json
-// @Produce json
-// @Param code path string true "Location Code"
-// @Success 200 {object} registry.Location
-// @Failure 500 {object} utils.Error
-// @Failure 400 {object} utils.Error
-// @Failure 403 {object} utils.Error
-// @Failure 404 {object} utils.Error
-// @Failure 422 {object} utils.Error
-// @Router /registry/locations/{code} [get]
+//	@Summary		Get location from registry by code
+//	@Description	Jwt Token required
+//	@Tags			registry
+//	@Accept			json
+//	@Produce		json
+//	@Param			code	path		string	true	"Location Code"
+//	@Success		200		{object}	registry.Location
+//	@Failure		500		{object}	utils.Error
+//	@Failure		400		{object}	utils.Error
+//	@Failure		403		{object}	utils.Error
+//	@Failure		404		{object}	utils.Error
+//	@Failure		422		{object}	utils.Error
+//	@Router			/registry/locations/{code} [get]
 func (h *Handler) getLocationByCode(c *fiber.Ctx) error {
 	code := c.Params("code")
 	if code == "" {

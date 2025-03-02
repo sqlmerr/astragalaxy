@@ -29,6 +29,14 @@ func (s *UserService) Register(data schemas.CreateUserSchema, location string, s
 		return nil, utils.ErrUserAlreadyExists
 	}
 
+	usr, err = s.FindOneRawByTelegramID(data.TelegramID)
+	if err != nil {
+		return nil, err
+	}
+	if usr != nil {
+		return nil, utils.ErrUserAlreadyExists
+	}
+
 	u := models.User{
 		Username:   data.Username,
 		TelegramID: data.TelegramID,
@@ -83,6 +91,9 @@ func (s *UserService) FindOneByTelegramID(telegramID int64) (*schemas.UserSchema
 	if err != nil {
 		return nil, err
 	}
+	if user == nil {
+		return nil, utils.ErrUserNotFound
+	}
 
 	schema := schemas.UserSchemaFromUser(*user)
 	return &schema, nil
@@ -106,8 +117,6 @@ func (s *UserService) Update(ID uuid.UUID, data schemas.UpdateUserSchema) error 
 			Name:        sp.Name,
 			UserID:      sp.UserID,
 			Location:    sp.Location,
-			FlownOutAt:  sp.FlownOutAt,
-			Flying:      &sp.Flying,
 			SystemID:    sp.SystemID,
 			PlanetID:    sp.PlanetID,
 			PlayerSitIn: &sp.PlayerSitIn,

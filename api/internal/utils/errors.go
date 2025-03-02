@@ -28,12 +28,13 @@ var (
 	ErrServerError                    = New("server error", http.StatusInternalServerError)
 	ErrInvalidToken                   = New("invalid token", http.StatusForbidden)
 	ErrUnauthorized                   = New("unauthorized", http.StatusUnauthorized)
-	ErrSpaceshipNotFound              = ErrNotFound
 	ErrNotFound                       = New("not found", http.StatusNotFound)
+	ErrSpaceshipNotFound              = ErrNotFound
 	ErrUserNotFound                   = ErrNotFound
 	ErrPlanetNotFound                 = ErrNotFound
 	ErrItemNotFound                   = ErrNotFound
 	ErrItemDataTagNotFound            = ErrNotFound
+	ErrIDMustBeUUID                   = New("id must be an uuid type", 400)
 	ErrSpaceshipAlreadyFlying         = New("spaceship is already flying", http.StatusBadRequest)
 	ErrSpaceshipIsInAnotherSystem     = New("spaceship is in another system", http.StatusBadRequest)
 	ErrSpaceshipIsAlreadyInThisPlanet = New("spaceship is already in this planet", http.StatusBadRequest)

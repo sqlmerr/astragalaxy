@@ -7,8 +7,8 @@ type Spaceship struct {
 	Name        string    `gorm:"not null"`
 	UserID      uuid.UUID
 	Location    string
-	FlownOutAt  int64
-	Flying      *bool `gorm:"not null;default:false"`
+	Flight      FlightInfo
+	FlightID    uuid.UUID `gorm:"default:null"`
 	SystemID    uuid.UUID
 	System      System
 	PlanetID    uuid.UUID `gorm:"default:null"`

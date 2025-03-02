@@ -17,21 +17,21 @@ import (
 	"gorm.io/gorm"
 )
 
-// @title Astragalaxy API
-// @version 0.1.0
-// @description Astragalaxy API
-// @license.name MIT
-// @host localhost:8000
-// @BasePath /
+//	@title			Astragalaxy API
+//	@version		0.1.0
+//	@description	Astragalaxy API
+//	@license.name	MIT
+//	@host			localhost:8000
+//	@BasePath		/
 
-// @securityDefinitions.apikey SudoToken
-// @in header
-// @name secret-token
+//	@securityDefinitions.apikey	SudoToken
+//	@in							header
+//	@name						secret-token
 
 // @securityDefinitions.apikey	JwtAuth
-// @in header
-// @name Authorization
-// @description You need to type "Bearer" before the token
+// @in							header
+// @name						Authorization
+// @description				You need to type "Bearer" before the token
 func main() {
 	config := utils.NewConfig(".env")
 	db, err := gorm.Open(postgres.Open(config.DatabaseURL), &gorm.Config{})
@@ -46,6 +46,7 @@ func main() {
 	db.AutoMigrate(&models.User{})
 	db.AutoMigrate(&models.Item{})
 	db.AutoMigrate(&models.ItemDataTag{})
+	db.AutoMigrate(&models.FlightInfo{})
 
 	app := fiber.New()
 

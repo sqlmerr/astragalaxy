@@ -38,8 +38,6 @@ func UserSchemaFromUser(val models.User) UserSchema {
 			Name:        sp.Name,
 			UserID:      sp.UserID,
 			Location:    sp.Location,
-			FlownOutAt:  sp.FlownOutAt,
-			Flying:      *sp.Flying,
 			SystemID:    sp.SystemID,
 			PlanetID:    sp.PlanetID,
 			PlayerSitIn: *sp.PlayerSitIn,

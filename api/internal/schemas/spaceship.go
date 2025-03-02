@@ -9,8 +9,6 @@ type SpaceshipSchema struct {
 	Name        string    `json:"name"`
 	UserID      uuid.UUID `json:"user_id"`
 	Location    string    `json:"location"`
-	FlownOutAt  int64     `json:"flown_out_at"`
-	Flying      bool      `json:"flying"`
 	SystemID    uuid.UUID `json:"system_id"`
 	PlanetID    uuid.UUID `json:"planet_id"`
 	PlayerSitIn bool      `json:"player_sit_in"`
@@ -27,8 +25,6 @@ type UpdateSpaceshipSchema struct {
 	Name        string    `json:"name"`
 	UserID      uuid.UUID `json:"user_id"`
 	Location    string    `json:"location"`
-	FlownOutAt  int64     `json:"flown_out_at"`
-	Flying      bool      `json:"flying"`
 	SystemID    uuid.UUID `json:"system_id"`
 	PlanetID    uuid.UUID `json:"planet_id"`
 	PlayerSitIn bool      `json:"player_sit_in"`
@@ -37,9 +33,4 @@ type UpdateSpaceshipSchema struct {
 type RenameSpaceshipSchema struct {
 	SpaceshipID uuid.UUID `json:"spaceship_id"`
 	Name        string    `json:"name"`
-}
-
-type FlySpaceshipSchema struct {
-	PlanetID    uuid.UUID `json:"planet_id"`
-	SpaceshipID uuid.UUID `json:"spaceship_id"`
 }

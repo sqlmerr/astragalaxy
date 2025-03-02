@@ -14,18 +14,18 @@ import (
 
 // registerFromTelegram godoc
 //
-// @Summary Register account from telegram
-// @Description Register account using telegram id and username. Sudo token required.
-// @Tags auth
-// @Accept json
-// @Produce json
-// @Param schema body schemas.CreateUserSchema true "Create User Schema"
-// @Success 201 {object} schemas.UserSchema
-// @Failure 500 {object} utils.Error
-// @Failure 403 {object} utils.Error
-// @Failure 422 {object} utils.Error
-// @Security SudoToken
-// @Router /auth/register [post]
+//	@Summary		Register account from telegram
+//	@Description	Register account using telegram id and username. Sudo token required.
+//	@Tags			auth
+//	@Accept			json
+//	@Produce		json
+//	@Param			schema	body		schemas.CreateUserSchema	true	"Create User Schema"
+//	@Success		201		{object}	schemas.UserSchema
+//	@Failure		500		{object}	utils.Error
+//	@Failure		403		{object}	utils.Error
+//	@Failure		422		{object}	utils.Error
+//	@Security		SudoToken
+//	@Router			/auth/register [post]
 func (h *Handler) registerFromTelegram(c *fiber.Ctx) error {
 	req := &schemas.CreateUserSchema{}
 	if err := c.BodyParser(&req); err != nil {
@@ -68,17 +68,17 @@ func (h *Handler) registerFromTelegram(c *fiber.Ctx) error {
 
 // login godoc
 //
-// @Summary Login using user token
-// @Description Login. Auth not required.
-// @Tags auth
-// @Accept json
-// @Produce json
-// @Param payload body schemas.AuthPayload true "Auth Payload"
-// @Success 200 {object} schemas.AuthBody
-// @Failure 500 {object} utils.Error
-// @Failure 403 {object} utils.Error
-// @Failure 422 {object} utils.Error
-// @Router /auth/login [post]
+//	@Summary		Login using user token
+//	@Description	Login. Auth not required.
+//	@Tags			auth
+//	@Accept			json
+//	@Produce		json
+//	@Param			payload	body		schemas.AuthPayload	true	"Auth Payload"
+//	@Success		200		{object}	schemas.AuthBody
+//	@Failure		500		{object}	utils.Error
+//	@Failure		403		{object}	utils.Error
+//	@Failure		422		{object}	utils.Error
+//	@Router			/auth/login [post]
 func (h *Handler) login(c *fiber.Ctx) error {
 	req := &schemas.AuthPayload{}
 
@@ -102,16 +102,16 @@ func (h *Handler) login(c *fiber.Ctx) error {
 
 // getMe godoc
 //
-// @Summary GetMe
-// @Description Get me. Auth required
-// @ID get-me
-// @Tags auth
-// @Produce  json
-// @Success 200 {object} schemas.UserSchema
-// @Failure 500 {object} utils.Error
-// @Failure 403 {object} utils.Error
-// @Security JwtAuth
-// @Router /auth/me [get]
+//	@Summary		GetMe
+//	@Description	Get me. Auth required
+//	@ID				get-me
+//	@Tags			auth
+//	@Produce		json
+//	@Success		200	{object}	schemas.UserSchema
+//	@Failure		500	{object}	utils.Error
+//	@Failure		403	{object}	utils.Error
+//	@Security		JwtAuth
+//	@Router			/auth/me [get]
 func (h *Handler) getMe(c *fiber.Ctx) error {
 	user := c.Locals("user").(*schemas.UserSchema)
 	// spaceships, err := h.spaceshipService.FindAll(&models.Spaceship{UserID: user.ID})
@@ -125,18 +125,18 @@ func (h *Handler) getMe(c *fiber.Ctx) error {
 
 // getUserTokenSudo godoc
 //
-// @Summary Get user token using sudo token
-// @Description Sudo token required
-// @Tags auth
-// @Accept json
-// @Produce json
-// @Param telegram_id query string true "User telegram id"
-// @Success 200 {object} schemas.UserTokenResponseSchema
-// @Failure 500 {object} utils.Error
-// @Failure 403 {object} utils.Error
-// @Failure 422 {object} utils.Error
-// @Security SudoToken
-// @Router /auth/token/sudo [get]
+//	@Summary		Get user token using sudo token
+//	@Description	Sudo token required
+//	@Tags			auth
+//	@Accept			json
+//	@Produce		json
+//	@Param			telegram_id	query		string	true	"User telegram id"
+//	@Success		200			{object}	schemas.UserTokenResponseSchema
+//	@Failure		500			{object}	utils.Error
+//	@Failure		403			{object}	utils.Error
+//	@Failure		422			{object}	utils.Error
+//	@Security		SudoToken
+//	@Router			/auth/token/sudo [get]
 func (h *Handler) getUserTokenSudo(c *fiber.Ctx) error {
 	telegramID := c.Query("telegram_id", "")
 	log.Println(telegramID)

@@ -29,7 +29,8 @@ func New(db *gorm.DB) *State {
 	systemService := services.NewSystemService(systemRepository)
 
 	spaceshipRepository := repositories.NewSpaceshipRepository(db)
-	spaceshipService := services.NewSpaceshipService(spaceshipRepository, planetService, systemService)
+	flightRepository := repositories.NewFlightRepository(db)
+	spaceshipService := services.NewSpaceshipService(spaceshipRepository, flightRepository, planetService, systemService)
 
 	userRepository := repositories.NewUserRepository(db)
 	userService := services.NewUserService(userRepository, spaceshipService)

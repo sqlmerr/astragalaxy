@@ -10,18 +10,18 @@ import (
 
 // createPlanet godoc
 //
-// @Summary Create planet using sudo token
-// @Description Sudo token required
-// @Tags planets
-// @Accept json
-// @Produce json
-// @Param req body schemas.CreatePlanetSchema true "create planet schema"
-// @Success 201 {object} schemas.PlanetSchema
-// @Failure 500 {object} utils.Error
-// @Failure 403 {object} utils.Error
-// @Failure 422 {object} utils.Error
-// @Security SudoToken
-// @Router /planets [post]
+//	@Summary		Create planet using sudo token
+//	@Description	Sudo token required
+//	@Tags			planets
+//	@Accept			json
+//	@Produce		json
+//	@Param			req	body		schemas.CreatePlanetSchema	true	"create planet schema"
+//	@Success		201	{object}	schemas.PlanetSchema
+//	@Failure		500	{object}	utils.Error
+//	@Failure		403	{object}	utils.Error
+//	@Failure		422	{object}	utils.Error
+//	@Security		SudoToken
+//	@Router			/planets [post]
 func (h *Handler) createPlanet(c *fiber.Ctx) error {
 	req := &schemas.CreatePlanetSchema{}
 

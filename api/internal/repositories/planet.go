@@ -9,7 +9,7 @@ import (
 )
 
 type PlanetRepo interface {
-	Create(p *models.Planet) (*uuid.UUID, error)
+	Create(m *models.Planet) (*uuid.UUID, error)
 	FindOne(ID uuid.UUID) (*models.Planet, error)
 	FindAll(filter *models.Planet) ([]models.Planet, error)
 	Delete(ID uuid.UUID) error
@@ -24,11 +24,7 @@ func NewPlanetRepository(db *gorm.DB) PlanetRepository {
 	return PlanetRepository{db: db}
 }
 
-func (r PlanetRepository) Create(p *models.Planet) (*uuid.UUID, error) {
-	m := models.Planet{
-		SystemID: p.SystemID,
-		Threat:   p.Threat,
-	}
+func (r PlanetRepository) Create(m *models.Planet) (*uuid.UUID, error) {
 	if err := r.db.Create(&m).Error; err != nil {
 		return nil, err
 	}

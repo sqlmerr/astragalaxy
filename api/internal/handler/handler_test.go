@@ -5,6 +5,7 @@ import (
 	"astragalaxy/internal/schemas"
 	"astragalaxy/internal/state"
 	"astragalaxy/internal/utils"
+	"astragalaxy/pkg/test"
 	"fmt"
 	"os"
 	"testing"
@@ -22,6 +23,7 @@ var (
 	sudoToken    string
 	stateObj     *state.State
 	spaceship    *schemas.SpaceshipSchema
+	executor     *test.Executor
 )
 
 func TestMain(m *testing.M) {
@@ -91,6 +93,8 @@ func setup(state *state.State) {
 	if err != nil || jwtToken == nil {
 		panic(err)
 	}
+
+	executor = test.New(app)
 
 	userJwtToken = *jwtToken
 	userToken = token

@@ -34,7 +34,7 @@ func (r SpaceshipRepository) Create(s *models.Spaceship) (*uuid.UUID, error) {
 func (r SpaceshipRepository) FindOne(ID uuid.UUID) (*models.Spaceship, error) {
 	var m models.Spaceship
 
-	if err := r.db.Find(&m, ID).Error; err != nil {
+	if err := r.db.Preload("Flight").Find(&m, ID).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, nil
 		}

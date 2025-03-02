@@ -13,17 +13,17 @@ import (
 
 // createSystem godoc
 //
-// @Summary Create system
-// @Description Sudo Token required
-// @Tags systems
-// @Produce json
-// @Param req body schemas.CreateSystemSchema true "create system schema"
-// @Success 201 {object} schemas.SystemSchema
-// @Failure 500 {object} utils.Error
-// @Failure 403 {object} utils.Error
-// @Failure 422 {object} utils.Error
-// @Security SudoToken
-// @Router /systems [post]
+//	@Summary		Create system
+//	@Description	Sudo Token required
+//	@Tags			systems
+//	@Produce		json
+//	@Param			req	body		schemas.CreateSystemSchema	true	"create system schema"
+//	@Success		201	{object}	schemas.SystemSchema
+//	@Failure		500	{object}	utils.Error
+//	@Failure		403	{object}	utils.Error
+//	@Failure		422	{object}	utils.Error
+//	@Security		SudoToken
+//	@Router			/systems [post]
 func (h *Handler) createSystem(c *fiber.Ctx) error {
 	req := &schemas.CreateSystemSchema{}
 	if err := utils.BodyParser(req, c); err != nil {
@@ -40,17 +40,17 @@ func (h *Handler) createSystem(c *fiber.Ctx) error {
 
 // getSystemPlanets godoc
 //
-// @Summary get system planets
-// @Description Jwt Token required
-// @Tags systems
-// @Produce json
-// @Param id path string true "system id"
-// @Success 200 {object} []schemas.PlanetSchema
-// @Failure 500 {object} utils.Error
-// @Failure 403 {object} utils.Error
-// @Failure 422 {object} utils.Error
-// @Security JwtAuth
-// @Router /systems/{id}/planets [get]
+//	@Summary		get system planets
+//	@Description	Jwt Token required
+//	@Tags			systems
+//	@Produce		json
+//	@Param			id	path		string	true	"system id"
+//	@Success		200	{object}	[]schemas.PlanetSchema
+//	@Failure		500	{object}	utils.Error
+//	@Failure		403	{object}	utils.Error
+//	@Failure		422	{object}	utils.Error
+//	@Security		JwtAuth
+//	@Router			/systems/{id}/planets [get]
 func (h *Handler) getSystemPlanets(c *fiber.Ctx) error {
 	ID, err := uuid.Parse(c.Params("id"))
 	if err != nil {
@@ -74,16 +74,16 @@ func (h *Handler) getSystemPlanets(c *fiber.Ctx) error {
 
 // getAllSystems godoc
 //
-// @Summary get all systems
-// @Description Jwt Token required
-// @Tags systems
-// @Produce json
-// @Success 200 {object} []schemas.SystemSchema
-// @Failure 500 {object} utils.Error
-// @Failure 403 {object} utils.Error
-// @Failure 422 {object} utils.Error
-// @Security JwtAuth
-// @Router /systems [get]
+//	@Summary		get all systems
+//	@Description	Jwt Token required
+//	@Tags			systems
+//	@Produce		json
+//	@Success		200	{object}	[]schemas.SystemSchema
+//	@Failure		500	{object}	utils.Error
+//	@Failure		403	{object}	utils.Error
+//	@Failure		422	{object}	utils.Error
+//	@Security		JwtAuth
+//	@Router			/systems [get]
 func (h *Handler) getAllSystems(c *fiber.Ctx) error {
 	systems := h.systemService.FindAll()
 	return c.JSON(systems)
@@ -91,17 +91,17 @@ func (h *Handler) getAllSystems(c *fiber.Ctx) error {
 
 // getSystemByID godoc
 //
-// @Summary get one system
-// @Description Jwt Token required
-// @Tags systems
-// @Produce json
-// @Param id path string true "system id"
-// @Success 200 {object} schemas.SystemSchema
-// @Failure 500 {object} utils.Error
-// @Failure 403 {object} utils.Error
-// @Failure 422 {object} utils.Error
-// @Security JwtAuth
-// @Router /systems/{id} [get]
+//	@Summary		get one system
+//	@Description	Jwt Token required
+//	@Tags			systems
+//	@Produce		json
+//	@Param			id	path		string	true	"system id"
+//	@Success		200	{object}	schemas.SystemSchema
+//	@Failure		500	{object}	utils.Error
+//	@Failure		403	{object}	utils.Error
+//	@Failure		422	{object}	utils.Error
+//	@Security		JwtAuth
+//	@Router			/systems/{id} [get]
 func (h *Handler) getSystemByID(c *fiber.Ctx) error {
 	ID, err := uuid.Parse(c.Params("id"))
 	if err != nil {

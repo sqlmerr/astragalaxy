@@ -14,23 +14,23 @@ import (
 
 // getSpaceshipByID godoc
 //
-// @Summary Get spaceship by id
-// @Description Jwt Token required
-// @Tags spaceships
-// @Accept json
-// @Produce json
-// @Param id path string true "Spaceship ID. Must be a UUID"
-// @Success 200 {object} schemas.SpaceshipSchema
-// @Failure 500 {object} utils.Error
-// @Failure 400 {object} utils.Error
-// @Failure 403 {object} utils.Error
-// @Failure 422 {object} utils.Error
-// @Security JwtAuth
-// @Router /spaceships/{id} [get]
+//	@Summary		Get spaceship by id
+//	@Description	Jwt Token required
+//	@Tags			spaceships
+//	@Accept			json
+//	@Produce		json
+//	@Param			id	path		string	true	"Spaceship ID. Must be a UUID"
+//	@Success		200	{object}	schemas.SpaceshipSchema
+//	@Failure		500	{object}	utils.Error
+//	@Failure		400	{object}	utils.Error
+//	@Failure		403	{object}	utils.Error
+//	@Failure		422	{object}	utils.Error
+//	@Security		JwtAuth
+//	@Router			/spaceships/{id} [get]
 func (h *Handler) getSpaceshipByID(c *fiber.Ctx) error {
 	ID, err := uuid.Parse(c.Params("id"))
 	if err != nil {
-		return c.Status(http.StatusBadRequest).JSON(utils.NewError(errors.New("id must be an uuid type")))
+		return c.Status(http.StatusBadRequest).JSON(utils.NewError(utils.ErrIDMustBeUUID))
 	}
 
 	spaceship, err := h.spaceshipService.FindOne(ID)
@@ -46,16 +46,16 @@ func (h *Handler) getSpaceshipByID(c *fiber.Ctx) error {
 
 // getMySpaceships godoc
 //
-// @Summary Get authorized user spaceships
-// @Description Jwt Token required
-// @Tags spaceships
-// @Produce json
-// @Success 200 {object} []schemas.SpaceshipSchema
-// @Failure 500 {object} utils.Error
-// @Failure 403 {object} utils.Error
-// @Failure 422 {object} utils.Error
-// @Security JwtAuth
-// @Router /spaceships/my [get]
+//	@Summary		Get authorized user spaceships
+//	@Description	Jwt Token required
+//	@Tags			spaceships
+//	@Produce		json
+//	@Success		200	{object}	[]schemas.SpaceshipSchema
+//	@Failure		500	{object}	utils.Error
+//	@Failure		403	{object}	utils.Error
+//	@Failure		422	{object}	utils.Error
+//	@Security		JwtAuth
+//	@Router			/spaceships/my [get]
 func (h *Handler) getMySpaceships(c *fiber.Ctx) error {
 	user := c.Locals("user").(*schemas.UserSchema)
 	spaceships, err := h.spaceshipService.FindAll(&models.Spaceship{UserID: user.ID})
@@ -68,18 +68,18 @@ func (h *Handler) getMySpaceships(c *fiber.Ctx) error {
 
 // enterMySpaceship godoc
 //
-// @Summary Enter authorized user spaceship
-// @Description Jwt Token required
-// @Tags spaceships
-// @Produce json
-// @Param id path string true "Spaceship ID. Must be a UUID"
-// @Success 200 {object} schemas.OkResponseSchema
-// @Failure 500 {object} utils.Error
-// @Failure 400 {object} utils.Error
-// @Failure 403 {object} utils.Error
-// @Failure 422 {object} utils.Error
-// @Security JwtAuth
-// @Router /spaceships/my/{id}/enter [post]
+//	@Summary		Enter authorized user spaceship
+//	@Description	Jwt Token required
+//	@Tags			spaceships
+//	@Produce		json
+//	@Param			id	path		string	true	"Spaceship ID. Must be a UUID"
+//	@Success		200	{object}	schemas.OkResponseSchema
+//	@Failure		500	{object}	utils.Error
+//	@Failure		400	{object}	utils.Error
+//	@Failure		403	{object}	utils.Error
+//	@Failure		422	{object}	utils.Error
+//	@Security		JwtAuth
+//	@Router			/spaceships/my/{id}/enter [post]
 func (h *Handler) enterMySpaceship(c *fiber.Ctx) error {
 	ID, err := uuid.Parse(c.Params("id"))
 	if err != nil {
@@ -90,7 +90,7 @@ func (h *Handler) enterMySpaceship(c *fiber.Ctx) error {
 
 	err = h.userService.EnterSpaceship(*user, ID)
 	if err != nil {
-		var apiErr *utils.APIError
+		var apiErr utils.APIError
 		ok := errors.As(err, &apiErr)
 		if ok {
 			return c.Status(apiErr.Status()).JSON(utils.NewError(apiErr))
@@ -102,17 +102,17 @@ func (h *Handler) enterMySpaceship(c *fiber.Ctx) error {
 
 // exitMySpaceship godoc
 //
-// @Summary Exit authorized user spaceship
-// @Description Jwt Token required
-// @Tags spaceships
-// @Produce json
-// @Param id path string true "Spaceship ID. Must be a UUID"
-// @Success 200 {object} schemas.OkResponseSchema
-// @Failure 500 {object} utils.Error
-// @Failure 403 {object} utils.Error
-// @Failure 422 {object} utils.Error
-// @Security JwtAuth
-// @Router /spaceships/my/{id}/exit [post]
+//	@Summary		Exit authorized user spaceship
+//	@Description	Jwt Token required
+//	@Tags			spaceships
+//	@Produce		json
+//	@Param			id	path		string	true	"Spaceship ID. Must be a UUID"
+//	@Success		200	{object}	schemas.OkResponseSchema
+//	@Failure		500	{object}	utils.Error
+//	@Failure		403	{object}	utils.Error
+//	@Failure		422	{object}	utils.Error
+//	@Security		JwtAuth
+//	@Router			/spaceships/my/{id}/exit [post]
 func (h *Handler) exitMySpaceship(c *fiber.Ctx) error {
 	ID, err := uuid.Parse(c.Params("id"))
 	if err != nil {
@@ -135,18 +135,18 @@ func (h *Handler) exitMySpaceship(c *fiber.Ctx) error {
 
 // renameMySpaceship godoc
 //
-// @Summary Rename authorized user spaceship
-// @Description Jwt Token required
-// @Tags spaceships
-// @Accept json
-// @Produce json
-// @Param req body schemas.RenameSpaceshipSchema true "rename spaceship schema"
-// @Success 200 {object} schemas.OkResponseSchema
-// @Failure 500 {object} utils.Error
-// @Failure 403 {object} utils.Error
-// @Failure 422 {object} utils.Error
-// @Security JwtAuth
-// @Router /spaceships/my/rename [put]
+//	@Summary		Rename authorized user spaceship
+//	@Description	Jwt Token required
+//	@Tags			spaceships
+//	@Accept			json
+//	@Produce		json
+//	@Param			req	body		schemas.RenameSpaceshipSchema	true	"rename spaceship schema"
+//	@Success		200	{object}	schemas.OkResponseSchema
+//	@Failure		500	{object}	utils.Error
+//	@Failure		403	{object}	utils.Error
+//	@Failure		422	{object}	utils.Error
+//	@Security		JwtAuth
+//	@Router			/spaceships/my/rename [put]
 func (h *Handler) renameMySpaceship(c *fiber.Ctx) error {
 	req := &schemas.RenameSpaceshipSchema{}
 	if err := utils.BodyParser(req, c); err != nil {
