@@ -33,10 +33,6 @@ func (e *Executor) TestHTTP(t *testing.T, tests []HTTPTest, headers ...map[strin
 		res, err := e.app.Test(req, -1)
 
 		assert.NoError(t, err, test.Description)
-		//b, err := io.ReadAll(res.Body)
-		//var arbuz interface{}
-		//json.Unmarshal(b, &arbuz)
-		//fmt.Println(res.StatusCode, arbuz)
 		assert.Equalf(t, test.ExpectedCode, res.StatusCode, test.Description)
 		if test.ExpectedError || test.BodyValidator == nil {
 			continue
