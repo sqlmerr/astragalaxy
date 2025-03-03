@@ -52,6 +52,7 @@ func (h *Handler) Register(app *fiber.App) {
 
 	flights := app.Group("/flights", h.JwtMiddleware(), h.UserGetter)
 	flights.Post("/planet", h.flightToPlanet)
+	flights.Post("/hyperjump", h.hyperJump)
 	flights.Get("/info", h.checkFlight)
 
 	registry := app.Group("/registry")

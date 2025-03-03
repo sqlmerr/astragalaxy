@@ -3,5 +3,15 @@
         "code": "space_station",
         "emoji": "🛰️",
         "multiplayer": true
+    },
+    {
+        "code": "system",
+        "emoji": "☀\uFE0F",
+        "multiplayer": false
+    },
+    {
+        "code": "planet",
+        "emoji": "\uD83E\uDE90",
+        "multiplayer": false
     }
 ]

@@ -56,6 +56,53 @@ func (h *Handler) flightToPlanet(c *fiber.Ctx) error {
 	return c.JSON(schemas.OkResponseSchema{Ok: true, CustomStatusCode: 1})
 }
 
+// hyperJump godoc
+//
+//	@Summary		Flight to system
+//	@Description	HyperJump. Jwt token required
+//	@Tags			flights
+//	@Accept			json
+//	@Produce		json
+//	@Param			req	body		schemas.HyperJumpSchema	true	"hyper jump schema"
+//	@Success		200	{object}	schemas.OkResponseSchema
+//	@Failure		500	{object}	utils.Error
+//	@Failure		403	{object}	utils.Error
+//	@Failure		422	{object}	utils.Error
+//	@Security		JwtAuth
+//	@Router			/flights/hyperjump [post]
+func (h *Handler) hyperJump(c *fiber.Ctx) error {
+	user := c.Locals("user").(*schemas.UserSchema)
+	req := &schemas.HyperJumpSchema{}
+	if err := utils.BodyParser(req, c); err != nil {
+		return c.Status(http.StatusUnprocessableEntity).JSON(utils.New(err.Error(), 422))
+	}
+
+	s, err := h.spaceshipService.FindOne(req.SpaceshipID)
+	if err != nil {
+		var apiErr utils.APIError
+		ok := errors.As(err, &apiErr)
+		if ok {
+			return c.Status(apiErr.Status()).JSON(utils.NewError(apiErr))
+		}
+		return c.Status(http.StatusInternalServerError).JSON(utils.NewError(err))
+	}
+
+	if s.UserID != user.ID {
+		return c.Status(http.StatusNotFound).JSON(utils.ErrSpaceshipNotFound)
+	}
+
+	err = h.spaceshipService.HyperJump(req.SpaceshipID, req.SystemID)
+	if err != nil {
+		var apiErr utils.APIError
+		ok := errors.As(err, &apiErr)
+		if ok {
+			return c.Status(apiErr.Status()).JSON(utils.NewError(apiErr))
+		}
+		return c.Status(http.StatusInternalServerError).JSON(utils.NewError(err))
+	}
+	return c.JSON(schemas.OkResponseSchema{Ok: true, CustomStatusCode: 1})
+}
+
 // checkFlight godoc
 //
 //	@Summary		Get flight info

@@ -14,3 +14,8 @@ type FlyToPlanetSchema struct {
 	SpaceshipID uuid.UUID `json:"spaceship_id"`
 	PlanetID    uuid.UUID `json:"planet_id"`
 }
+
+type HyperJumpSchema struct {
+	SpaceshipID uuid.UUID `json:"spaceship_id"`
+	SystemID    uuid.UUID `json:"system_id"`
+}
