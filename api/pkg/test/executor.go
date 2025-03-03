@@ -1,7 +1,6 @@
 package test
 
 import (
-	"encoding/json"
 	"github.com/gofiber/fiber/v2"
 	"github.com/stretchr/testify/assert"
 	"io"
@@ -30,16 +29,13 @@ func (e *Executor) TestHTTP(t *testing.T, tests []HTTPTest, headers ...map[strin
 
 		assert.NoError(t, err, test.Description)
 		assert.Equalf(t, test.ExpectedCode, res.StatusCode, test.Description)
-		if test.ExpectedError || test.ExpectedBodyKeys == nil {
+		if test.ExpectedError || test.BodyValidator == nil {
 			continue
 		}
 		body, err := io.ReadAll(res.Body)
 		assert.NoErrorf(t, err, test.Description)
-		var bodyKeys map[string]interface{}
-		err = json.Unmarshal(body, &bodyKeys)
-		assert.NoErrorf(t, err, test.Description)
-		for k, v := range test.ExpectedBodyKeys {
-			assert.Equalf(t, v, bodyKeys[k], test.Description)
+		if test.BodyValidator != nil {
+			test.BodyValidator(body)
 		}
 	}
 }

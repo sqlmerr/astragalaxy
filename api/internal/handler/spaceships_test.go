@@ -15,26 +15,29 @@ import (
 )
 
 func TestGetMySpaceships(t *testing.T) {
-	req := httptest.NewRequest(http.MethodGet, "/spaceships/my", nil)
-	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", userJwtToken))
+	tests := []test.HTTPTest{
+		{
+			Description:   "Should return 200 OK response",
+			Method:        http.MethodGet,
+			ExpectedCode:  http.StatusOK,
+			ExpectedError: false,
+			Route:         "/spaceships/my",
+			BodyValidator: func(body []byte) {
+				var b []schemas.SpaceshipSchema
+				err := json.Unmarshal(body, &b)
+				assert.NoError(t, err)
+				assert.NotEmpty(t, b)
 
-	res, err := app.Test(req, -1)
-	assert.NoError(t, err)
-
-	if assert.Equal(t, http.StatusOK, res.StatusCode) {
-		body, err := io.ReadAll(res.Body)
-		assert.NoError(t, err)
-
-		var response []schemas.SpaceshipSchema
-
-		err = json.Unmarshal(body, &response)
-		assert.NoError(t, err)
-
-		assert.NotEmpty(t, response)
-		assert.Len(t, response, 1)
-		assert.Equal(t, response[0].Name, spaceship.Name)
+				assert.Len(t, b, 1)
+				assert.Equal(t, b[0].Name, spaceship.Name)
+			},
+		},
 	}
+
+	executor.TestHTTP(t, tests, map[string]string{
+		"Content-Type":  "application/json",
+		"Authorization": fmt.Sprintf("Bearer %s", userJwtToken)},
+	)
 }
 
 func TestGetSpaceshipByID(t *testing.T) {
@@ -44,10 +47,13 @@ func TestGetSpaceshipByID(t *testing.T) {
 			Route:         fmt.Sprintf("/spaceships/%s", spaceship.ID),
 			ExpectedError: false,
 			ExpectedCode:  200,
-			ExpectedBodyKeys: map[string]interface{}{
-				"id":      spaceship.ID.String(),
-				"name":    spaceship.Name,
-				"user_id": spaceship.UserID.String(),
+			BodyValidator: func(body []byte) {
+				var b map[string]interface{}
+				err := json.Unmarshal(body, &b)
+				assert.NoError(t, err)
+				assert.Equal(t, spaceship.ID.String(), b["id"].(string))
+				assert.Equal(t, spaceship.Name, b["name"].(string))
+				assert.Equal(t, spaceship.UserID.String(), b["user_id"].(string))
 			},
 			Method: http.MethodGet,
 		},
@@ -75,9 +81,12 @@ func TestEnterMySpaceship(t *testing.T) {
 			Route:         fmt.Sprintf("/spaceships/my/%s/enter", spaceship.ID),
 			ExpectedError: false,
 			ExpectedCode:  200,
-			ExpectedBodyKeys: map[string]interface{}{
-				"ok":                 true,
-				"custom_status_code": float64(1),
+			BodyValidator: func(body []byte) {
+				var b map[string]interface{}
+				err := json.Unmarshal(body, &b)
+				assert.NoError(t, err)
+				assert.Equal(t, true, b["ok"])
+				assert.Equal(t, float64(1), b["custom_status_code"])
 			},
 			Method: http.MethodPost,
 		},
