@@ -24,12 +24,27 @@ import (
 //	@Security		JwtAuth
 //	@Router			/flights/planet [post]
 func (h *Handler) flightToPlanet(c *fiber.Ctx) error {
+	user := c.Locals("user").(*schemas.UserSchema)
 	req := &schemas.FlyToPlanetSchema{}
 	if err := utils.BodyParser(req, c); err != nil {
-		return c.Status(http.StatusUnprocessableEntity).JSON(utils.NewError(err))
+		return c.Status(http.StatusUnprocessableEntity).JSON(utils.New(err.Error(), 422))
 	}
 
-	err := h.spaceshipService.Fly(req.SpaceshipID, req.PlanetID)
+	s, err := h.spaceshipService.FindOne(req.SpaceshipID)
+	if err != nil {
+		var apiErr utils.APIError
+		ok := errors.As(err, &apiErr)
+		if ok {
+			return c.Status(apiErr.Status()).JSON(utils.NewError(apiErr))
+		}
+		return c.Status(http.StatusInternalServerError).JSON(utils.NewError(err))
+	}
+
+	if s.UserID != user.ID {
+		return c.Status(http.StatusNotFound).JSON(utils.ErrSpaceshipNotFound)
+	}
+
+	err = h.spaceshipService.Fly(req.SpaceshipID, req.PlanetID)
 	if err != nil {
 		var apiErr utils.APIError
 		ok := errors.As(err, &apiErr)

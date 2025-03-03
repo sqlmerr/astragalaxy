@@ -58,7 +58,10 @@ func TestGetSystemPlanets(t *testing.T) {
 		err = json.Unmarshal(body, &response)
 		assert.NoError(t, err)
 
-		assert.Len(t, response, 0)
+		assert.Len(t, response, 1)
+		planet := response[0]
+		assert.Equal(t, "testPlanet1", planet.Name)
+		assert.Equal(t, "TOXINS", planet.Threat)
 	}
 }
 

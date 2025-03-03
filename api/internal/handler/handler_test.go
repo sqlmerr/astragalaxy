@@ -61,6 +61,11 @@ func setup(state *state.State) {
 		panic(err)
 	}
 
+	_, err = state.PlanetService.Create(schemas.CreatePlanetSchema{Name: "testPlanet1", SystemID: sys.ID, Threat: "TOXINS"})
+	if err != nil {
+		panic(err)
+	}
+
 	fmt.Println("Initial system:", sys)
 
 	user, err := state.UserService.Register(schemas.CreateUserSchema{TelegramID: 123456789, Username: "tester"}, "space_station", sys.ID)

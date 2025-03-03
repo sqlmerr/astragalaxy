@@ -116,9 +116,6 @@ func (s *SpaceshipService) Fly(ID uuid.UUID, planetID uuid.UUID) error {
 		FlownOutAt:    spaceship.Flight.FlownOutAt,
 	}
 
-	if flight.Destination != "planet" {
-		return utils.ErrSpaceshipAlreadyFlying
-	}
 	if flight.Flying && flight.FlownOutAt == 0 {
 		return utils.ErrServerError
 	} else if !*spaceship.PlayerSitIn {
@@ -129,7 +126,6 @@ func (s *SpaceshipService) Fly(ID uuid.UUID, planetID uuid.UUID) error {
 		now := time.Now().UTC()
 		flownOutAt := time.Unix(flight.FlownOutAt, 0)
 		if now.Sub(flownOutAt).Minutes() >= 1 {
-
 			flying := false
 			fl := models.FlightInfo{
 				ID:          spaceship.Flight.ID,
