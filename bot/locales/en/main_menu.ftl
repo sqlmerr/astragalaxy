@@ -23,7 +23,10 @@ starmap_planet = 🪐 <b>planet</b> <code>{ $name }</code>
     - <b>in the</b> <code>{ $system_name }</code> <b>system</b>
     <code>............</code>
     ⚠️ <b>threat:</b> { $threat }
+starmap-flight-info = 🛸 <b>flying</b>
+    - <i>time left:</i> { $time } sec.
 
 flight-error = error
+flight-error-already_flying = You're already flying!
 flight-success = ✅
 flight-not_in_spaceship = ⚠ You must be in your spaceship!

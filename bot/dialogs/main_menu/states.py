@@ -15,3 +15,4 @@ class StarMapSG(StatesGroup):
     select = State()
     info = State()
     planet = State()
+    flight = State()

@@ -11,5 +11,5 @@ class User(BaseModel):
     telegram_id: int
     spaceships: list[Spaceship]
     in_spaceship: bool
-    location_id: UUID
+    location: str
     system_id: UUID

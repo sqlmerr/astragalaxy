@@ -1,3 +1,6 @@
+from _pyrepl.commands import refresh
+
+from aiogram import F
 from aiogram.types import CallbackQuery
 from aiogram_dialog import Dialog, Window, DialogManager, StartMode
 from aiogram_dialog.widgets.kbd import (
@@ -111,6 +114,33 @@ async def planet_getter(dialog_manager: DialogManager, **_kwargs) -> dict:
         "system_name": system.name
     }
 
+async def flight_info_getter(dialog_manager: DialogManager, **_kwargs) -> dict:
+    api: Api = dialog_manager.middleware_data["api"]
+    token_pair: TokenPair = dialog_manager.middleware_data["token_pair"]
+
+    user: User = User.model_validate(dialog_manager.middleware_data["user"])
+    if not user.in_spaceship:
+        print('a')
+        return {
+            "ok": False
+        }
+
+    sp = [s for s in user.spaceships if s.player_sit_in]
+    if len(sp) == 0:
+        print('b')
+        return {
+            "ok": False
+        }
+    spaceship = sp[0]
+    info = await api.get_flight_info(token_pair.jwt_token, spaceship.id)
+    dialog_manager.dialog_data["flying"] = info.flying
+
+    return {
+        "flight": info,
+        **info.model_dump(),
+        "ok": True
+    }
+
 
 async def flight_to_planet(callback: CallbackQuery, button: Button, manager: DialogManager) -> None:
     i18n: I18nContext = manager.middleware_data["i18n"]
@@ -128,11 +158,54 @@ async def flight_to_planet(callback: CallbackQuery, button: Button, manager: Dia
         return
     spaceship = sp[0]
 
-    ok = await api.flight_to_planet(token_pair.jwt_token, planet.id, spaceship.id)
-    if not ok:
-        await callback.answer(i18n.flight.error())
+    status = await api.flight_to_planet(token_pair.jwt_token, planet.id, spaceship.id)
+    if status != 200:
+        if status == 400:
+            await callback.answer(i18n.flight.error.already_flying())
+        else:
+            await callback.answer(i18n.flight.error())
         return
     await callback.answer(i18n.flight.success(), True)
+    await manager.switch_to(StarMapSG.flight)
+
+
+async def hyperjump(callback: CallbackQuery, button: Button, manager: DialogManager) -> None:
+    i18n: I18nContext = manager.middleware_data["i18n"]
+    api: Api = manager.middleware_data["api"]
+    token_pair: TokenPair = manager.middleware_data["token_pair"]
+    system: System = System.model_validate(manager.dialog_data["system"])
+    user: User = User.model_validate(manager.middleware_data["user"])
+    if not user.in_spaceship:
+        await callback.answer(i18n.flight.not_in_spaceship())
+        return
+
+    sp = [s for s in user.spaceships if s.player_sit_in]
+    if len(sp) == 0:
+        await callback.answer(i18n.flight.error())
+        return
+    spaceship = sp[0]
+
+    status = await api.hyperjump(token_pair.jwt_token, system.id, spaceship.id)
+    if status != 200:
+        if status == 400:
+            await callback.answer(i18n.flight.error.already_flying())
+        else:
+            print(status)
+            await callback.answer(i18n.flight.error())
+        return
+    await callback.answer(i18n.flight.success(), True)
+    await manager.switch_to(StarMapSG.flight)
+
+
+async def refresh_flight_info(callback: CallbackQuery, button: Button, manager: DialogManager) -> None:
+    i18n: I18nContext = manager.middleware_data["i18n"]
+    flying = manager.dialog_data.get("flying")
+    if not flying:
+        await callback.answer(i18n.flight.success())
+        await manager.switch_to(StarMapSG.planet)
+        return
+
+    await callback.answer()
 
 
 dialog = Dialog(
@@ -180,6 +253,7 @@ dialog = Dialog(
             items="planets",
             item_id_getter=lambda i: i.id,
         ),
+        Button(I18NFormat("btn-travel"), id="travel", on_click=hyperjump),
         SwitchTo(Const("←"), id="to_select", state=StarMapSG.select),
         state=StarMapSG.info,
         getter=info_getter,
@@ -190,5 +264,13 @@ dialog = Dialog(
         SwitchTo(Const("←"), id="to_select", state=StarMapSG.info),
         state=StarMapSG.planet,
         getter=planet_getter,
+    ),
+    Window(
+        I18NFormat("starmap-flight-info", keys={"destination": "destination", "time": "remaining_time", "flown_out": "flown_out_at"}, when=F["ok"]),
+        Format("{flight}", when=~F["ok"]),
+        Button(Const("⟳"), id="refresh", on_click=refresh_flight_info, when=F["ok"]),
+        SwitchTo(Const("←"), id="return", state=StarMapSG.info),
+        state=StarMapSG.flight,
+        getter=flight_info_getter,
     )
 )

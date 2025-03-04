@@ -1,4 +1,4 @@
-from . import planet
+from . import planet, hyperjump, info
 
-class Flights(planet.PlanetFlight):
+class Flights(planet.PlanetFlight, hyperjump.HyperJump, info.GetFlightInfo):
     pass

@@ -30,8 +30,11 @@ starmap_planet = 🪐 <b>планета</b> <code>{ $name }</code>
         [heat] жара
         [freezing] холод
     }
+starmap-flight-info = 🛸 <b>летим</b>
+    - <i>осталось времени:</i> { $time } с.
 
 
-flight-error = error
+flight-error = ошибка
+flight-error-already_flying = Вы уже летите!
 flight-success = ✅
 flight-not_in_spaceship = ⚠ Ты должен сидеть в корабле!

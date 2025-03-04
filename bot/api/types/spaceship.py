@@ -7,9 +7,7 @@ class Spaceship(BaseModel):
     id: UUID
     name: str
     user_id: UUID
-    location_id: UUID
-    flown_out_at: int
-    flying: bool
+    location: str
     system_id: UUID
     planet_id: UUID
     player_sit_in: bool

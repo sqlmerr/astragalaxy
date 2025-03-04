@@ -1,14 +1,14 @@
-from enum import StrEnum, auto
+from enum import StrEnum
 from uuid import UUID
 
 from pydantic import BaseModel
 
 
 class PlanetThreat(StrEnum):
-    RADIATION = auto()
-    TOXINS = auto()
-    FREEZING = auto()
-    HEAT = auto()
+    RADIATION = "RADIATION"
+    TOXINS = "TOXINS"
+    FREEZING = "FREEZING"
+    HEAT = "HEAT"
 
 
 class Planet(BaseModel):

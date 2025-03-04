@@ -62,7 +62,7 @@ func GetProjectRoot() (string, error) {
 
 		parentDir := filepath.Dir(currentDir)
 		if parentDir == currentDir {
-			return "", fmt.Errorf("project root not found")
+			return ".", nil
 		}
 		currentDir = parentDir
 	}
