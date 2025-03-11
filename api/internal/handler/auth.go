@@ -2,7 +2,7 @@ package handler
 
 import (
 	"astragalaxy/internal/model"
-	"astragalaxy/internal/schemas"
+	"astragalaxy/internal/schema"
 	"astragalaxy/internal/util"
 	"errors"
 	"log"
@@ -19,15 +19,15 @@ import (
 //	@Tags			auth
 //	@Accept			json
 //	@Produce		json
-//	@Param			schema	body		schemas.CreateUserSchema	true	"Create User Schema"
-//	@Success		201		{object}	schemas.UserSchema
+//	@Param			schema	body		schema.CreateUserSchema	true	"Create User Schema"
+//	@Success		201		{object}	schema.UserSchema
 //	@Failure		500		{object}	util.Error
 //	@Failure		403		{object}	util.Error
 //	@Failure		422		{object}	util.Error
 //	@Security		SudoToken
 //	@Router			/auth/register [post]
 func (h *Handler) registerFromTelegram(c *fiber.Ctx) error {
-	req := &schemas.CreateUserSchema{}
+	req := &schema.CreateUserSchema{}
 	if err := c.BodyParser(&req); err != nil {
 		return c.Status(http.StatusUnprocessableEntity).JSON(util.NewError(err))
 	}
@@ -45,7 +45,7 @@ func (h *Handler) registerFromTelegram(c *fiber.Ctx) error {
 		return c.Status(http.StatusInternalServerError).JSON(util.NewError(util.ErrServerError))
 	}
 
-	spaceship, err := h.s.CreateSpaceship(schemas.CreateSpaceshipSchema{
+	spaceship, err := h.s.CreateSpaceship(schema.CreateSpaceshipSchema{
 		Name: "initial", UserID: user.ID, Location: "space_station", SystemID: system.ID,
 	})
 	if err != nil || spaceship == nil {
@@ -73,14 +73,14 @@ func (h *Handler) registerFromTelegram(c *fiber.Ctx) error {
 //	@Tags			auth
 //	@Accept			json
 //	@Produce		json
-//	@Param			payload	body		schemas.AuthPayload	true	"Auth Payload"
-//	@Success		200		{object}	schemas.AuthBody
+//	@Param			payload	body		schema.AuthPayload	true	"Auth Payload"
+//	@Success		200		{object}	schema.AuthBody
 //	@Failure		500		{object}	util.Error
 //	@Failure		403		{object}	util.Error
 //	@Failure		422		{object}	util.Error
 //	@Router			/auth/login [post]
 func (h *Handler) login(c *fiber.Ctx) error {
-	req := &schemas.AuthPayload{}
+	req := &schema.AuthPayload{}
 
 	if err := c.BodyParser(&req); err != nil {
 		return c.Status(http.StatusUnprocessableEntity).JSON(util.NewError(err))
@@ -97,7 +97,7 @@ func (h *Handler) login(c *fiber.Ctx) error {
 		return c.Status(http.StatusForbidden).JSON(util.NewError(util.ErrUnauthorized))
 	}
 
-	return c.JSON(schemas.AuthBody{AccessToken: *jwtToken, TokenType: "Bearer"})
+	return c.JSON(schema.AuthBody{AccessToken: *jwtToken, TokenType: "Bearer"})
 }
 
 // getMe godoc
@@ -107,13 +107,13 @@ func (h *Handler) login(c *fiber.Ctx) error {
 //	@ID				get-me
 //	@Tags			auth
 //	@Produce		json
-//	@Success		200	{object}	schemas.UserSchema
+//	@Success		200	{object}	schema.UserSchema
 //	@Failure		500	{object}	util.Error
 //	@Failure		403	{object}	util.Error
 //	@Security		JwtAuth
 //	@Router			/auth/me [get]
 func (h *Handler) getMe(c *fiber.Ctx) error {
-	user := c.Locals("user").(*schemas.UserSchema)
+	user := c.Locals("user").(*schema.UserSchema)
 	// spaceships, err := h.spaceshipService.FindAll(&model.Spaceship{UserID: user.ID})
 	// if err != nil {
 	// 	return c.Status(http.StatusInternalServerError).JSON(util.NewError(util.ErrServerError))
@@ -131,7 +131,7 @@ func (h *Handler) getMe(c *fiber.Ctx) error {
 //	@Accept			json
 //	@Produce		json
 //	@Param			telegram_id	query		string	true	"User telegram id"
-//	@Success		200			{object}	schemas.UserTokenResponseSchema
+//	@Success		200			{object}	schema.UserTokenResponseSchema
 //	@Failure		500			{object}	util.Error
 //	@Failure		403			{object}	util.Error
 //	@Failure		422			{object}	util.Error
@@ -150,5 +150,5 @@ func (h *Handler) getUserTokenSudo(c *fiber.Ctx) error {
 		return c.Status(http.StatusInternalServerError).JSON(util.NewError(util.ErrServerError))
 	}
 
-	return c.JSON(&schemas.UserTokenResponseSchema{Token: user.Token})
+	return c.JSON(&schema.UserTokenResponseSchema{Token: user.Token})
 }

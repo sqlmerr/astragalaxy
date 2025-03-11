@@ -2,13 +2,13 @@ package service
 
 import (
 	"astragalaxy/internal/model"
-	"astragalaxy/internal/schemas"
+	"astragalaxy/internal/schema"
 	"astragalaxy/internal/util"
 
 	"github.com/google/uuid"
 )
 
-func (s *Service) AddItem(userID uuid.UUID, itemCode string, dataTags map[string]string) (*schemas.ItemSchema, error) {
+func (s *Service) AddItem(userID uuid.UUID, itemCode string, dataTags map[string]string) (*schema.ItemSchema, error) {
 	item := model.Item{
 		UserID: userID,
 		Code:   itemCode,
@@ -29,11 +29,11 @@ func (s *Service) AddItem(userID uuid.UUID, itemCode string, dataTags map[string
 			return nil, err
 		}
 	}
-	schema := schemas.ItemSchemaFromItem(&item)
+	schema := schema.ItemSchemaFromItem(&item)
 	return schema, err
 }
 
-func (s *Service) FindOneItem(ID uuid.UUID) (*schemas.ItemSchema, error) {
+func (s *Service) FindOneItem(ID uuid.UUID) (*schema.ItemSchema, error) {
 	item, err := s.i.FindOne(ID)
 	if err != nil {
 		return nil, err
@@ -41,11 +41,11 @@ func (s *Service) FindOneItem(ID uuid.UUID) (*schemas.ItemSchema, error) {
 		return nil, util.ErrItemNotFound
 	}
 
-	schema := schemas.ItemSchemaFromItem(item)
+	schema := schema.ItemSchemaFromItem(item)
 	return schema, nil
 }
 
-func (s *Service) FindOneItemByCode(code string) (*schemas.ItemSchema, error) {
+func (s *Service) FindOneItemByCode(code string) (*schema.ItemSchema, error) {
 	item, err := s.i.FindOneByCode(code)
 	if err != nil {
 		return nil, err
@@ -53,7 +53,7 @@ func (s *Service) FindOneItemByCode(code string) (*schemas.ItemSchema, error) {
 		return nil, util.ErrItemNotFound
 	}
 
-	schema := schemas.ItemSchemaFromItem(item)
+	schema := schema.ItemSchemaFromItem(item)
 	return schema, nil
 }
 
@@ -82,15 +82,15 @@ func (s *Service) GetItemDataTag(itemID uuid.UUID, key string) (*string, error) 
 	return &val, nil
 }
 
-func (s *Service) GetUserItems(userID uuid.UUID) []schemas.ItemSchema {
+func (s *Service) GetUserItems(userID uuid.UUID) []schema.ItemSchema {
 	items, err := s.i.FindAll(&model.Item{UserID: userID})
 	if err != nil {
 		return nil
 	}
 
-	var itemSchemas []schemas.ItemSchema
+	var itemSchemas []schema.ItemSchema
 	for _, i := range items {
-		itemSchemas = append(itemSchemas, *schemas.ItemSchemaFromItem(&i))
+		itemSchemas = append(itemSchemas, *schema.ItemSchemaFromItem(&i))
 	}
 	return itemSchemas
 }

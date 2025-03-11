@@ -1,7 +1,7 @@
 package handler
 
 import (
-	"astragalaxy/internal/schemas"
+	"astragalaxy/internal/schema"
 	"bytes"
 	"encoding/json"
 	"fmt"
@@ -14,7 +14,7 @@ import (
 )
 
 func TestRegister(t *testing.T) {
-	body := &schemas.CreateUserSchema{TelegramID: 987654321, Username: "tester2"}
+	body := &schema.CreateUserSchema{TelegramID: 987654321, Username: "tester2"}
 	b, err := json.Marshal(body)
 	assert.NoError(t, err)
 
@@ -29,7 +29,7 @@ func TestRegister(t *testing.T) {
 		body, err := io.ReadAll(res.Body)
 		assert.NoError(t, err)
 
-		var response *schemas.UserSchema
+		var response *schema.UserSchema
 
 		err = json.Unmarshal(body, &response)
 		assert.NoError(t, err)
@@ -58,7 +58,7 @@ func TestLogin(t *testing.T) {
 		body, err := io.ReadAll(res.Body)
 		assert.NoError(t, err)
 
-		var authBody *schemas.AuthBody
+		var authBody *schema.AuthBody
 		err = json.Unmarshal(body, &authBody)
 		assert.NoError(t, err)
 
@@ -77,7 +77,7 @@ func TestGetUserTokenSudo(t *testing.T) {
 		body, err := io.ReadAll(res.Body)
 		assert.NoError(t, err)
 
-		var response *schemas.UserTokenResponseSchema
+		var response *schema.UserTokenResponseSchema
 		err = json.Unmarshal(body, &response)
 		assert.NoError(t, err)
 
@@ -98,7 +98,7 @@ func TestGetMe(t *testing.T) {
 		body, err := io.ReadAll(res.Body)
 		assert.NoError(t, err)
 
-		var me *schemas.UserSchema
+		var me *schema.UserSchema
 		err = json.Unmarshal(body, &me)
 		assert.NoError(t, err)
 

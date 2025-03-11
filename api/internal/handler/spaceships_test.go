@@ -1,7 +1,7 @@
 package handler
 
 import (
-	"astragalaxy/internal/schemas"
+	"astragalaxy/internal/schema"
 	"astragalaxy/pkg/test"
 	"bytes"
 	"encoding/json"
@@ -23,7 +23,7 @@ func TestGetMySpaceships(t *testing.T) {
 			ExpectedError: false,
 			Route:         "/spaceships/my",
 			BodyValidator: func(body []byte) {
-				var b []schemas.SpaceshipSchema
+				var b []schema.SpaceshipSchema
 				err := json.Unmarshal(body, &b)
 				assert.NoError(t, err)
 				assert.NotEmpty(t, b)
@@ -118,7 +118,7 @@ func TestEnterMySpaceship(t *testing.T) {
 	//if assert.Equal(t, http.StatusOK, res.StatusCode) {
 	//	body, err := io.ReadAll(res.Body)
 	//	assert.NoError(t, err)
-	//	var response schemas.OkResponseSchema
+	//	var response schema.OkResponseSchema
 	//	err = json.Unmarshal(body, &response)
 	//	assert.NoError(t, err)
 	//
@@ -148,7 +148,7 @@ func TestExitMySpaceship(t *testing.T) {
 	if assert.Equal(t, http.StatusOK, res.StatusCode) {
 		body, err := io.ReadAll(res.Body)
 		assert.NoError(t, err)
-		var response schemas.OkResponseSchema
+		var response schema.OkResponseSchema
 		err = json.Unmarshal(body, &response)
 		assert.NoError(t, err)
 
@@ -168,7 +168,7 @@ func TestExitMySpaceship(t *testing.T) {
 
 func TestRenameMySpaceship(t *testing.T) {
 	url := "/spaceships/my/rename"
-	body := &schemas.RenameSpaceshipSchema{SpaceshipID: spaceship.ID, Name: "testSpaceship"}
+	body := &schema.RenameSpaceshipSchema{SpaceshipID: spaceship.ID, Name: "testSpaceship"}
 	b, err := json.Marshal(body)
 	assert.NoError(t, err)
 
@@ -182,7 +182,7 @@ func TestRenameMySpaceship(t *testing.T) {
 	if assert.Equal(t, http.StatusOK, res.StatusCode) {
 		body, err := io.ReadAll(res.Body)
 		assert.NoError(t, err)
-		var response schemas.OkResponseSchema
+		var response schema.OkResponseSchema
 		err = json.Unmarshal(body, &response)
 		assert.NoError(t, err)
 

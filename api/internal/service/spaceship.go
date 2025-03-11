@@ -2,7 +2,7 @@ package service
 
 import (
 	"astragalaxy/internal/model"
-	"astragalaxy/internal/schemas"
+	"astragalaxy/internal/schema"
 	"astragalaxy/internal/util"
 	"errors"
 	"time"
@@ -10,7 +10,7 @@ import (
 	"github.com/google/uuid"
 )
 
-func (s *Service) CreateSpaceship(data schemas.CreateSpaceshipSchema) (*schemas.SpaceshipSchema, error) {
+func (s *Service) CreateSpaceship(data schema.CreateSpaceshipSchema) (*schema.SpaceshipSchema, error) {
 	flightInfo, err := s.f.Create(&model.FlightInfo{})
 	if err != nil {
 		return nil, err
@@ -32,7 +32,7 @@ func (s *Service) CreateSpaceship(data schemas.CreateSpaceshipSchema) (*schemas.
 	return s.FindOneSpaceship(*response)
 }
 
-func (s *Service) FindOneSpaceship(ID uuid.UUID) (*schemas.SpaceshipSchema, error) {
+func (s *Service) FindOneSpaceship(ID uuid.UUID) (*schema.SpaceshipSchema, error) {
 	response, err := s.sp.FindOne(ID)
 	if err != nil {
 		return nil, err
@@ -40,7 +40,7 @@ func (s *Service) FindOneSpaceship(ID uuid.UUID) (*schemas.SpaceshipSchema, erro
 	if response == nil {
 		return nil, nil
 	}
-	return &schemas.SpaceshipSchema{
+	return &schema.SpaceshipSchema{
 		ID:          response.ID,
 		Name:        response.Name,
 		UserID:      response.UserID,
@@ -51,15 +51,15 @@ func (s *Service) FindOneSpaceship(ID uuid.UUID) (*schemas.SpaceshipSchema, erro
 	}, nil
 }
 
-func (s *Service) FindAllSpaceships(filter *model.Spaceship) ([]schemas.SpaceshipSchema, error) {
+func (s *Service) FindAllSpaceships(filter *model.Spaceship) ([]schema.SpaceshipSchema, error) {
 	response, err := s.sp.FindAll(filter)
 	if err != nil {
 		return nil, err
 	}
-	var spaceships []schemas.SpaceshipSchema
+	var spaceships []schema.SpaceshipSchema
 	for _, sp := range response {
 		spaceships = append(spaceships,
-			schemas.SpaceshipSchema{
+			schema.SpaceshipSchema{
 				ID:       sp.ID,
 				Name:     sp.Name,
 				UserID:   sp.UserID,
@@ -75,7 +75,7 @@ func (s *Service) DeleteSpaceship(ID uuid.UUID) error {
 	return s.sp.Delete(ID)
 }
 
-func (s *Service) UpdateSpaceship(ID uuid.UUID, data schemas.UpdateSpaceshipSchema) error {
+func (s *Service) UpdateSpaceship(ID uuid.UUID, data schema.UpdateSpaceshipSchema) error {
 	spaceship := model.Spaceship{
 		ID:          ID,
 		Name:        data.Name,
@@ -97,7 +97,7 @@ func (s *Service) SpaceshipFly(ID uuid.UUID, planetID uuid.UUID) error {
 	if spaceship.Flight.Flying != nil {
 		flying = *spaceship.Flight.Flying
 	}
-	flight := schemas.FlyInfoSchema{
+	flight := schema.FlyInfoSchema{
 		Flying:        flying,
 		Destination:   spaceship.Flight.Destination,
 		DestinationID: spaceship.Flight.DestinationID,
@@ -150,7 +150,7 @@ func (s *Service) SpaceshipHyperJump(ID uuid.UUID, systemID uuid.UUID) error {
 	if spaceship.Flight.Flying != nil {
 		flying = *spaceship.Flight.Flying
 	}
-	flight := schemas.FlyInfoSchema{
+	flight := schema.FlyInfoSchema{
 		Flying:        flying,
 		Destination:   spaceship.Flight.Destination,
 		DestinationID: spaceship.Flight.DestinationID,
@@ -237,7 +237,7 @@ func (s *Service) CheckFlightEnd(ID uuid.UUID, flight *model.FlightInfo) error {
 	return nil
 }
 
-func (s *Service) GetFlyInfo(ID uuid.UUID) (*schemas.FlyInfoSchema, error) {
+func (s *Service) GetFlyInfo(ID uuid.UUID) (*schema.FlyInfoSchema, error) {
 	spaceship, err := s.sp.FindOne(ID)
 	if err != nil || spaceship == nil {
 		return nil, err
@@ -248,7 +248,7 @@ func (s *Service) GetFlyInfo(ID uuid.UUID) (*schemas.FlyInfoSchema, error) {
 		return nil, err
 	}
 	if err == nil {
-		return &schemas.FlyInfoSchema{Flying: false}, nil
+		return &schema.FlyInfoSchema{Flying: false}, nil
 	}
 
 	now := time.Now().UTC()
@@ -256,10 +256,10 @@ func (s *Service) GetFlyInfo(ID uuid.UUID) (*schemas.FlyInfoSchema, error) {
 	arriveTime := flownOutAt.Add(time.Duration(spaceship.Flight.FlyingTime) * time.Minute)
 	remainingTime := arriveTime.Sub(now)
 	if spaceship.Flight.Flying == nil {
-		return &schemas.FlyInfoSchema{Flying: false}, nil
+		return &schema.FlyInfoSchema{Flying: false}, nil
 	}
 
-	return &schemas.FlyInfoSchema{
+	return &schema.FlyInfoSchema{
 		Flying:        *spaceship.Flight.Flying,
 		Destination:   spaceship.Flight.Destination,
 		DestinationID: spaceship.Flight.DestinationID,

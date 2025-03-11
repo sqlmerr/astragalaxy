@@ -1,7 +1,7 @@
 package handler
 
 import (
-	"astragalaxy/internal/schemas"
+	"astragalaxy/internal/schema"
 	"bytes"
 	"encoding/json"
 	"fmt"
@@ -14,7 +14,7 @@ import (
 )
 
 func TestCreateSystem(t *testing.T) {
-	body := &schemas.CreateSystemSchema{Name: "testSystem"}
+	body := &schema.CreateSystemSchema{Name: "testSystem"}
 	b, err := json.Marshal(body)
 	assert.NoError(t, err)
 
@@ -29,7 +29,7 @@ func TestCreateSystem(t *testing.T) {
 		body, err := io.ReadAll(res.Body)
 		assert.NoError(t, err)
 
-		var response schemas.SystemSchema
+		var response schema.SystemSchema
 		err = json.Unmarshal(body, &response)
 		assert.NoError(t, err)
 
@@ -54,7 +54,7 @@ func TestGetSystemPlanets(t *testing.T) {
 		body, err := io.ReadAll(res.Body)
 		assert.NoError(t, err)
 
-		var response []schemas.PlanetSchema
+		var response []schema.PlanetSchema
 		err = json.Unmarshal(body, &response)
 		assert.NoError(t, err)
 
@@ -78,7 +78,7 @@ func TestGetSystemByID(t *testing.T) {
 	if assert.Equal(t, http.StatusOK, res.StatusCode) {
 		body, err := io.ReadAll(res.Body)
 		assert.NoError(t, err)
-		var response schemas.SystemSchema
+		var response schema.SystemSchema
 		err = json.Unmarshal(body, &response)
 		assert.NoError(t, err)
 		assert.Equal(t, "initial", response.Name)
@@ -99,7 +99,7 @@ func TestGetAllSystems(t *testing.T) {
 	if assert.Equal(t, http.StatusOK, res.StatusCode) {
 		body, err := io.ReadAll(res.Body)
 		assert.NoError(t, err)
-		var response []schemas.SystemSchema
+		var response []schema.SystemSchema
 		err = json.Unmarshal(body, &response)
 		assert.NoError(t, err)
 

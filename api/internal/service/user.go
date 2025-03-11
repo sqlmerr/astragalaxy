@@ -2,7 +2,7 @@ package service
 
 import (
 	"astragalaxy/internal/model"
-	"astragalaxy/internal/schemas"
+	"astragalaxy/internal/schema"
 	"astragalaxy/internal/util"
 	"time"
 
@@ -10,7 +10,7 @@ import (
 	"github.com/google/uuid"
 )
 
-func (s *Service) Register(data schemas.CreateUserSchema, location string, systemID uuid.UUID) (*schemas.UserSchema, error) {
+func (s *Service) Register(data schema.CreateUserSchema, location string, systemID uuid.UUID) (*schema.UserSchema, error) {
 	usr, err := s.u.FindOneByUsername(data.Username)
 	if err != nil {
 		return nil, err
@@ -64,17 +64,17 @@ func (s *Service) Login(telegramID int64, token string) (*string, error) {
 	return &t, err
 }
 
-func (s *Service) FindOneUser(ID uuid.UUID) (*schemas.UserSchema, error) {
+func (s *Service) FindOneUser(ID uuid.UUID) (*schema.UserSchema, error) {
 	user, err := s.u.FindOne(ID)
 	if err != nil {
 		return nil, err
 	}
 
-	schema := schemas.UserSchemaFromUser(*user)
+	schema := schema.UserSchemaFromUser(*user)
 	return &schema, nil
 }
 
-func (s *Service) FindOneUserByTelegramID(telegramID int64) (*schemas.UserSchema, error) {
+func (s *Service) FindOneUserByTelegramID(telegramID int64) (*schema.UserSchema, error) {
 	user, err := s.u.FindOneFilter(&model.User{
 		TelegramID: telegramID,
 	})
@@ -85,7 +85,7 @@ func (s *Service) FindOneUserByTelegramID(telegramID int64) (*schemas.UserSchema
 		return nil, util.ErrUserNotFound
 	}
 
-	schema := schemas.UserSchemaFromUser(*user)
+	schema := schema.UserSchemaFromUser(*user)
 	return &schema, nil
 }
 
@@ -99,7 +99,7 @@ func (s *Service) FindOneUserRawByTelegramID(telegramID int64) (*model.User, err
 	return user, nil
 }
 
-func (s *Service) UpdateUser(ID uuid.UUID, data schemas.UpdateUserSchema) error {
+func (s *Service) UpdateUser(ID uuid.UUID, data schema.UpdateUserSchema) error {
 	var spaceships []model.Spaceship
 	for _, sp := range data.Spaceships {
 		spaceships = append(spaceships, model.Spaceship{
@@ -126,7 +126,7 @@ func (s *Service) UpdateUser(ID uuid.UUID, data schemas.UpdateUserSchema) error 
 	return s.u.Update(&user)
 }
 
-func (s *Service) AddUserSpaceship(userID uuid.UUID, spaceship schemas.SpaceshipSchema) error {
+func (s *Service) AddUserSpaceship(userID uuid.UUID, spaceship schema.SpaceshipSchema) error {
 	user, err := s.FindOneUser(userID)
 	if err != nil {
 		return err
@@ -135,34 +135,34 @@ func (s *Service) AddUserSpaceship(userID uuid.UUID, spaceship schemas.Spaceship
 	}
 
 	user.Spaceships = append(user.Spaceships, spaceship)
-	s.UpdateUser(userID, schemas.UpdateUserSchema{
+	s.UpdateUser(userID, schema.UpdateUserSchema{
 		Spaceships: user.Spaceships,
 	})
 
 	return nil
 }
 
-func (s *Service) EnterUserSpaceship(user schemas.UserSchema, spaceshipID uuid.UUID) error {
+func (s *Service) EnterUserSpaceship(user schema.UserSchema, spaceshipID uuid.UUID) error {
 	for _, sp := range user.Spaceships {
 		if sp.ID == spaceshipID {
 			if sp.PlayerSitIn || user.InSpaceship {
 				return util.ErrPlayerAlreadyInSpaceship
 			}
-			err := s.UpdateUser(user.ID, schemas.UpdateUserSchema{InSpaceship: true})
+			err := s.UpdateUser(user.ID, schema.UpdateUserSchema{InSpaceship: true})
 			if err != nil {
 				return err
 			}
-			return s.UpdateSpaceship(spaceshipID, schemas.UpdateSpaceshipSchema{PlayerSitIn: true})
+			return s.UpdateSpaceship(spaceshipID, schema.UpdateSpaceshipSchema{PlayerSitIn: true})
 		}
 	}
 
 	return util.ErrSpaceshipNotFound
 }
 
-func (s *Service) ExitUserSpaceship(user schemas.UserSchema, spaceshipID uuid.UUID) error {
+func (s *Service) ExitUserSpaceship(user schema.UserSchema, spaceshipID uuid.UUID) error {
 	for _, sp := range user.Spaceships {
 		if sp.ID == spaceshipID {
-			// err := s.Update(user.ID, schemas.UpdateUserSchema{InSpaceship: false})
+			// err := s.Update(user.ID, schema.UpdateUserSchema{InSpaceship: false})
 			inSpaceship := false
 			err := s.u.Update(&model.User{ID: user.ID, InSpaceship: &inSpaceship})
 			if err != nil {

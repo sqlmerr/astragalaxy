@@ -1,7 +1,7 @@
 package handler
 
 import (
-	"astragalaxy/internal/schemas"
+	"astragalaxy/internal/schema"
 	"astragalaxy/internal/util"
 	"net/http"
 
@@ -15,15 +15,15 @@ import (
 //	@Tags			planets
 //	@Accept			json
 //	@Produce		json
-//	@Param			req	body		schemas.CreatePlanetSchema	true	"create planet schema"
-//	@Success		201	{object}	schemas.PlanetSchema
+//	@Param			req	body		schema.CreatePlanetSchema	true	"create planet schema"
+//	@Success		201	{object}	schema.PlanetSchema
 //	@Failure		500	{object}	util.Error
 //	@Failure		403	{object}	util.Error
 //	@Failure		422	{object}	util.Error
 //	@Security		SudoToken
 //	@Router			/planets [post]
 func (h *Handler) createPlanet(c *fiber.Ctx) error {
-	req := &schemas.CreatePlanetSchema{}
+	req := &schema.CreatePlanetSchema{}
 
 	if err := util.BodyParser(&req, c); err != nil {
 		return c.Status(http.StatusUnprocessableEntity).JSON(util.NewError(err))

@@ -2,7 +2,7 @@ package handler
 
 import (
 	"astragalaxy/internal/model"
-	"astragalaxy/internal/schemas"
+	"astragalaxy/internal/schema"
 	"astragalaxy/pkg/test"
 	"encoding/json"
 	"fmt"
@@ -16,7 +16,7 @@ func TestFlightToPlanet(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Len(t, planets, 1)
 	planet := planets[0]
-	body, err := json.Marshal(&schemas.FlyToPlanetSchema{PlanetID: planet.ID, SpaceshipID: spaceship.ID})
+	body, err := json.Marshal(&schema.FlyToPlanetSchema{PlanetID: planet.ID, SpaceshipID: spaceship.ID})
 	assert.NoError(t, err)
 
 	if !spaceship.PlayerSitIn {
@@ -33,7 +33,7 @@ func TestFlightToPlanet(t *testing.T) {
 			ExpectedError: false,
 			ExpectedCode:  http.StatusOK,
 			BodyValidator: func(body []byte) {
-				var res schemas.OkResponseSchema
+				var res schema.OkResponseSchema
 				err = json.Unmarshal(body, &res)
 				assert.NoError(t, err)
 
@@ -63,10 +63,10 @@ func TestHyperJump(t *testing.T) {
 	err := stateObj.S.SetFlightInfo(spaceship.ID, &model.FlightInfo{Flying: &flying})
 	assert.NoError(t, err)
 
-	system, err := stateObj.S.CreateSystem(schemas.CreateSystemSchema{Name: "hyperjumpSystem"})
+	system, err := stateObj.S.CreateSystem(schema.CreateSystemSchema{Name: "hyperjumpSystem"})
 	assert.NoError(t, err)
 
-	body, err := json.Marshal(&schemas.HyperJumpSchema{SystemID: system.ID, SpaceshipID: spaceship.ID})
+	body, err := json.Marshal(&schema.HyperJumpSchema{SystemID: system.ID, SpaceshipID: spaceship.ID})
 	assert.NoError(t, err)
 
 	if !spaceship.PlayerSitIn {
@@ -83,7 +83,7 @@ func TestHyperJump(t *testing.T) {
 			ExpectedError: false,
 			ExpectedCode:  http.StatusOK,
 			BodyValidator: func(body []byte) {
-				var res schemas.OkResponseSchema
+				var res schema.OkResponseSchema
 				err = json.Unmarshal(body, &res)
 				assert.NoError(t, err)
 
@@ -123,7 +123,7 @@ func TestCheckFlight(t *testing.T) {
 			ExpectedError: false,
 			ExpectedCode:  http.StatusOK,
 			BodyValidator: func(body []byte) {
-				var b *schemas.FlyInfoSchema
+				var b *schema.FlyInfoSchema
 				err := json.Unmarshal(body, &b)
 				assert.NoError(t, err)
 				assert.Contains(t, []string{"planet", "system"}, b.Destination)

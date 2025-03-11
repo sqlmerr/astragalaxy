@@ -1,4 +1,4 @@
-package schemas
+package schema
 
 type AuthBody struct {
 	AccessToken string `json:"access_token"`

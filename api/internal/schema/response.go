@@ -1,4 +1,4 @@
-package schemas
+package schema
 
 type OkResponseSchema struct {
 	Ok               bool `json:"ok"`

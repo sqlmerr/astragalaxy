@@ -2,7 +2,7 @@ package handler
 
 import (
 	"astragalaxy/internal/model"
-	"astragalaxy/internal/schemas"
+	"astragalaxy/internal/schema"
 	"astragalaxy/internal/state"
 	"astragalaxy/internal/util"
 	"astragalaxy/pkg/test"
@@ -17,12 +17,12 @@ import (
 
 var (
 	app          *fiber.App
-	usr          *schemas.UserSchema
+	usr          *schema.UserSchema
 	userJwtToken string
 	userToken    string
 	sudoToken    string
 	stateObj     *state.State
-	spaceship    *schemas.SpaceshipSchema
+	spaceship    *schema.SpaceshipSchema
 	executor     *test.Executor
 )
 
@@ -55,26 +55,26 @@ func TestMain(m *testing.M) {
 }
 
 func setup(state *state.State) {
-	sys, err := state.S.CreateSystem(schemas.CreateSystemSchema{
+	sys, err := state.S.CreateSystem(schema.CreateSystemSchema{
 		Name: "initial",
 	})
 	if err != nil {
 		panic(err)
 	}
 
-	_, err = state.S.CreatePlanet(schemas.CreatePlanetSchema{Name: "testPlanet1", SystemID: sys.ID, Threat: "TOXINS"})
+	_, err = state.S.CreatePlanet(schema.CreatePlanetSchema{Name: "testPlanet1", SystemID: sys.ID, Threat: "TOXINS"})
 	if err != nil {
 		panic(err)
 	}
 
 	fmt.Println("Initial system:", sys)
 
-	user, err := state.S.Register(schemas.CreateUserSchema{TelegramID: 123456789, Username: "tester"}, "space_station", sys.ID)
+	user, err := state.S.Register(schema.CreateUserSchema{TelegramID: 123456789, Username: "tester"}, "space_station", sys.ID)
 	if err != nil {
 		panic(err)
 	}
 
-	spcship, err := state.S.CreateSpaceship(schemas.CreateSpaceshipSchema{Name: "initial", UserID: user.ID, Location: "space_station", SystemID: sys.ID})
+	spcship, err := state.S.CreateSpaceship(schema.CreateSpaceshipSchema{Name: "initial", UserID: user.ID, Location: "space_station", SystemID: sys.ID})
 	if err != nil {
 		panic(err)
 	}
