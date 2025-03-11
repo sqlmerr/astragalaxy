@@ -1,7 +1,7 @@
 package schemas
 
 import (
-	"astragalaxy/internal/models"
+	"astragalaxy/internal/model"
 
 	"github.com/google/uuid"
 )
@@ -30,7 +30,7 @@ type UpdateUserSchema struct {
 	SystemID    uuid.UUID         `json:"system_id"`
 }
 
-func UserSchemaFromUser(val models.User) UserSchema {
+func UserSchemaFromUser(val model.User) UserSchema {
 	var spaceships []SpaceshipSchema
 	for _, sp := range val.Spaceships {
 		spaceships = append(spaceships, SpaceshipSchema{

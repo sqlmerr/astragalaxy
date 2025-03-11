@@ -152,10 +152,10 @@ func TestExitMySpaceship(t *testing.T) {
 		err = json.Unmarshal(body, &response)
 		assert.NoError(t, err)
 
-		s, err := stateObj.SpaceshipService.FindOne(spaceship.ID)
+		s, err := stateObj.S.FindOneSpaceship(spaceship.ID)
 		assert.NoError(t, err)
 
-		p, err := stateObj.UserService.FindOne(usr.ID)
+		p, err := stateObj.S.FindOneUser(usr.ID)
 		assert.NoError(t, err)
 
 		assert.NotEmpty(t, response)
@@ -186,7 +186,7 @@ func TestRenameMySpaceship(t *testing.T) {
 		err = json.Unmarshal(body, &response)
 		assert.NoError(t, err)
 
-		s, err := stateObj.SpaceshipService.FindOne(spaceship.ID)
+		s, err := stateObj.S.FindOneSpaceship(spaceship.ID)
 		assert.NoError(t, err)
 
 		assert.NotEmpty(t, response)

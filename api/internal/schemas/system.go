@@ -1,7 +1,7 @@
 package schemas
 
 import (
-	"astragalaxy/internal/models"
+	"astragalaxy/internal/model"
 
 	"github.com/google/uuid"
 )
@@ -19,7 +19,7 @@ type UpdateSystemSchema struct {
 	Name string `json:"name"`
 }
 
-func SystemSchemaFromSystem(system *models.System) *SystemSchema {
+func SystemSchemaFromSystem(system *model.System) *SystemSchema {
 	schema := SystemSchema(*system)
 	return &schema
 }

@@ -2,9 +2,9 @@ package main
 
 import (
 	"astragalaxy/internal/handler"
-	"astragalaxy/internal/models"
+	"astragalaxy/internal/model"
 	"astragalaxy/internal/state"
-	"astragalaxy/internal/utils"
+	"astragalaxy/internal/util"
 	"log"
 
 	_ "astragalaxy/docs"
@@ -33,20 +33,20 @@ import (
 // @name						Authorization
 // @description				You need to type "Bearer" before the token
 func main() {
-	config := utils.NewConfig(".env")
+	config := util.NewConfig(".env")
 	db, err := gorm.Open(postgres.Open(config.DatabaseURL), &gorm.Config{})
 	// db, err := gorm.Open(postgres.Open("postgresql://postgres:password@db:5432"), &gorm.Config{})
 	if err != nil {
 		panic("Failed to open database")
 	}
 
-	db.AutoMigrate(&models.Planet{})
-	db.AutoMigrate(&models.System{})
-	db.AutoMigrate(&models.Spaceship{})
-	db.AutoMigrate(&models.User{})
-	db.AutoMigrate(&models.Item{})
-	db.AutoMigrate(&models.ItemDataTag{})
-	db.AutoMigrate(&models.FlightInfo{})
+	db.AutoMigrate(&model.Planet{})
+	db.AutoMigrate(&model.System{})
+	db.AutoMigrate(&model.Spaceship{})
+	db.AutoMigrate(&model.User{})
+	db.AutoMigrate(&model.Item{})
+	db.AutoMigrate(&model.ItemDataTag{})
+	db.AutoMigrate(&model.FlightInfo{})
 
 	app := fiber.New()
 

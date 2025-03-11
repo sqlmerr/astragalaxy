@@ -1,7 +1,7 @@
 package handler
 
 import (
-	"astragalaxy/internal/utils"
+	"astragalaxy/internal/util"
 	"net/http"
 
 	jwtware "github.com/gofiber/contrib/jwt"
@@ -12,7 +12,7 @@ import (
 func (h *Handler) SudoMiddleware(c *fiber.Ctx) error {
 	header := c.Get("secret-token", "")
 	if header != h.state.Config.SecretToken {
-		return c.Status(http.StatusForbidden).JSON(utils.NewError(utils.ErrInvalidToken))
+		return c.Status(http.StatusForbidden).JSON(util.NewError(util.ErrInvalidToken))
 	}
 
 	return c.Next()
@@ -23,9 +23,9 @@ func (h *Handler) UserGetter(c *fiber.Ctx) error {
 	claims := token.Claims.(jwt.MapClaims)
 	telegramID := int64(claims["sub"].(float64))
 
-	user, err := h.userService.FindOneByTelegramID(telegramID)
+	user, err := h.s.FindOneUserByTelegramID(telegramID)
 	if err != nil || user == nil {
-		return c.Status(http.StatusForbidden).JSON(utils.NewError(utils.ErrInvalidToken))
+		return c.Status(http.StatusForbidden).JSON(util.NewError(util.ErrInvalidToken))
 	}
 
 	c.Locals("user", user)
@@ -44,8 +44,8 @@ func (h *Handler) JwtMiddleware() fiber.Handler {
 func jwtError(c *fiber.Ctx, err error) error {
 	if err.Error() == "Missing or malformed JWT" {
 		return c.Status(fiber.StatusBadRequest).
-			JSON(utils.NewError(err))
+			JSON(util.NewError(err))
 	}
 	return c.Status(fiber.StatusUnauthorized).
-		JSON(utils.NewError(err))
+		JSON(util.NewError(err))
 }

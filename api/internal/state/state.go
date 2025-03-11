@@ -2,9 +2,9 @@ package state
 
 import (
 	"astragalaxy/internal/registry"
-	"astragalaxy/internal/repositories"
-	"astragalaxy/internal/services"
-	"astragalaxy/internal/utils"
+	"astragalaxy/internal/repository"
+	"astragalaxy/internal/service"
+	"astragalaxy/internal/util"
 	"fmt"
 	"path/filepath"
 
@@ -12,34 +12,23 @@ import (
 )
 
 type State struct {
-	UserService      *services.UserService
-	SpaceshipService *services.SpaceshipService
-	PlanetService    *services.PlanetService
-	SystemService    *services.SystemService
-	ItemService      *services.ItemService
-	MasterRegistry   *registry.MasterRegistry
-	Config           *utils.Config
+	S              *service.Service
+	MasterRegistry *registry.MasterRegistry
+	Config         *util.Config
 }
 
 func New(db *gorm.DB) *State {
-	planetRepository := repositories.NewPlanetRepository(db)
-	planetService := services.NewPlanetService(planetRepository)
+	planetRepository := repository.NewPlanetRepository(db)
+	systemRepository := repository.NewSystemRepository(db)
+	spaceshipRepository := repository.NewSpaceshipRepository(db)
+	flightRepository := repository.NewFlightRepository(db)
+	userRepository := repository.NewUserRepository(db)
+	itemRepository := repository.NewItemRepository(db)
+	itemDataTagRepository := repository.NewItemDataTagRepository(db)
 
-	systemRepository := repositories.NewSystemRepository(db)
-	systemService := services.NewSystemService(systemRepository)
+	s := service.New(spaceshipRepository, flightRepository, systemRepository, userRepository, itemRepository, itemDataTagRepository, planetRepository)
 
-	spaceshipRepository := repositories.NewSpaceshipRepository(db)
-	flightRepository := repositories.NewFlightRepository(db)
-	spaceshipService := services.NewSpaceshipService(spaceshipRepository, flightRepository, planetService, systemService)
-
-	userRepository := repositories.NewUserRepository(db)
-	userService := services.NewUserService(userRepository, spaceshipService)
-
-	itemRepository := repositories.NewItemRepository(db)
-	itemDataTagRepository := repositories.NewItemDataTagRepository(db)
-	itemService := services.NewItemService(itemRepository, itemDataTagRepository)
-
-	projectRoot, err := utils.GetProjectRoot()
+	projectRoot, err := util.GetProjectRoot()
 	if err != nil {
 		panic(fmt.Sprintf("Error finding project root: %v", err))
 	}
@@ -61,15 +50,11 @@ func New(db *gorm.DB) *State {
 	}
 
 	masterRegistry := registry.NewMaster(itemRegistry, tagRegistry, locationRegistry)
-	config := utils.NewConfig(".env")
+	config := util.NewConfig(".env")
 
 	return &State{
-		UserService:      &userService,
-		SpaceshipService: &spaceshipService,
-		PlanetService:    &planetService,
-		SystemService:    &systemService,
-		ItemService:      &itemService,
-		MasterRegistry:   &masterRegistry,
-		Config:           &config,
+		S:              s,
+		MasterRegistry: &masterRegistry,
+		Config:         &config,
 	}
 }

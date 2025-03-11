@@ -1,7 +1,7 @@
 package registry
 
 import (
-	"astragalaxy/internal/utils"
+	"astragalaxy/internal/util"
 	"encoding/json"
 	"io"
 	"os"
@@ -67,5 +67,5 @@ func (r *TagRegistry) FindOne(tag string) (*Tag, error) {
 		}
 	}
 
-	return nil, utils.ErrItemNotFound
+	return nil, util.ErrItemNotFound
 }

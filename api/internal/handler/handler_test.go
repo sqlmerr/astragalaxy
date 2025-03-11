@@ -1,10 +1,10 @@
 package handler
 
 import (
-	"astragalaxy/internal/models"
+	"astragalaxy/internal/model"
 	"astragalaxy/internal/schemas"
 	"astragalaxy/internal/state"
-	"astragalaxy/internal/utils"
+	"astragalaxy/internal/util"
 	"astragalaxy/pkg/test"
 	"fmt"
 	"os"
@@ -27,18 +27,19 @@ var (
 )
 
 func TestMain(m *testing.M) {
-	db, err := gorm.Open(postgres.Open(utils.GetEnv("TEST_DATABASE_URL")), &gorm.Config{})
+	db, err := gorm.Open(postgres.Open(util.GetEnv("TEST_DATABASE_URL")), &gorm.Config{})
 	// db, err := gorm.Open(postgres.Open("postgresql://postgres:password@db:5432"), &gorm.Config{})
 	if err != nil {
 		panic("Failed to open database")
 	}
 
-	db.AutoMigrate(&models.Planet{})
-	db.AutoMigrate(&models.System{})
-	db.AutoMigrate(&models.Spaceship{})
-	db.AutoMigrate(&models.User{})
-	db.AutoMigrate(&models.Item{})
-	db.AutoMigrate(&models.ItemDataTag{})
+	db.AutoMigrate(&model.Planet{})
+	db.AutoMigrate(&model.System{})
+	db.AutoMigrate(&model.Spaceship{})
+	db.AutoMigrate(&model.User{})
+	db.AutoMigrate(&model.Item{})
+	db.AutoMigrate(&model.ItemDataTag{})
+	db.AutoMigrate(&model.FlightInfo{})
 
 	app = fiber.New()
 
@@ -54,47 +55,47 @@ func TestMain(m *testing.M) {
 }
 
 func setup(state *state.State) {
-	sys, err := state.SystemService.Create(schemas.CreateSystemSchema{
+	sys, err := state.S.CreateSystem(schemas.CreateSystemSchema{
 		Name: "initial",
 	})
 	if err != nil {
 		panic(err)
 	}
 
-	_, err = state.PlanetService.Create(schemas.CreatePlanetSchema{Name: "testPlanet1", SystemID: sys.ID, Threat: "TOXINS"})
+	_, err = state.S.CreatePlanet(schemas.CreatePlanetSchema{Name: "testPlanet1", SystemID: sys.ID, Threat: "TOXINS"})
 	if err != nil {
 		panic(err)
 	}
 
 	fmt.Println("Initial system:", sys)
 
-	user, err := state.UserService.Register(schemas.CreateUserSchema{TelegramID: 123456789, Username: "tester"}, "space_station", sys.ID)
+	user, err := state.S.Register(schemas.CreateUserSchema{TelegramID: 123456789, Username: "tester"}, "space_station", sys.ID)
 	if err != nil {
 		panic(err)
 	}
 
-	spcship, err := state.SpaceshipService.Create(schemas.CreateSpaceshipSchema{Name: "initial", UserID: user.ID, Location: "space_station", SystemID: sys.ID})
+	spcship, err := state.S.CreateSpaceship(schemas.CreateSpaceshipSchema{Name: "initial", UserID: user.ID, Location: "space_station", SystemID: sys.ID})
 	if err != nil {
 		panic(err)
 	}
-	err = state.UserService.AddSpaceship(user.ID, *spcship)
+	err = state.S.AddUserSpaceship(user.ID, *spcship)
 	if err != nil {
 		panic(err)
 	}
 
-	spaceships, err := state.SpaceshipService.FindAll(&models.Spaceship{UserID: user.ID})
+	spaceships, err := state.S.FindAllSpaceships(&model.Spaceship{UserID: user.ID})
 	if err != nil {
 		panic(err)
 	}
 	user.Spaceships = spaceships
 
-	usrRaw, err := state.UserService.FindOneRawByTelegramID(user.TelegramID)
+	usrRaw, err := state.S.FindOneUserRawByTelegramID(user.TelegramID)
 	if err != nil {
 		panic(err)
 	}
 
 	token := usrRaw.Token
-	jwtToken, err := state.UserService.Login(user.TelegramID, token)
+	jwtToken, err := state.S.Login(user.TelegramID, token)
 	if err != nil || jwtToken == nil {
 		panic(err)
 	}

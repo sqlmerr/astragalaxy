@@ -1,11 +1,9 @@
 package main
 
 import (
-	"astragalaxy/internal/models"
-	"astragalaxy/internal/repositories"
-	"astragalaxy/internal/schemas"
-	"astragalaxy/internal/services"
-	"astragalaxy/internal/utils"
+	"astragalaxy/internal/model"
+	"astragalaxy/internal/repository"
+	"astragalaxy/internal/util"
 	"fmt"
 
 	"gorm.io/driver/postgres"
@@ -13,23 +11,22 @@ import (
 )
 
 func main() {
-	config := utils.NewConfig(".env")
+	config := util.NewConfig(".env")
 	db, err := gorm.Open(postgres.Open(config.DatabaseURL))
 	if err != nil {
 		panic("failed to connect to database")
 	}
-	db.AutoMigrate(&models.Planet{})
-	db.AutoMigrate(&models.System{})
-	db.AutoMigrate(&models.Spaceship{})
-	db.AutoMigrate(&models.User{})
-	db.AutoMigrate(&models.Item{})
-	db.AutoMigrate(&models.ItemDataTag{})
-	db.AutoMigrate(&models.FlightInfo{})
+	db.AutoMigrate(&model.Planet{})
+	db.AutoMigrate(&model.System{})
+	db.AutoMigrate(&model.Spaceship{})
+	db.AutoMigrate(&model.User{})
+	db.AutoMigrate(&model.Item{})
+	db.AutoMigrate(&model.ItemDataTag{})
+	db.AutoMigrate(&model.FlightInfo{})
 
-	systemRepository := repositories.NewSystemRepository(db)
-	systemService := services.NewSystemService(systemRepository)
+	systemRepository := repository.NewSystemRepository(db)
 
-	_, err = systemService.Create(schemas.CreateSystemSchema{
+	_, err = systemRepository.Create(&model.System{
 		Name: "initial",
 	})
 	if err != nil {

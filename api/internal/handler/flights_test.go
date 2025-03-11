@@ -1,7 +1,7 @@
 package handler
 
 import (
-	"astragalaxy/internal/models"
+	"astragalaxy/internal/model"
 	"astragalaxy/internal/schemas"
 	"astragalaxy/pkg/test"
 	"encoding/json"
@@ -12,7 +12,7 @@ import (
 )
 
 func TestFlightToPlanet(t *testing.T) {
-	planets, err := stateObj.PlanetService.FindAll(&models.Planet{Name: "testPlanet1"})
+	planets, err := stateObj.S.FindAllPlanets(&model.Planet{Name: "testPlanet1"})
 	assert.NoError(t, err)
 	assert.Len(t, planets, 1)
 	planet := planets[0]
@@ -20,7 +20,7 @@ func TestFlightToPlanet(t *testing.T) {
 	assert.NoError(t, err)
 
 	if !spaceship.PlayerSitIn {
-		err = stateObj.UserService.EnterSpaceship(*usr, spaceship.ID)
+		err = stateObj.S.EnterUserSpaceship(*usr, spaceship.ID)
 		assert.NoError(t, err)
 	}
 
@@ -55,22 +55,22 @@ func TestFlightToPlanet(t *testing.T) {
 		"Authorization": fmt.Sprintf("Bearer %s", userJwtToken),
 	})
 
-	stateObj.UserService.ExitSpaceship(*usr, spaceship.ID)
+	stateObj.S.ExitUserSpaceship(*usr, spaceship.ID)
 }
 
 func TestHyperJump(t *testing.T) {
 	flying := false
-	err := stateObj.SpaceshipService.SetFlightInfo(spaceship.ID, &models.FlightInfo{Flying: &flying})
+	err := stateObj.S.SetFlightInfo(spaceship.ID, &model.FlightInfo{Flying: &flying})
 	assert.NoError(t, err)
 
-	system, err := stateObj.SystemService.Create(schemas.CreateSystemSchema{Name: "hyperjumpSystem"})
+	system, err := stateObj.S.CreateSystem(schemas.CreateSystemSchema{Name: "hyperjumpSystem"})
 	assert.NoError(t, err)
 
 	body, err := json.Marshal(&schemas.HyperJumpSchema{SystemID: system.ID, SpaceshipID: spaceship.ID})
 	assert.NoError(t, err)
 
 	if !spaceship.PlayerSitIn {
-		err = stateObj.UserService.EnterSpaceship(*usr, spaceship.ID)
+		err = stateObj.S.EnterUserSpaceship(*usr, spaceship.ID)
 		assert.NoError(t, err)
 	}
 
@@ -105,7 +105,7 @@ func TestHyperJump(t *testing.T) {
 		"Authorization": fmt.Sprintf("Bearer %s", userJwtToken),
 	})
 
-	stateObj.UserService.ExitSpaceship(*usr, spaceship.ID)
+	stateObj.S.ExitUserSpaceship(*usr, spaceship.ID)
 }
 
 func TestCheckFlight(t *testing.T) {

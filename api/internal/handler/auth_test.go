@@ -37,7 +37,7 @@ func TestRegister(t *testing.T) {
 		assert.Equal(t, int64(987654321), response.TelegramID)
 		assert.Equal(t, "tester2", response.Username)
 
-		spaceship, err := stateObj.SpaceshipService.FindOne(response.Spaceships[0].ID)
+		spaceship, err := stateObj.S.FindOneSpaceship(response.Spaceships[0].ID)
 		assert.NoError(t, err)
 
 		assert.Equal(t, "initial", spaceship.Name)

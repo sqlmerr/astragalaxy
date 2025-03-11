@@ -1,4 +1,4 @@
-package utils
+package util
 
 var validPlanetThreats = map[string]bool{
 	"RADIATION": true,

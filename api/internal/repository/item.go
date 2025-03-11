@@ -1,7 +1,7 @@
-package repositories
+package repository
 
 import (
-	"astragalaxy/internal/models"
+	"astragalaxy/internal/model"
 	"errors"
 
 	"github.com/google/uuid"
@@ -9,10 +9,10 @@ import (
 )
 
 type ItemRepo interface {
-	Create(m *models.Item) error
-	FindOne(ID uuid.UUID) (*models.Item, error)
-	FindOneByCode(code string) (*models.Item, error)
-	FindAll(filter *models.Item) ([]models.Item, error)
+	Create(m *model.Item) error
+	FindOne(ID uuid.UUID) (*model.Item, error)
+	FindOneByCode(code string) (*model.Item, error)
+	FindAll(filter *model.Item) ([]model.Item, error)
 	Delete(ID uuid.UUID) error
 }
 
@@ -24,15 +24,15 @@ func NewItemRepository(db *gorm.DB) ItemRepository {
 	return ItemRepository{db: db}
 }
 
-func (r ItemRepository) Create(m *models.Item) error {
+func (r ItemRepository) Create(m *model.Item) error {
 	if err := r.db.Create(&m).Error; err != nil {
 		return err
 	}
 	return nil
 }
 
-func (r ItemRepository) FindOne(ID uuid.UUID) (*models.Item, error) {
-	var m models.Item
+func (r ItemRepository) FindOne(ID uuid.UUID) (*model.Item, error) {
+	var m model.Item
 	if err := r.db.Find(&m, ID).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, nil
@@ -42,9 +42,9 @@ func (r ItemRepository) FindOne(ID uuid.UUID) (*models.Item, error) {
 	return &m, nil
 }
 
-func (r ItemRepository) FindOneByCode(code string) (*models.Item, error) {
-	var m models.Item
-	if err := r.db.Where(&models.Item{Code: code}).First(&m).Error; err != nil {
+func (r ItemRepository) FindOneByCode(code string) (*model.Item, error) {
+	var m model.Item
+	if err := r.db.Where(&model.Item{Code: code}).First(&m).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, nil
 		}
@@ -53,8 +53,8 @@ func (r ItemRepository) FindOneByCode(code string) (*models.Item, error) {
 	return &m, nil
 }
 
-func (r ItemRepository) FindAll(filter *models.Item) ([]models.Item, error) {
-	var m []models.Item
+func (r ItemRepository) FindAll(filter *model.Item) ([]model.Item, error) {
+	var m []model.Item
 	if err := r.db.Where(&filter).Find(&m).Error; err != nil {
 		return nil, err
 	}
@@ -62,5 +62,5 @@ func (r ItemRepository) FindAll(filter *models.Item) ([]models.Item, error) {
 }
 
 func (r ItemRepository) Delete(ID uuid.UUID) error {
-	return r.db.Delete(&models.Item{}, ID).Error
+	return r.db.Delete(&model.Item{}, ID).Error
 }

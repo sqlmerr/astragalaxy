@@ -1,7 +1,7 @@
 package registry
 
 import (
-	"astragalaxy/internal/utils"
+	"astragalaxy/internal/util"
 	"encoding/json"
 	"io"
 	"os"
@@ -68,5 +68,5 @@ func (r *ItemRegistry) FindOne(code string) (*Item, error) {
 		}
 	}
 
-	return nil, utils.ErrNotFound
+	return nil, util.ErrNotFound
 }

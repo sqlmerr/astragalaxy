@@ -2,7 +2,7 @@ package handler
 
 import (
 	"astragalaxy/internal/schemas"
-	"astragalaxy/internal/utils"
+	"astragalaxy/internal/util"
 	"errors"
 	"github.com/gofiber/fiber/v2"
 	"github.com/google/uuid"
@@ -18,40 +18,40 @@ import (
 //	@Produce		json
 //	@Param			req	body		schemas.FlyToPlanetSchema	true	"fly spaceship schema"
 //	@Success		200	{object}	schemas.OkResponseSchema
-//	@Failure		500	{object}	utils.Error
-//	@Failure		403	{object}	utils.Error
-//	@Failure		422	{object}	utils.Error
+//	@Failure		500	{object}	util.Error
+//	@Failure		403	{object}	util.Error
+//	@Failure		422	{object}	util.Error
 //	@Security		JwtAuth
 //	@Router			/flights/planet [post]
 func (h *Handler) flightToPlanet(c *fiber.Ctx) error {
 	user := c.Locals("user").(*schemas.UserSchema)
 	req := &schemas.FlyToPlanetSchema{}
-	if err := utils.BodyParser(req, c); err != nil {
-		return c.Status(http.StatusUnprocessableEntity).JSON(utils.New(err.Error(), 422))
+	if err := util.BodyParser(req, c); err != nil {
+		return c.Status(http.StatusUnprocessableEntity).JSON(util.New(err.Error(), 422))
 	}
 
-	s, err := h.spaceshipService.FindOne(req.SpaceshipID)
+	s, err := h.s.FindOneSpaceship(req.SpaceshipID)
 	if err != nil {
-		var apiErr utils.APIError
+		var apiErr util.APIError
 		ok := errors.As(err, &apiErr)
 		if ok {
-			return c.Status(apiErr.Status()).JSON(utils.NewError(apiErr))
+			return c.Status(apiErr.Status()).JSON(util.NewError(apiErr))
 		}
-		return c.Status(http.StatusInternalServerError).JSON(utils.NewError(err))
+		return c.Status(http.StatusInternalServerError).JSON(util.NewError(err))
 	}
 
 	if s.UserID != user.ID {
-		return c.Status(http.StatusNotFound).JSON(utils.ErrSpaceshipNotFound)
+		return c.Status(http.StatusNotFound).JSON(util.ErrSpaceshipNotFound)
 	}
 
-	err = h.spaceshipService.Fly(req.SpaceshipID, req.PlanetID)
+	err = h.s.SpaceshipFly(req.SpaceshipID, req.PlanetID)
 	if err != nil {
-		var apiErr utils.APIError
+		var apiErr util.APIError
 		ok := errors.As(err, &apiErr)
 		if ok {
-			return c.Status(apiErr.Status()).JSON(utils.NewError(apiErr))
+			return c.Status(apiErr.Status()).JSON(util.NewError(apiErr))
 		}
-		return c.Status(http.StatusInternalServerError).JSON(utils.NewError(err))
+		return c.Status(http.StatusInternalServerError).JSON(util.NewError(err))
 	}
 	return c.JSON(schemas.OkResponseSchema{Ok: true, CustomStatusCode: 1})
 }
@@ -65,40 +65,40 @@ func (h *Handler) flightToPlanet(c *fiber.Ctx) error {
 //	@Produce		json
 //	@Param			req	body		schemas.HyperJumpSchema	true	"hyper jump schema"
 //	@Success		200	{object}	schemas.OkResponseSchema
-//	@Failure		500	{object}	utils.Error
-//	@Failure		403	{object}	utils.Error
-//	@Failure		422	{object}	utils.Error
+//	@Failure		500	{object}	util.Error
+//	@Failure		403	{object}	util.Error
+//	@Failure		422	{object}	util.Error
 //	@Security		JwtAuth
 //	@Router			/flights/hyperjump [post]
 func (h *Handler) hyperJump(c *fiber.Ctx) error {
 	user := c.Locals("user").(*schemas.UserSchema)
 	req := &schemas.HyperJumpSchema{}
-	if err := utils.BodyParser(req, c); err != nil {
-		return c.Status(http.StatusUnprocessableEntity).JSON(utils.New(err.Error(), 422))
+	if err := util.BodyParser(req, c); err != nil {
+		return c.Status(http.StatusUnprocessableEntity).JSON(util.New(err.Error(), 422))
 	}
 
-	s, err := h.spaceshipService.FindOne(req.SpaceshipID)
+	s, err := h.s.FindOneSpaceship(req.SpaceshipID)
 	if err != nil {
-		var apiErr utils.APIError
+		var apiErr util.APIError
 		ok := errors.As(err, &apiErr)
 		if ok {
-			return c.Status(apiErr.Status()).JSON(utils.NewError(apiErr))
+			return c.Status(apiErr.Status()).JSON(util.NewError(apiErr))
 		}
-		return c.Status(http.StatusInternalServerError).JSON(utils.NewError(err))
+		return c.Status(http.StatusInternalServerError).JSON(util.NewError(err))
 	}
 
 	if s.UserID != user.ID {
-		return c.Status(http.StatusNotFound).JSON(utils.ErrSpaceshipNotFound)
+		return c.Status(http.StatusNotFound).JSON(util.ErrSpaceshipNotFound)
 	}
 
-	err = h.spaceshipService.HyperJump(req.SpaceshipID, req.SystemID)
+	err = h.s.SpaceshipHyperJump(req.SpaceshipID, req.SystemID)
 	if err != nil {
-		var apiErr utils.APIError
+		var apiErr util.APIError
 		ok := errors.As(err, &apiErr)
 		if ok {
-			return c.Status(apiErr.Status()).JSON(utils.NewError(apiErr))
+			return c.Status(apiErr.Status()).JSON(util.NewError(apiErr))
 		}
-		return c.Status(http.StatusInternalServerError).JSON(utils.NewError(err))
+		return c.Status(http.StatusInternalServerError).JSON(util.NewError(err))
 	}
 	return c.JSON(schemas.OkResponseSchema{Ok: true, CustomStatusCode: 1})
 }
@@ -112,25 +112,25 @@ func (h *Handler) hyperJump(c *fiber.Ctx) error {
 //	@Produce		json
 //	@Param			id	query		string	true	"spaceship id. Must be uuid"
 //	@Success		200	{object}	schemas.FlyInfoSchema
-//	@Failure		500	{object}	utils.Error
-//	@Failure		403	{object}	utils.Error
-//	@Failure		400	{object}	utils.Error
-//	@Failure		422	{object}	utils.Error
+//	@Failure		500	{object}	util.Error
+//	@Failure		403	{object}	util.Error
+//	@Failure		400	{object}	util.Error
+//	@Failure		422	{object}	util.Error
 //	@Security		JwtAuth
 //	@Router			/flights/info [get]
 func (h *Handler) checkFlight(c *fiber.Ctx) error {
 	ID, err := uuid.Parse(c.Query("id"))
 	if err != nil {
-		return c.Status(http.StatusBadRequest).JSON(utils.NewError(utils.New(err.Error(), http.StatusBadRequest)))
+		return c.Status(http.StatusBadRequest).JSON(util.NewError(util.New(err.Error(), http.StatusBadRequest)))
 	}
 
 	if ID == uuid.Nil {
-		return c.Status(http.StatusBadRequest).JSON(utils.New("invalid uuid", 400))
+		return c.Status(http.StatusBadRequest).JSON(util.New("invalid uuid", 400))
 	}
 
-	flightInfo, err := h.spaceshipService.GetFlyInfo(ID)
+	flightInfo, err := h.s.GetFlyInfo(ID)
 	if err != nil || flightInfo == nil {
-		return c.Status(http.StatusNotFound).JSON(utils.ErrNotFound)
+		return c.Status(http.StatusNotFound).JSON(util.ErrNotFound)
 	}
 
 	return c.JSON(flightInfo)

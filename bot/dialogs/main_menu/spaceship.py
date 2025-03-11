@@ -82,7 +82,8 @@ async def change_name(
         await notify_admins_error(
             message.bot,
             APIError(f"Custom status code = {response}", status_code=response),
-            message.from_user,
+            i18n=i18n,
+            user=message.from_user,
         )
         return
 

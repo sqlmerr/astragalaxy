@@ -1,29 +1,21 @@
 package handler
 
 import (
-	"astragalaxy/internal/services"
+	"astragalaxy/internal/service"
 	"astragalaxy/internal/state"
 
 	"github.com/gofiber/fiber/v2"
 )
 
 type Handler struct {
-	userService      *services.UserService
-	spaceshipService *services.SpaceshipService
-	planetService    *services.PlanetService
-	systemService    *services.SystemService
-	itemService      *services.ItemService
-	state            *state.State
+	s     *service.Service
+	state *state.State
 }
 
 func NewHandler(state *state.State) Handler {
 	return Handler{
-		userService:      state.UserService,
-		spaceshipService: state.SpaceshipService,
-		planetService:    state.PlanetService,
-		systemService:    state.SystemService,
-		itemService:      state.ItemService,
-		state:            state,
+		s:     state.S,
+		state: state,
 	}
 }
 

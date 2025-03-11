@@ -1,7 +1,7 @@
 package schemas
 
 import (
-	"astragalaxy/internal/models"
+	"astragalaxy/internal/model"
 	"github.com/google/uuid"
 )
 
@@ -12,7 +12,7 @@ type ItemSchema struct {
 	Durability int       `json:"durability"`
 }
 
-func ItemSchemaFromItem(item *models.Item) *ItemSchema {
+func ItemSchemaFromItem(item *model.Item) *ItemSchema {
 	schema := ItemSchema{
 		ID:         item.ID,
 		UserID:     item.UserID,

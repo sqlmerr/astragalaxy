@@ -1,7 +1,7 @@
-package repositories
+package repository
 
 import (
-	"astragalaxy/internal/models"
+	"astragalaxy/internal/model"
 	"errors"
 
 	"github.com/google/uuid"
@@ -9,11 +9,11 @@ import (
 )
 
 type PlanetRepo interface {
-	Create(m *models.Planet) (*uuid.UUID, error)
-	FindOne(ID uuid.UUID) (*models.Planet, error)
-	FindAll(filter *models.Planet) ([]models.Planet, error)
+	Create(m *model.Planet) (*uuid.UUID, error)
+	FindOne(ID uuid.UUID) (*model.Planet, error)
+	FindAll(filter *model.Planet) ([]model.Planet, error)
 	Delete(ID uuid.UUID) error
-	Update(p *models.Planet) error
+	Update(p *model.Planet) error
 }
 
 type PlanetRepository struct {
@@ -24,15 +24,15 @@ func NewPlanetRepository(db *gorm.DB) PlanetRepository {
 	return PlanetRepository{db: db}
 }
 
-func (r PlanetRepository) Create(m *models.Planet) (*uuid.UUID, error) {
+func (r PlanetRepository) Create(m *model.Planet) (*uuid.UUID, error) {
 	if err := r.db.Create(&m).Error; err != nil {
 		return nil, err
 	}
 	return &m.ID, nil
 }
 
-func (r PlanetRepository) FindOne(ID uuid.UUID) (*models.Planet, error) {
-	var m models.Planet
+func (r PlanetRepository) FindOne(ID uuid.UUID) (*model.Planet, error) {
+	var m model.Planet
 
 	if err := r.db.Find(&m, ID).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
@@ -43,8 +43,8 @@ func (r PlanetRepository) FindOne(ID uuid.UUID) (*models.Planet, error) {
 	return &m, nil
 }
 
-func (r PlanetRepository) FindAll(filter *models.Planet) ([]models.Planet, error) {
-	var m []models.Planet
+func (r PlanetRepository) FindAll(filter *model.Planet) ([]model.Planet, error) {
+	var m []model.Planet
 
 	if err := r.db.Where(&filter).Find(&m).Error; err != nil {
 		return nil, err
@@ -53,9 +53,9 @@ func (r PlanetRepository) FindAll(filter *models.Planet) ([]models.Planet, error
 }
 
 func (r PlanetRepository) Delete(ID uuid.UUID) error {
-	return r.db.Delete(&models.Planet{}, ID).Error
+	return r.db.Delete(&model.Planet{}, ID).Error
 }
 
-func (r PlanetRepository) Update(p *models.Planet) error {
+func (r PlanetRepository) Update(p *model.Planet) error {
 	return r.db.Model(&p).Updates(&p).Error
 }

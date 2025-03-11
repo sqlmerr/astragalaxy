@@ -38,7 +38,7 @@ func TestCreateSystem(t *testing.T) {
 }
 
 func TestGetSystemPlanets(t *testing.T) {
-	system, err := stateObj.SystemService.FindOneByName("initial")
+	system, err := stateObj.S.FindOneSystemByName("initial")
 	assert.NoError(t, err)
 
 	req, err := http.NewRequest(http.MethodGet, fmt.Sprintf("/systems/%s/planets", system.ID.String()), nil)
@@ -66,7 +66,7 @@ func TestGetSystemPlanets(t *testing.T) {
 }
 
 func TestGetSystemByID(t *testing.T) {
-	system, err := stateObj.SystemService.FindOneByName("initial")
+	system, err := stateObj.S.FindOneSystemByName("initial")
 	assert.NoError(t, err)
 
 	req := httptest.NewRequest(http.MethodGet, fmt.Sprintf("/systems/%s", system.ID.String()), nil)
@@ -87,7 +87,7 @@ func TestGetSystemByID(t *testing.T) {
 }
 
 func TestGetAllSystems(t *testing.T) {
-	system, err := stateObj.SystemService.FindOneByName("initial")
+	system, err := stateObj.S.FindOneSystemByName("initial")
 	assert.NoError(t, err)
 
 	req := httptest.NewRequest(http.MethodGet, "/systems", nil)

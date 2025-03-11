@@ -19,11 +19,11 @@ func teleport(s *state.State, dataTags map[string]string) bool {
 }
 
 func ExecuteItemAction(userID uuid.UUID, itemID uuid.UUID, state *state.State) bool {
-	item, err := state.ItemService.FindOne(itemID)
+	item, err := state.S.FindOneItem(itemID)
 	if err != nil || item == nil {
 		return false
 	}
-	dataTags := state.ItemService.GetItemDataTags(itemID)
+	dataTags := state.S.GetItemDataTags(itemID)
 
 	i, err := state.MasterRegistry.Item.FindOne(item.Code)
 	if err != nil || i == nil || i.Action == "" {
