@@ -52,4 +52,9 @@ func (h *Handler) Register(app *fiber.App) {
 	registry.Get("/items", h.getItems)
 	registry.Get("/locations/:code", h.getLocationByCode)
 	registry.Get("/locations", h.getLocations)
+
+	inventory := app.Group("/inventory", h.JwtMiddleware(), h.UserGetter)
+	inventory.Get("/items", h.getMyItems)
+	inventory.Get("/items/:code", h.getMyItemsByCode)
+	inventory.Get("/items/:id/data", h.getItemData)
 }

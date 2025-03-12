@@ -6,19 +6,19 @@ import (
 	"github.com/google/uuid"
 )
 
-type Action = func(s *state.State, dataTags map[string]string) bool
+type Action = func(s *state.State, data map[string]interface{}, dataTags map[string]string, itemID uuid.UUID) bool
 
 var ItemActions = map[string]Action{
 	"teleport": teleport,
 }
 
-func teleport(s *state.State, dataTags map[string]string) bool {
+func teleport(s *state.State, data map[string]interface{}, dataTags map[string]string, itemID uuid.UUID) bool {
 	fmt.Println("teleport")
 
 	return true
 }
 
-func ExecuteItemAction(userID uuid.UUID, itemID uuid.UUID, state *state.State) bool {
+func ExecuteItemAction(data map[string]interface{}, itemID uuid.UUID, state *state.State) bool {
 	item, err := state.S.FindOneItem(itemID)
 	if err != nil || item == nil {
 		return false
@@ -31,6 +31,6 @@ func ExecuteItemAction(userID uuid.UUID, itemID uuid.UUID, state *state.State) b
 	}
 	function := ItemActions[i.Action]
 
-	res := function(state, dataTags)
+	res := function(state, data, dataTags, itemID)
 	return res
 }

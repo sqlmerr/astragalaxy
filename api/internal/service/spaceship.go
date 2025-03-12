@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+	"github.com/samber/lo"
 )
 
 func (s *Service) CreateSpaceship(data schema.CreateSpaceshipSchema) (*schema.SpaceshipSchema, error) {
@@ -40,15 +41,7 @@ func (s *Service) FindOneSpaceship(ID uuid.UUID) (*schema.SpaceshipSchema, error
 	if response == nil {
 		return nil, nil
 	}
-	return &schema.SpaceshipSchema{
-		ID:          response.ID,
-		Name:        response.Name,
-		UserID:      response.UserID,
-		Location:    response.Location,
-		SystemID:    response.SystemID,
-		PlanetID:    response.PlanetID,
-		PlayerSitIn: *response.PlayerSitIn,
-	}, nil
+	return schema.SpaceshipSchemaFromSpaceship(response), nil
 }
 
 func (s *Service) FindAllSpaceships(filter *model.Spaceship) ([]schema.SpaceshipSchema, error) {
@@ -56,18 +49,9 @@ func (s *Service) FindAllSpaceships(filter *model.Spaceship) ([]schema.Spaceship
 	if err != nil {
 		return nil, err
 	}
-	var spaceships []schema.SpaceshipSchema
-	for _, sp := range response {
-		spaceships = append(spaceships,
-			schema.SpaceshipSchema{
-				ID:       sp.ID,
-				Name:     sp.Name,
-				UserID:   sp.UserID,
-				Location: sp.Location,
-				SystemID: sp.SystemID,
-				PlanetID: sp.PlanetID,
-			})
-	}
+	spaceships := lo.Map(response, func(item model.Spaceship, index int) schema.SpaceshipSchema {
+		return *schema.SpaceshipSchemaFromSpaceship(&item)
+	})
 	return spaceships, nil
 }
 

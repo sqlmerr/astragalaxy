@@ -1,6 +1,7 @@
 package schema
 
 import (
+	"astragalaxy/internal/model"
 	"github.com/google/uuid"
 )
 
@@ -33,4 +34,16 @@ type UpdateSpaceshipSchema struct {
 type RenameSpaceshipSchema struct {
 	SpaceshipID uuid.UUID `json:"spaceship_id"`
 	Name        string    `json:"name"`
+}
+
+func SpaceshipSchemaFromSpaceship(spaceship *model.Spaceship) *SpaceshipSchema {
+	return &SpaceshipSchema{
+		ID:          spaceship.ID,
+		Name:        spaceship.Name,
+		UserID:      spaceship.UserID,
+		Location:    spaceship.Location,
+		SystemID:    spaceship.SystemID,
+		PlanetID:    spaceship.PlanetID,
+		PlayerSitIn: *spaceship.PlayerSitIn,
+	}
 }

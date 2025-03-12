@@ -24,6 +24,7 @@ var (
 	stateObj     *state.State
 	spaceship    *schema.SpaceshipSchema
 	executor     *test.Executor
+	testItem     *schema.ItemSchema
 )
 
 func TestMain(m *testing.M) {
@@ -97,6 +98,11 @@ func setup(state *state.State) {
 	token := usrRaw.Token
 	jwtToken, err := state.S.Login(user.TelegramID, token)
 	if err != nil || jwtToken == nil {
+		panic(err)
+	}
+
+	testItem, err = state.S.AddItem(usrRaw.ID, "test", map[string]string{"test": "123"})
+	if err != nil {
 		panic(err)
 	}
 

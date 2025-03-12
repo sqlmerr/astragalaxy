@@ -18,5 +18,11 @@
         "emoji": "⚡️",
         "damagePerUse": 0,
         "rarity": "common"
+    },
+    {
+        "code": "test",
+        "emoji": "\uD83E\uDDEA",
+        "damagePerUse": 1,
+        "rarity": "immortal"
     }
 ]

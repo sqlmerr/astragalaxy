@@ -8,3 +8,7 @@ type AuthBody struct {
 type AuthPayload struct {
 	Token string `json:"token"`
 }
+
+type UserTokenResponseSchema struct {
+	Token string `json:"token"`
+}

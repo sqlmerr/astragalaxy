@@ -21,3 +21,7 @@ func ItemSchemaFromItem(item *model.Item) *ItemSchema {
 	}
 	return &schema
 }
+
+type ItemDataResponseSchema struct {
+	Data map[string]string `json:"data"`
+}

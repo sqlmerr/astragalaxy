@@ -53,7 +53,6 @@ func GetProjectRoot() (string, error) {
 		return "", fmt.Errorf("failed to get current file path")
 	}
 	currentDir := filepath.Dir(filename)
-
 	for {
 		goModPath := filepath.Join(currentDir, "go.mod")
 		if _, err := os.Stat(goModPath); err == nil {

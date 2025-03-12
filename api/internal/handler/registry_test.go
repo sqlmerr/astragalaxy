@@ -17,7 +17,7 @@ func TestGetItemByCode(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Equal(t, http.StatusNotFound, resNotFound.StatusCode)
 
-	code := "teleporter"
+	code := "test"
 	url := fmt.Sprintf("/registry/items/%s", code)
 	request := httptest.NewRequest(http.MethodGet, url, nil)
 	request.Header.Set("Content-Type", "application/json")
@@ -31,6 +31,7 @@ func TestGetItemByCode(t *testing.T) {
 		assert.NoError(t, err)
 
 		assert.Equal(t, code, item.Code)
+		assert.Equal(t, registry.ITEM_RARITY_IMMORTAL, item.Rarity)
 	}
 }
 

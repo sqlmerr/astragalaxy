@@ -167,8 +167,8 @@ func (h *Handler) renameMySpaceship(c *fiber.Ctx) error {
 		return c.Status(http.StatusNotFound).JSON(util.NewError(util.ErrSpaceshipNotFound))
 	}
 
-	schema := schema.UpdateSpaceshipSchema{Name: req.Name}
-	err = h.s.UpdateSpaceship(req.SpaceshipID, schema)
+	spaceshipSchema := schema.UpdateSpaceshipSchema{Name: req.Name}
+	err = h.s.UpdateSpaceship(req.SpaceshipID, spaceshipSchema)
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return c.Status(http.StatusNotFound).JSON(util.NewError(util.ErrSpaceshipNotFound))

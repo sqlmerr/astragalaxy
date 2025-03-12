@@ -5,6 +5,6 @@ type OkResponseSchema struct {
 	CustomStatusCode int  `json:"custom_status_code"`
 }
 
-type UserTokenResponseSchema struct {
-	Token string `json:"token"`
+type DataResponseSchema struct {
+	Data any `json:"data"`
 }

@@ -54,13 +54,13 @@ func (s *Service) Login(telegramID int64, token string) (*string, error) {
 		return nil, util.ErrInvalidToken
 	}
 
-	jwt_token := jwt.New(jwt.SigningMethodHS512)
+	jwtToken := jwt.New(jwt.SigningMethodHS512)
 
-	claims := jwt_token.Claims.(jwt.MapClaims)
+	claims := jwtToken.Claims.(jwt.MapClaims)
 	claims["sub"] = telegramID
 	claims["exp"] = time.Now().Add(time.Hour * 24).Unix()
 
-	t, err := jwt_token.SignedString([]byte(util.GetEnv("JWT_SECRET")))
+	t, err := jwtToken.SignedString([]byte(util.GetEnv("JWT_SECRET")))
 	return &t, err
 }
 
@@ -70,8 +70,8 @@ func (s *Service) FindOneUser(ID uuid.UUID) (*schema.UserSchema, error) {
 		return nil, err
 	}
 
-	schema := schema.UserSchemaFromUser(*user)
-	return &schema, nil
+	userSchema := schema.UserSchemaFromUser(*user)
+	return &userSchema, nil
 }
 
 func (s *Service) FindOneUserByTelegramID(telegramID int64) (*schema.UserSchema, error) {
@@ -85,8 +85,8 @@ func (s *Service) FindOneUserByTelegramID(telegramID int64) (*schema.UserSchema,
 		return nil, util.ErrUserNotFound
 	}
 
-	schema := schema.UserSchemaFromUser(*user)
-	return &schema, nil
+	userSchema := schema.UserSchemaFromUser(*user)
+	return &userSchema, nil
 }
 
 func (s *Service) FindOneUserRawByTelegramID(telegramID int64) (*model.User, error) {
@@ -135,11 +135,9 @@ func (s *Service) AddUserSpaceship(userID uuid.UUID, spaceship schema.SpaceshipS
 	}
 
 	user.Spaceships = append(user.Spaceships, spaceship)
-	s.UpdateUser(userID, schema.UpdateUserSchema{
+	return s.UpdateUser(userID, schema.UpdateUserSchema{
 		Spaceships: user.Spaceships,
 	})
-
-	return nil
 }
 
 func (s *Service) EnterUserSpaceship(user schema.UserSchema, spaceshipID uuid.UUID) error {

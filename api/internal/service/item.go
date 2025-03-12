@@ -4,6 +4,7 @@ import (
 	"astragalaxy/internal/model"
 	"astragalaxy/internal/schema"
 	"astragalaxy/internal/util"
+	"github.com/samber/lo"
 
 	"github.com/google/uuid"
 )
@@ -29,8 +30,8 @@ func (s *Service) AddItem(userID uuid.UUID, itemCode string, dataTags map[string
 			return nil, err
 		}
 	}
-	schema := schema.ItemSchemaFromItem(&item)
-	return schema, err
+	itemSchema := schema.ItemSchemaFromItem(&item)
+	return itemSchema, err
 }
 
 func (s *Service) FindOneItem(ID uuid.UUID) (*schema.ItemSchema, error) {
@@ -41,8 +42,8 @@ func (s *Service) FindOneItem(ID uuid.UUID) (*schema.ItemSchema, error) {
 		return nil, util.ErrItemNotFound
 	}
 
-	schema := schema.ItemSchemaFromItem(item)
-	return schema, nil
+	itemSchema := schema.ItemSchemaFromItem(item)
+	return itemSchema, nil
 }
 
 func (s *Service) FindOneItemByCode(code string) (*schema.ItemSchema, error) {
@@ -53,8 +54,19 @@ func (s *Service) FindOneItemByCode(code string) (*schema.ItemSchema, error) {
 		return nil, util.ErrItemNotFound
 	}
 
-	schema := schema.ItemSchemaFromItem(item)
-	return schema, nil
+	itemSchema := schema.ItemSchemaFromItem(item)
+	return itemSchema, nil
+}
+
+func (s *Service) FindAllItems(filter *model.Item) ([]schema.ItemSchema, error) {
+	items, err := s.i.FindAll(filter)
+	if err != nil {
+		return nil, err
+	}
+	itemSchemas := lo.Map(items, func(item model.Item, index int) schema.ItemSchema {
+		return *schema.ItemSchemaFromItem(&item)
+	})
+	return itemSchemas, nil
 }
 
 func (s *Service) GetItemDataTags(itemID uuid.UUID) map[string]string {
@@ -63,7 +75,7 @@ func (s *Service) GetItemDataTags(itemID uuid.UUID) map[string]string {
 		return map[string]string{}
 	}
 
-	res := make(map[string]string)
+	var res = map[string]string{}
 	for _, t := range tags {
 		res[t.Key] = t.Value
 	}
