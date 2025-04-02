@@ -2,10 +2,6 @@ name: Test application
 
 on: [push]
 
-defaults:
-  run:
-    working-directory: api
-
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -41,4 +37,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: Go-results-${{ matrix.go-version }}
-          path: ./api/TestResults-${{ matrix.go-version }}.json
+          path: ./TestResults-${{ matrix.go-version }}.json

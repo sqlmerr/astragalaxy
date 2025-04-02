@@ -1,18 +1,4 @@
 services:
-    # bot:
-    #     build: 
-    #         context: bot
-    #         dockerfile: Dockerfile
-    #     env_file:
-    #         - bot/.env
-    #     # depends_on:
-    #         # - api
-    #         # - redis
-    #     environment:
-    #         - REDIS_URL=redis://redis:6379
-    #         - API_URL=http://api:8000
-    #     networks:
-    #         - backend
     db:
         image: postgres:16.2-alpine
         command: -p 5432
@@ -23,16 +9,16 @@ services:
         volumes:
             - app-db-data:/var/lib/postgresql/
         env_file:
-            - ./api/.env
+            - .env
         environment:
             - PGDATA=/var/lib/postgresql/data/pgdata
         networks:
             - backend
     api:
         build:
-            ./api
+            context: .
         env_file:
-            - ./api/.env
+            - .env
         ports:
             - "8000:8000"
         depends_on:
