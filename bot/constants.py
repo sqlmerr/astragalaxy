@@ -1,4 +1,0 @@
-STICKERS = {
-    "spaceship_menu": "CAACAgEAAxkBAAENZ0pncBwQmQTuHtYXIA0eUJRIMdEoVAACSgMAAm_XGETUUhY0_9qHgzYE",
-    "starmap_menu": "CAACAgEAAxkBAAEN4aVnuyu5TnaSL2PnRIVDQ3NHzFGX5QACjQQAApbcoUZgQGLo1I2DijYE",
-}
