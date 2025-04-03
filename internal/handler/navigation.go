@@ -4,16 +4,17 @@ import (
 	"astragalaxy/internal/schema"
 	"astragalaxy/internal/util"
 	"errors"
+	"net/http"
+
 	"github.com/gofiber/fiber/v2"
 	"github.com/google/uuid"
-	"net/http"
 )
 
 // flightToPlanet godoc
 //
 //	@Summary		Flight to planet
 //	@Description	Flight to planet. Jwt token required
-//	@Tags			flights
+//	@Tags			navigation
 //	@Accept			json
 //	@Produce		json
 //	@Param			req	body		schema.FlyToPlanetSchema	true	"fly spaceship schema"
@@ -22,7 +23,7 @@ import (
 //	@Failure		403	{object}	util.Error
 //	@Failure		422	{object}	util.Error
 //	@Security		JwtAuth
-//	@Router			/flights/planet [post]
+//	@Router			/navigation/planet [post]
 func (h *Handler) flightToPlanet(c *fiber.Ctx) error {
 	user := c.Locals("user").(*schema.UserSchema)
 	req := &schema.FlyToPlanetSchema{}
@@ -60,7 +61,7 @@ func (h *Handler) flightToPlanet(c *fiber.Ctx) error {
 //
 //	@Summary		Flight to system
 //	@Description	HyperJump. Jwt token required
-//	@Tags			flights
+//	@Tags			navigation
 //	@Accept			json
 //	@Produce		json
 //	@Param			req	body		schema.HyperJumpSchema	true	"hyper jump schema"
@@ -69,7 +70,7 @@ func (h *Handler) flightToPlanet(c *fiber.Ctx) error {
 //	@Failure		403	{object}	util.Error
 //	@Failure		422	{object}	util.Error
 //	@Security		JwtAuth
-//	@Router			/flights/hyperjump [post]
+//	@Router			/navigation/hyperjump [post]
 func (h *Handler) hyperJump(c *fiber.Ctx) error {
 	user := c.Locals("user").(*schema.UserSchema)
 	req := &schema.HyperJumpSchema{}
@@ -107,7 +108,7 @@ func (h *Handler) hyperJump(c *fiber.Ctx) error {
 //
 //	@Summary		Get flight info
 //	@Description	Jwt token required
-//	@Tags			flights
+//	@Tags			navigation
 //	@Accept			json
 //	@Produce		json
 //	@Param			id	query		string	true	"spaceship id. Must be uuid"
@@ -117,7 +118,7 @@ func (h *Handler) hyperJump(c *fiber.Ctx) error {
 //	@Failure		400	{object}	util.Error
 //	@Failure		422	{object}	util.Error
 //	@Security		JwtAuth
-//	@Router			/flights/info [get]
+//	@Router			/navigation/info [get]
 func (h *Handler) checkFlight(c *fiber.Ctx) error {
 	ID, err := uuid.Parse(c.Query("id"))
 	if err != nil {

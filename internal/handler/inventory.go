@@ -5,9 +5,10 @@ import (
 	"astragalaxy/internal/schema"
 	"astragalaxy/internal/util"
 	"errors"
+	"net/http"
+
 	"github.com/gofiber/fiber/v2"
 	"github.com/google/uuid"
-	"net/http"
 )
 
 // getMyItems godoc
@@ -68,7 +69,7 @@ func (h *Handler) getMyItemsByCode(ctx *fiber.Ctx) error {
 //
 //	@Summary		Get item data by id
 //	@Description	Jwt Token required
-//	@Tags			registry
+//	@Tags			inventory
 //	@Accept			json
 //	@Produce		json
 //	@Param			id	path		string	true	"item id. UUID"

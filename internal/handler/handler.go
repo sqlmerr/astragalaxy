@@ -42,7 +42,7 @@ func (h *Handler) Register(app *fiber.App) {
 	planets := app.Group("/planets")
 	planets.Post("/", h.SudoMiddleware, h.createPlanet)
 
-	flights := app.Group("/flights", h.JwtMiddleware(), h.UserGetter)
+	flights := app.Group("/navigation", h.JwtMiddleware(), h.UserGetter)
 	flights.Post("/planet", h.flightToPlanet)
 	flights.Post("/hyperjump", h.hyperJump)
 	flights.Get("/info", h.checkFlight)
