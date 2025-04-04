@@ -4,6 +4,7 @@ import (
 	"astragalaxy/internal/model"
 	"astragalaxy/internal/schema"
 	"astragalaxy/internal/util"
+	"fmt"
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
@@ -19,20 +20,16 @@ func (s *Service) Register(data schema.CreateUserSchema, location string, system
 		return nil, util.ErrUserAlreadyExists
 	}
 
-	usr, err = s.FindOneUserRawByTelegramID(data.TelegramID)
+	hashedPassword, err := util.HashPassword(data.Password)
 	if err != nil {
-		return nil, err
+		return nil, util.ErrServerError
 	}
-	if usr != nil {
-		return nil, util.ErrUserAlreadyExists
-	}
-
 	u := model.User{
-		Username:   data.Username,
-		TelegramID: data.TelegramID,
-		Location:   location,
-		SystemID:   systemID,
-		Token:      util.GenerateToken(32),
+		Username: data.Username,
+		Password: hashedPassword,
+		Location: location,
+		SystemID: systemID,
+		Token:    util.GenerateToken(32),
 	}
 	ID, err := s.u.Create(&u)
 	if err != nil {
@@ -41,8 +38,8 @@ func (s *Service) Register(data schema.CreateUserSchema, location string, system
 	return s.FindOneUser(*ID)
 }
 
-func (s *Service) Login(telegramID int64, token string) (*string, error) {
-	user, err := s.u.FindOneFilter(&model.User{TelegramID: telegramID})
+func (s *Service) LoginByToken(token string) (*string, error) {
+	user, err := s.u.FindOneFilter(&model.User{Token: token})
 	if err != nil {
 		return nil, err
 	}
@@ -57,7 +54,31 @@ func (s *Service) Login(telegramID int64, token string) (*string, error) {
 	jwtToken := jwt.New(jwt.SigningMethodHS512)
 
 	claims := jwtToken.Claims.(jwt.MapClaims)
-	claims["sub"] = telegramID
+	claims["sub"] = user.Username
+	claims["exp"] = time.Now().Add(time.Hour * 24).Unix()
+
+	t, err := jwtToken.SignedString([]byte(util.GetEnv("JWT_SECRET")))
+	return &t, err
+}
+
+func (s *Service) Login(data *schema.AuthPayload) (*string, error) {
+	user, err := s.u.FindOneFilter(&model.User{Username: data.Username})
+	if err != nil {
+		return nil, err
+	}
+	if user == nil {
+		return nil, util.ErrUnauthorized
+	}
+
+	if status := util.VerifyPassword(data.Password, user.Password); !status {
+		fmt.Println(status, user.Password, data.Password)
+		return nil, util.ErrUnauthorized
+	}
+
+	jwtToken := jwt.New(jwt.SigningMethodHS512)
+
+	claims := jwtToken.Claims.(jwt.MapClaims)
+	claims["sub"] = user.Username
 	claims["exp"] = time.Now().Add(time.Hour * 24).Unix()
 
 	t, err := jwtToken.SignedString([]byte(util.GetEnv("JWT_SECRET")))
@@ -74,25 +95,26 @@ func (s *Service) FindOneUser(ID uuid.UUID) (*schema.UserSchema, error) {
 	return &userSchema, nil
 }
 
-func (s *Service) FindOneUserByTelegramID(telegramID int64) (*schema.UserSchema, error) {
-	user, err := s.u.FindOneFilter(&model.User{
-		TelegramID: telegramID,
-	})
+func (s *Service) FindOneUserRaw(ID uuid.UUID) (*model.User, error) {
+	user, err := s.u.FindOne(ID)
 	if err != nil {
 		return nil, err
 	}
-	if user == nil {
-		return nil, util.ErrUserNotFound
+	return user, nil
+}
+
+func (s *Service) FindOneUserByUsername(username string) (*schema.UserSchema, error) {
+	user, err := s.u.FindOneByUsername(username)
+	if err != nil {
+		return nil, err
 	}
 
 	userSchema := schema.UserSchemaFromUser(*user)
 	return &userSchema, nil
 }
 
-func (s *Service) FindOneUserRawByTelegramID(telegramID int64) (*model.User, error) {
-	user, err := s.u.FindOneFilter(&model.User{
-		TelegramID: telegramID,
-	})
+func (s *Service) FindOneUserRawByUsername(username string) (*model.User, error) {
+	user, err := s.u.FindOneByUsername(username)
 	if err != nil {
 		return nil, err
 	}
@@ -113,11 +135,19 @@ func (s *Service) UpdateUser(ID uuid.UUID, data schema.UpdateUserSchema) error {
 		})
 	}
 
+	if data.Password != "" {
+		hashedPassword, err := util.HashPassword(data.Password)
+		if err != nil {
+			return util.ErrServerError
+		}
+		data.Password = hashedPassword
+	}
+
 	user := model.User{
 		ID:          ID,
 		Username:    data.Username,
-		TelegramID:  data.TelegramID,
 		Spaceships:  spaceships,
+		Password:    data.Password,
 		InSpaceship: &data.InSpaceship,
 		Location:    data.Location,
 		SystemID:    data.SystemID,

@@ -70,7 +70,7 @@ func setup(state *state.State) {
 
 	fmt.Println("Initial system:", sys)
 
-	user, err := state.S.Register(schema.CreateUserSchema{TelegramID: 123456789, Username: "tester"}, "space_station", sys.ID)
+	user, err := state.S.Register(schema.CreateUserSchema{Password: "testPassword", Username: "tester"}, "space_station", sys.ID)
 	if err != nil {
 		panic(err)
 	}
@@ -90,13 +90,13 @@ func setup(state *state.State) {
 	}
 	user.Spaceships = spaceships
 
-	usrRaw, err := state.S.FindOneUserRawByTelegramID(user.TelegramID)
+	usrRaw, err := state.S.FindOneUserRawByUsername(user.Username)
 	if err != nil {
 		panic(err)
 	}
 
 	token := usrRaw.Token
-	jwtToken, err := state.S.Login(user.TelegramID, token)
+	jwtToken, err := state.S.LoginByToken(token)
 	if err != nil || jwtToken == nil {
 		panic(err)
 	}

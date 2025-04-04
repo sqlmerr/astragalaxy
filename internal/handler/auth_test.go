@@ -5,16 +5,17 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"github.com/stretchr/testify/assert"
 	"io"
 	"net/http"
 	"net/http/httptest"
 	"strings"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestRegister(t *testing.T) {
-	body := &schema.CreateUserSchema{TelegramID: 987654321, Username: "tester2"}
+	body := &schema.CreateUserSchema{Password: "987654321", Username: "tester2"}
 	b, err := json.Marshal(body)
 	assert.NoError(t, err)
 
@@ -34,7 +35,6 @@ func TestRegister(t *testing.T) {
 		err = json.Unmarshal(body, &response)
 		assert.NoError(t, err)
 
-		assert.Equal(t, int64(987654321), response.TelegramID)
 		assert.Equal(t, "tester2", response.Username)
 
 		spaceship, err := stateObj.S.FindOneSpaceship(response.Spaceships[0].ID)
@@ -46,7 +46,7 @@ func TestRegister(t *testing.T) {
 }
 
 func TestLogin(t *testing.T) {
-	body := fmt.Sprintf(`{"token":"%s"}`, fmt.Sprintf("%d:%s", usr.TelegramID, userToken))
+	body := fmt.Sprintf(`{"token":"%s"}`, userToken)
 
 	request := httptest.NewRequest(http.MethodPost, "/auth/login", strings.NewReader(body))
 	request.Header.Set("Content-Type", "application/json")
@@ -67,7 +67,7 @@ func TestLogin(t *testing.T) {
 }
 
 func TestGetUserTokenSudo(t *testing.T) {
-	request := httptest.NewRequest(http.MethodGet, fmt.Sprintf("/auth/token/sudo?telegram_id=%d", usr.TelegramID), nil)
+	request := httptest.NewRequest(http.MethodGet, fmt.Sprintf("/auth/token/sudo?id=%s", usr.ID.String()), nil)
 	request.Header.Set("Content-Type", "application/json")
 	request.Header.Set("secret-token", sudoToken)
 

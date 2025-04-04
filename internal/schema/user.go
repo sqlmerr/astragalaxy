@@ -9,7 +9,6 @@ import (
 type UserSchema struct {
 	ID          uuid.UUID         `json:"id"`
 	Username    string            `json:"username"`
-	TelegramID  int64             `json:"telegram_id"`
 	Spaceships  []SpaceshipSchema `json:"spaceships"`
 	InSpaceship bool              `json:"in_spaceship"`
 	Location    string            `json:"location"`
@@ -17,13 +16,13 @@ type UserSchema struct {
 }
 
 type CreateUserSchema struct {
-	Username   string `json:"username"`
-	TelegramID int64  `json:"telegram_id"`
+	Username string `json:"username"`
+	Password string `json:"password"`
 }
 
 type UpdateUserSchema struct {
 	Username    string            `json:"username"`
-	TelegramID  int64             `json:"telegram_id"`
+	Password    string            `json:"password"`
 	Spaceships  []SpaceshipSchema `json:"spaceships"`
 	InSpaceship bool              `json:"in_spaceship"`
 	Location    string            `json:"location"`
@@ -33,21 +32,13 @@ type UpdateUserSchema struct {
 func UserSchemaFromUser(val model.User) UserSchema {
 	var spaceships []SpaceshipSchema
 	for _, sp := range val.Spaceships {
-		spaceships = append(spaceships, SpaceshipSchema{
-			ID:          sp.ID,
-			Name:        sp.Name,
-			UserID:      sp.UserID,
-			Location:    sp.Location,
-			SystemID:    sp.SystemID,
-			PlanetID:    sp.PlanetID,
-			PlayerSitIn: *sp.PlayerSitIn,
-		})
+		spaceships = append(spaceships, *SpaceshipSchemaFromSpaceship(&sp))
+
 	}
 
 	return UserSchema{
 		ID:          val.ID,
 		Username:    val.Username,
-		TelegramID:  val.TelegramID,
 		Spaceships:  spaceships,
 		InSpaceship: *val.InSpaceship,
 		Location:    val.Location,

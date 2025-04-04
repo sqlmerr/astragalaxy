@@ -3,6 +3,7 @@ package service
 import (
 	"astragalaxy/internal/model"
 	"astragalaxy/internal/schema"
+	"astragalaxy/internal/util"
 
 	"github.com/google/uuid"
 )
@@ -29,6 +30,9 @@ func (s *Service) FindOneSystemByName(name string) (*schema.SystemSchema, error)
 	response, err := s.sy.FindOneByName(name)
 	if err != nil {
 		return nil, err
+	}
+	if response == nil {
+		return nil, util.ErrNotFound
 	}
 	schema := schema.SystemSchema(*response)
 	return &schema, nil

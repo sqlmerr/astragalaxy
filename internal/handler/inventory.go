@@ -17,12 +17,12 @@ import (
 //	@Description	Jwt Token required
 //	@Tags			inventory
 //	@Produce		json
-//	@Success		200		{object}	[]schema.ItemSchema
-//	@Failure		500		{object}	util.Error
-//	@Failure		400		{object}	util.Error
-//	@Failure		403		{object}	util.Error
-//	@Failure		404		{object}	util.Error
-//	@Failure		422		{object}	util.Error
+//	@Success		200	{object}	[]schema.ItemSchema
+//	@Failure		500	{object}	util.Error
+//	@Failure		400	{object}	util.Error
+//	@Failure		403	{object}	util.Error
+//	@Failure		404	{object}	util.Error
+//	@Failure		422	{object}	util.Error
 //	@Router			/inventory/items/ [get]
 func (h *Handler) getMyItems(ctx *fiber.Ctx) error {
 	user := ctx.Locals("user").(*schema.UserSchema)
@@ -73,12 +73,12 @@ func (h *Handler) getMyItemsByCode(ctx *fiber.Ctx) error {
 //	@Accept			json
 //	@Produce		json
 //	@Param			id	path		string	true	"item id. UUID"
-//	@Success		200		{object}	schema.DataResponseSchema
-//	@Failure		500		{object}	util.Error
-//	@Failure		400		{object}	util.Error
-//	@Failure		403		{object}	util.Error
-//	@Failure		404		{object}	util.Error
-//	@Failure		422		{object}	util.Error
+//	@Success		200	{object}	schema.DataResponseSchema
+//	@Failure		500	{object}	util.Error
+//	@Failure		400	{object}	util.Error
+//	@Failure		403	{object}	util.Error
+//	@Failure		404	{object}	util.Error
+//	@Failure		422	{object}	util.Error
 //	@Router			/inventory/items/{id}/data [get]
 func (h *Handler) getItemData(ctx *fiber.Ctx) error {
 	user := ctx.Locals("user").(*schema.UserSchema)

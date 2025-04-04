@@ -21,9 +21,9 @@ func (h *Handler) SudoMiddleware(c *fiber.Ctx) error {
 func (h *Handler) UserGetter(c *fiber.Ctx) error {
 	token := c.Locals("jwtToken").(*jwt.Token)
 	claims := token.Claims.(jwt.MapClaims)
-	telegramID := int64(claims["sub"].(float64))
+	username := claims["sub"].(string)
 
-	user, err := h.s.FindOneUserByTelegramID(telegramID)
+	user, err := h.s.FindOneUserByUsername(username)
 	if err != nil || user == nil {
 		return c.Status(http.StatusForbidden).JSON(util.NewError(util.ErrInvalidToken))
 	}

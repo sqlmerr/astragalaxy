@@ -5,8 +5,13 @@ type AuthBody struct {
 	TokenType   string `json:"token_type"`
 }
 
-type AuthPayload struct {
+type AuthPayloadToken struct {
 	Token string `json:"token"`
+}
+
+type AuthPayload struct {
+	Username string `json:"username"`
+	Password string `json:"password"`
 }
 
 type UserTokenResponseSchema struct {

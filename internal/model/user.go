@@ -5,7 +5,7 @@ import "github.com/google/uuid"
 type User struct {
 	ID          uuid.UUID `gorm:"type:uuid;default:gen_random_uuid()"`
 	Username    string    `gorm:"unique;not null"`
-	TelegramID  int64     `gorm:"unique"`
+	Password    string
 	Spaceships  []Spaceship
 	InSpaceship *bool `gorm:"default:false"`
 	Location    string

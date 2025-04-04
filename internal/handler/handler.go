@@ -21,8 +21,9 @@ func NewHandler(state *state.State) Handler {
 
 func (h *Handler) Register(app *fiber.App) {
 	auth := app.Group("/auth")
-	auth.Post("/register", h.SudoMiddleware, h.registerFromTelegram)
+	auth.Post("/register", h.registerUser)
 	auth.Post("/login", h.login)
+	auth.Post("/login/token", h.loginByToken)
 	auth.Get("/me", h.JwtMiddleware(), h.UserGetter, h.getMe)
 	auth.Get("/token/sudo", h.SudoMiddleware, h.getUserTokenSudo)
 

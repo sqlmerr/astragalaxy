@@ -5,17 +5,16 @@ import (
 	"astragalaxy/internal/schema"
 	"astragalaxy/internal/util"
 	"errors"
-	"log"
 	"net/http"
-	"strconv"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/google/uuid"
 )
 
 // registerFromTelegram godoc
 //
-//	@Summary		Register account from telegram
-//	@Description	Register account using telegram id and username. Sudo token required.
+//	@Summary		Register account
+//	@Description	Register account using password and username
 //	@Tags			auth
 //	@Accept			json
 //	@Produce		json
@@ -24,9 +23,8 @@ import (
 //	@Failure		500		{object}	util.Error
 //	@Failure		403		{object}	util.Error
 //	@Failure		422		{object}	util.Error
-//	@Security		SudoToken
 //	@Router			/auth/register [post]
-func (h *Handler) registerFromTelegram(c *fiber.Ctx) error {
+func (h *Handler) registerUser(c *fiber.Ctx) error {
 	req := &schema.CreateUserSchema{}
 	if err := c.BodyParser(&req); err != nil {
 		return c.Status(http.StatusUnprocessableEntity).JSON(util.NewError(err))
@@ -40,7 +38,7 @@ func (h *Handler) registerFromTelegram(c *fiber.Ctx) error {
 	user, err := h.s.Register(*req, "space_station", system.ID)
 	if err != nil || user == nil {
 		if errors.Is(err, util.ErrUserAlreadyExists) {
-			return c.Status(http.StatusForbidden).JSON(util.NewError(err))
+			return c.Status(http.StatusConflict).JSON(util.NewError(err))
 		}
 		return c.Status(http.StatusInternalServerError).JSON(util.NewError(util.ErrServerError))
 	}
@@ -66,9 +64,38 @@ func (h *Handler) registerFromTelegram(c *fiber.Ctx) error {
 	return c.Status(http.StatusCreated).JSON(&user)
 }
 
-// login godoc
+// loginByToken godoc
 //
 //	@Summary		Login using user token
+//	@Description	Login. Auth not required.
+//	@Tags			auth
+//	@Accept			json
+//	@Produce		json
+//	@Param			payload	body		schema.AuthPayloadToken	true	"Auth Payload"
+//	@Success		200		{object}	schema.AuthBody
+//	@Failure		500		{object}	util.Error
+//	@Failure		403		{object}	util.Error
+//	@Failure		422		{object}	util.Error
+//	@Router			/auth/login/token [post]
+func (h *Handler) loginByToken(c *fiber.Ctx) error {
+	req := &schema.AuthPayloadToken{}
+
+	if err := c.BodyParser(&req); err != nil {
+		return c.Status(http.StatusUnprocessableEntity).JSON(util.NewError(err))
+	}
+
+	jwtToken, err := h.s.LoginByToken(req.Token)
+
+	if err != nil || jwtToken == nil {
+		return c.Status(http.StatusForbidden).JSON(util.NewError(util.ErrUnauthorized))
+	}
+
+	return c.JSON(schema.AuthBody{AccessToken: *jwtToken, TokenType: "Bearer"})
+}
+
+// login godoc
+//
+//	@Summary		Login using username and password
 //	@Description	Login. Auth not required.
 //	@Tags			auth
 //	@Accept			json
@@ -86,15 +113,10 @@ func (h *Handler) login(c *fiber.Ctx) error {
 		return c.Status(http.StatusUnprocessableEntity).JSON(util.NewError(err))
 	}
 
-	id, token, err := util.SplitUserToken(req.Token)
-	if err != nil {
-		return c.Status(http.StatusForbidden).JSON(util.NewError(util.ErrInvalidToken))
-	}
-
-	jwtToken, err := h.s.Login(id, token)
+	jwtToken, err := h.s.Login(req)
 
 	if err != nil || jwtToken == nil {
-		return c.Status(http.StatusForbidden).JSON(util.NewError(util.ErrUnauthorized))
+		return c.Status(http.StatusUnauthorized).JSON(util.NewError(util.ErrUnauthorized))
 	}
 
 	return c.JSON(schema.AuthBody{AccessToken: *jwtToken, TokenType: "Bearer"})
@@ -130,22 +152,21 @@ func (h *Handler) getMe(c *fiber.Ctx) error {
 //	@Tags			auth
 //	@Accept			json
 //	@Produce		json
-//	@Param			telegram_id	query		string	true	"User telegram id"
-//	@Success		200			{object}	schema.UserTokenResponseSchema
-//	@Failure		500			{object}	util.Error
-//	@Failure		403			{object}	util.Error
-//	@Failure		422			{object}	util.Error
+//	@Param			id	query		string	true	"User id"
+//	@Success		200	{object}	schema.UserTokenResponseSchema
+//	@Failure		500	{object}	util.Error
+//	@Failure		403	{object}	util.Error
+//	@Failure		422	{object}	util.Error
 //	@Security		SudoToken
 //	@Router			/auth/token/sudo [get]
 func (h *Handler) getUserTokenSudo(c *fiber.Ctx) error {
-	telegramID := c.Query("telegram_id", "")
-	log.Println(telegramID)
-	ID, err := strconv.Atoi(telegramID)
+	userID := c.Query("id", "")
+	ID, err := uuid.Parse(userID)
 	if err != nil {
 		return c.Status(http.StatusUnprocessableEntity).JSON(util.NewError(util.New(err.Error(), http.StatusUnprocessableEntity)))
 	}
 
-	user, err := h.s.FindOneUserRawByTelegramID(int64(ID))
+	user, err := h.s.FindOneUserRaw(ID)
 	if err != nil || user == nil {
 		return c.Status(http.StatusInternalServerError).JSON(util.NewError(util.ErrServerError))
 	}
