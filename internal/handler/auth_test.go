@@ -45,8 +45,29 @@ func TestRegister(t *testing.T) {
 	}
 }
 
-func TestLogin(t *testing.T) {
+func TestLoginByToken(t *testing.T) {
 	body := fmt.Sprintf(`{"token":"%s"}`, userToken)
+
+	request := httptest.NewRequest(http.MethodPost, "/auth/login/token", strings.NewReader(body))
+	request.Header.Set("Content-Type", "application/json")
+
+	res, err := app.Test(request, -1)
+	assert.NoError(t, err)
+
+	if assert.Equal(t, http.StatusOK, res.StatusCode) {
+		body, err := io.ReadAll(res.Body)
+		assert.NoError(t, err)
+
+		var authBody *schema.AuthBody
+		err = json.Unmarshal(body, &authBody)
+		assert.NoError(t, err)
+
+		assert.Equal(t, authBody.TokenType, "Bearer")
+	}
+}
+
+func TestLogin(t *testing.T) {
+	body := fmt.Sprintf(`{"username":"%s","password":"%s"}`, usr.Username, "testPassword")
 
 	request := httptest.NewRequest(http.MethodPost, "/auth/login", strings.NewReader(body))
 	request.Header.Set("Content-Type", "application/json")
