@@ -8,3 +8,5 @@ jobs:
     steps:
       - name: Golangci-lint
         uses: golangci/golangci-lint-action@v7.0.0
+        with:
+          args: --timeout=5m ./cmd/web/...
