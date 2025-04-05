@@ -10,8 +10,8 @@ type SpaceshipSchema struct {
 	Name        string    `json:"name"`
 	UserID      uuid.UUID `json:"user_id"`
 	Location    string    `json:"location"`
-	SystemID    uuid.UUID `json:"system_id"`
-	PlanetID    uuid.UUID `json:"planet_id"`
+	SystemID    string    `json:"system_id"`
+	PlanetID    string    `json:"planet_id"`
 	PlayerSitIn bool      `json:"player_sit_in"`
 }
 
@@ -19,15 +19,15 @@ type CreateSpaceshipSchema struct {
 	Name     string    `json:"name"`
 	UserID   uuid.UUID `json:"user_id"`
 	Location string    `json:"location"`
-	SystemID uuid.UUID `json:"system_id"`
+	SystemID string    `json:"system_id"`
 }
 
 type UpdateSpaceshipSchema struct {
 	Name        string    `json:"name"`
 	UserID      uuid.UUID `json:"user_id"`
 	Location    string    `json:"location"`
-	SystemID    uuid.UUID `json:"system_id"`
-	PlanetID    uuid.UUID `json:"planet_id"`
+	SystemID    string    `json:"system_id"`
+	PlanetID    string    `json:"planet_id"`
 	PlayerSitIn bool      `json:"player_sit_in"`
 }
 

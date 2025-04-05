@@ -8,7 +8,6 @@ import (
 	"net/http"
 
 	"github.com/gofiber/fiber/v2"
-	"github.com/google/uuid"
 )
 
 // createSystem godoc
@@ -52,9 +51,9 @@ func (h *Handler) createSystem(c *fiber.Ctx) error {
 //	@Security		JwtAuth
 //	@Router			/systems/{id}/planets [get]
 func (h *Handler) getSystemPlanets(c *fiber.Ctx) error {
-	ID, err := uuid.Parse(c.Params("id"))
-	if err != nil {
-		return c.Status(http.StatusBadRequest).JSON(util.NewError(errors.New("id must be an uuid type")))
+	ID := c.Params("id")
+	if ID == "" {
+		return c.Status(http.StatusBadRequest).JSON(util.NewError(errors.New("id must be valid")))
 	}
 
 	planets, err := h.s.FindAllPlanets(&model.Planet{SystemID: ID})
@@ -103,9 +102,9 @@ func (h *Handler) getAllSystems(c *fiber.Ctx) error {
 //	@Security		JwtAuth
 //	@Router			/systems/{id} [get]
 func (h *Handler) getSystemByID(c *fiber.Ctx) error {
-	ID, err := uuid.Parse(c.Params("id"))
-	if err != nil {
-		return c.Status(http.StatusBadRequest).JSON(util.NewError(errors.New("id must be an uuid type")))
+	ID := c.Params("id")
+	if ID == "" {
+		return c.Status(http.StatusBadRequest).JSON(util.NewError(errors.New("id must be valid")))
 	}
 
 	system, err := h.s.FindOneSystem(ID)

@@ -36,18 +36,9 @@ import (
 func main() {
 	config := util.NewConfig(".env")
 	db, err := gorm.Open(postgres.Open(config.DatabaseURL), &gorm.Config{})
-	// db, err := gorm.Open(postgres.Open("postgresql://postgres:password@db:5432"), &gorm.Config{})
 	if err != nil {
 		panic("Failed to open database")
 	}
-
-	//db.AutoMigrate(&model.Planet{})
-	//db.AutoMigrate(&model.System{})
-	//db.AutoMigrate(&model.Spaceship{})
-	//db.AutoMigrate(&model.User{})
-	//db.AutoMigrate(&model.Item{})
-	//db.AutoMigrate(&model.ItemDataTag{})
-	//db.AutoMigrate(&model.FlightInfo{})
 
 	app := fiber.New()
 

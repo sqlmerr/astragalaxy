@@ -1,6 +1,9 @@
 package service
 
-import "astragalaxy/internal/repository"
+import (
+	"astragalaxy/internal/repository"
+	"astragalaxy/internal/util/id"
+)
 
 type Service struct {
 	sp  repository.SpaceshipRepo
@@ -10,6 +13,7 @@ type Service struct {
 	i   repository.ItemRepo
 	idt repository.ItemDataTagRepo
 	p   repository.PlanetRepo
+	id  id.Generator // only for systems and planets
 }
 
 func New(
@@ -19,7 +23,8 @@ func New(
 	u repository.UserRepo,
 	i repository.ItemRepo,
 	idt repository.ItemDataTagRepo,
-	p repository.PlanetRepo) *Service {
+	p repository.PlanetRepo,
+	id id.Generator) *Service {
 	return &Service{
 		sp:  sp,
 		f:   f,
@@ -28,5 +33,6 @@ func New(
 		i:   i,
 		idt: idt,
 		p:   p,
+		id:  id,
 	}
 }

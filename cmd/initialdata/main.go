@@ -4,6 +4,7 @@ import (
 	"astragalaxy/internal/model"
 	"astragalaxy/internal/repository"
 	"astragalaxy/internal/util"
+	"astragalaxy/internal/util/id"
 	"fmt"
 
 	"gorm.io/driver/postgres"
@@ -16,17 +17,11 @@ func main() {
 	if err != nil {
 		panic("failed to connect to database")
 	}
-	//db.AutoMigrate(&model.Planet{})
-	//db.AutoMigrate(&model.System{})
-	//db.AutoMigrate(&model.Spaceship{})
-	//db.AutoMigrate(&model.User{})
-	//db.AutoMigrate(&model.Item{})
-	//db.AutoMigrate(&model.ItemDataTag{})
-	//db.AutoMigrate(&model.FlightInfo{})
 
 	systemRepository := repository.NewSystemRepository(db)
 
 	_, err = systemRepository.Create(&model.System{
+		ID:   id.NewHexGenerator().MustGenerate(7),
 		Name: "initial",
 	})
 	if err != nil {

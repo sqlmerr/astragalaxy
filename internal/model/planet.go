@@ -1,9 +1,5 @@
 package model
 
-import (
-	"github.com/google/uuid"
-)
-
 type PlanetThreat string
 
 const (
@@ -14,9 +10,9 @@ const (
 )
 
 type Planet struct {
-	ID       uuid.UUID `gorm:"type:uuid;default:gen_random_uuid()"`
+	ID       string `gorm:"not null"`
 	Name     string
-	SystemID uuid.UUID
+	SystemID string
 	System   System
 	Threat   string
 }

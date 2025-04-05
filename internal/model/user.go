@@ -9,7 +9,7 @@ type User struct {
 	Spaceships  []Spaceship
 	InSpaceship *bool `gorm:"default:false"`
 	Location    string
-	SystemID    uuid.UUID
+	SystemID    string
 	System      System
 	Token       string `gorm:"not null"`
 }

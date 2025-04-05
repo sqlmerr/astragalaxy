@@ -72,7 +72,7 @@ func (s *Service) UpdateSpaceship(ID uuid.UUID, data schema.UpdateSpaceshipSchem
 	return s.sp.Update(&spaceship)
 }
 
-func (s *Service) SpaceshipFly(ID uuid.UUID, planetID uuid.UUID) error {
+func (s *Service) SpaceshipFly(ID uuid.UUID, planetID string) error {
 	spaceship, err := s.sp.FindOne(ID)
 	if err != nil {
 		return err
@@ -125,7 +125,7 @@ func (s *Service) SpaceshipFly(ID uuid.UUID, planetID uuid.UUID) error {
 	return s.f.Update(&fl)
 }
 
-func (s *Service) SpaceshipHyperJump(ID uuid.UUID, systemID uuid.UUID) error {
+func (s *Service) SpaceshipHyperJump(ID uuid.UUID, systemID string) error {
 	spaceship, err := s.sp.FindOne(ID)
 	if err != nil {
 		return err

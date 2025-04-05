@@ -4,16 +4,15 @@ import (
 	"astragalaxy/internal/model"
 	"errors"
 
-	"github.com/google/uuid"
 	"gorm.io/gorm"
 )
 
 type SystemRepo interface {
-	Create(s *model.System) (*uuid.UUID, error)
-	FindOne(ID uuid.UUID) (*model.System, error)
+	Create(s *model.System) (*string, error)
+	FindOne(ID string) (*model.System, error)
 	FindOneByName(name string) (*model.System, error)
 	FindAll() []model.System
-	Delete(ID uuid.UUID) error
+	Delete(ID string) error
 	Update(s *model.System) error
 }
 
@@ -25,20 +24,17 @@ func NewSystemRepository(db *gorm.DB) SystemRepository {
 	return SystemRepository{db: db}
 }
 
-func (r SystemRepository) Create(s *model.System) (*uuid.UUID, error) {
-	m := model.System{
-		Name: s.Name,
-	}
-	if err := r.db.Create(&m).Error; err != nil {
+func (r SystemRepository) Create(s *model.System) (*string, error) {
+	if err := r.db.Create(s).Error; err != nil {
 		return nil, err
 	}
-	return &m.ID, nil
+	return &s.ID, nil
 }
 
-func (r SystemRepository) FindOne(ID uuid.UUID) (*model.System, error) {
+func (r SystemRepository) FindOne(ID string) (*model.System, error) {
 	var m model.System
 
-	if err := r.db.Find(&m, ID).Error; err != nil {
+	if err := r.db.Where(model.System{ID: ID}).First(&m).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, nil
 		}
@@ -67,7 +63,7 @@ func (r SystemRepository) FindAll() []model.System {
 	return systems
 }
 
-func (r SystemRepository) Delete(ID uuid.UUID) error {
+func (r SystemRepository) Delete(ID string) error {
 	return r.db.Delete(&model.System{}, ID).Error
 }
 

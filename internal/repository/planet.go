@@ -4,15 +4,14 @@ import (
 	"astragalaxy/internal/model"
 	"errors"
 
-	"github.com/google/uuid"
 	"gorm.io/gorm"
 )
 
 type PlanetRepo interface {
-	Create(m *model.Planet) (*uuid.UUID, error)
-	FindOne(ID uuid.UUID) (*model.Planet, error)
+	Create(m *model.Planet) (*string, error)
+	FindOne(ID string) (*model.Planet, error)
 	FindAll(filter *model.Planet) ([]model.Planet, error)
-	Delete(ID uuid.UUID) error
+	Delete(ID string) error
 	Update(p *model.Planet) error
 }
 
@@ -24,17 +23,17 @@ func NewPlanetRepository(db *gorm.DB) PlanetRepository {
 	return PlanetRepository{db: db}
 }
 
-func (r PlanetRepository) Create(m *model.Planet) (*uuid.UUID, error) {
+func (r PlanetRepository) Create(m *model.Planet) (*string, error) {
 	if err := r.db.Create(&m).Error; err != nil {
 		return nil, err
 	}
 	return &m.ID, nil
 }
 
-func (r PlanetRepository) FindOne(ID uuid.UUID) (*model.Planet, error) {
+func (r PlanetRepository) FindOne(ID string) (*model.Planet, error) {
 	var m model.Planet
 
-	if err := r.db.Find(&m, ID).Error; err != nil {
+	if err := r.db.Where(model.Planet{ID: ID}).First(&m).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, nil
 		}
@@ -52,7 +51,7 @@ func (r PlanetRepository) FindAll(filter *model.Planet) ([]model.Planet, error) 
 	return m, nil
 }
 
-func (r PlanetRepository) Delete(ID uuid.UUID) error {
+func (r PlanetRepository) Delete(ID string) error {
 	return r.db.Delete(&model.Planet{}, ID).Error
 }
 

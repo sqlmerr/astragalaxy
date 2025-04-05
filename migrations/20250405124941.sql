@@ -1,6 +1,6 @@
 -- Create "systems" table
 CREATE TABLE "public"."systems" (
-  "id" uuid NOT NULL DEFAULT gen_random_uuid(),
+  "id" text NOT NULL,
   "name" text NOT NULL,
   PRIMARY KEY ("id")
 );
@@ -11,7 +11,7 @@ CREATE TABLE "public"."users" (
   "password" text NULL,
   "in_spaceship" boolean NULL DEFAULT false,
   "location" text NULL,
-  "system_id" uuid NULL,
+  "system_id" text NULL,
   "token" text NOT NULL,
   PRIMARY KEY ("id"),
   CONSTRAINT "uni_users_username" UNIQUE ("username"),
@@ -37,9 +37,9 @@ CREATE TABLE "public"."item_data_tags" (
 );
 -- Create "planets" table
 CREATE TABLE "public"."planets" (
-  "id" uuid NOT NULL DEFAULT gen_random_uuid(),
+  "id" text NOT NULL,
   "name" text NULL,
-  "system_id" uuid NULL,
+  "system_id" text NULL,
   "threat" text NULL,
   PRIMARY KEY ("id"),
   CONSTRAINT "fk_planets_system" FOREIGN KEY ("system_id") REFERENCES "public"."systems" ("id") ON UPDATE NO ACTION ON DELETE NO ACTION
@@ -61,8 +61,8 @@ CREATE TABLE "public"."spaceships" (
   "user_id" uuid NULL,
   "location" text NULL,
   "flight_id" uuid NULL,
-  "system_id" uuid NULL,
-  "planet_id" uuid NULL,
+  "system_id" text NULL,
+  "planet_id" text NULL,
   "player_sit_in" boolean NULL DEFAULT false,
   PRIMARY KEY ("id"),
   CONSTRAINT "fk_spaceships_flight" FOREIGN KEY ("flight_id") REFERENCES "public"."flight_infos" ("id") ON UPDATE NO ACTION ON DELETE NO ACTION,

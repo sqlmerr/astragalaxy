@@ -12,7 +12,7 @@ type UserSchema struct {
 	Spaceships  []SpaceshipSchema `json:"spaceships"`
 	InSpaceship bool              `json:"in_spaceship"`
 	Location    string            `json:"location"`
-	SystemID    uuid.UUID         `json:"system_id"`
+	SystemID    string            `json:"system_id"`
 }
 
 type CreateUserSchema struct {
@@ -26,7 +26,7 @@ type UpdateUserSchema struct {
 	Spaceships  []SpaceshipSchema `json:"spaceships"`
 	InSpaceship bool              `json:"in_spaceship"`
 	Location    string            `json:"location"`
-	SystemID    uuid.UUID         `json:"system_id"`
+	SystemID    string            `json:"system_id"`
 }
 
 func UserSchemaFromUser(val model.User) UserSchema {

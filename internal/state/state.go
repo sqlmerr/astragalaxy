@@ -5,6 +5,7 @@ import (
 	"astragalaxy/internal/repository"
 	"astragalaxy/internal/service"
 	"astragalaxy/internal/util"
+	"astragalaxy/internal/util/id"
 	"fmt"
 	"path/filepath"
 
@@ -26,7 +27,9 @@ func New(db *gorm.DB) *State {
 	itemRepository := repository.NewItemRepository(db)
 	itemDataTagRepository := repository.NewItemDataTagRepository(db)
 
-	s := service.New(spaceshipRepository, flightRepository, systemRepository, userRepository, itemRepository, itemDataTagRepository, planetRepository)
+	idGenerator := id.NewHexGenerator()
+
+	s := service.New(spaceshipRepository, flightRepository, systemRepository, userRepository, itemRepository, itemDataTagRepository, planetRepository, idGenerator)
 
 	projectRoot, err := util.GetProjectRoot()
 	if err != nil {

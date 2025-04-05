@@ -4,12 +4,14 @@ import (
 	"astragalaxy/internal/model"
 	"astragalaxy/internal/schema"
 	"astragalaxy/internal/util"
-
-	"github.com/google/uuid"
 )
 
 func (s *Service) CreateSystem(data schema.CreateSystemSchema) (*schema.SystemSchema, error) {
-	response, err := s.sy.Create(&model.System{Name: data.Name})
+	id, err := s.id.Generate(7)
+	if err != nil {
+		return nil, util.ErrServerError
+	}
+	response, err := s.sy.Create(&model.System{ID: id, Name: data.Name})
 	if err != nil {
 		return nil, err
 	}
@@ -17,13 +19,13 @@ func (s *Service) CreateSystem(data schema.CreateSystemSchema) (*schema.SystemSc
 	return s.FindOneSystem(*response)
 }
 
-func (s *Service) FindOneSystem(ID uuid.UUID) (*schema.SystemSchema, error) {
+func (s *Service) FindOneSystem(ID string) (*schema.SystemSchema, error) {
 	response, err := s.sy.FindOne(ID)
 	if err != nil {
 		return nil, err
 	}
-	schema := schema.SystemSchema(*response)
-	return &schema, nil
+	systemSchema := schema.SystemSchema(*response)
+	return &systemSchema, nil
 }
 
 func (s *Service) FindOneSystemByName(name string) (*schema.SystemSchema, error) {
@@ -34,13 +36,13 @@ func (s *Service) FindOneSystemByName(name string) (*schema.SystemSchema, error)
 	if response == nil {
 		return nil, util.ErrNotFound
 	}
-	schema := schema.SystemSchema(*response)
-	return &schema, nil
+	systemSchema := schema.SystemSchema(*response)
+	return &systemSchema, nil
 }
 
 func (s *Service) FindAllSystems() []schema.SystemSchema {
 	response := s.sy.FindAll()
-	systems := []schema.SystemSchema{}
+	var systems []schema.SystemSchema
 	for _, r := range response {
 		systems = append(systems, schema.SystemSchema(r))
 	}
@@ -48,11 +50,11 @@ func (s *Service) FindAllSystems() []schema.SystemSchema {
 	return systems
 }
 
-func (s *Service) DeleteSystem(ID uuid.UUID) error {
+func (s *Service) DeleteSystem(ID string) error {
 	return s.sy.Delete(ID)
 }
 
-func (s *Service) UpdateSystem(ID uuid.UUID, data schema.UpdateSystemSchema) error {
+func (s *Service) UpdateSystem(ID string, data schema.UpdateSystemSchema) error {
 	system := model.System{
 		ID:   ID,
 		Name: data.Name,

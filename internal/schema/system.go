@@ -2,13 +2,11 @@ package schema
 
 import (
 	"astragalaxy/internal/model"
-
-	"github.com/google/uuid"
 )
 
 type SystemSchema struct {
-	ID   uuid.UUID `json:"id"`
-	Name string    `json:"name"`
+	ID   string `json:"id"`
+	Name string `json:"name"`
 }
 
 type CreateSystemSchema struct {

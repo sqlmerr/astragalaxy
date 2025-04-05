@@ -11,7 +11,7 @@ import (
 	"github.com/google/uuid"
 )
 
-func (s *Service) Register(data schema.CreateUserSchema, location string, systemID uuid.UUID) (*schema.UserSchema, error) {
+func (s *Service) Register(data schema.CreateUserSchema, location string, systemID string) (*schema.UserSchema, error) {
 	usr, err := s.u.FindOneByUsername(data.Username)
 	if err != nil {
 		return nil, err
