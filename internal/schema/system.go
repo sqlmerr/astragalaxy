@@ -10,7 +10,8 @@ type System struct {
 }
 
 type CreateSystem struct {
-	Name string `json:"name"`
+	Name        string   `json:"name"`
+	Connections []string `json:"connections"`
 }
 
 type UpdateSystem struct {
@@ -18,6 +19,9 @@ type UpdateSystem struct {
 }
 
 func SystemSchemaFromSystem(system *model.System) *System {
-	schema := System(*system)
+	schema := System{
+		ID:   system.ID,
+		Name: system.Name,
+	}
 	return &schema
 }

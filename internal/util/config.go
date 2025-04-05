@@ -66,3 +66,10 @@ func GetProjectRoot() (string, error) {
 		currentDir = parentDir
 	}
 }
+
+func Must[V any](val V, err error) V {
+	if err != nil {
+		panic(err)
+	}
+	return val
+}

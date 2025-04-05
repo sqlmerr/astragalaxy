@@ -17,7 +17,7 @@ import (
 //	@Tags			navigation
 //	@Accept			json
 //	@Produce		json
-//	@Param			req	body		schema.FlyToPlanet	true	"fly spaceship schema"
+//	@Param			req	body		schema.FlyToPlanet	true	"fly testSpaceship schema"
 //	@Success		200	{object}	schema.OkResponse
 //	@Failure		500	{object}	util.Error
 //	@Failure		403	{object}	util.Error
@@ -92,7 +92,7 @@ func (h *Handler) hyperJump(c *fiber.Ctx) error {
 		return c.Status(http.StatusNotFound).JSON(util.ErrSpaceshipNotFound)
 	}
 
-	err = h.s.SpaceshipHyperJump(req.SpaceshipID, req.SystemID)
+	err = h.s.SpaceshipHyperJump(req.SpaceshipID, req.Path)
 	if err != nil {
 		var apiErr util.APIError
 		ok := errors.As(err, &apiErr)
@@ -111,7 +111,7 @@ func (h *Handler) hyperJump(c *fiber.Ctx) error {
 //	@Tags			navigation
 //	@Accept			json
 //	@Produce		json
-//	@Param			id	query		string	true	"spaceship id. Must be uuid"
+//	@Param			id	query		string	true	"testSpaceship id. Must be uuid"
 //	@Success		200	{object}	schema.FlyInfo
 //	@Failure		500	{object}	util.Error
 //	@Failure		403	{object}	util.Error

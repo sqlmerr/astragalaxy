@@ -41,6 +41,7 @@ var (
 	ErrSpaceshipIsAlreadyInThisSystem = New("spaceship is already in this system", http.StatusBadRequest)
 	ErrPlayerAlreadyInSpaceship       = New("player already in spaceship", http.StatusBadRequest)
 	ErrPlayerNotInSpaceship           = New("player not in spaceship", http.StatusBadRequest)
+	ErrInvalidHyperJumpPath           = New("invalid hyperjump path", http.StatusBadRequest)
 )
 
 type Error struct {
