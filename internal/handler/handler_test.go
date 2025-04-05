@@ -17,14 +17,14 @@ import (
 
 var (
 	app          *fiber.App
-	usr          *schema.UserSchema
+	usr          *schema.User
 	userJwtToken string
 	userToken    string
 	sudoToken    string
 	stateObj     *state.State
-	spaceship    *schema.SpaceshipSchema
+	spaceship    *schema.Spaceship
 	executor     *test.Executor
-	testItem     *schema.ItemSchema
+	testItem     *schema.Item
 )
 
 func TestMain(m *testing.M) {
@@ -56,26 +56,26 @@ func TestMain(m *testing.M) {
 }
 
 func setup(state *state.State) {
-	sys, err := state.S.CreateSystem(schema.CreateSystemSchema{
+	sys, err := state.S.CreateSystem(schema.CreateSystem{
 		Name: "initial",
 	})
 	if err != nil {
 		panic(err)
 	}
 
-	_, err = state.S.CreatePlanet(schema.CreatePlanetSchema{Name: "testPlanet1", SystemID: sys.ID, Threat: "TOXINS"})
+	_, err = state.S.CreatePlanet(schema.CreatePlanet{Name: "testPlanet1", SystemID: sys.ID, Threat: "TOXINS"})
 	if err != nil {
 		panic(err)
 	}
 
 	fmt.Println("Initial system:", sys)
 
-	user, err := state.S.Register(schema.CreateUserSchema{Password: "testPassword", Username: "tester"}, "space_station", sys.ID)
+	user, err := state.S.Register(schema.CreateUser{Password: "testPassword", Username: "tester"}, "space_station", sys.ID)
 	if err != nil {
 		panic(err)
 	}
 
-	spcship, err := state.S.CreateSpaceship(schema.CreateSpaceshipSchema{Name: "initial", UserID: user.ID, Location: "space_station", SystemID: sys.ID})
+	spcship, err := state.S.CreateSpaceship(schema.CreateSpaceship{Name: "initial", UserID: user.ID, Location: "space_station", SystemID: sys.ID})
 	if err != nil {
 		panic(err)
 	}

@@ -17,7 +17,7 @@ func TestFlightToPlanet(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Len(t, planets, 1)
 	planet := planets[0]
-	body, err := json.Marshal(&schema.FlyToPlanetSchema{PlanetID: planet.ID, SpaceshipID: spaceship.ID})
+	body, err := json.Marshal(&schema.FlyToPlanet{PlanetID: planet.ID, SpaceshipID: spaceship.ID})
 	assert.NoError(t, err)
 
 	if !spaceship.PlayerSitIn {
@@ -34,7 +34,7 @@ func TestFlightToPlanet(t *testing.T) {
 			ExpectedError: false,
 			ExpectedCode:  http.StatusOK,
 			BodyValidator: func(body []byte) {
-				var res schema.OkResponseSchema
+				var res schema.OkResponse
 				err = json.Unmarshal(body, &res)
 				assert.NoError(t, err)
 
@@ -64,10 +64,10 @@ func TestHyperJump(t *testing.T) {
 	err := stateObj.S.SetFlightInfo(spaceship.ID, &model.FlightInfo{Flying: &flying})
 	assert.NoError(t, err)
 
-	system, err := stateObj.S.CreateSystem(schema.CreateSystemSchema{Name: "hyperjumpSystem"})
+	system, err := stateObj.S.CreateSystem(schema.CreateSystem{Name: "hyperjumpSystem"})
 	assert.NoError(t, err)
 
-	body, err := json.Marshal(&schema.HyperJumpSchema{SystemID: system.ID, SpaceshipID: spaceship.ID})
+	body, err := json.Marshal(&schema.HyperJump{SystemID: system.ID, SpaceshipID: spaceship.ID})
 	assert.NoError(t, err)
 
 	if !spaceship.PlayerSitIn {
@@ -84,7 +84,7 @@ func TestHyperJump(t *testing.T) {
 			ExpectedError: false,
 			ExpectedCode:  http.StatusOK,
 			BodyValidator: func(body []byte) {
-				var res schema.OkResponseSchema
+				var res schema.OkResponse
 				err = json.Unmarshal(body, &res)
 				assert.NoError(t, err)
 
@@ -124,7 +124,7 @@ func TestCheckFlight(t *testing.T) {
 			ExpectedError: false,
 			ExpectedCode:  http.StatusOK,
 			BodyValidator: func(body []byte) {
-				var b *schema.FlyInfoSchema
+				var b *schema.FlyInfo
 				err := json.Unmarshal(body, &b)
 				assert.NoError(t, err)
 				assert.Contains(t, []string{"planet", "system"}, b.Destination)

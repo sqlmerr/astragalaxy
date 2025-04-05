@@ -17,7 +17,7 @@ import (
 //	@Description	Jwt Token required
 //	@Tags			inventory
 //	@Produce		json
-//	@Success		200	{object}	schema.DataResponseSchema{data=[]schema.ItemSchema}
+//	@Success		200	{object}	schema.DataResponse{data=[]schema.Item}
 //	@Failure		500	{object}	util.Error
 //	@Failure		400	{object}	util.Error
 //	@Failure		403	{object}	util.Error
@@ -26,10 +26,10 @@ import (
 //	@Router			/inventory/items/ [get]
 //	@Security		JwtAuth
 func (h *Handler) getMyItems(ctx *fiber.Ctx) error {
-	user := ctx.Locals("user").(*schema.UserSchema)
+	user := ctx.Locals("user").(*schema.User)
 
 	items := h.s.GetUserItems(user.ID)
-	return ctx.JSON(schema.DataResponseSchema{Data: items})
+	return ctx.JSON(schema.DataResponse{Data: items})
 }
 
 // getMyItemsByCode godoc
@@ -40,7 +40,7 @@ func (h *Handler) getMyItems(ctx *fiber.Ctx) error {
 //	@Accept			json
 //	@Produce		json
 //	@Param			code	path		string	true	"Item Code"
-//	@Success		200		{object}	schema.DataResponseSchema{data=[]schema.ItemSchema}
+//	@Success		200		{object}	schema.DataResponse{data=[]schema.Item}
 //	@Failure		500		{object}	util.Error
 //	@Failure		400		{object}	util.Error
 //	@Failure		403		{object}	util.Error
@@ -49,7 +49,7 @@ func (h *Handler) getMyItems(ctx *fiber.Ctx) error {
 //	@Security		JwtAuth
 //	@Router			/inventory/items/{code} [get]
 func (h *Handler) getMyItemsByCode(ctx *fiber.Ctx) error {
-	user := ctx.Locals("user").(*schema.UserSchema)
+	user := ctx.Locals("user").(*schema.User)
 	code := ctx.Params("code")
 	if code == "" {
 		return ctx.Status(fiber.StatusBadRequest).JSON(util.NewError(util.New("invalid item code", 400)))
@@ -64,7 +64,7 @@ func (h *Handler) getMyItemsByCode(ctx *fiber.Ctx) error {
 		}
 		return ctx.Status(fiber.StatusInternalServerError).JSON(util.NewError(err))
 	}
-	return ctx.JSON(schema.DataResponseSchema{Data: items})
+	return ctx.JSON(schema.DataResponse{Data: items})
 }
 
 // getItemData godoc
@@ -75,7 +75,7 @@ func (h *Handler) getMyItemsByCode(ctx *fiber.Ctx) error {
 //	@Accept			json
 //	@Produce		json
 //	@Param			id	path		string	true	"item id. UUID"
-//	@Success		200	{object}	schema.ItemDataResponseSchema
+//	@Success		200	{object}	schema.ItemDataResponse
 //	@Failure		500	{object}	util.Error
 //	@Failure		400	{object}	util.Error
 //	@Failure		403	{object}	util.Error
@@ -84,7 +84,7 @@ func (h *Handler) getMyItemsByCode(ctx *fiber.Ctx) error {
 //	@Security		JwtAuth
 //	@Router			/inventory/items/{id}/data [get]
 func (h *Handler) getItemData(ctx *fiber.Ctx) error {
-	user := ctx.Locals("user").(*schema.UserSchema)
+	user := ctx.Locals("user").(*schema.User)
 	id := ctx.Params("id")
 	itemID, err := uuid.Parse(id)
 	if err != nil || itemID == uuid.Nil {
@@ -104,7 +104,7 @@ func (h *Handler) getItemData(ctx *fiber.Ctx) error {
 	}
 
 	data := h.s.GetItemDataTags(itemID)
-	return ctx.JSON(schema.ItemDataResponseSchema{
+	return ctx.JSON(schema.ItemDataResponse{
 		Data: data,
 	})
 }

@@ -44,7 +44,7 @@ func (h *Handler) getItemByCode(c *fiber.Ctx) error {
 //	@Description	Jwt Token required
 //	@Tags			registry
 //	@Produce		json
-//	@Success		200	{object}	schema.DataResponseSchema{data=[]registry.Item}
+//	@Success		200	{object}	schema.DataResponse{data=[]registry.Item}
 //	@Failure		500	{object}	util.Error
 //	@Failure		400	{object}	util.Error
 //	@Failure		403	{object}	util.Error
@@ -52,7 +52,7 @@ func (h *Handler) getItemByCode(c *fiber.Ctx) error {
 //	@Router			/registry/items [get]
 func (h *Handler) getItems(c *fiber.Ctx) error {
 	items := h.state.MasterRegistry.Item.All()
-	return c.JSON(schema.DataResponseSchema{Data: items})
+	return c.JSON(schema.DataResponse{Data: items})
 }
 
 // getLocations godoc
@@ -61,7 +61,7 @@ func (h *Handler) getItems(c *fiber.Ctx) error {
 //	@Description	Jwt Token required
 //	@Tags			registry
 //	@Produce		json
-//	@Success		200	{object}	schema.DataResponseSchema{data=[]registry.Location}
+//	@Success		200	{object}	schema.DataResponse{data=[]registry.Location}
 //	@Failure		500	{object}	util.Error
 //	@Failure		400	{object}	util.Error
 //	@Failure		403	{object}	util.Error
@@ -69,7 +69,7 @@ func (h *Handler) getItems(c *fiber.Ctx) error {
 //	@Router			/registry/locations [get]
 func (h *Handler) getLocations(c *fiber.Ctx) error {
 	locations := h.state.MasterRegistry.Location.All()
-	return c.JSON(schema.DataResponseSchema{Data: locations})
+	return c.JSON(schema.DataResponse{Data: locations})
 }
 
 // getLocationByCode godoc

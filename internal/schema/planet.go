@@ -1,19 +1,19 @@
 package schema
 
-type PlanetSchema struct {
+type Planet struct {
 	ID       string `json:"id"`
 	Name     string `json:"name"`
 	SystemID string `json:"system_id"`
 	Threat   string `json:"threat"`
 }
 
-type CreatePlanetSchema struct {
+type CreatePlanet struct {
 	Name     string `json:"name"`
 	SystemID string `json:"system_id"`
 	Threat   string `json:"threat"`
 }
 
-type UpdatePlanetSchema struct {
+type UpdatePlanet struct {
 	Name     string `json:"name"`
 	SystemID string `json:"system_id"`
 	Threat   string `json:"threat"`

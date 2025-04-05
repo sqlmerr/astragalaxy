@@ -6,7 +6,7 @@ import (
 	"astragalaxy/internal/util"
 )
 
-func (s *Service) CreatePlanet(data schema.CreatePlanetSchema) (*schema.PlanetSchema, error) {
+func (s *Service) CreatePlanet(data schema.CreatePlanet) (*schema.Planet, error) {
 	id, err := s.id.Generate(14)
 	if err != nil {
 		return nil, util.ErrServerError
@@ -19,24 +19,24 @@ func (s *Service) CreatePlanet(data schema.CreatePlanetSchema) (*schema.PlanetSc
 	return s.FindOnePlanet(*response)
 }
 
-func (s *Service) FindOnePlanet(ID string) (*schema.PlanetSchema, error) {
+func (s *Service) FindOnePlanet(ID string) (*schema.Planet, error) {
 	response, err := s.p.FindOne(ID)
 	if err != nil {
 		return nil, err
 	}
-	planetSchema := schema.PlanetSchema{ID: response.ID, Name: response.Name, SystemID: response.SystemID, Threat: response.Threat}
+	planetSchema := schema.Planet{ID: response.ID, Name: response.Name, SystemID: response.SystemID, Threat: response.Threat}
 	return &planetSchema, nil
 }
 
-func (s *Service) FindAllPlanets(filter *model.Planet) ([]schema.PlanetSchema, error) {
+func (s *Service) FindAllPlanets(filter *model.Planet) ([]schema.Planet, error) {
 	response, err := s.p.FindAll(filter)
 	if err != nil {
 		return nil, err
 	}
-	var planetSchemas []schema.PlanetSchema
+	var planetSchemas []schema.Planet
 
 	for _, planet := range response {
-		planetSchemas = append(planetSchemas, schema.PlanetSchema{
+		planetSchemas = append(planetSchemas, schema.Planet{
 			ID:       planet.ID,
 			Name:     planet.Name,
 			SystemID: planet.SystemID,
@@ -51,7 +51,7 @@ func (s *Service) DeletePlanet(ID string) error {
 	return s.p.Delete(ID)
 }
 
-func (s *Service) UpdatePlanet(ID string, data schema.UpdatePlanetSchema) error {
+func (s *Service) UpdatePlanet(ID string, data schema.UpdatePlanet) error {
 	planet := model.Planet{
 		ID:       ID,
 		Name:     data.Name,

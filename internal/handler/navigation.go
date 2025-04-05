@@ -17,16 +17,16 @@ import (
 //	@Tags			navigation
 //	@Accept			json
 //	@Produce		json
-//	@Param			req	body		schema.FlyToPlanetSchema	true	"fly spaceship schema"
-//	@Success		200	{object}	schema.OkResponseSchema
+//	@Param			req	body		schema.FlyToPlanet	true	"fly spaceship schema"
+//	@Success		200	{object}	schema.OkResponse
 //	@Failure		500	{object}	util.Error
 //	@Failure		403	{object}	util.Error
 //	@Failure		422	{object}	util.Error
 //	@Security		JwtAuth
 //	@Router			/navigation/planet [post]
 func (h *Handler) flightToPlanet(c *fiber.Ctx) error {
-	user := c.Locals("user").(*schema.UserSchema)
-	req := &schema.FlyToPlanetSchema{}
+	user := c.Locals("user").(*schema.User)
+	req := &schema.FlyToPlanet{}
 	if err := util.BodyParser(req, c); err != nil {
 		return c.Status(http.StatusUnprocessableEntity).JSON(util.New(err.Error(), 422))
 	}
@@ -54,7 +54,7 @@ func (h *Handler) flightToPlanet(c *fiber.Ctx) error {
 		}
 		return c.Status(http.StatusInternalServerError).JSON(util.NewError(err))
 	}
-	return c.JSON(schema.OkResponseSchema{Ok: true, CustomStatusCode: 1})
+	return c.JSON(schema.OkResponse{Ok: true, CustomStatusCode: 1})
 }
 
 // hyperJump godoc
@@ -64,16 +64,16 @@ func (h *Handler) flightToPlanet(c *fiber.Ctx) error {
 //	@Tags			navigation
 //	@Accept			json
 //	@Produce		json
-//	@Param			req	body		schema.HyperJumpSchema	true	"hyper jump schema"
-//	@Success		200	{object}	schema.OkResponseSchema
+//	@Param			req	body		schema.HyperJump	true	"hyper jump schema"
+//	@Success		200	{object}	schema.OkResponse
 //	@Failure		500	{object}	util.Error
 //	@Failure		403	{object}	util.Error
 //	@Failure		422	{object}	util.Error
 //	@Security		JwtAuth
 //	@Router			/navigation/hyperjump [post]
 func (h *Handler) hyperJump(c *fiber.Ctx) error {
-	user := c.Locals("user").(*schema.UserSchema)
-	req := &schema.HyperJumpSchema{}
+	user := c.Locals("user").(*schema.User)
+	req := &schema.HyperJump{}
 	if err := util.BodyParser(req, c); err != nil {
 		return c.Status(http.StatusUnprocessableEntity).JSON(util.New(err.Error(), 422))
 	}
@@ -101,7 +101,7 @@ func (h *Handler) hyperJump(c *fiber.Ctx) error {
 		}
 		return c.Status(http.StatusInternalServerError).JSON(util.NewError(err))
 	}
-	return c.JSON(schema.OkResponseSchema{Ok: true, CustomStatusCode: 1})
+	return c.JSON(schema.OkResponse{Ok: true, CustomStatusCode: 1})
 }
 
 // checkFlight godoc
@@ -112,7 +112,7 @@ func (h *Handler) hyperJump(c *fiber.Ctx) error {
 //	@Accept			json
 //	@Produce		json
 //	@Param			id	query		string	true	"spaceship id. Must be uuid"
-//	@Success		200	{object}	schema.FlyInfoSchema
+//	@Success		200	{object}	schema.FlyInfo
 //	@Failure		500	{object}	util.Error
 //	@Failure		403	{object}	util.Error
 //	@Failure		400	{object}	util.Error

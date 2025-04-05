@@ -18,14 +18,14 @@ import (
 //	@Tags			auth
 //	@Accept			json
 //	@Produce		json
-//	@Param			schema	body		schema.CreateUserSchema	true	"Create User Schema"
-//	@Success		201		{object}	schema.UserSchema
+//	@Param			schema	body		schema.CreateUser	true	"Create User Schema"
+//	@Success		201		{object}	schema.User
 //	@Failure		500		{object}	util.Error
 //	@Failure		403		{object}	util.Error
 //	@Failure		422		{object}	util.Error
 //	@Router			/auth/register [post]
 func (h *Handler) registerUser(c *fiber.Ctx) error {
-	req := &schema.CreateUserSchema{}
+	req := &schema.CreateUser{}
 	if err := c.BodyParser(&req); err != nil {
 		return c.Status(http.StatusUnprocessableEntity).JSON(util.NewError(err))
 	}
@@ -43,7 +43,7 @@ func (h *Handler) registerUser(c *fiber.Ctx) error {
 		return c.Status(http.StatusInternalServerError).JSON(util.NewError(util.ErrServerError))
 	}
 
-	spaceship, err := h.s.CreateSpaceship(schema.CreateSpaceshipSchema{
+	spaceship, err := h.s.CreateSpaceship(schema.CreateSpaceship{
 		Name: "initial", UserID: user.ID, Location: "space_station", SystemID: system.ID,
 	})
 	if err != nil || spaceship == nil {
@@ -129,13 +129,13 @@ func (h *Handler) login(c *fiber.Ctx) error {
 //	@ID				get-me
 //	@Tags			auth
 //	@Produce		json
-//	@Success		200	{object}	schema.UserSchema
+//	@Success		200	{object}	schema.User
 //	@Failure		500	{object}	util.Error
 //	@Failure		403	{object}	util.Error
 //	@Security		JwtAuth
 //	@Router			/auth/me [get]
 func (h *Handler) getMe(c *fiber.Ctx) error {
-	user := c.Locals("user").(*schema.UserSchema)
+	user := c.Locals("user").(*schema.User)
 	// spaceships, err := h.spaceshipService.FindAll(&model.Spaceship{UserID: user.ID})
 	// if err != nil {
 	// 	return c.Status(http.StatusInternalServerError).JSON(util.NewError(util.ErrServerError))
@@ -153,7 +153,7 @@ func (h *Handler) getMe(c *fiber.Ctx) error {
 //	@Accept			json
 //	@Produce		json
 //	@Param			id	query		string	true	"User id"
-//	@Success		200	{object}	schema.UserTokenResponseSchema
+//	@Success		200	{object}	schema.UserTokenResponse
 //	@Failure		500	{object}	util.Error
 //	@Failure		403	{object}	util.Error
 //	@Failure		422	{object}	util.Error
@@ -171,5 +171,5 @@ func (h *Handler) getUserTokenSudo(c *fiber.Ctx) error {
 		return c.Status(http.StatusInternalServerError).JSON(util.NewError(util.ErrServerError))
 	}
 
-	return c.JSON(&schema.UserTokenResponseSchema{Token: user.Token})
+	return c.JSON(&schema.UserTokenResponse{Token: user.Token})
 }

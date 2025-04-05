@@ -1,11 +1,11 @@
 package schema
 
-type OkResponseSchema struct {
+type OkResponse struct {
 	Ok               bool `json:"ok"`
 	CustomStatusCode int  `json:"custom_status_code"`
 }
 
-type DataResponseSchema struct {
+type DataResponse struct {
 	Data any `json:"data"`
 }
 

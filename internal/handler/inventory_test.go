@@ -19,7 +19,7 @@ func TestGetMyItems(t *testing.T) {
 			ExpectedError: false,
 			ExpectedCode:  200,
 			BodyValidator: func(body []byte) {
-				var b schema.DataGenericResponse[[]schema.ItemSchema]
+				var b schema.DataGenericResponse[[]schema.Item]
 				err := json.Unmarshal(body, &b)
 				assert.NoError(t, err)
 
@@ -43,7 +43,7 @@ func TestGetMyItemsByCode(t *testing.T) {
 			ExpectedError: false,
 			ExpectedCode:  200,
 			BodyValidator: func(body []byte) {
-				var b schema.DataGenericResponse[[]schema.ItemSchema]
+				var b schema.DataGenericResponse[[]schema.Item]
 				err := json.Unmarshal(body, &b)
 				assert.NoError(t, err)
 
@@ -60,7 +60,7 @@ func TestGetMyItemsByCode(t *testing.T) {
 			ExpectedError: false,
 			ExpectedCode:  200,
 			BodyValidator: func(body []byte) {
-				var b schema.DataResponseSchema
+				var b schema.DataResponse
 				err := json.Unmarshal(body, &b)
 				assert.NoError(t, err)
 				assert.Len(t, b.Data, 0)
@@ -80,7 +80,7 @@ func TestGetItemData(t *testing.T) {
 			ExpectedError: false,
 			ExpectedCode:  200,
 			BodyValidator: func(body []byte) {
-				var b schema.ItemDataResponseSchema
+				var b schema.ItemDataResponse
 				err := json.Unmarshal(body, &b)
 				assert.NoError(t, err)
 				assert.Equal(t, "123", b.Data["test"])

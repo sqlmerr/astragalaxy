@@ -14,6 +14,6 @@ type AuthPayload struct {
 	Password string `json:"password"`
 }
 
-type UserTokenResponseSchema struct {
+type UserTokenResponse struct {
 	Token string `json:"token"`
 }

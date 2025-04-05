@@ -16,15 +16,15 @@ import (
 //	@Description	Sudo Token required
 //	@Tags			systems
 //	@Produce		json
-//	@Param			req	body		schema.CreateSystemSchema	true	"create system schema"
-//	@Success		201	{object}	schema.SystemSchema
+//	@Param			req	body		schema.CreateSystem	true	"create system schema"
+//	@Success		201	{object}	schema.System
 //	@Failure		500	{object}	util.Error
 //	@Failure		403	{object}	util.Error
 //	@Failure		422	{object}	util.Error
 //	@Security		SudoToken
 //	@Router			/systems [post]
 func (h *Handler) createSystem(c *fiber.Ctx) error {
-	req := &schema.CreateSystemSchema{}
+	req := &schema.CreateSystem{}
 	if err := util.BodyParser(req, c); err != nil {
 		return c.Status(http.StatusUnprocessableEntity).JSON(util.NewError(err))
 	}
@@ -44,7 +44,7 @@ func (h *Handler) createSystem(c *fiber.Ctx) error {
 //	@Tags			systems
 //	@Produce		json
 //	@Param			id	path		string	true	"system id"
-//	@Success		200	{object}	schema.DataResponseSchema{data=[]schema.PlanetSchema}
+//	@Success		200	{object}	schema.DataResponse{data=[]schema.Planet}
 //	@Failure		500	{object}	util.Error
 //	@Failure		403	{object}	util.Error
 //	@Failure		422	{object}	util.Error
@@ -65,10 +65,10 @@ func (h *Handler) getSystemPlanets(c *fiber.Ctx) error {
 		return c.Status(500).JSON(util.NewError(util.ErrServerError))
 	}
 	if planets == nil {
-		return c.JSON([]schema.PlanetSchema{})
+		return c.JSON([]schema.Planet{})
 	}
 
-	return c.JSON(schema.DataResponseSchema{Data: planets})
+	return c.JSON(schema.DataResponse{Data: planets})
 }
 
 // getAllSystems godoc
@@ -77,7 +77,7 @@ func (h *Handler) getSystemPlanets(c *fiber.Ctx) error {
 //	@Description	Jwt Token required
 //	@Tags			systems
 //	@Produce		json
-//	@Success		200	{object}	schema.DataResponseSchema{data=[]schema.SystemSchema}
+//	@Success		200	{object}	schema.DataResponse{data=[]schema.System}
 //	@Failure		500	{object}	util.Error
 //	@Failure		403	{object}	util.Error
 //	@Failure		422	{object}	util.Error
@@ -85,7 +85,7 @@ func (h *Handler) getSystemPlanets(c *fiber.Ctx) error {
 //	@Router			/systems [get]
 func (h *Handler) getAllSystems(c *fiber.Ctx) error {
 	systems := h.s.FindAllSystems()
-	data := schema.DataResponseSchema{Data: systems}
+	data := schema.DataResponse{Data: systems}
 	return c.JSON(data)
 }
 
@@ -96,7 +96,7 @@ func (h *Handler) getAllSystems(c *fiber.Ctx) error {
 //	@Tags			systems
 //	@Produce		json
 //	@Param			id	path		string	true	"system id"
-//	@Success		200	{object}	schema.SystemSchema
+//	@Success		200	{object}	schema.System
 //	@Failure		500	{object}	util.Error
 //	@Failure		403	{object}	util.Error
 //	@Failure		422	{object}	util.Error

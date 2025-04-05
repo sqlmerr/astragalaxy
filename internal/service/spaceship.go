@@ -11,7 +11,7 @@ import (
 	"github.com/samber/lo"
 )
 
-func (s *Service) CreateSpaceship(data schema.CreateSpaceshipSchema) (*schema.SpaceshipSchema, error) {
+func (s *Service) CreateSpaceship(data schema.CreateSpaceship) (*schema.Spaceship, error) {
 	flightInfo, err := s.f.Create(&model.FlightInfo{})
 	if err != nil {
 		return nil, err
@@ -33,7 +33,7 @@ func (s *Service) CreateSpaceship(data schema.CreateSpaceshipSchema) (*schema.Sp
 	return s.FindOneSpaceship(*response)
 }
 
-func (s *Service) FindOneSpaceship(ID uuid.UUID) (*schema.SpaceshipSchema, error) {
+func (s *Service) FindOneSpaceship(ID uuid.UUID) (*schema.Spaceship, error) {
 	response, err := s.sp.FindOne(ID)
 	if err != nil {
 		return nil, err
@@ -44,12 +44,12 @@ func (s *Service) FindOneSpaceship(ID uuid.UUID) (*schema.SpaceshipSchema, error
 	return schema.SpaceshipSchemaFromSpaceship(response), nil
 }
 
-func (s *Service) FindAllSpaceships(filter *model.Spaceship) ([]schema.SpaceshipSchema, error) {
+func (s *Service) FindAllSpaceships(filter *model.Spaceship) ([]schema.Spaceship, error) {
 	response, err := s.sp.FindAll(filter)
 	if err != nil {
 		return nil, err
 	}
-	spaceships := lo.Map(response, func(item model.Spaceship, index int) schema.SpaceshipSchema {
+	spaceships := lo.Map(response, func(item model.Spaceship, index int) schema.Spaceship {
 		return *schema.SpaceshipSchemaFromSpaceship(&item)
 	})
 	return spaceships, nil
@@ -59,7 +59,7 @@ func (s *Service) DeleteSpaceship(ID uuid.UUID) error {
 	return s.sp.Delete(ID)
 }
 
-func (s *Service) UpdateSpaceship(ID uuid.UUID, data schema.UpdateSpaceshipSchema) error {
+func (s *Service) UpdateSpaceship(ID uuid.UUID, data schema.UpdateSpaceship) error {
 	spaceship := model.Spaceship{
 		ID:          ID,
 		Name:        data.Name,
@@ -81,7 +81,7 @@ func (s *Service) SpaceshipFly(ID uuid.UUID, planetID string) error {
 	if spaceship.Flight.Flying != nil {
 		flying = *spaceship.Flight.Flying
 	}
-	flight := schema.FlyInfoSchema{
+	flight := schema.FlyInfo{
 		Flying:        flying,
 		Destination:   spaceship.Flight.Destination,
 		DestinationID: spaceship.Flight.DestinationID,
@@ -134,7 +134,7 @@ func (s *Service) SpaceshipHyperJump(ID uuid.UUID, systemID string) error {
 	if spaceship.Flight.Flying != nil {
 		flying = *spaceship.Flight.Flying
 	}
-	flight := schema.FlyInfoSchema{
+	flight := schema.FlyInfo{
 		Flying:        flying,
 		Destination:   spaceship.Flight.Destination,
 		DestinationID: spaceship.Flight.DestinationID,
@@ -221,7 +221,7 @@ func (s *Service) CheckFlightEnd(ID uuid.UUID, flight *model.FlightInfo) error {
 	return nil
 }
 
-func (s *Service) GetFlyInfo(ID uuid.UUID) (*schema.FlyInfoSchema, error) {
+func (s *Service) GetFlyInfo(ID uuid.UUID) (*schema.FlyInfo, error) {
 	spaceship, err := s.sp.FindOne(ID)
 	if err != nil || spaceship == nil {
 		return nil, err
@@ -232,7 +232,7 @@ func (s *Service) GetFlyInfo(ID uuid.UUID) (*schema.FlyInfoSchema, error) {
 		return nil, err
 	}
 	if err == nil {
-		return &schema.FlyInfoSchema{Flying: false}, nil
+		return &schema.FlyInfo{Flying: false}, nil
 	}
 
 	now := time.Now().UTC()
@@ -240,10 +240,10 @@ func (s *Service) GetFlyInfo(ID uuid.UUID) (*schema.FlyInfoSchema, error) {
 	arriveTime := flownOutAt.Add(time.Duration(spaceship.Flight.FlyingTime) * time.Minute)
 	remainingTime := arriveTime.Sub(now)
 	if spaceship.Flight.Flying == nil {
-		return &schema.FlyInfoSchema{Flying: false}, nil
+		return &schema.FlyInfo{Flying: false}, nil
 	}
 
-	return &schema.FlyInfoSchema{
+	return &schema.FlyInfo{
 		Flying:        *spaceship.Flight.Flying,
 		Destination:   spaceship.Flight.Destination,
 		DestinationID: spaceship.Flight.DestinationID,

@@ -5,7 +5,7 @@ import (
 	"github.com/google/uuid"
 )
 
-type SpaceshipSchema struct {
+type Spaceship struct {
 	ID          uuid.UUID `json:"id"`
 	Name        string    `json:"name"`
 	UserID      uuid.UUID `json:"user_id"`
@@ -15,14 +15,14 @@ type SpaceshipSchema struct {
 	PlayerSitIn bool      `json:"player_sit_in"`
 }
 
-type CreateSpaceshipSchema struct {
+type CreateSpaceship struct {
 	Name     string    `json:"name"`
 	UserID   uuid.UUID `json:"user_id"`
 	Location string    `json:"location"`
 	SystemID string    `json:"system_id"`
 }
 
-type UpdateSpaceshipSchema struct {
+type UpdateSpaceship struct {
 	Name        string    `json:"name"`
 	UserID      uuid.UUID `json:"user_id"`
 	Location    string    `json:"location"`
@@ -31,13 +31,13 @@ type UpdateSpaceshipSchema struct {
 	PlayerSitIn bool      `json:"player_sit_in"`
 }
 
-type RenameSpaceshipSchema struct {
+type RenameSpaceship struct {
 	SpaceshipID uuid.UUID `json:"spaceship_id"`
 	Name        string    `json:"name"`
 }
 
-func SpaceshipSchemaFromSpaceship(spaceship *model.Spaceship) *SpaceshipSchema {
-	return &SpaceshipSchema{
+func SpaceshipSchemaFromSpaceship(spaceship *model.Spaceship) *Spaceship {
+	return &Spaceship{
 		ID:          spaceship.ID,
 		Name:        spaceship.Name,
 		UserID:      spaceship.UserID,

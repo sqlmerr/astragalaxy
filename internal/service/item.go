@@ -9,7 +9,7 @@ import (
 	"github.com/google/uuid"
 )
 
-func (s *Service) AddItem(userID uuid.UUID, itemCode string, dataTags map[string]string) (*schema.ItemSchema, error) {
+func (s *Service) AddItem(userID uuid.UUID, itemCode string, dataTags map[string]string) (*schema.Item, error) {
 	item := model.Item{
 		UserID: userID,
 		Code:   itemCode,
@@ -34,7 +34,7 @@ func (s *Service) AddItem(userID uuid.UUID, itemCode string, dataTags map[string
 	return itemSchema, err
 }
 
-func (s *Service) FindOneItem(ID uuid.UUID) (*schema.ItemSchema, error) {
+func (s *Service) FindOneItem(ID uuid.UUID) (*schema.Item, error) {
 	item, err := s.i.FindOne(ID)
 	if err != nil {
 		return nil, err
@@ -46,7 +46,7 @@ func (s *Service) FindOneItem(ID uuid.UUID) (*schema.ItemSchema, error) {
 	return itemSchema, nil
 }
 
-func (s *Service) FindOneItemByCode(code string) (*schema.ItemSchema, error) {
+func (s *Service) FindOneItemByCode(code string) (*schema.Item, error) {
 	item, err := s.i.FindOneByCode(code)
 	if err != nil {
 		return nil, err
@@ -58,12 +58,12 @@ func (s *Service) FindOneItemByCode(code string) (*schema.ItemSchema, error) {
 	return itemSchema, nil
 }
 
-func (s *Service) FindAllItems(filter *model.Item) ([]schema.ItemSchema, error) {
+func (s *Service) FindAllItems(filter *model.Item) ([]schema.Item, error) {
 	items, err := s.i.FindAll(filter)
 	if err != nil {
 		return nil, err
 	}
-	itemSchemas := lo.Map(items, func(item model.Item, index int) schema.ItemSchema {
+	itemSchemas := lo.Map(items, func(item model.Item, index int) schema.Item {
 		return *schema.ItemSchemaFromItem(&item)
 	})
 	return itemSchemas, nil
@@ -94,13 +94,13 @@ func (s *Service) GetItemDataTag(itemID uuid.UUID, key string) (*string, error) 
 	return &val, nil
 }
 
-func (s *Service) GetUserItems(userID uuid.UUID) []schema.ItemSchema {
+func (s *Service) GetUserItems(userID uuid.UUID) []schema.Item {
 	items, err := s.i.FindAll(&model.Item{UserID: userID})
 	if err != nil {
 		return nil
 	}
 
-	var itemSchemas []schema.ItemSchema
+	var itemSchemas []schema.Item
 	for _, i := range items {
 		itemSchemas = append(itemSchemas, *schema.ItemSchemaFromItem(&i))
 	}

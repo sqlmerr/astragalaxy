@@ -14,7 +14,7 @@ import (
 )
 
 func TestCreateSystem(t *testing.T) {
-	body := &schema.CreateSystemSchema{Name: "testSystem"}
+	body := &schema.CreateSystem{Name: "testSystem"}
 	b, err := json.Marshal(body)
 	assert.NoError(t, err)
 
@@ -29,7 +29,7 @@ func TestCreateSystem(t *testing.T) {
 		body, err := io.ReadAll(res.Body)
 		assert.NoError(t, err)
 
-		var response schema.SystemSchema
+		var response schema.System
 		err = json.Unmarshal(body, &response)
 		assert.NoError(t, err)
 
@@ -54,7 +54,7 @@ func TestGetSystemPlanets(t *testing.T) {
 		body, err := io.ReadAll(res.Body)
 		assert.NoError(t, err)
 
-		var response schema.DataGenericResponse[[]schema.PlanetSchema]
+		var response schema.DataGenericResponse[[]schema.Planet]
 		err = json.Unmarshal(body, &response)
 		assert.NoError(t, err)
 
@@ -79,7 +79,7 @@ func TestGetSystemByID(t *testing.T) {
 	if assert.Equal(t, http.StatusOK, res.StatusCode) {
 		body, err := io.ReadAll(res.Body)
 		assert.NoError(t, err)
-		var response schema.SystemSchema
+		var response schema.System
 		err = json.Unmarshal(body, &response)
 		assert.NoError(t, err)
 		assert.Equal(t, "initial", response.Name)
@@ -100,7 +100,7 @@ func TestGetAllSystems(t *testing.T) {
 	if assert.Equal(t, http.StatusOK, res.StatusCode) {
 		body, err := io.ReadAll(res.Body)
 		assert.NoError(t, err)
-		var r schema.DataGenericResponse[[]schema.SystemSchema]
+		var r schema.DataGenericResponse[[]schema.System]
 		err = json.Unmarshal(body, &r)
 		assert.NoError(t, err)
 

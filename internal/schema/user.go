@@ -6,37 +6,37 @@ import (
 	"github.com/google/uuid"
 )
 
-type UserSchema struct {
-	ID          uuid.UUID         `json:"id"`
-	Username    string            `json:"username"`
-	Spaceships  []SpaceshipSchema `json:"spaceships"`
-	InSpaceship bool              `json:"in_spaceship"`
-	Location    string            `json:"location"`
-	SystemID    string            `json:"system_id"`
+type User struct {
+	ID          uuid.UUID   `json:"id"`
+	Username    string      `json:"username"`
+	Spaceships  []Spaceship `json:"spaceships"`
+	InSpaceship bool        `json:"in_spaceship"`
+	Location    string      `json:"location"`
+	SystemID    string      `json:"system_id"`
 }
 
-type CreateUserSchema struct {
+type CreateUser struct {
 	Username string `json:"username"`
 	Password string `json:"password"`
 }
 
-type UpdateUserSchema struct {
-	Username    string            `json:"username"`
-	Password    string            `json:"password"`
-	Spaceships  []SpaceshipSchema `json:"spaceships"`
-	InSpaceship bool              `json:"in_spaceship"`
-	Location    string            `json:"location"`
-	SystemID    string            `json:"system_id"`
+type UpdateUser struct {
+	Username    string      `json:"username"`
+	Password    string      `json:"password"`
+	Spaceships  []Spaceship `json:"spaceships"`
+	InSpaceship bool        `json:"in_spaceship"`
+	Location    string      `json:"location"`
+	SystemID    string      `json:"system_id"`
 }
 
-func UserSchemaFromUser(val model.User) UserSchema {
-	var spaceships []SpaceshipSchema
+func UserSchemaFromUser(val model.User) User {
+	var spaceships []Spaceship
 	for _, sp := range val.Spaceships {
 		spaceships = append(spaceships, *SpaceshipSchemaFromSpaceship(&sp))
 
 	}
 
-	return UserSchema{
+	return User{
 		ID:          val.ID,
 		Username:    val.Username,
 		Spaceships:  spaceships,

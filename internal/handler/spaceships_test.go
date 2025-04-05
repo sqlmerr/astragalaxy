@@ -23,7 +23,7 @@ func TestGetMySpaceships(t *testing.T) {
 			ExpectedError: false,
 			Route:         "/spaceships/my",
 			BodyValidator: func(body []byte) {
-				var res schema.DataGenericResponse[[]schema.SpaceshipSchema]
+				var res schema.DataGenericResponse[[]schema.Spaceship]
 				err := json.Unmarshal(body, &res)
 				assert.NoError(t, err)
 				assert.NotEmpty(t, res.Data)
@@ -119,7 +119,7 @@ func TestEnterMySpaceship(t *testing.T) {
 	//if assert.Equal(t, http.StatusOK, res.StatusCode) {
 	//	body, err := io.ReadAll(res.Body)
 	//	assert.NoError(t, err)
-	//	var response schema.OkResponseSchema
+	//	var response schema.OkResponse
 	//	err = json.Unmarshal(body, &response)
 	//	assert.NoError(t, err)
 	//
@@ -149,7 +149,7 @@ func TestExitMySpaceship(t *testing.T) {
 	if assert.Equal(t, http.StatusOK, res.StatusCode) {
 		body, err := io.ReadAll(res.Body)
 		assert.NoError(t, err)
-		var response schema.OkResponseSchema
+		var response schema.OkResponse
 		err = json.Unmarshal(body, &response)
 		assert.NoError(t, err)
 
@@ -169,7 +169,7 @@ func TestExitMySpaceship(t *testing.T) {
 
 func TestRenameMySpaceship(t *testing.T) {
 	url := "/spaceships/my/rename"
-	body := &schema.RenameSpaceshipSchema{SpaceshipID: spaceship.ID, Name: "testSpaceship"}
+	body := &schema.RenameSpaceship{SpaceshipID: spaceship.ID, Name: "testSpaceship"}
 	b, err := json.Marshal(body)
 	assert.NoError(t, err)
 
@@ -183,7 +183,7 @@ func TestRenameMySpaceship(t *testing.T) {
 	if assert.Equal(t, http.StatusOK, res.StatusCode) {
 		body, err := io.ReadAll(res.Body)
 		assert.NoError(t, err)
-		var response schema.OkResponseSchema
+		var response schema.OkResponse
 		err = json.Unmarshal(body, &response)
 		assert.NoError(t, err)
 

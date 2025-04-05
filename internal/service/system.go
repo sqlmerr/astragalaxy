@@ -6,7 +6,7 @@ import (
 	"astragalaxy/internal/util"
 )
 
-func (s *Service) CreateSystem(data schema.CreateSystemSchema) (*schema.SystemSchema, error) {
+func (s *Service) CreateSystem(data schema.CreateSystem) (*schema.System, error) {
 	id, err := s.id.Generate(7)
 	if err != nil {
 		return nil, util.ErrServerError
@@ -19,16 +19,16 @@ func (s *Service) CreateSystem(data schema.CreateSystemSchema) (*schema.SystemSc
 	return s.FindOneSystem(*response)
 }
 
-func (s *Service) FindOneSystem(ID string) (*schema.SystemSchema, error) {
+func (s *Service) FindOneSystem(ID string) (*schema.System, error) {
 	response, err := s.sy.FindOne(ID)
 	if err != nil {
 		return nil, err
 	}
-	systemSchema := schema.SystemSchema(*response)
+	systemSchema := schema.System(*response)
 	return &systemSchema, nil
 }
 
-func (s *Service) FindOneSystemByName(name string) (*schema.SystemSchema, error) {
+func (s *Service) FindOneSystemByName(name string) (*schema.System, error) {
 	response, err := s.sy.FindOneByName(name)
 	if err != nil {
 		return nil, err
@@ -36,15 +36,15 @@ func (s *Service) FindOneSystemByName(name string) (*schema.SystemSchema, error)
 	if response == nil {
 		return nil, util.ErrNotFound
 	}
-	systemSchema := schema.SystemSchema(*response)
+	systemSchema := schema.System(*response)
 	return &systemSchema, nil
 }
 
-func (s *Service) FindAllSystems() []schema.SystemSchema {
+func (s *Service) FindAllSystems() []schema.System {
 	response := s.sy.FindAll()
-	var systems []schema.SystemSchema
+	var systems []schema.System
 	for _, r := range response {
-		systems = append(systems, schema.SystemSchema(r))
+		systems = append(systems, schema.System(r))
 	}
 
 	return systems
@@ -54,7 +54,7 @@ func (s *Service) DeleteSystem(ID string) error {
 	return s.sy.Delete(ID)
 }
 
-func (s *Service) UpdateSystem(ID string, data schema.UpdateSystemSchema) error {
+func (s *Service) UpdateSystem(ID string, data schema.UpdateSystem) error {
 	system := model.System{
 		ID:   ID,
 		Name: data.Name,

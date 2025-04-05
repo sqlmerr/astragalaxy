@@ -15,7 +15,7 @@ import (
 )
 
 func TestRegister(t *testing.T) {
-	body := &schema.CreateUserSchema{Password: "987654321", Username: "tester2"}
+	body := &schema.CreateUser{Password: "987654321", Username: "tester2"}
 	b, err := json.Marshal(body)
 	assert.NoError(t, err)
 
@@ -30,7 +30,7 @@ func TestRegister(t *testing.T) {
 		body, err := io.ReadAll(res.Body)
 		assert.NoError(t, err)
 
-		var response *schema.UserSchema
+		var response *schema.User
 
 		err = json.Unmarshal(body, &response)
 		assert.NoError(t, err)
@@ -98,7 +98,7 @@ func TestGetUserTokenSudo(t *testing.T) {
 		body, err := io.ReadAll(res.Body)
 		assert.NoError(t, err)
 
-		var response *schema.UserTokenResponseSchema
+		var response *schema.UserTokenResponse
 		err = json.Unmarshal(body, &response)
 		assert.NoError(t, err)
 
@@ -119,7 +119,7 @@ func TestGetMe(t *testing.T) {
 		body, err := io.ReadAll(res.Body)
 		assert.NoError(t, err)
 
-		var me *schema.UserSchema
+		var me *schema.User
 		err = json.Unmarshal(body, &me)
 		assert.NoError(t, err)
 
