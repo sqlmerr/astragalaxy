@@ -54,17 +54,15 @@ func TestGetSystemPlanets(t *testing.T) {
 		body, err := io.ReadAll(res.Body)
 		assert.NoError(t, err)
 
-		var response schema.DataResponseSchema
+		var response schema.DataGenericResponse[[]schema.PlanetSchema]
 		err = json.Unmarshal(body, &response)
 		assert.NoError(t, err)
 
-		r, ok := response.Data.([]schema.PlanetSchema)
-		assert.True(t, ok)
-
-		assert.Len(t, r, 1)
-		planet := r[0]
-		assert.Equal(t, "testPlanet1", planet.Name)
-		assert.Equal(t, "TOXINS", planet.Threat)
+		if assert.Len(t, response.Data, 1) {
+			planet := response.Data[0]
+			assert.Equal(t, "testPlanet1", planet.Name)
+			assert.Equal(t, "TOXINS", planet.Threat)
+		}
 	}
 }
 
@@ -102,14 +100,13 @@ func TestGetAllSystems(t *testing.T) {
 	if assert.Equal(t, http.StatusOK, res.StatusCode) {
 		body, err := io.ReadAll(res.Body)
 		assert.NoError(t, err)
-		var response schema.DataResponseSchema
-		err = json.Unmarshal(body, &response)
+		var r schema.DataGenericResponse[[]schema.SystemSchema]
+		err = json.Unmarshal(body, &r)
 		assert.NoError(t, err)
 
-		r, ok := response.Data.([]schema.SystemSchema)
-		assert.True(t, ok)
-
-		assert.Equal(t, system.ID, r[0].ID)
-		assert.Equal(t, system.Name, r[0].Name)
+		if assert.GreaterOrEqual(t, len(r.Data), 1) {
+			assert.Equal(t, system.ID, r.Data[0].ID)
+			assert.Equal(t, system.Name, r.Data[0].Name)
+		}
 	}
 }

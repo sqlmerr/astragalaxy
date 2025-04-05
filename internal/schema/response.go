@@ -8,3 +8,7 @@ type OkResponseSchema struct {
 type DataResponseSchema struct {
 	Data any `json:"data"`
 }
+
+type DataGenericResponse[T any] struct {
+	Data T `json:"data"`
+}

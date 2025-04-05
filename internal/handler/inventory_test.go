@@ -19,16 +19,14 @@ func TestGetMyItems(t *testing.T) {
 			ExpectedError: false,
 			ExpectedCode:  200,
 			BodyValidator: func(body []byte) {
-				var response schema.DataResponseSchema
-				err := json.Unmarshal(body, &response)
+				var b schema.DataGenericResponse[[]schema.ItemSchema]
+				err := json.Unmarshal(body, &b)
 				assert.NoError(t, err)
 
-				b, ok := response.Data.([]schema.ItemSchema)
-				assert.True(t, ok)
-
-				assert.Len(t, b, 1)
-				assert.Equal(t, "test", b[0].Code)
-				assert.Equal(t, usr.ID, b[0].UserID)
+				if assert.Len(t, b.Data, 1) {
+					assert.Equal(t, "test", b.Data[0].Code)
+					assert.Equal(t, usr.ID, b.Data[0].UserID)
+				}
 			},
 		},
 	}
@@ -45,16 +43,14 @@ func TestGetMyItemsByCode(t *testing.T) {
 			ExpectedError: false,
 			ExpectedCode:  200,
 			BodyValidator: func(body []byte) {
-				var res schema.DataResponseSchema
-				err := json.Unmarshal(body, &res)
+				var b schema.DataGenericResponse[[]schema.ItemSchema]
+				err := json.Unmarshal(body, &b)
 				assert.NoError(t, err)
 
-				b, ok := res.Data.([]schema.ItemSchema)
-				assert.True(t, ok)
-
-				assert.Len(t, b, 1)
-				assert.Equal(t, "test", b[0].Code)
-				assert.Equal(t, usr.ID, b[0].UserID)
+				if assert.Len(t, b.Data, 1) {
+					assert.Equal(t, "test", b.Data[0].Code)
+					assert.Equal(t, usr.ID, b.Data[0].UserID)
+				}
 			},
 		},
 		{
@@ -64,10 +60,10 @@ func TestGetMyItemsByCode(t *testing.T) {
 			ExpectedError: false,
 			ExpectedCode:  200,
 			BodyValidator: func(body []byte) {
-				var b []schema.ItemSchema
+				var b schema.DataResponseSchema
 				err := json.Unmarshal(body, &b)
 				assert.NoError(t, err)
-				assert.Len(t, b, 0)
+				assert.Len(t, b.Data, 0)
 			},
 		},
 	}

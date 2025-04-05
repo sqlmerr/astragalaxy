@@ -23,16 +23,14 @@ func TestGetMySpaceships(t *testing.T) {
 			ExpectedError: false,
 			Route:         "/spaceships/my",
 			BodyValidator: func(body []byte) {
-				var res schema.DataResponseSchema
+				var res schema.DataGenericResponse[[]schema.SpaceshipSchema]
 				err := json.Unmarshal(body, &res)
 				assert.NoError(t, err)
-				assert.NotEmpty(t, res)
+				assert.NotEmpty(t, res.Data)
 
-				b, ok := res.Data.([]schema.SpaceshipSchema)
-				assert.True(t, ok)
-
-				assert.Len(t, b, 1)
-				assert.Equal(t, b[0].Name, spaceship.Name)
+				if assert.Len(t, res.Data, 1) {
+					assert.Equal(t, res.Data[0].Name, spaceship.Name)
+				}
 			},
 		},
 	}
