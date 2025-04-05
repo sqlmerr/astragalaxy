@@ -50,7 +50,7 @@ func (h *Handler) getSpaceshipByID(c *fiber.Ctx) error {
 //	@Description	Jwt Token required
 //	@Tags			spaceships
 //	@Produce		json
-//	@Success		200	{object}	[]schema.SpaceshipSchema
+//	@Success		200	{object}	schema.DataResponseSchema{data=[]schema.SpaceshipSchema}
 //	@Failure		500	{object}	util.Error
 //	@Failure		403	{object}	util.Error
 //	@Failure		422	{object}	util.Error
@@ -63,7 +63,7 @@ func (h *Handler) getMySpaceships(c *fiber.Ctx) error {
 		return c.Status(http.StatusInternalServerError).JSON(util.NewError(util.ErrServerError))
 	}
 
-	return c.JSON(spaceships)
+	return c.JSON(schema.DataResponseSchema{Data: spaceships})
 }
 
 // enterMySpaceship godoc

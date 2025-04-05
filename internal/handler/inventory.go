@@ -17,18 +17,19 @@ import (
 //	@Description	Jwt Token required
 //	@Tags			inventory
 //	@Produce		json
-//	@Success		200	{object}	[]schema.ItemSchema
+//	@Success		200	{object}	schema.DataResponseSchema{data=[]schema.ItemSchema}
 //	@Failure		500	{object}	util.Error
 //	@Failure		400	{object}	util.Error
 //	@Failure		403	{object}	util.Error
 //	@Failure		404	{object}	util.Error
 //	@Failure		422	{object}	util.Error
 //	@Router			/inventory/items/ [get]
+//	@Security		JwtAuth
 func (h *Handler) getMyItems(ctx *fiber.Ctx) error {
 	user := ctx.Locals("user").(*schema.UserSchema)
 
 	items := h.s.GetUserItems(user.ID)
-	return ctx.JSON(items)
+	return ctx.JSON(schema.DataResponseSchema{Data: items})
 }
 
 // getMyItemsByCode godoc
@@ -39,12 +40,13 @@ func (h *Handler) getMyItems(ctx *fiber.Ctx) error {
 //	@Accept			json
 //	@Produce		json
 //	@Param			code	path		string	true	"Item Code"
-//	@Success		200		{object}	[]schema.ItemSchema
+//	@Success		200		{object}	schema.DataResponseSchema{data=[]schema.ItemSchema}
 //	@Failure		500		{object}	util.Error
 //	@Failure		400		{object}	util.Error
 //	@Failure		403		{object}	util.Error
 //	@Failure		404		{object}	util.Error
 //	@Failure		422		{object}	util.Error
+//	@Security		JwtAuth
 //	@Router			/inventory/items/{code} [get]
 func (h *Handler) getMyItemsByCode(ctx *fiber.Ctx) error {
 	user := ctx.Locals("user").(*schema.UserSchema)
@@ -62,7 +64,7 @@ func (h *Handler) getMyItemsByCode(ctx *fiber.Ctx) error {
 		}
 		return ctx.Status(fiber.StatusInternalServerError).JSON(util.NewError(err))
 	}
-	return ctx.JSON(items)
+	return ctx.JSON(schema.DataResponseSchema{Data: items})
 }
 
 // getItemData godoc
@@ -73,12 +75,13 @@ func (h *Handler) getMyItemsByCode(ctx *fiber.Ctx) error {
 //	@Accept			json
 //	@Produce		json
 //	@Param			id	path		string	true	"item id. UUID"
-//	@Success		200	{object}	schema.DataResponseSchema
+//	@Success		200	{object}	schema.ItemDataResponseSchema
 //	@Failure		500	{object}	util.Error
 //	@Failure		400	{object}	util.Error
 //	@Failure		403	{object}	util.Error
 //	@Failure		404	{object}	util.Error
 //	@Failure		422	{object}	util.Error
+//	@Security		JwtAuth
 //	@Router			/inventory/items/{id}/data [get]
 func (h *Handler) getItemData(ctx *fiber.Ctx) error {
 	user := ctx.Locals("user").(*schema.UserSchema)

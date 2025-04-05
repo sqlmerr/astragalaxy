@@ -44,7 +44,7 @@ func (h *Handler) createSystem(c *fiber.Ctx) error {
 //	@Tags			systems
 //	@Produce		json
 //	@Param			id	path		string	true	"system id"
-//	@Success		200	{object}	[]schema.PlanetSchema
+//	@Success		200	{object}	schema.DataResponseSchema{data=[]schema.PlanetSchema}
 //	@Failure		500	{object}	util.Error
 //	@Failure		403	{object}	util.Error
 //	@Failure		422	{object}	util.Error
@@ -68,7 +68,7 @@ func (h *Handler) getSystemPlanets(c *fiber.Ctx) error {
 		return c.JSON([]schema.PlanetSchema{})
 	}
 
-	return c.JSON(planets)
+	return c.JSON(schema.DataResponseSchema{Data: planets})
 }
 
 // getAllSystems godoc
@@ -77,7 +77,7 @@ func (h *Handler) getSystemPlanets(c *fiber.Ctx) error {
 //	@Description	Jwt Token required
 //	@Tags			systems
 //	@Produce		json
-//	@Success		200	{object}	[]schema.SystemSchema
+//	@Success		200	{object}	schema.DataResponseSchema{data=[]schema.SystemSchema}
 //	@Failure		500	{object}	util.Error
 //	@Failure		403	{object}	util.Error
 //	@Failure		422	{object}	util.Error
@@ -85,7 +85,8 @@ func (h *Handler) getSystemPlanets(c *fiber.Ctx) error {
 //	@Router			/systems [get]
 func (h *Handler) getAllSystems(c *fiber.Ctx) error {
 	systems := h.s.FindAllSystems()
-	return c.JSON(systems)
+	data := schema.DataResponseSchema{Data: systems}
+	return c.JSON(data)
 }
 
 // getSystemByID godoc
