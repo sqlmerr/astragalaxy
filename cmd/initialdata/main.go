@@ -16,13 +16,13 @@ func main() {
 	if err != nil {
 		panic("failed to connect to database")
 	}
-	db.AutoMigrate(&model.Planet{})
-	db.AutoMigrate(&model.System{})
-	db.AutoMigrate(&model.Spaceship{})
-	db.AutoMigrate(&model.User{})
-	db.AutoMigrate(&model.Item{})
-	db.AutoMigrate(&model.ItemDataTag{})
-	db.AutoMigrate(&model.FlightInfo{})
+	//db.AutoMigrate(&model.Planet{})
+	//db.AutoMigrate(&model.System{})
+	//db.AutoMigrate(&model.Spaceship{})
+	//db.AutoMigrate(&model.User{})
+	//db.AutoMigrate(&model.Item{})
+	//db.AutoMigrate(&model.ItemDataTag{})
+	//db.AutoMigrate(&model.FlightInfo{})
 
 	systemRepository := repository.NewSystemRepository(db)
 

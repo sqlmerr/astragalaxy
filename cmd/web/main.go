@@ -2,12 +2,13 @@ package main
 
 import (
 	"astragalaxy/internal/handler"
-	"astragalaxy/internal/model"
 	"astragalaxy/internal/state"
 	"astragalaxy/internal/util"
 	"log"
 
 	_ "astragalaxy/docs"
+
+	_ "ariga.io/atlas-provider-gorm/gormschema"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
@@ -40,13 +41,13 @@ func main() {
 		panic("Failed to open database")
 	}
 
-	db.AutoMigrate(&model.Planet{})
-	db.AutoMigrate(&model.System{})
-	db.AutoMigrate(&model.Spaceship{})
-	db.AutoMigrate(&model.User{})
-	db.AutoMigrate(&model.Item{})
-	db.AutoMigrate(&model.ItemDataTag{})
-	db.AutoMigrate(&model.FlightInfo{})
+	//db.AutoMigrate(&model.Planet{})
+	//db.AutoMigrate(&model.System{})
+	//db.AutoMigrate(&model.Spaceship{})
+	//db.AutoMigrate(&model.User{})
+	//db.AutoMigrate(&model.Item{})
+	//db.AutoMigrate(&model.ItemDataTag{})
+	//db.AutoMigrate(&model.FlightInfo{})
 
 	app := fiber.New()
 
