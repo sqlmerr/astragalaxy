@@ -52,7 +52,7 @@ jobs:
         uses: ariga/setup-atlas@v0
 
       - name: Test with Go
-        run: go test -v ./... -json && echo "{}" > TestResults-${{ matrix.go-version }}.json
+        run: go test -v ./... -json > TestResults-${{ matrix.go-version }}.json
         
       - name: Stop docker compose
         run: docker compose -f docker-compose-test.yaml down
