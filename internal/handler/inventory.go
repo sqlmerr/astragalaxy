@@ -4,9 +4,6 @@ import (
 	"astragalaxy/internal/model"
 	"astragalaxy/internal/schema"
 	"astragalaxy/internal/util"
-	"errors"
-	"net/http"
-
 	"github.com/gofiber/fiber/v2"
 	"github.com/google/uuid"
 )
@@ -57,12 +54,7 @@ func (h *Handler) getMyItemsByCode(ctx *fiber.Ctx) error {
 
 	items, err := h.s.FindAllItems(&model.Item{Code: code, UserID: user.ID})
 	if err != nil {
-		var apiErr util.APIError
-		ok := errors.As(err, &apiErr)
-		if ok {
-			return ctx.Status(apiErr.Status()).JSON(util.NewError(apiErr))
-		}
-		return ctx.Status(fiber.StatusInternalServerError).JSON(util.NewError(err))
+		return util.AnswerWithError(ctx, err)
 	}
 	return ctx.JSON(schema.DataResponse{Data: items})
 }
@@ -93,14 +85,11 @@ func (h *Handler) getItemData(ctx *fiber.Ctx) error {
 
 	item, err := h.s.FindOneItem(itemID)
 	if err != nil || item == nil {
-		if item == nil {
-			return ctx.Status(http.StatusNotFound).JSON(util.NewError(util.ErrNotFound))
-		}
-		return ctx.Status(fiber.StatusInternalServerError).JSON(util.NewError(err))
+		return util.AnswerWithError(ctx, err)
 	}
 
 	if item.UserID != user.ID {
-		return ctx.Status(fiber.StatusNotFound).JSON(util.NewError(util.ErrNotFound))
+		return util.AnswerWithError(ctx, util.ErrNotFound)
 	}
 
 	data := h.s.GetItemDataTags(itemID)
