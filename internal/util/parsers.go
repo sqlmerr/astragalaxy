@@ -2,6 +2,7 @@ package util
 
 import (
 	"reflect"
+	"strings"
 
 	"github.com/gofiber/fiber/v2"
 )
@@ -36,4 +37,10 @@ func StructToMap(obj interface{}) map[string]interface{} {
 	}
 
 	return result
+}
+
+func ParseHyperJumpPath(p string) []string {
+	path := strings.Split(p, "->")
+
+	return path
 }

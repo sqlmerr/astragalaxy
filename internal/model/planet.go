@@ -10,7 +10,7 @@ const (
 )
 
 type Planet struct {
-	ID       string `gorm:"not null"`
+	ID       string `gorm:"not null;primaryKey"`
 	Name     string
 	SystemID string
 	System   System

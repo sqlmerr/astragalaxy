@@ -29,32 +29,32 @@ func TestGetMySpaceships(t *testing.T) {
 				assert.NotEmpty(t, res.Data)
 
 				if assert.Len(t, res.Data, 1) {
-					assert.Equal(t, res.Data[0].Name, spaceship.Name)
+					assert.Equal(t, res.Data[0].Name, testSpaceship.Name)
 				}
 			},
 		},
 	}
 
-	executor.TestHTTP(t, tests, map[string]string{
+	testExecutor.TestHTTP(t, tests, map[string]string{
 		"Content-Type":  "application/json",
-		"Authorization": fmt.Sprintf("Bearer %s", userJwtToken)},
+		"Authorization": fmt.Sprintf("Bearer %s", testUserJwtToken)},
 	)
 }
 
 func TestGetSpaceshipByID(t *testing.T) {
 	tests := []test.HTTPTest{
 		{
-			Description:   "spaceship found",
-			Route:         fmt.Sprintf("/spaceships/%s", spaceship.ID),
+			Description:   "testSpaceship found",
+			Route:         fmt.Sprintf("/spaceships/%s", testSpaceship.ID),
 			ExpectedError: false,
 			ExpectedCode:  200,
 			BodyValidator: func(body []byte) {
 				var b map[string]interface{}
 				err := json.Unmarshal(body, &b)
 				assert.NoError(t, err)
-				assert.Equal(t, spaceship.ID.String(), b["id"].(string))
-				assert.Equal(t, spaceship.Name, b["name"].(string))
-				assert.Equal(t, spaceship.UserID.String(), b["user_id"].(string))
+				assert.Equal(t, testSpaceship.ID.String(), b["id"].(string))
+				assert.Equal(t, testSpaceship.Name, b["name"].(string))
+				assert.Equal(t, testSpaceship.UserID.String(), b["user_id"].(string))
 			},
 			Method: http.MethodGet,
 		},
@@ -67,19 +67,19 @@ func TestGetSpaceshipByID(t *testing.T) {
 		},
 	}
 
-	executor.TestHTTP(
+	testExecutor.TestHTTP(
 		t, tests,
 		map[string]string{
 			"Content-Type":  "application/json",
-			"Authorization": fmt.Sprintf("Bearer %s", userJwtToken)},
+			"Authorization": fmt.Sprintf("Bearer %s", testUserJwtToken)},
 	)
 }
 
 func TestEnterMySpaceship(t *testing.T) {
 	tests := []test.HTTPTest{
 		{
-			Description:   "entered spaceship",
-			Route:         fmt.Sprintf("/spaceships/my/%s/enter", spaceship.ID),
+			Description:   "entered testSpaceship",
+			Route:         fmt.Sprintf("/spaceships/my/%s/enter", testSpaceship.ID),
 			ExpectedError: false,
 			ExpectedCode:  200,
 			BodyValidator: func(body []byte) {
@@ -92,8 +92,8 @@ func TestEnterMySpaceship(t *testing.T) {
 			Method: http.MethodPost,
 		},
 		{
-			Description:   "can't enter spaceship",
-			Route:         fmt.Sprintf("/spaceships/my/%s/enter", spaceship.ID),
+			Description:   "can't enter testSpaceship",
+			Route:         fmt.Sprintf("/spaceships/my/%s/enter", testSpaceship.ID),
 			ExpectedError: true,
 			ExpectedCode:  400,
 			Method:        http.MethodPost,
@@ -106,15 +106,15 @@ func TestEnterMySpaceship(t *testing.T) {
 			Method:        http.MethodPost,
 		},
 	}
-	executor.TestHTTP(t, tests, map[string]string{"Content-Type": "application/json", "Authorization": fmt.Sprintf("Bearer %s", userJwtToken)})
+	testExecutor.TestHTTP(t, tests, map[string]string{"Content-Type": "application/json", "Authorization": fmt.Sprintf("Bearer %s", testUserJwtToken)})
 
-	//url := fmt.Sprintf("/spaceships/my/%s/enter", spaceship.ID.String())
+	//url := fmt.Sprintf("/spaceships/my/%s/enter", testSpaceship.ID.String())
 	//
 	//req := httptest.NewRequest(http.MethodPost, url, nil)
 	//req.Header.Set("Content-Type", "application/json")
-	//req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", userJwtToken))
+	//req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", testUserJwtToken))
 	//
-	//res, err := app.Test(req, -1)
+	//res, err := testApp.Test(req, -1)
 	//assert.NoError(t, err)
 	//if assert.Equal(t, http.StatusOK, res.StatusCode) {
 	//	body, err := io.ReadAll(res.Body)
@@ -123,10 +123,10 @@ func TestEnterMySpaceship(t *testing.T) {
 	//	err = json.Unmarshal(body, &response)
 	//	assert.NoError(t, err)
 	//
-	//	s, err := stateObj.SpaceshipService.FindOne(spaceship.ID)
+	//	s, err := testStateObj.SpaceshipService.FindOne(testSpaceship.ID)
 	//	assert.NoError(t, err)
 	//
-	//	p, err := stateObj.UserService.FindOne(usr.ID)
+	//	p, err := testStateObj.UserService.FindOne(testUser.ID)
 	//	assert.NoError(t, err)
 	//
 	//	assert.NotEmpty(t, response)
@@ -138,13 +138,13 @@ func TestEnterMySpaceship(t *testing.T) {
 }
 
 func TestExitMySpaceship(t *testing.T) {
-	url := fmt.Sprintf("/spaceships/my/%s/exit", spaceship.ID.String())
+	url := fmt.Sprintf("/spaceships/my/%s/exit", testSpaceship.ID.String())
 
 	req := httptest.NewRequest(http.MethodPost, url, nil)
 	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", userJwtToken))
+	req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", testUserJwtToken))
 
-	res, err := app.Test(req, -1)
+	res, err := testApp.Test(req, -1)
 	assert.NoError(t, err)
 	if assert.Equal(t, http.StatusOK, res.StatusCode) {
 		body, err := io.ReadAll(res.Body)
@@ -153,10 +153,10 @@ func TestExitMySpaceship(t *testing.T) {
 		err = json.Unmarshal(body, &response)
 		assert.NoError(t, err)
 
-		s, err := stateObj.S.FindOneSpaceship(spaceship.ID)
+		s, err := testStateObj.S.FindOneSpaceship(testSpaceship.ID)
 		assert.NoError(t, err)
 
-		p, err := stateObj.S.FindOneUser(usr.ID)
+		p, err := testStateObj.S.FindOneUser(testUser.ID)
 		assert.NoError(t, err)
 
 		assert.NotEmpty(t, response)
@@ -169,15 +169,15 @@ func TestExitMySpaceship(t *testing.T) {
 
 func TestRenameMySpaceship(t *testing.T) {
 	url := "/spaceships/my/rename"
-	body := &schema.RenameSpaceship{SpaceshipID: spaceship.ID, Name: "testSpaceship"}
+	body := &schema.RenameSpaceship{SpaceshipID: testSpaceship.ID, Name: "testSpaceship"}
 	b, err := json.Marshal(body)
 	assert.NoError(t, err)
 
 	req := httptest.NewRequest(http.MethodPut, url, bytes.NewReader(b))
 	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", userJwtToken))
+	req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", testUserJwtToken))
 
-	res, err := app.Test(req, -1)
+	res, err := testApp.Test(req, -1)
 	assert.NoError(t, err)
 
 	if assert.Equal(t, http.StatusOK, res.StatusCode) {
@@ -187,7 +187,7 @@ func TestRenameMySpaceship(t *testing.T) {
 		err = json.Unmarshal(body, &response)
 		assert.NoError(t, err)
 
-		s, err := stateObj.S.FindOneSpaceship(spaceship.ID)
+		s, err := testStateObj.S.FindOneSpaceship(testSpaceship.ID)
 		assert.NoError(t, err)
 
 		assert.NotEmpty(t, response)

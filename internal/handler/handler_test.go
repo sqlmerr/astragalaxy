@@ -1,11 +1,13 @@
 package handler
 
 import (
+	"ariga.io/atlas-go-sdk/atlasexec"
 	"astragalaxy/internal/model"
 	"astragalaxy/internal/schema"
 	"astragalaxy/internal/state"
 	"astragalaxy/internal/util"
 	"astragalaxy/pkg/test"
+	"context"
 	"fmt"
 	"os"
 	"testing"
@@ -16,39 +18,43 @@ import (
 )
 
 var (
-	app          *fiber.App
-	usr          *schema.User
-	userJwtToken string
-	userToken    string
-	sudoToken    string
-	stateObj     *state.State
-	spaceship    *schema.Spaceship
-	executor     *test.Executor
-	testItem     *schema.Item
+	testApp          *fiber.App
+	testUser         *schema.User
+	testUserJwtToken string
+	testUserToken    string
+	testSudoToken    string
+	testStateObj     *state.State
+	testSpaceship    *schema.Spaceship
+	testExecutor     *test.Executor
+	testItem         *schema.Item
 )
 
 func TestMain(m *testing.M) {
 	db, err := gorm.Open(postgres.Open(util.GetEnv("TEST_DATABASE_URL")), &gorm.Config{})
-	// db, err := gorm.Open(postgres.Open("postgresql://postgres:password@db:5432"), &gorm.Config{})
 	if err != nil {
 		panic("Failed to open database")
 	}
 
-	db.AutoMigrate(&model.Planet{})
-	db.AutoMigrate(&model.System{})
-	db.AutoMigrate(&model.Spaceship{})
-	db.AutoMigrate(&model.User{})
-	db.AutoMigrate(&model.Item{})
-	db.AutoMigrate(&model.ItemDataTag{})
-	db.AutoMigrate(&model.FlightInfo{})
+	client, err := atlasexec.NewClient(util.Must(util.GetProjectRoot()), "atlas")
+	if err != nil {
+		panic(err)
+	}
 
-	app = fiber.New()
+	_, err = client.MigrateApply(context.Background(), &atlasexec.MigrateApplyParams{
+		URL: util.GetEnv("TEST_DATABASE_URL"), // Database URL
+		Env: "gorm",                           // Environment name from atlas.hcl
+	})
+	if err != nil {
+		panic(err)
+	}
+
+	testApp = fiber.New()
 
 	stateObj := state.New(db)
 	setup(stateObj)
 
 	h := NewHandler(stateObj)
-	h.Register(app)
+	h.Register(testApp)
 
 	code := m.Run()
 
@@ -106,12 +112,12 @@ func setup(state *state.State) {
 		panic(err)
 	}
 
-	executor = test.New(app)
+	testExecutor = test.New(testApp)
 
-	userJwtToken = *jwtToken
-	userToken = token
-	usr = user
-	sudoToken = state.Config.SecretToken
-	stateObj = state
-	spaceship = spcship
+	testUserJwtToken = *jwtToken
+	testUserToken = token
+	testUser = user
+	testSudoToken = state.Config.SecretToken
+	testStateObj = state
+	testSpaceship = spcship
 }

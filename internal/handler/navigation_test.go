@@ -13,15 +13,15 @@ import (
 )
 
 func TestFlightToPlanet(t *testing.T) {
-	planets, err := stateObj.S.FindAllPlanets(&model.Planet{Name: "testPlanet1"})
+	planets, err := testStateObj.S.FindAllPlanets(&model.Planet{Name: "testPlanet1"})
 	assert.NoError(t, err)
 	assert.Len(t, planets, 1)
 	planet := planets[0]
-	body, err := json.Marshal(&schema.FlyToPlanet{PlanetID: planet.ID, SpaceshipID: spaceship.ID})
+	body, err := json.Marshal(&schema.FlyToPlanet{PlanetID: planet.ID, SpaceshipID: testSpaceship.ID})
 	assert.NoError(t, err)
 
-	if !spaceship.PlayerSitIn {
-		err = stateObj.S.EnterUserSpaceship(*usr, spaceship.ID)
+	if !testSpaceship.PlayerSitIn {
+		err = testStateObj.S.EnterUserSpaceship(*testUser, testSpaceship.ID)
 		assert.NoError(t, err)
 	}
 
@@ -51,27 +51,27 @@ func TestFlightToPlanet(t *testing.T) {
 		},
 	}
 
-	executor.TestHTTP(t, tests, map[string]string{
+	testExecutor.TestHTTP(t, tests, map[string]string{
 		"Content-Type":  "application/json",
-		"Authorization": fmt.Sprintf("Bearer %s", userJwtToken),
+		"Authorization": fmt.Sprintf("Bearer %s", testUserJwtToken),
 	})
 
-	stateObj.S.ExitUserSpaceship(*usr, spaceship.ID)
+	testStateObj.S.ExitUserSpaceship(*testUser, testSpaceship.ID)
 }
 
 func TestHyperJump(t *testing.T) {
 	flying := false
-	err := stateObj.S.SetFlightInfo(spaceship.ID, &model.FlightInfo{Flying: &flying})
+	err := testStateObj.S.SetFlightInfo(testSpaceship.ID, &model.FlightInfo{Flying: &flying})
 	assert.NoError(t, err)
 
-	system, err := stateObj.S.CreateSystem(schema.CreateSystem{Name: "hyperjumpSystem"})
+	system, err := testStateObj.S.CreateSystem(schema.CreateSystem{Name: "hyperjumpSystem", Connections: []string{testSpaceship.SystemID}})
 	assert.NoError(t, err)
 
-	body, err := json.Marshal(&schema.HyperJump{SystemID: system.ID, SpaceshipID: spaceship.ID})
+	body, err := json.Marshal(&schema.HyperJump{Path: fmt.Sprintf("%s->%s", testSpaceship.SystemID, system.ID), SpaceshipID: testSpaceship.ID})
 	assert.NoError(t, err)
 
-	if !spaceship.PlayerSitIn {
-		err = stateObj.S.EnterUserSpaceship(*usr, spaceship.ID)
+	if !testSpaceship.PlayerSitIn {
+		err = testStateObj.S.EnterUserSpaceship(*testUser, testSpaceship.ID)
 		assert.NoError(t, err)
 	}
 
@@ -101,18 +101,18 @@ func TestHyperJump(t *testing.T) {
 		},
 	}
 
-	executor.TestHTTP(t, tests, map[string]string{
+	testExecutor.TestHTTP(t, tests, map[string]string{
 		"Content-Type":  "application/json",
-		"Authorization": fmt.Sprintf("Bearer %s", userJwtToken),
+		"Authorization": fmt.Sprintf("Bearer %s", testUserJwtToken),
 	})
 
-	stateObj.S.ExitUserSpaceship(*usr, spaceship.ID)
+	testStateObj.S.ExitUserSpaceship(*testUser, testSpaceship.ID)
 }
 
 func TestCheckFlight(t *testing.T) {
 	tests := []test.HTTPTest{
 		{
-			Description:   "Invalid spaceship UUID",
+			Description:   "Invalid testSpaceship UUID",
 			Route:         "/navigation/info?id=123",
 			ExpectedError: true,
 			ExpectedCode:  http.StatusBadRequest,
@@ -120,7 +120,7 @@ func TestCheckFlight(t *testing.T) {
 		},
 		{
 			Description:   "Success",
-			Route:         fmt.Sprintf("/navigation/info?id=%s", spaceship.ID.String()),
+			Route:         fmt.Sprintf("/navigation/info?id=%s", testSpaceship.ID.String()),
 			ExpectedError: false,
 			ExpectedCode:  http.StatusOK,
 			BodyValidator: func(body []byte) {
@@ -133,8 +133,8 @@ func TestCheckFlight(t *testing.T) {
 		},
 	}
 
-	executor.TestHTTP(t, tests, map[string]string{
+	testExecutor.TestHTTP(t, tests, map[string]string{
 		"Content-Type":  "application/json",
-		"Authorization": fmt.Sprintf("Bearer %s", userJwtToken),
+		"Authorization": fmt.Sprintf("Bearer %s", testUserJwtToken),
 	})
 }

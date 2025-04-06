@@ -3,7 +3,7 @@ package model
 import "github.com/google/uuid"
 
 type Spaceship struct {
-	ID          uuid.UUID `gorm:"type:uuid;default:gen_random_uuid()"`
+	ID          uuid.UUID `gorm:"type:uuid;default:gen_random_uuid();primaryKey"`
 	Name        string    `gorm:"not null"`
 	UserID      uuid.UUID
 	Location    string

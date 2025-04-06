@@ -14,7 +14,7 @@ import (
 
 // getSpaceshipByID godoc
 //
-//	@Summary		Get spaceship by id
+//	@Summary		Get testSpaceship by id
 //	@Description	Jwt Token required
 //	@Tags			spaceships
 //	@Accept			json
@@ -68,7 +68,7 @@ func (h *Handler) getMySpaceships(c *fiber.Ctx) error {
 
 // enterMySpaceship godoc
 //
-//	@Summary		Enter authorized user spaceship
+//	@Summary		Enter authorized user testSpaceship
 //	@Description	Jwt Token required
 //	@Tags			spaceships
 //	@Produce		json
@@ -102,7 +102,7 @@ func (h *Handler) enterMySpaceship(c *fiber.Ctx) error {
 
 // exitMySpaceship godoc
 //
-//	@Summary		Exit authorized user spaceship
+//	@Summary		Exit authorized user testSpaceship
 //	@Description	Jwt Token required
 //	@Tags			spaceships
 //	@Produce		json
@@ -135,12 +135,12 @@ func (h *Handler) exitMySpaceship(c *fiber.Ctx) error {
 
 // renameMySpaceship godoc
 //
-//	@Summary		Rename authorized user spaceship
+//	@Summary		Rename authorized user testSpaceship
 //	@Description	Jwt Token required
 //	@Tags			spaceships
 //	@Accept			json
 //	@Produce		json
-//	@Param			req	body		schema.RenameSpaceship	true	"rename spaceship schema"
+//	@Param			req	body		schema.RenameSpaceship	true	"rename testSpaceship schema"
 //	@Success		200	{object}	schema.OkResponse
 //	@Failure		500	{object}	util.Error
 //	@Failure		403	{object}	util.Error

@@ -21,9 +21,9 @@ func TestRegister(t *testing.T) {
 
 	request := httptest.NewRequest(http.MethodPost, "/auth/register", bytes.NewReader(b))
 	request.Header.Set("Content-Type", "application/json")
-	request.Header.Set("secret-token", sudoToken)
+	request.Header.Set("secret-token", testSudoToken)
 
-	res, err := app.Test(request, -1)
+	res, err := testApp.Test(request, -1)
 	assert.NoError(t, err)
 
 	if assert.Equal(t, res.StatusCode, http.StatusCreated) {
@@ -37,7 +37,7 @@ func TestRegister(t *testing.T) {
 
 		assert.Equal(t, "tester2", response.Username)
 
-		spaceship, err := stateObj.S.FindOneSpaceship(response.Spaceships[0].ID)
+		spaceship, err := testStateObj.S.FindOneSpaceship(response.Spaceships[0].ID)
 		assert.NoError(t, err)
 
 		assert.Equal(t, "initial", spaceship.Name)
@@ -46,12 +46,12 @@ func TestRegister(t *testing.T) {
 }
 
 func TestLoginByToken(t *testing.T) {
-	body := fmt.Sprintf(`{"token":"%s"}`, userToken)
+	body := fmt.Sprintf(`{"token":"%s"}`, testUserToken)
 
 	request := httptest.NewRequest(http.MethodPost, "/auth/login/token", strings.NewReader(body))
 	request.Header.Set("Content-Type", "application/json")
 
-	res, err := app.Test(request, -1)
+	res, err := testApp.Test(request, -1)
 	assert.NoError(t, err)
 
 	if assert.Equal(t, http.StatusOK, res.StatusCode) {
@@ -67,12 +67,12 @@ func TestLoginByToken(t *testing.T) {
 }
 
 func TestLogin(t *testing.T) {
-	body := fmt.Sprintf(`{"username":"%s","password":"%s"}`, usr.Username, "testPassword")
+	body := fmt.Sprintf(`{"username":"%s","password":"%s"}`, testUser.Username, "testPassword")
 
 	request := httptest.NewRequest(http.MethodPost, "/auth/login", strings.NewReader(body))
 	request.Header.Set("Content-Type", "application/json")
 
-	res, err := app.Test(request, -1)
+	res, err := testApp.Test(request, -1)
 	assert.NoError(t, err)
 
 	if assert.Equal(t, http.StatusOK, res.StatusCode) {
@@ -88,11 +88,11 @@ func TestLogin(t *testing.T) {
 }
 
 func TestGetUserTokenSudo(t *testing.T) {
-	request := httptest.NewRequest(http.MethodGet, fmt.Sprintf("/auth/token/sudo?id=%s", usr.ID.String()), nil)
+	request := httptest.NewRequest(http.MethodGet, fmt.Sprintf("/auth/token/sudo?id=%s", testUser.ID.String()), nil)
 	request.Header.Set("Content-Type", "application/json")
-	request.Header.Set("secret-token", sudoToken)
+	request.Header.Set("secret-token", testSudoToken)
 
-	res, err := app.Test(request, -1)
+	res, err := testApp.Test(request, -1)
 	assert.NoError(t, err)
 	if assert.Equal(t, http.StatusOK, res.StatusCode) {
 		body, err := io.ReadAll(res.Body)
@@ -102,7 +102,7 @@ func TestGetUserTokenSudo(t *testing.T) {
 		err = json.Unmarshal(body, &response)
 		assert.NoError(t, err)
 
-		assert.Equal(t, userToken, response.Token)
+		assert.Equal(t, testUserToken, response.Token)
 	}
 }
 
@@ -110,8 +110,8 @@ func TestGetMe(t *testing.T) {
 	url := "/auth/me"
 	request := httptest.NewRequest(http.MethodGet, url, nil)
 	request.Header.Set("Content-Type", "application/json")
-	request.Header.Set("Authorization", fmt.Sprintf("Bearer %s", userJwtToken))
-	res, err := app.Test(request, -1)
+	request.Header.Set("Authorization", fmt.Sprintf("Bearer %s", testUserJwtToken))
+	res, err := testApp.Test(request, -1)
 
 	assert.NoError(t, err)
 
@@ -124,7 +124,7 @@ func TestGetMe(t *testing.T) {
 		assert.NoError(t, err)
 
 		assert.NotEmpty(t, me)
-		//assert.Equal(t, me.TelegramID, usr.TelegramID)
-		assert.Equal(t, me, usr)
+		//assert.Equal(t, me.TelegramID, testUser.TelegramID)
+		assert.Equal(t, me, testUser)
 	}
 }

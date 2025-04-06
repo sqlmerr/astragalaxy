@@ -125,7 +125,7 @@ func (s *Service) SpaceshipFly(ID uuid.UUID, planetID string) error {
 	return s.f.Update(&fl)
 }
 
-func (s *Service) SpaceshipHyperJump(ID uuid.UUID, systemID string) error {
+func (s *Service) SpaceshipHyperJump(ID uuid.UUID, path string) error {
 	spaceship, err := s.sp.FindOne(ID)
 	if err != nil {
 		return err
@@ -154,6 +154,40 @@ func (s *Service) SpaceshipHyperJump(ID uuid.UUID, systemID string) error {
 		return err
 	}
 
+	// TODO: fuel check here
+	parsedPath := util.ParseHyperJumpPath(path)
+	if len(parsedPath) < 2 {
+		return util.ErrInvalidHyperJumpPath
+	}
+	if parsedPath[0] != spaceship.SystemID {
+		return util.ErrSpaceshipIsInAnotherSystem
+	}
+
+	var flyingTime int64 = 0
+	systemID := parsedPath[len(parsedPath)-1]
+	for i, dest := range parsedPath {
+		if i == len(parsedPath)-1 {
+			break
+		}
+
+		if dest == spaceship.SystemID && i != 0 {
+			return util.ErrSpaceshipIsAlreadyInThisSystem
+		}
+
+		connections, err := s.GetSystemConnections(dest)
+		if err != nil {
+			return err
+		}
+		conns := lo.Map(connections, func(item model.SystemConnection, index int) string {
+			return item.SystemToID
+		})
+		if !lo.Contains(conns, parsedPath[i+1]) {
+			return util.ErrInvalidHyperJumpPath
+		}
+
+		flyingTime += 5
+	}
+
 	system, err := s.FindOneSystem(systemID)
 	if err != nil || system == nil {
 		return util.ErrNotFound
@@ -170,7 +204,7 @@ func (s *Service) SpaceshipHyperJump(ID uuid.UUID, systemID string) error {
 		Destination:   "system",
 		DestinationID: system.ID,
 		FlownOutAt:    time.Now().UTC().Unix(),
-		FlyingTime:    5,
+		FlyingTime:    flyingTime,
 	}
 	return s.f.Update(&fl)
 }

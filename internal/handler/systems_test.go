@@ -20,9 +20,9 @@ func TestCreateSystem(t *testing.T) {
 
 	req := httptest.NewRequest(http.MethodPost, "/systems", bytes.NewBuffer(b))
 	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("secret-token", stateObj.Config.SecretToken)
+	req.Header.Set("secret-token", testStateObj.Config.SecretToken)
 
-	res, err := app.Test(req, -1)
+	res, err := testApp.Test(req, -1)
 	assert.NoError(t, err)
 
 	if assert.Equal(t, http.StatusCreated, res.StatusCode) {
@@ -38,16 +38,16 @@ func TestCreateSystem(t *testing.T) {
 }
 
 func TestGetSystemPlanets(t *testing.T) {
-	system, err := stateObj.S.FindOneSystemByName("initial")
+	system, err := testStateObj.S.FindOneSystemByName("initial")
 	assert.NoError(t, err)
 
 	req, err := http.NewRequest(http.MethodGet, fmt.Sprintf("/systems/%s/planets", system.ID), nil)
 	assert.NoError(t, err)
 
 	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("Authorization", fmt.Sprintf("Bearer %v", userJwtToken))
+	req.Header.Set("Authorization", fmt.Sprintf("Bearer %v", testUserJwtToken))
 
-	res, err := app.Test(req, -1)
+	res, err := testApp.Test(req, -1)
 	assert.NoError(t, err)
 
 	if assert.Equal(t, http.StatusOK, res.StatusCode) {
@@ -67,13 +67,13 @@ func TestGetSystemPlanets(t *testing.T) {
 }
 
 func TestGetSystemByID(t *testing.T) {
-	system, err := stateObj.S.FindOneSystemByName("initial")
+	system, err := testStateObj.S.FindOneSystemByName("initial")
 	assert.NoError(t, err)
 
 	req := httptest.NewRequest(http.MethodGet, fmt.Sprintf("/systems/%s", system.ID), nil)
 	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("Authorization", fmt.Sprintf("Bearer %v", userJwtToken))
-	res, err := app.Test(req, -1)
+	req.Header.Set("Authorization", fmt.Sprintf("Bearer %v", testUserJwtToken))
+	res, err := testApp.Test(req, -1)
 	assert.NoError(t, err)
 
 	if assert.Equal(t, http.StatusOK, res.StatusCode) {
@@ -88,13 +88,13 @@ func TestGetSystemByID(t *testing.T) {
 }
 
 func TestGetAllSystems(t *testing.T) {
-	system, err := stateObj.S.FindOneSystemByName("initial")
+	system, err := testStateObj.S.FindOneSystemByName("initial")
 	assert.NoError(t, err)
 
 	req := httptest.NewRequest(http.MethodGet, "/systems", nil)
 	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("Authorization", fmt.Sprintf("Bearer %v", userJwtToken))
-	res, err := app.Test(req, -1)
+	req.Header.Set("Authorization", fmt.Sprintf("Bearer %v", testUserJwtToken))
+	res, err := testApp.Test(req, -1)
 	assert.NoError(t, err)
 
 	if assert.Equal(t, http.StatusOK, res.StatusCode) {

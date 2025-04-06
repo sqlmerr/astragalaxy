@@ -17,5 +17,5 @@ type FlyToPlanet struct {
 
 type HyperJump struct {
 	SpaceshipID uuid.UUID `json:"spaceship_id"`
-	SystemID    string    `json:"system_id"`
+	Path        string    `json:"path"`
 }

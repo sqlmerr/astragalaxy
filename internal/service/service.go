@@ -13,6 +13,7 @@ type Service struct {
 	i   repository.ItemRepo
 	idt repository.ItemDataTagRepo
 	p   repository.PlanetRepo
+	syc repository.SystemConnectionRepo
 	id  id.Generator // only for systems and planets
 }
 
@@ -24,6 +25,7 @@ func New(
 	i repository.ItemRepo,
 	idt repository.ItemDataTagRepo,
 	p repository.PlanetRepo,
+	syc repository.SystemConnectionRepo,
 	id id.Generator) *Service {
 	return &Service{
 		sp:  sp,
@@ -33,6 +35,7 @@ func New(
 		i:   i,
 		idt: idt,
 		p:   p,
+		syc: syc,
 		id:  id,
 	}
 }

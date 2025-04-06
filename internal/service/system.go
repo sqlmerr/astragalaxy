@@ -16,6 +16,22 @@ func (s *Service) CreateSystem(data schema.CreateSystem) (*schema.System, error)
 		return nil, err
 	}
 
+	for _, conn := range data.Connections {
+		sys, err := s.FindOneSystem(conn)
+		if err != nil {
+			return nil, err
+		}
+
+		err = s.AddSystemConnection(sys.ID, id)
+		if err != nil {
+			return nil, err
+		}
+		err = s.AddSystemConnection(id, sys.ID)
+		if err != nil {
+			return nil, err
+		}
+	}
+
 	return s.FindOneSystem(*response)
 }
 
@@ -24,8 +40,11 @@ func (s *Service) FindOneSystem(ID string) (*schema.System, error) {
 	if err != nil {
 		return nil, err
 	}
-	systemSchema := schema.System(*response)
-	return &systemSchema, nil
+	if response == nil {
+		return nil, util.ErrNotFound
+	}
+	systemSchema := schema.SystemSchemaFromSystem(response)
+	return systemSchema, nil
 }
 
 func (s *Service) FindOneSystemByName(name string) (*schema.System, error) {
@@ -36,15 +55,15 @@ func (s *Service) FindOneSystemByName(name string) (*schema.System, error) {
 	if response == nil {
 		return nil, util.ErrNotFound
 	}
-	systemSchema := schema.System(*response)
-	return &systemSchema, nil
+	systemSchema := schema.SystemSchemaFromSystem(response)
+	return systemSchema, nil
 }
 
 func (s *Service) FindAllSystems() []schema.System {
 	response := s.sy.FindAll()
 	var systems []schema.System
 	for _, r := range response {
-		systems = append(systems, schema.System(r))
+		systems = append(systems, *schema.SystemSchemaFromSystem(&r))
 	}
 
 	return systems
@@ -60,4 +79,17 @@ func (s *Service) UpdateSystem(ID string, data schema.UpdateSystem) error {
 		Name: data.Name,
 	}
 	return s.sy.Update(&system)
+}
+
+func (s *Service) GetSystemConnections(ID string) ([]model.SystemConnection, error) {
+	connections, err := s.syc.FindAll(&model.SystemConnection{SystemFromID: ID})
+	if err != nil {
+		return nil, err
+	}
+	return connections, nil
+}
+
+func (s *Service) AddSystemConnection(from string, to string) error {
+	_, err := s.syc.Create(&model.SystemConnection{SystemFromID: from, SystemToID: to})
+	return err
 }
