@@ -4,7 +4,6 @@ import (
 	"astragalaxy/internal/model"
 	"astragalaxy/internal/schema"
 	"astragalaxy/internal/util"
-	"errors"
 	"net/http"
 
 	"github.com/gofiber/fiber/v2"
@@ -26,7 +25,7 @@ import (
 func (h *Handler) createSystem(c *fiber.Ctx) error {
 	req := &schema.CreateSystem{}
 	if err := util.BodyParser(req, c); err != nil {
-		return c.Status(http.StatusUnprocessableEntity).JSON(util.NewError(err))
+		return util.AnswerWithError(c, util.New(err.Error(), http.StatusUnprocessableEntity))
 	}
 
 	system, err := h.s.CreateSystem(*req)
@@ -53,19 +52,15 @@ func (h *Handler) createSystem(c *fiber.Ctx) error {
 func (h *Handler) getSystemPlanets(c *fiber.Ctx) error {
 	ID := c.Params("id")
 	if ID == "" {
-		return c.Status(http.StatusBadRequest).JSON(util.NewError(errors.New("id must be valid")))
+		return util.AnswerWithError(c, util.New("invalid id", 400))
 	}
 
 	planets, err := h.s.FindAllPlanets(&model.Planet{SystemID: ID})
 	if err != nil {
-		var ae *util.APIError
-		if errors.As(err, &ae) {
-			return c.Status(ae.Status()).JSON(util.NewError(ae))
-		}
-		return c.Status(500).JSON(util.NewError(util.ErrServerError))
+		return util.AnswerWithError(c, err)
 	}
 	if planets == nil {
-		return c.JSON([]schema.Planet{})
+		return c.JSON(schema.DataResponse{Data: []model.Planet{}})
 	}
 
 	return c.JSON(schema.DataResponse{Data: planets})
@@ -105,16 +100,12 @@ func (h *Handler) getAllSystems(c *fiber.Ctx) error {
 func (h *Handler) getSystemByID(c *fiber.Ctx) error {
 	ID := c.Params("id")
 	if ID == "" {
-		return c.Status(http.StatusBadRequest).JSON(util.NewError(errors.New("id must be valid")))
+		return util.AnswerWithError(c, util.New("id must be valid", 400))
 	}
 
 	system, err := h.s.FindOneSystem(ID)
 	if err != nil || system == nil {
-		var ae *util.APIError
-		if errors.As(err, &ae) {
-			return c.Status(ae.Status()).JSON(util.NewError(ae))
-		}
-		return c.Status(500).JSON(util.NewError(util.ErrServerError))
+		return util.AnswerWithError(c, err)
 	}
 	return c.JSON(system)
 }

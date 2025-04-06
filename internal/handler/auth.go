@@ -4,7 +4,6 @@ import (
 	"astragalaxy/internal/model"
 	"astragalaxy/internal/schema"
 	"astragalaxy/internal/util"
-	"errors"
 	"net/http"
 
 	"github.com/gofiber/fiber/v2"
@@ -32,32 +31,29 @@ func (h *Handler) registerUser(c *fiber.Ctx) error {
 
 	system, err := h.s.FindOneSystemByName("initial")
 	if err != nil || system == nil {
-		return c.Status(http.StatusInternalServerError).JSON(util.NewError(util.ErrServerError))
+		return util.AnswerWithError(c, err)
 	}
 
 	user, err := h.s.Register(*req, "space_station", system.ID)
 	if err != nil || user == nil {
-		if errors.Is(err, util.ErrUserAlreadyExists) {
-			return c.Status(http.StatusConflict).JSON(util.NewError(err))
-		}
-		return c.Status(http.StatusInternalServerError).JSON(util.NewError(util.ErrServerError))
+		return util.AnswerWithError(c, err)
 	}
 
 	spaceship, err := h.s.CreateSpaceship(schema.CreateSpaceship{
 		Name: "initial", UserID: user.ID, Location: "space_station", SystemID: system.ID,
 	})
 	if err != nil || spaceship == nil {
-		return c.Status(http.StatusInternalServerError).JSON(util.NewError(util.ErrServerError))
+		return util.AnswerWithError(c, err)
 	}
 
 	err = h.s.AddUserSpaceship(user.ID, *spaceship)
 	if err != nil {
-		return c.Status(http.StatusInternalServerError).JSON(util.NewError(util.ErrServerError))
+		return util.AnswerWithError(c, err)
 	}
 
 	spaceships, err := h.s.FindAllSpaceships(&model.Spaceship{UserID: user.ID})
 	if err != nil {
-		return c.Status(http.StatusInternalServerError).JSON(util.NewError(util.ErrServerError))
+		return util.AnswerWithError(c, err)
 	}
 	user.Spaceships = spaceships
 
@@ -87,7 +83,7 @@ func (h *Handler) loginByToken(c *fiber.Ctx) error {
 	jwtToken, err := h.s.LoginByToken(req.Token)
 
 	if err != nil || jwtToken == nil {
-		return c.Status(http.StatusForbidden).JSON(util.NewError(util.ErrUnauthorized))
+		return util.AnswerWithError(c, util.ErrUnauthorized)
 	}
 
 	return c.JSON(schema.AuthBody{AccessToken: *jwtToken, TokenType: "Bearer"})
@@ -136,12 +132,6 @@ func (h *Handler) login(c *fiber.Ctx) error {
 //	@Router			/auth/me [get]
 func (h *Handler) getMe(c *fiber.Ctx) error {
 	user := c.Locals("user").(*schema.User)
-	// spaceships, err := h.spaceshipService.FindAll(&model.Spaceship{UserID: user.ID})
-	// if err != nil {
-	// 	return c.Status(http.StatusInternalServerError).JSON(util.NewError(util.ErrServerError))
-	// }
-	// user.Spaceships = spaceships
-
 	return c.JSON(&user)
 }
 
@@ -150,7 +140,6 @@ func (h *Handler) getMe(c *fiber.Ctx) error {
 //	@Summary		Get user token using sudo token
 //	@Description	Sudo token required
 //	@Tags			auth
-//	@Accept			json
 //	@Produce		json
 //	@Param			id	query		string	true	"User id"
 //	@Success		200	{object}	schema.UserTokenResponse
@@ -168,7 +157,7 @@ func (h *Handler) getUserTokenSudo(c *fiber.Ctx) error {
 
 	user, err := h.s.FindOneUserRaw(ID)
 	if err != nil || user == nil {
-		return c.Status(http.StatusInternalServerError).JSON(util.NewError(util.ErrServerError))
+		return util.AnswerWithError(c, err)
 	}
 
 	return c.JSON(&schema.UserTokenResponse{Token: user.Token})

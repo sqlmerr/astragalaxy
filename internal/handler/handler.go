@@ -29,7 +29,7 @@ func (h *Handler) Register(app *fiber.App) {
 
 	spaceships := app.Group("/spaceships", h.JwtMiddleware())
 	spaceships.Get("/my", h.UserGetter, h.getMySpaceships)
-	spaceships.Put("/my/rename", h.UserGetter, h.renameMySpaceship)
+	spaceships.Patch("/my/rename", h.UserGetter, h.renameMySpaceship)
 	spaceships.Post("/my/:id/enter", h.UserGetter, h.enterMySpaceship)
 	spaceships.Post("/my/:id/exit", h.UserGetter, h.exitMySpaceship)
 	spaceships.Get("/:id", h.getSpaceshipByID)

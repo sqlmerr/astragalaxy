@@ -30,15 +30,15 @@ import (
 func (h *Handler) getSpaceshipByID(c *fiber.Ctx) error {
 	ID, err := uuid.Parse(c.Params("id"))
 	if err != nil {
-		return c.Status(http.StatusBadRequest).JSON(util.NewError(util.ErrIDMustBeUUID))
+		return util.AnswerWithError(c, util.ErrIDMustBeUUID)
 	}
 
 	spaceship, err := h.s.FindOneSpaceship(ID)
 	if err != nil {
-		return c.Status(http.StatusInternalServerError).JSON(util.NewError(util.ErrServerError))
+		return util.AnswerWithError(c, err)
 	}
 	if spaceship == nil {
-		return c.Status(http.StatusNotFound).JSON(util.NewError(util.ErrSpaceshipNotFound))
+		return util.AnswerWithError(c, util.ErrNotFound)
 	}
 
 	return c.JSON(&spaceship)
@@ -60,7 +60,7 @@ func (h *Handler) getMySpaceships(c *fiber.Ctx) error {
 	user := c.Locals("user").(*schema.User)
 	spaceships, err := h.s.FindAllSpaceships(&model.Spaceship{UserID: user.ID})
 	if err != nil {
-		return c.Status(http.StatusInternalServerError).JSON(util.NewError(util.ErrServerError))
+		return util.AnswerWithError(c, err)
 	}
 
 	return c.JSON(schema.DataResponse{Data: spaceships})
@@ -83,19 +83,14 @@ func (h *Handler) getMySpaceships(c *fiber.Ctx) error {
 func (h *Handler) enterMySpaceship(c *fiber.Ctx) error {
 	ID, err := uuid.Parse(c.Params("id"))
 	if err != nil {
-		return c.Status(http.StatusBadRequest).JSON(util.NewError(util.New(err.Error(), http.StatusBadRequest)))
+		return util.AnswerWithError(c, util.New(err.Error(), http.StatusBadRequest))
 	}
 
 	user := c.Locals("user").(*schema.User)
 
 	err = h.s.EnterUserSpaceship(*user, ID)
 	if err != nil {
-		var apiErr util.APIError
-		ok := errors.As(err, &apiErr)
-		if ok {
-			return c.Status(apiErr.Status()).JSON(util.NewError(apiErr))
-		}
-		return c.Status(http.StatusInternalServerError).JSON(util.NewError(err))
+		return util.AnswerWithError(c, err)
 	}
 	return c.JSON(schema.OkResponse{Ok: true, CustomStatusCode: 1})
 }
@@ -116,19 +111,14 @@ func (h *Handler) enterMySpaceship(c *fiber.Ctx) error {
 func (h *Handler) exitMySpaceship(c *fiber.Ctx) error {
 	ID, err := uuid.Parse(c.Params("id"))
 	if err != nil {
-		return c.Status(http.StatusBadRequest).JSON(util.NewError(errors.New("id must be an uuid type")))
+		return util.AnswerWithError(c, util.ErrIDMustBeUUID)
 	}
 
 	user := c.Locals("user").(*schema.User)
 
 	err = h.s.ExitUserSpaceship(*user, ID)
 	if err != nil {
-		var apiErr *util.APIError
-		ok := errors.As(err, &apiErr)
-		if ok {
-			return c.Status(apiErr.Status()).JSON(util.NewError(apiErr))
-		}
-		return c.Status(http.StatusInternalServerError).JSON(util.NewError(err))
+		return util.AnswerWithError(c, err)
 	}
 	return c.JSON(schema.OkResponse{Ok: true, CustomStatusCode: 1})
 }
@@ -146,34 +136,28 @@ func (h *Handler) exitMySpaceship(c *fiber.Ctx) error {
 //	@Failure		403	{object}	util.Error
 //	@Failure		422	{object}	util.Error
 //	@Security		JwtAuth
-//	@Router			/spaceships/my/rename [put]
+//	@Router			/spaceships/my/rename [patch]
 func (h *Handler) renameMySpaceship(c *fiber.Ctx) error {
 	req := &schema.RenameSpaceship{}
 	if err := util.BodyParser(req, c); err != nil {
 		return c.Status(http.StatusUnprocessableEntity).JSON(util.NewError(err))
 	}
 	user := c.Locals("user").(*schema.User)
-	spaceships, err := h.s.FindAllSpaceships(&model.Spaceship{UserID: user.ID})
+	spaceship, err := h.s.FindOneSpaceship(req.SpaceshipID)
 	if err != nil {
-		return c.Status(http.StatusInternalServerError).JSON(util.NewError(util.ErrServerError))
+		return util.AnswerWithError(c, err)
 	}
-	flag := false
-	for _, sp := range spaceships {
-		if sp.ID == req.SpaceshipID {
-			flag = true
-		}
-	}
-	if !flag {
-		return c.Status(http.StatusNotFound).JSON(util.NewError(util.ErrSpaceshipNotFound))
+	if spaceship.UserID != user.ID {
+		return util.AnswerWithError(c, util.ErrNotFound)
 	}
 
 	spaceshipSchema := schema.UpdateSpaceship{Name: req.Name}
 	err = h.s.UpdateSpaceship(req.SpaceshipID, spaceshipSchema)
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return c.Status(http.StatusNotFound).JSON(util.NewError(util.ErrSpaceshipNotFound))
+			return util.AnswerWithError(c, util.ErrNotFound)
 		}
-		return c.Status(http.StatusInternalServerError).JSON(util.NewError(err))
+		return util.AnswerWithError(c, err)
 	}
 	response := schema.OkResponse{Ok: true, CustomStatusCode: 1}
 	return c.JSON(&response)

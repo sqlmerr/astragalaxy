@@ -33,7 +33,7 @@ jobs:
       - name: Install dependencies
         run: |
           go mod download
-          go install github.com/swaggo/swag/cmd/swag@latest
+          go install github.com/swaggo/swag/v2/cmd/swag@latest
           swag --version
 
       - name: Generate docs
@@ -52,7 +52,7 @@ jobs:
         uses: ariga/setup-atlas@v0
 
       - name: Test with Go
-        run: go test -v ./... -json > TestResults-${{ matrix.go-version }}.json
+        run: go test -v ./... -json > TestResults-${{ matrix.go-version }}.json || (cat TestResults-${{ matrix.go-version }}.json && exit 1)
         
       - name: Stop docker compose
         run: docker compose -f docker-compose-test.yaml down

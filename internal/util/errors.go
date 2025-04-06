@@ -2,25 +2,22 @@ package util
 
 import (
 	"errors"
+	"github.com/gofiber/fiber/v2"
 	"net/http"
 )
 
 type APIError struct {
-	message string
-	status  int
+	Message string `json:"message"`
+	Status  int    `json:"status_code"`
 }
 
 // Error implements error.
 func (e APIError) Error() string {
-	return e.message
-}
-
-func (e APIError) Status() int {
-	return e.status
+	return e.Message
 }
 
 func New(msg string, status int) APIError {
-	return APIError{message: msg, status: status}
+	return APIError{Message: msg, Status: status}
 }
 
 var (
@@ -34,7 +31,7 @@ var (
 	ErrPlanetNotFound                 = ErrNotFound
 	ErrItemNotFound                   = ErrNotFound
 	ErrItemDataTagNotFound            = ErrNotFound
-	ErrIDMustBeUUID                   = New("id must be valid uuid type", 400)
+	ErrIDMustBeUUID                   = New("id must be valid uuid", 400)
 	ErrSpaceshipAlreadyFlying         = New("spaceship is already flying", http.StatusBadRequest)
 	ErrSpaceshipIsInAnotherSystem     = New("spaceship is in another system", http.StatusBadRequest)
 	ErrSpaceshipIsAlreadyInThisPlanet = New("spaceship is already in this planet", http.StatusBadRequest)
@@ -43,6 +40,15 @@ var (
 	ErrPlayerNotInSpaceship           = New("player not in spaceship", http.StatusBadRequest)
 	ErrInvalidHyperJumpPath           = New("invalid hyperjump path", http.StatusBadRequest)
 )
+
+func AnswerWithError(c *fiber.Ctx, err error) error {
+	var apiErr APIError
+	ok := errors.As(err, &apiErr)
+	if ok {
+		return c.Status(apiErr.Status).JSON(apiErr)
+	}
+	return c.Status(fiber.StatusInternalServerError).JSON(ErrServerError)
+}
 
 type Error struct {
 	Message string `json:"message"`
@@ -54,8 +60,8 @@ func NewError(err error) Error {
 	ok := errors.As(err, &apiErr)
 	if ok {
 		e := Error{
-			Message: apiErr.message,
-			Status:  apiErr.status,
+			Message: apiErr.Message,
+			Status:  apiErr.Status,
 		}
 		return e
 	}

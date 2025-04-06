@@ -3,7 +3,6 @@ package handler
 import (
 	"astragalaxy/internal/schema"
 	"astragalaxy/internal/util"
-	"errors"
 	"net/http"
 
 	"github.com/gofiber/fiber/v2"
@@ -33,26 +32,16 @@ func (h *Handler) flightToPlanet(c *fiber.Ctx) error {
 
 	s, err := h.s.FindOneSpaceship(req.SpaceshipID)
 	if err != nil {
-		var apiErr util.APIError
-		ok := errors.As(err, &apiErr)
-		if ok {
-			return c.Status(apiErr.Status()).JSON(util.NewError(apiErr))
-		}
-		return c.Status(http.StatusInternalServerError).JSON(util.NewError(err))
+		return util.AnswerWithError(c, err)
 	}
 
 	if s.UserID != user.ID {
-		return c.Status(http.StatusNotFound).JSON(util.ErrSpaceshipNotFound)
+		return util.AnswerWithError(c, util.ErrNotFound)
 	}
 
 	err = h.s.SpaceshipFly(req.SpaceshipID, req.PlanetID)
 	if err != nil {
-		var apiErr util.APIError
-		ok := errors.As(err, &apiErr)
-		if ok {
-			return c.Status(apiErr.Status()).JSON(util.NewError(apiErr))
-		}
-		return c.Status(http.StatusInternalServerError).JSON(util.NewError(err))
+		return util.AnswerWithError(c, err)
 	}
 	return c.JSON(schema.OkResponse{Ok: true, CustomStatusCode: 1})
 }
@@ -80,26 +69,16 @@ func (h *Handler) hyperJump(c *fiber.Ctx) error {
 
 	s, err := h.s.FindOneSpaceship(req.SpaceshipID)
 	if err != nil {
-		var apiErr util.APIError
-		ok := errors.As(err, &apiErr)
-		if ok {
-			return c.Status(apiErr.Status()).JSON(util.NewError(apiErr))
-		}
-		return c.Status(http.StatusInternalServerError).JSON(util.NewError(err))
+		return util.AnswerWithError(c, err)
 	}
 
 	if s.UserID != user.ID {
-		return c.Status(http.StatusNotFound).JSON(util.ErrSpaceshipNotFound)
+		return util.AnswerWithError(c, util.ErrNotFound)
 	}
 
 	err = h.s.SpaceshipHyperJump(req.SpaceshipID, req.Path)
 	if err != nil {
-		var apiErr util.APIError
-		ok := errors.As(err, &apiErr)
-		if ok {
-			return c.Status(apiErr.Status()).JSON(util.NewError(apiErr))
-		}
-		return c.Status(http.StatusInternalServerError).JSON(util.NewError(err))
+		return util.AnswerWithError(c, err)
 	}
 	return c.JSON(schema.OkResponse{Ok: true, CustomStatusCode: 1})
 }
@@ -126,12 +105,12 @@ func (h *Handler) checkFlight(c *fiber.Ctx) error {
 	}
 
 	if ID == uuid.Nil {
-		return c.Status(http.StatusBadRequest).JSON(util.New("invalid uuid", 400))
+		return util.AnswerWithError(c, util.ErrIDMustBeUUID)
 	}
 
 	flightInfo, err := h.s.GetFlyInfo(ID)
 	if err != nil || flightInfo == nil {
-		return c.Status(http.StatusNotFound).JSON(util.ErrNotFound)
+		return util.AnswerWithError(c, util.ErrNotFound)
 	}
 
 	return c.JSON(flightInfo)

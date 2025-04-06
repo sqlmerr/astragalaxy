@@ -4,6 +4,7 @@ import (
 	"astragalaxy/internal/schema"
 	"astragalaxy/internal/util"
 	"errors"
+	"net/http"
 
 	"github.com/gofiber/fiber/v2"
 )
@@ -31,9 +32,9 @@ func (h *Handler) getItemByCode(c *fiber.Ctx) error {
 
 	item, err := h.state.MasterRegistry.Item.FindOne(code)
 	if err != nil && item == nil {
-		return c.Status(fiber.StatusNotFound).JSON(util.NewError(util.ErrItemNotFound))
+		return util.AnswerWithError(c, util.ErrNotFound)
 	} else if err != nil {
-		return c.Status(fiber.StatusInternalServerError).JSON(util.NewError(util.ErrServerError))
+		return util.AnswerWithError(c, err)
 	}
 	return c.JSON(item)
 }
@@ -90,14 +91,14 @@ func (h *Handler) getLocations(c *fiber.Ctx) error {
 func (h *Handler) getLocationByCode(c *fiber.Ctx) error {
 	code := c.Params("code")
 	if code == "" {
-		return c.Status(fiber.StatusUnprocessableEntity).JSON(util.NewError(errors.New("code must not be empty")))
+		return util.AnswerWithError(c, util.New("code must not be empty", http.StatusUnprocessableEntity))
 	}
 
 	location, err := h.state.MasterRegistry.Location.FindOne(code)
 	if err != nil && location == nil {
 		return c.Status(fiber.StatusNotFound).JSON(util.NewError(util.ErrNotFound))
 	} else if err != nil {
-		return c.Status(fiber.StatusInternalServerError).JSON(util.NewError(util.ErrServerError))
+		return util.AnswerWithError(c, err)
 	}
 	return c.JSON(location)
 }
