@@ -34,7 +34,7 @@ func (r SystemRepository) Create(s *model.System) (*string, error) {
 func (r SystemRepository) FindOne(ID string) (*model.System, error) {
 	var m model.System
 
-	if err := r.db.Where(model.System{ID: ID}).First(&m).Error; err != nil {
+	if err := r.db.Preload("Connections").Where(model.System{ID: ID}).First(&m).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, nil
 		}
@@ -46,7 +46,7 @@ func (r SystemRepository) FindOne(ID string) (*model.System, error) {
 
 func (r SystemRepository) FindOneByName(name string) (*model.System, error) {
 	var m model.System
-	if err := r.db.Where(model.System{Name: name}).First(&m).Error; err != nil {
+	if err := r.db.Preload("Connections").Where(model.System{Name: name}).First(&m).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, nil
 		}
@@ -58,7 +58,7 @@ func (r SystemRepository) FindOneByName(name string) (*model.System, error) {
 
 func (r SystemRepository) FindAll() []model.System {
 	var systems []model.System
-	r.db.Find(&systems)
+	r.db.Preload("Connections").Find(&systems)
 
 	return systems
 }
