@@ -48,6 +48,9 @@ jobs:
           sleep 10
           docker compose -f docker-compose-test.yaml ps
 
+      - name: Setup atlas migration tool
+        uses: ariga/setup-atlas@v0
+
       - name: Test with Go
         run: go test -v ./... -json && echo "{}" > TestResults-${{ matrix.go-version }}.json
         
