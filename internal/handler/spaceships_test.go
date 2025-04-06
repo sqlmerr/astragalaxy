@@ -173,7 +173,7 @@ func TestRenameMySpaceship(t *testing.T) {
 	b, err := json.Marshal(body)
 	assert.NoError(t, err)
 
-	req := httptest.NewRequest(http.MethodPut, url, bytes.NewReader(b))
+	req := httptest.NewRequest(http.MethodPatch, url, bytes.NewReader(b))
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", testUserJwtToken))
 
