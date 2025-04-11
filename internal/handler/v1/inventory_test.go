@@ -1,4 +1,4 @@
-package handler
+package v1
 
 import (
 	"astragalaxy/internal/schema"
@@ -14,7 +14,7 @@ func TestGetMyItems(t *testing.T) {
 	tests := []test.HTTPTest{
 		{
 			Description:   "Get items",
-			Route:         "/inventory/items",
+			Route:         "/v1/inventory/items",
 			Method:        http.MethodGet,
 			ExpectedError: false,
 			ExpectedCode:  200,
@@ -38,7 +38,7 @@ func TestGetMyItemsByCode(t *testing.T) {
 	tests := []test.HTTPTest{
 		{
 			Description:   "Get items by code",
-			Route:         "/inventory/items/test",
+			Route:         "/v1/inventory/items/test",
 			Method:        http.MethodGet,
 			ExpectedError: false,
 			ExpectedCode:  200,
@@ -55,7 +55,7 @@ func TestGetMyItemsByCode(t *testing.T) {
 		},
 		{
 			Description:   "Get items by code not found",
-			Route:         "/inventory/items/notfound",
+			Route:         "/v1/inventory/items/notfound",
 			Method:        http.MethodGet,
 			ExpectedError: false,
 			ExpectedCode:  200,
@@ -75,7 +75,7 @@ func TestGetItemData(t *testing.T) {
 	tests := []test.HTTPTest{
 		{
 			Description:   "Get item data success",
-			Route:         fmt.Sprintf("/inventory/items/%s/data", testItem.ID.String()),
+			Route:         fmt.Sprintf("/v1/inventory/items/%s/data", testItem.ID.String()),
 			Method:        http.MethodGet,
 			ExpectedError: false,
 			ExpectedCode:  200,
@@ -88,14 +88,14 @@ func TestGetItemData(t *testing.T) {
 		},
 		{
 			Description:   "Invalid uuid",
-			Route:         "/inventory/items/123/data",
+			Route:         "/v1/inventory/items/123/data",
 			Method:        http.MethodGet,
 			ExpectedError: true,
 			ExpectedCode:  400,
 		},
 		{
 			Description:   "Item not found",
-			Route:         "/inventory/items/34afa4f5-c0e9-49ca-8e13-7dcb731b1541/data",
+			Route:         "/v1/inventory/items/34afa4f5-c0e9-49ca-8e13-7dcb731b1541/data",
 			Method:        http.MethodGet,
 			ExpectedError: true,
 			ExpectedCode:  404,

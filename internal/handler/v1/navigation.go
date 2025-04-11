@@ -1,4 +1,4 @@
-package handler
+package v1
 
 import (
 	"astragalaxy/internal/schema"
@@ -22,7 +22,7 @@ import (
 //	@Failure		403	{object}	util.Error
 //	@Failure		422	{object}	util.Error
 //	@Security		JwtAuth
-//	@Router			/navigation/planet [post]
+//	@Router			/v1/navigation/planet [post]
 func (h *Handler) flightToPlanet(c *fiber.Ctx) error {
 	user := c.Locals("user").(*schema.User)
 	req := &schema.FlyToPlanet{}
@@ -59,7 +59,7 @@ func (h *Handler) flightToPlanet(c *fiber.Ctx) error {
 //	@Failure		403	{object}	util.Error
 //	@Failure		422	{object}	util.Error
 //	@Security		JwtAuth
-//	@Router			/navigation/hyperjump [post]
+//	@Router			/v1/navigation/hyperjump [post]
 func (h *Handler) hyperJump(c *fiber.Ctx) error {
 	user := c.Locals("user").(*schema.User)
 	req := &schema.HyperJump{}
@@ -97,7 +97,7 @@ func (h *Handler) hyperJump(c *fiber.Ctx) error {
 //	@Failure		400	{object}	util.Error
 //	@Failure		422	{object}	util.Error
 //	@Security		JwtAuth
-//	@Router			/navigation/info [get]
+//	@Router			/v1/navigation/info [get]
 func (h *Handler) checkFlight(c *fiber.Ctx) error {
 	ID, err := uuid.Parse(c.Query("id"))
 	if err != nil {

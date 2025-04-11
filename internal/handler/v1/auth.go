@@ -1,4 +1,4 @@
-package handler
+package v1
 
 import (
 	"astragalaxy/internal/model"
@@ -10,7 +10,7 @@ import (
 	"github.com/google/uuid"
 )
 
-// registerFromTelegram godoc
+// registerUser godoc
 //
 //	@Summary		Register account
 //	@Description	Register account using password and username
@@ -22,7 +22,7 @@ import (
 //	@Failure		500		{object}	util.Error
 //	@Failure		403		{object}	util.Error
 //	@Failure		422		{object}	util.Error
-//	@Router			/auth/register [post]
+//	@Router			/v1/auth/register [post]
 func (h *Handler) registerUser(c *fiber.Ctx) error {
 	req := &schema.CreateUser{}
 	if err := c.BodyParser(&req); err != nil {
@@ -72,7 +72,7 @@ func (h *Handler) registerUser(c *fiber.Ctx) error {
 //	@Failure		500		{object}	util.Error
 //	@Failure		403		{object}	util.Error
 //	@Failure		422		{object}	util.Error
-//	@Router			/auth/login/token [post]
+//	@Router			/v1/auth/login/token [post]
 func (h *Handler) loginByToken(c *fiber.Ctx) error {
 	req := &schema.AuthPayloadToken{}
 
@@ -101,7 +101,7 @@ func (h *Handler) loginByToken(c *fiber.Ctx) error {
 //	@Failure		500		{object}	util.Error
 //	@Failure		403		{object}	util.Error
 //	@Failure		422		{object}	util.Error
-//	@Router			/auth/login [post]
+//	@Router			/v1/auth/login [post]
 func (h *Handler) login(c *fiber.Ctx) error {
 	req := &schema.AuthPayload{}
 
@@ -129,7 +129,7 @@ func (h *Handler) login(c *fiber.Ctx) error {
 //	@Failure		500	{object}	util.Error
 //	@Failure		403	{object}	util.Error
 //	@Security		JwtAuth
-//	@Router			/auth/me [get]
+//	@Router			/v1/auth/me [get]
 func (h *Handler) getMe(c *fiber.Ctx) error {
 	user := c.Locals("user").(*schema.User)
 	return c.JSON(&user)
@@ -147,7 +147,7 @@ func (h *Handler) getMe(c *fiber.Ctx) error {
 //	@Failure		403	{object}	util.Error
 //	@Failure		422	{object}	util.Error
 //	@Security		SudoToken
-//	@Router			/auth/token/sudo [get]
+//	@Router			/v1/auth/token/sudo [get]
 func (h *Handler) getUserTokenSudo(c *fiber.Ctx) error {
 	userID := c.Query("id", "")
 	ID, err := uuid.Parse(userID)

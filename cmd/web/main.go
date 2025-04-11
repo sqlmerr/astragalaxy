@@ -1,7 +1,7 @@
 package main
 
 import (
-	"astragalaxy/internal/handler"
+	"astragalaxy/internal/handler/v1"
 	"astragalaxy/internal/state"
 	"astragalaxy/internal/util"
 	"github.com/MarceloPetrucio/go-scalar-api-reference"
@@ -92,8 +92,8 @@ func main() {
 
 	stateObj := state.New(db)
 
-	h := handler.NewHandler(stateObj)
-	h.Register(app)
+	h := v1.NewHandler(stateObj)
+	h.Register(app.Group("/v1"))
 
 	//app.Use(func(c *fiber.Ctx) error {
 	//	return util.AnswerWithError(c, util.ErrNotFound)

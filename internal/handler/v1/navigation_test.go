@@ -1,4 +1,4 @@
-package handler
+package v1
 
 import (
 	"astragalaxy/internal/model"
@@ -29,7 +29,7 @@ func TestFlightToPlanet(t *testing.T) {
 		{
 			Description:   "Success",
 			Method:        http.MethodPost,
-			Route:         "/navigation/planet",
+			Route:         "/v1/navigation/planet",
 			Body:          body,
 			ExpectedError: false,
 			ExpectedCode:  http.StatusOK,
@@ -45,7 +45,7 @@ func TestFlightToPlanet(t *testing.T) {
 		{
 			Description:   "Invalid body",
 			Method:        http.MethodPost,
-			Route:         "/navigation/planet",
+			Route:         "/v1/navigation/planet",
 			ExpectedError: true,
 			ExpectedCode:  http.StatusUnprocessableEntity,
 		},
@@ -79,7 +79,7 @@ func TestHyperJump(t *testing.T) {
 		{
 			Description:   "Success",
 			Method:        http.MethodPost,
-			Route:         "/navigation/hyperjump",
+			Route:         "/v1/navigation/hyperjump",
 			Body:          body,
 			ExpectedError: false,
 			ExpectedCode:  http.StatusOK,
@@ -95,7 +95,7 @@ func TestHyperJump(t *testing.T) {
 		{
 			Description:   "Invalid body",
 			Method:        http.MethodPost,
-			Route:         "/navigation/hyperjump",
+			Route:         "/v1/navigation/hyperjump",
 			ExpectedError: true,
 			ExpectedCode:  http.StatusUnprocessableEntity,
 		},
@@ -113,14 +113,14 @@ func TestCheckFlight(t *testing.T) {
 	tests := []test.HTTPTest{
 		{
 			Description:   "Invalid testSpaceship UUID",
-			Route:         "/navigation/info?id=123",
+			Route:         "/v1/navigation/info?id=123",
 			ExpectedError: true,
 			ExpectedCode:  http.StatusBadRequest,
 			Method:        http.MethodGet,
 		},
 		{
 			Description:   "Success",
-			Route:         fmt.Sprintf("/navigation/info?id=%s", testSpaceship.ID.String()),
+			Route:         fmt.Sprintf("/v1/navigation/info?id=%s", testSpaceship.ID.String()),
 			ExpectedError: false,
 			ExpectedCode:  http.StatusOK,
 			BodyValidator: func(body []byte) {

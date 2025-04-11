@@ -1,4 +1,4 @@
-package handler
+package v1
 
 import (
 	"astragalaxy/internal/registry"
@@ -13,12 +13,12 @@ import (
 )
 
 func TestGetItemByCode(t *testing.T) {
-	resNotFound, err := testApp.Test(httptest.NewRequest(http.MethodGet, "/registry/items/notfound", nil), -1)
+	resNotFound, err := testApp.Test(httptest.NewRequest(http.MethodGet, "/v1/registry/items/notfound", nil), -1)
 	assert.NoError(t, err)
 	assert.Equal(t, http.StatusNotFound, resNotFound.StatusCode)
 
 	code := "test"
-	url := fmt.Sprintf("/registry/items/%s", code)
+	url := fmt.Sprintf("/v1/registry/items/%s", code)
 	request := httptest.NewRequest(http.MethodGet, url, nil)
 	request.Header.Set("Content-Type", "application/json")
 	res, err := testApp.Test(request, -1)
@@ -36,7 +36,7 @@ func TestGetItemByCode(t *testing.T) {
 }
 
 func TestGetItems(t *testing.T) {
-	url := "/registry/items"
+	url := "/v1/registry/items"
 	request := httptest.NewRequest(http.MethodGet, url, nil)
 	request.Header.Set("Content-Type", "application/json")
 	res, err := testApp.Test(request, -1)
@@ -46,7 +46,7 @@ func TestGetItems(t *testing.T) {
 }
 
 func TestGetLocations(t *testing.T) {
-	url := "/registry/locations"
+	url := "/v1/registry/locations"
 	request := httptest.NewRequest(http.MethodGet, url, nil)
 	request.Header.Set("Content-Type", "application/json")
 	res, err := testApp.Test(request, -1)
@@ -56,12 +56,12 @@ func TestGetLocations(t *testing.T) {
 }
 
 func TestGetLocationByCode(t *testing.T) {
-	resNotFound, err := testApp.Test(httptest.NewRequest(http.MethodGet, "/registry/locations/notfound", nil), -1)
+	resNotFound, err := testApp.Test(httptest.NewRequest(http.MethodGet, "/v1/registry/locations/notfound", nil), -1)
 	assert.NoError(t, err)
 	assert.Equal(t, http.StatusNotFound, resNotFound.StatusCode)
 
 	code := "space_station"
-	url := fmt.Sprintf("/registry/locations/%s", code)
+	url := fmt.Sprintf("/v1/registry/locations/%s", code)
 	request := httptest.NewRequest(http.MethodGet, url, nil)
 	request.Header.Set("Content-Type", "application/json")
 	res, err := testApp.Test(request, -1)

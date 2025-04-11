@@ -1,4 +1,4 @@
-package handler
+package v1
 
 import (
 	"astragalaxy/internal/model"
@@ -20,7 +20,7 @@ import (
 //	@Failure		403	{object}	util.Error
 //	@Failure		404	{object}	util.Error
 //	@Failure		422	{object}	util.Error
-//	@Router			/inventory/items/ [get]
+//	@Router			/v1/inventory/items/ [get]
 //	@Security		JwtAuth
 func (h *Handler) getMyItems(ctx *fiber.Ctx) error {
 	user := ctx.Locals("user").(*schema.User)
@@ -44,7 +44,7 @@ func (h *Handler) getMyItems(ctx *fiber.Ctx) error {
 //	@Failure		404		{object}	util.Error
 //	@Failure		422		{object}	util.Error
 //	@Security		JwtAuth
-//	@Router			/inventory/items/{code} [get]
+//	@Router			/v1/inventory/items/{code} [get]
 func (h *Handler) getMyItemsByCode(ctx *fiber.Ctx) error {
 	user := ctx.Locals("user").(*schema.User)
 	code := ctx.Params("code")
@@ -74,7 +74,7 @@ func (h *Handler) getMyItemsByCode(ctx *fiber.Ctx) error {
 //	@Failure		404	{object}	util.Error
 //	@Failure		422	{object}	util.Error
 //	@Security		JwtAuth
-//	@Router			/inventory/items/{id}/data [get]
+//	@Router			/v1/inventory/items/{id}/data [get]
 func (h *Handler) getItemData(ctx *fiber.Ctx) error {
 	user := ctx.Locals("user").(*schema.User)
 	id := ctx.Params("id")
