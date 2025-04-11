@@ -22,12 +22,12 @@ func New(msg string, status int) APIError {
 
 var (
 	ErrUserAlreadyExists              = New("user with this username already exists", http.StatusConflict)
+	ErrAstralAlreadyExists            = New("astral with this code already exists", http.StatusConflict)
 	ErrServerError                    = New("server error", http.StatusInternalServerError)
 	ErrInvalidToken                   = New("invalid token", http.StatusForbidden)
 	ErrUnauthorized                   = New("unauthorized", http.StatusUnauthorized)
 	ErrNotFound                       = New("not found", http.StatusNotFound)
 	ErrSpaceshipNotFound              = ErrNotFound
-	ErrUserNotFound                   = ErrNotFound
 	ErrPlanetNotFound                 = ErrNotFound
 	ErrItemNotFound                   = ErrNotFound
 	ErrItemDataTagNotFound            = ErrNotFound
@@ -39,6 +39,9 @@ var (
 	ErrPlayerAlreadyInSpaceship       = New("player already in spaceship", http.StatusBadRequest)
 	ErrPlayerNotInSpaceship           = New("player not in spaceship", http.StatusBadRequest)
 	ErrInvalidHyperJumpPath           = New("invalid hyperjump path", http.StatusBadRequest)
+	ErrInvalidCode                    = New("invalid code", http.StatusBadRequest)
+	ErrTooManyAstrals                 = New("too many astrals", http.StatusBadRequest)
+	ErrInvalidAstralIDHeader          = New("astral id header not specified or invalid", http.StatusUnauthorized)
 )
 
 func AnswerWithError(c *fiber.Ctx, err error) error {

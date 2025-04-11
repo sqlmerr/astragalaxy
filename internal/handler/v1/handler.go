@@ -28,10 +28,10 @@ func (h *Handler) Register(router fiber.Router) {
 	auth.Get("/token/sudo", h.SudoMiddleware, h.getUserTokenSudo)
 
 	spaceships := router.Group("/spaceships", h.JwtMiddleware())
-	spaceships.Get("/my", h.UserGetter, h.getMySpaceships)
-	spaceships.Patch("/my/rename", h.UserGetter, h.renameMySpaceship)
-	spaceships.Post("/my/:id/enter", h.UserGetter, h.enterMySpaceship)
-	spaceships.Post("/my/:id/exit", h.UserGetter, h.exitMySpaceship)
+	spaceships.Get("/my", h.UserGetter, h.AstralGetter, h.getMySpaceships)
+	spaceships.Patch("/my/rename", h.UserGetter, h.AstralGetter, h.renameMySpaceship)
+	spaceships.Post("/my/:id/enter", h.UserGetter, h.AstralGetter, h.enterMySpaceship)
+	spaceships.Post("/my/:id/exit", h.UserGetter, h.AstralGetter, h.exitMySpaceship)
 	spaceships.Get("/:id", h.getSpaceshipByID)
 
 	systems := router.Group("/systems")
@@ -43,7 +43,7 @@ func (h *Handler) Register(router fiber.Router) {
 	planets := router.Group("/planets")
 	planets.Post("/", h.SudoMiddleware, h.createPlanet)
 
-	flights := router.Group("/navigation", h.JwtMiddleware(), h.UserGetter)
+	flights := router.Group("/navigation", h.JwtMiddleware(), h.UserGetter, h.AstralGetter)
 	flights.Post("/planet", h.flightToPlanet)
 	flights.Post("/hyperjump", h.hyperJump)
 	flights.Get("/info", h.checkFlight)
@@ -54,8 +54,13 @@ func (h *Handler) Register(router fiber.Router) {
 	registry.Get("/locations/:code", h.getLocationByCode)
 	registry.Get("/locations", h.getLocations)
 
-	inventory := router.Group("/inventory", h.JwtMiddleware(), h.UserGetter)
+	inventory := router.Group("/inventory", h.JwtMiddleware(), h.UserGetter, h.AstralGetter)
 	inventory.Get("/items", h.getMyItems)
 	inventory.Get("/items/:code", h.getMyItemsByCode)
 	inventory.Get("/items/:id/data", h.getItemData)
+
+	astral := router.Group("/astral", h.JwtMiddleware(), h.UserGetter)
+	astral.Post("/", h.createAstral)
+	astral.Get("/", h.AstralGetter, h.getCurrentAstral)
+	astral.Get("/my", h.getCurrentUserAstrals)
 }

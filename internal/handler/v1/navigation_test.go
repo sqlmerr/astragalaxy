@@ -21,7 +21,7 @@ func TestFlightToPlanet(t *testing.T) {
 	assert.NoError(t, err)
 
 	if !testSpaceship.PlayerSitIn {
-		err = testStateObj.S.EnterUserSpaceship(*testUser, testSpaceship.ID)
+		err = testStateObj.S.EnterAstralSpaceship(*testAstral, testSpaceship.ID)
 		assert.NoError(t, err)
 	}
 
@@ -54,9 +54,10 @@ func TestFlightToPlanet(t *testing.T) {
 	testExecutor.TestHTTP(t, tests, map[string]string{
 		"Content-Type":  "application/json",
 		"Authorization": fmt.Sprintf("Bearer %s", testUserJwtToken),
+		"X-Astral-ID":   testAstral.ID.String(),
 	})
 
-	testStateObj.S.ExitUserSpaceship(*testUser, testSpaceship.ID)
+	testStateObj.S.ExitAstralSpaceship(*testAstral, testSpaceship.ID)
 }
 
 func TestHyperJump(t *testing.T) {
@@ -71,7 +72,7 @@ func TestHyperJump(t *testing.T) {
 	assert.NoError(t, err)
 
 	if !testSpaceship.PlayerSitIn {
-		err = testStateObj.S.EnterUserSpaceship(*testUser, testSpaceship.ID)
+		err = testStateObj.S.EnterAstralSpaceship(*testAstral, testSpaceship.ID)
 		assert.NoError(t, err)
 	}
 
@@ -104,9 +105,10 @@ func TestHyperJump(t *testing.T) {
 	testExecutor.TestHTTP(t, tests, map[string]string{
 		"Content-Type":  "application/json",
 		"Authorization": fmt.Sprintf("Bearer %s", testUserJwtToken),
+		"X-Astral-ID":   testAstral.ID.String(),
 	})
 
-	testStateObj.S.ExitUserSpaceship(*testUser, testSpaceship.ID)
+	testStateObj.S.ExitAstralSpaceship(*testAstral, testSpaceship.ID)
 }
 
 func TestCheckFlight(t *testing.T) {
@@ -136,5 +138,6 @@ func TestCheckFlight(t *testing.T) {
 	testExecutor.TestHTTP(t, tests, map[string]string{
 		"Content-Type":  "application/json",
 		"Authorization": fmt.Sprintf("Bearer %s", testUserJwtToken),
+		"X-Astral-ID":   testAstral.ID.String(),
 	})
 }

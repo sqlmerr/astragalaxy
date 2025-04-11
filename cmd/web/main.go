@@ -19,7 +19,7 @@ import (
 )
 
 //	@title Astragalaxy API
-//	@version 0.5.4
+//	@version 0.6.0
 //	@description Astragalaxy API
 //	@license.name MIT
 
@@ -53,30 +53,11 @@ func main() {
 		})
 	})
 
-	//doc := redoc.Redoc{
-	//	Title:       "Astragalaxy API",
-	//	Description: "AstraGalaxyAPI",
-	//	SpecFile:    "./docs/swagger.json",
-	//	SpecPath:    "/docs/openapi.json",
-	//	DocsPath:    "/docs",
-	//}
-	//app.Use(fiberredoc.New(doc))
-
-	//app.Get("/docs/*", swagger.HandlerDefault) // default
-	//
-	//app.Get("/docs/*", swagger.New(swagger.Config{ // custom
-	//	URL:         "http://localhost:8000/doc.json",
-	//	DeepLinking: false,
-	//	// Expand ("list") or Collapse ("none") tag groups by default
-	//	DocExpansion: "none",
-	//}))
-
 	app.Get("/docs", func(c *fiber.Ctx) error {
 		htmlContent, err := scalar.ApiReferenceHTML(&scalar.Options{
-			// SpecURL: "https://generator3.swagger.io/openapi.json",// allow external URL or local path file
 			SpecURL: "./docs/swagger.json",
 			CustomOptions: scalar.CustomOptions{
-				PageTitle: "Simple API",
+				PageTitle: "Astragalaxy API",
 			},
 			DarkMode: true,
 		})
@@ -94,10 +75,6 @@ func main() {
 
 	h := v1.NewHandler(stateObj)
 	h.Register(app.Group("/v1"))
-
-	//app.Use(func(c *fiber.Ctx) error {
-	//	return util.AnswerWithError(c, util.ErrNotFound)
-	//})
 
 	log.Fatal(app.Listen(":8000"))
 }

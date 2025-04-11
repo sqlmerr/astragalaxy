@@ -1,7 +1,6 @@
 package v1
 
 import (
-	"astragalaxy/internal/model"
 	"astragalaxy/internal/schema"
 	"astragalaxy/internal/util"
 	"net/http"
@@ -34,28 +33,10 @@ func (h *Handler) registerUser(c *fiber.Ctx) error {
 		return util.AnswerWithError(c, err)
 	}
 
-	user, err := h.s.Register(*req, "space_station", system.ID)
+	user, err := h.s.Register(*req)
 	if err != nil || user == nil {
 		return util.AnswerWithError(c, err)
 	}
-
-	spaceship, err := h.s.CreateSpaceship(schema.CreateSpaceship{
-		Name: "initial", UserID: user.ID, Location: "space_station", SystemID: system.ID,
-	})
-	if err != nil || spaceship == nil {
-		return util.AnswerWithError(c, err)
-	}
-
-	err = h.s.AddUserSpaceship(user.ID, *spaceship)
-	if err != nil {
-		return util.AnswerWithError(c, err)
-	}
-
-	spaceships, err := h.s.FindAllSpaceships(&model.Spaceship{UserID: user.ID})
-	if err != nil {
-		return util.AnswerWithError(c, err)
-	}
-	user.Spaceships = spaceships
 
 	return c.Status(http.StatusCreated).JSON(&user)
 }

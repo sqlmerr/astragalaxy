@@ -11,7 +11,7 @@ import (
 	"github.com/google/uuid"
 )
 
-func (s *Service) Register(data schema.CreateUser, location string, systemID string) (*schema.User, error) {
+func (s *Service) Register(data schema.CreateUser) (*schema.User, error) {
 	usr, err := s.u.FindOneByUsername(data.Username)
 	if err != nil {
 		return nil, err
@@ -27,8 +27,6 @@ func (s *Service) Register(data schema.CreateUser, location string, systemID str
 	u := model.User{
 		Username: data.Username,
 		Password: hashedPassword,
-		Location: location,
-		SystemID: systemID,
 		Token:    util.GenerateToken(32),
 	}
 	ID, err := s.u.Create(&u)
@@ -122,19 +120,6 @@ func (s *Service) FindOneUserRawByUsername(username string) (*model.User, error)
 }
 
 func (s *Service) UpdateUser(ID uuid.UUID, data schema.UpdateUser) error {
-	var spaceships []model.Spaceship
-	for _, sp := range data.Spaceships {
-		spaceships = append(spaceships, model.Spaceship{
-			ID:          sp.ID,
-			Name:        sp.Name,
-			UserID:      sp.UserID,
-			Location:    sp.Location,
-			SystemID:    sp.SystemID,
-			PlanetID:    sp.PlanetID,
-			PlayerSitIn: &sp.PlayerSitIn,
-		})
-	}
-
 	if data.Password != "" {
 		hashedPassword, err := util.HashPassword(data.Password)
 		if err != nil {
@@ -144,62 +129,10 @@ func (s *Service) UpdateUser(ID uuid.UUID, data schema.UpdateUser) error {
 	}
 
 	user := model.User{
-		ID:          ID,
-		Username:    data.Username,
-		Spaceships:  spaceships,
-		Password:    data.Password,
-		InSpaceship: &data.InSpaceship,
-		Location:    data.Location,
-		SystemID:    data.SystemID,
+		ID:       ID,
+		Username: data.Username,
+		Password: data.Password,
 	}
 
 	return s.u.Update(&user)
-}
-
-func (s *Service) AddUserSpaceship(userID uuid.UUID, spaceship schema.Spaceship) error {
-	user, err := s.FindOneUser(userID)
-	if err != nil {
-		return err
-	} else if user == nil {
-		return util.ErrUserNotFound
-	}
-
-	user.Spaceships = append(user.Spaceships, spaceship)
-	return s.UpdateUser(userID, schema.UpdateUser{
-		Spaceships: user.Spaceships,
-	})
-}
-
-func (s *Service) EnterUserSpaceship(user schema.User, spaceshipID uuid.UUID) error {
-	for _, sp := range user.Spaceships {
-		if sp.ID == spaceshipID {
-			if sp.PlayerSitIn || user.InSpaceship {
-				return util.ErrPlayerAlreadyInSpaceship
-			}
-			err := s.UpdateUser(user.ID, schema.UpdateUser{InSpaceship: true})
-			if err != nil {
-				return err
-			}
-			return s.UpdateSpaceship(spaceshipID, schema.UpdateSpaceship{PlayerSitIn: true})
-		}
-	}
-
-	return util.ErrSpaceshipNotFound
-}
-
-func (s *Service) ExitUserSpaceship(user schema.User, spaceshipID uuid.UUID) error {
-	for _, sp := range user.Spaceships {
-		if sp.ID == spaceshipID {
-			// err := s.Update(user.ID, schema.UpdateUser{InSpaceship: false})
-			inSpaceship := false
-			err := s.u.Update(&model.User{ID: user.ID, InSpaceship: &inSpaceship})
-			if err != nil {
-				return err
-			}
-			playerSitIn := false
-			return s.sp.Update(&model.Spaceship{ID: spaceshipID, PlayerSitIn: &playerSitIn})
-		}
-	}
-
-	return util.ErrSpaceshipNotFound
 }

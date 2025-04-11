@@ -1,7 +1,9 @@
 package v1
 
 import (
+	"astragalaxy/internal/schema"
 	"astragalaxy/internal/util"
+	"github.com/google/uuid"
 	"net/http"
 
 	jwtware "github.com/gofiber/contrib/jwt"
@@ -29,6 +31,33 @@ func (h *Handler) UserGetter(c *fiber.Ctx) error {
 	}
 
 	c.Locals("user", user)
+
+	return c.Next()
+}
+
+func (h *Handler) AstralGetter(c *fiber.Ctx) error {
+	user := c.Locals("user").(*schema.User)
+
+	astralID := c.Get("X-Astral-ID", "")
+	if astralID == "" {
+		return util.AnswerWithError(c, util.ErrInvalidAstralIDHeader)
+	}
+
+	ID, err := uuid.Parse(astralID)
+	if err != nil {
+		return util.AnswerWithError(c, util.ErrInvalidAstralIDHeader)
+	}
+
+	astral, err := h.s.FindOneAstral(ID)
+	if err != nil || astral == nil {
+		return util.AnswerWithError(c, util.ErrInvalidAstralIDHeader)
+	}
+
+	if astral.UserID != user.ID {
+		return util.AnswerWithError(c, util.ErrInvalidAstralIDHeader)
+	}
+
+	c.Locals("astral", astral)
 
 	return c.Next()
 }

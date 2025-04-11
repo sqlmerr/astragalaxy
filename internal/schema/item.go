@@ -7,7 +7,7 @@ import (
 
 type Item struct {
 	ID         uuid.UUID `json:"id"`
-	UserID     uuid.UUID `json:"user_id"`
+	AstralID   uuid.UUID `json:"astral_id"`
 	Code       string    `json:"code"`
 	Durability int       `json:"durability"`
 }
@@ -15,7 +15,7 @@ type Item struct {
 func ItemSchemaFromItem(item *model.Item) *Item {
 	schema := Item{
 		ID:         item.ID,
-		UserID:     item.UserID,
+		AstralID:   item.AstralID,
 		Code:       item.Code,
 		Durability: item.Durability,
 	}

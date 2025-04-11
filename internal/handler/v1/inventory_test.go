@@ -25,13 +25,13 @@ func TestGetMyItems(t *testing.T) {
 
 				if assert.Len(t, b.Data, 1) {
 					assert.Equal(t, "test", b.Data[0].Code)
-					assert.Equal(t, testUser.ID, b.Data[0].UserID)
+					assert.Equal(t, testAstral.ID, b.Data[0].AstralID)
 				}
 			},
 		},
 	}
 
-	testExecutor.TestHTTP(t, tests, map[string]string{"Content-Type": "application/json", "Authorization": fmt.Sprintf("Bearer %s", testUserJwtToken)})
+	testExecutor.TestHTTP(t, tests, map[string]string{"Content-Type": "application/json", "Authorization": fmt.Sprintf("Bearer %s", testUserJwtToken), "X-Astral-ID": testAstral.ID.String()})
 }
 
 func TestGetMyItemsByCode(t *testing.T) {
@@ -49,7 +49,7 @@ func TestGetMyItemsByCode(t *testing.T) {
 
 				if assert.Len(t, b.Data, 1) {
 					assert.Equal(t, "test", b.Data[0].Code)
-					assert.Equal(t, testUser.ID, b.Data[0].UserID)
+					assert.Equal(t, testAstral.ID, b.Data[0].AstralID)
 				}
 			},
 		},
@@ -68,7 +68,7 @@ func TestGetMyItemsByCode(t *testing.T) {
 		},
 	}
 
-	testExecutor.TestHTTP(t, tests, map[string]string{"Authorization": fmt.Sprintf("Bearer %s", testUserJwtToken)})
+	testExecutor.TestHTTP(t, tests, map[string]string{"Authorization": fmt.Sprintf("Bearer %s", testUserJwtToken), "X-Astral-ID": testAstral.ID.String()})
 }
 
 func TestGetItemData(t *testing.T) {
@@ -102,5 +102,5 @@ func TestGetItemData(t *testing.T) {
 		},
 	}
 
-	testExecutor.TestHTTP(t, tests, map[string]string{"Authorization": fmt.Sprintf("Bearer %s", testUserJwtToken)})
+	testExecutor.TestHTTP(t, tests, map[string]string{"Authorization": fmt.Sprintf("Bearer %s", testUserJwtToken), "X-Astral-ID": testAstral.ID.String()})
 }

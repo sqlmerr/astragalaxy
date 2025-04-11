@@ -14,7 +14,7 @@ import (
 
 // getSpaceshipByID godoc
 //
-//	@Summary		Get testSpaceship by id
+//	@Summary		Get spaceship by id
 //	@Description	Jwt Token required
 //	@Tags			spaceships
 //	@Accept			json
@@ -47,7 +47,7 @@ func (h *Handler) getSpaceshipByID(c *fiber.Ctx) error {
 // getMySpaceships godoc
 //
 //	@Summary		Get authorized user spaceships
-//	@Description	Jwt Token required
+//	@Description	Jwt Token required and X-Astral-ID header
 //	@Tags			spaceships
 //	@Produce		json
 //	@Success		200	{object}	schema.DataResponse{data=[]schema.Spaceship}
@@ -57,8 +57,8 @@ func (h *Handler) getSpaceshipByID(c *fiber.Ctx) error {
 //	@Security		JwtAuth
 //	@Router			/v1/spaceships/my [get]
 func (h *Handler) getMySpaceships(c *fiber.Ctx) error {
-	user := c.Locals("user").(*schema.User)
-	spaceships, err := h.s.FindAllSpaceships(&model.Spaceship{UserID: user.ID})
+	astral := c.Locals("astral").(*schema.Astral)
+	spaceships, err := h.s.FindAllSpaceships(&model.Spaceship{AstralID: astral.ID})
 	if err != nil {
 		return util.AnswerWithError(c, err)
 	}
@@ -68,8 +68,8 @@ func (h *Handler) getMySpaceships(c *fiber.Ctx) error {
 
 // enterMySpaceship godoc
 //
-//	@Summary		Enter authorized user testSpaceship
-//	@Description	Jwt Token required
+//	@Summary		Enter astral spaceship
+//	@Description	Jwt Token required and X-Astral-ID header
 //	@Tags			spaceships
 //	@Produce		json
 //	@Param			id	path		string	true	"Spaceship ID. Must be a UUID"
@@ -86,9 +86,9 @@ func (h *Handler) enterMySpaceship(c *fiber.Ctx) error {
 		return util.AnswerWithError(c, util.New(err.Error(), http.StatusBadRequest))
 	}
 
-	user := c.Locals("user").(*schema.User)
+	astral := c.Locals("astral").(*schema.Astral)
 
-	err = h.s.EnterUserSpaceship(*user, ID)
+	err = h.s.EnterAstralSpaceship(*astral, ID)
 	if err != nil {
 		return util.AnswerWithError(c, err)
 	}
@@ -97,8 +97,8 @@ func (h *Handler) enterMySpaceship(c *fiber.Ctx) error {
 
 // exitMySpaceship godoc
 //
-//	@Summary		Exit authorized user testSpaceship
-//	@Description	Jwt Token required
+//	@Summary		Exit astral spaceship
+//	@Description	Jwt Token required and X-Astral-ID header
 //	@Tags			spaceships
 //	@Produce		json
 //	@Param			id	path		string	true	"Spaceship ID. Must be a UUID"
@@ -114,9 +114,9 @@ func (h *Handler) exitMySpaceship(c *fiber.Ctx) error {
 		return util.AnswerWithError(c, util.ErrIDMustBeUUID)
 	}
 
-	user := c.Locals("user").(*schema.User)
+	astral := c.Locals("astral").(*schema.Astral)
 
-	err = h.s.ExitUserSpaceship(*user, ID)
+	err = h.s.ExitAstralSpaceship(*astral, ID)
 	if err != nil {
 		return util.AnswerWithError(c, err)
 	}
@@ -125,12 +125,12 @@ func (h *Handler) exitMySpaceship(c *fiber.Ctx) error {
 
 // renameMySpaceship godoc
 //
-//	@Summary		Rename authorized user testSpaceship
-//	@Description	Jwt Token required
+//	@Summary		Rename astral spaceship
+//	@Description	Jwt Token required and X-Astral-ID header
 //	@Tags			spaceships
 //	@Accept			json
 //	@Produce		json
-//	@Param			req	body		schema.RenameSpaceship	true	"rename testSpaceship schema"
+//	@Param			req	body		schema.RenameSpaceship	true	"rename spaceship schema"
 //	@Success		200	{object}	schema.OkResponse
 //	@Failure		500	{object}	util.Error
 //	@Failure		403	{object}	util.Error
@@ -142,12 +142,12 @@ func (h *Handler) renameMySpaceship(c *fiber.Ctx) error {
 	if err := util.BodyParser(req, c); err != nil {
 		return c.Status(http.StatusUnprocessableEntity).JSON(util.NewError(err))
 	}
-	user := c.Locals("user").(*schema.User)
+	astral := c.Locals("astral").(*schema.Astral)
 	spaceship, err := h.s.FindOneSpaceship(req.SpaceshipID)
 	if err != nil {
 		return util.AnswerWithError(c, err)
 	}
-	if spaceship.UserID != user.ID {
+	if spaceship.AstralID != astral.ID {
 		return util.AnswerWithError(c, util.ErrNotFound)
 	}
 

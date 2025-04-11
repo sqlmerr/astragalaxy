@@ -37,7 +37,8 @@ func TestGetMySpaceships(t *testing.T) {
 
 	testExecutor.TestHTTP(t, tests, map[string]string{
 		"Content-Type":  "application/json",
-		"Authorization": fmt.Sprintf("Bearer %s", testUserJwtToken)},
+		"Authorization": fmt.Sprintf("Bearer %s", testUserJwtToken),
+		"X-Astral-ID":   testAstral.ID.String()},
 	)
 }
 
@@ -54,7 +55,7 @@ func TestGetSpaceshipByID(t *testing.T) {
 				assert.NoError(t, err)
 				assert.Equal(t, testSpaceship.ID.String(), b["id"].(string))
 				assert.Equal(t, testSpaceship.Name, b["name"].(string))
-				assert.Equal(t, testSpaceship.UserID.String(), b["user_id"].(string))
+				assert.Equal(t, testSpaceship.AstralID.String(), b["astral_id"].(string))
 			},
 			Method: http.MethodGet,
 		},
@@ -71,7 +72,8 @@ func TestGetSpaceshipByID(t *testing.T) {
 		t, tests,
 		map[string]string{
 			"Content-Type":  "application/json",
-			"Authorization": fmt.Sprintf("Bearer %s", testUserJwtToken)},
+			"Authorization": fmt.Sprintf("Bearer %s", testUserJwtToken),
+			"X-Astral-ID":   testAstral.ID.String()},
 	)
 }
 
@@ -106,7 +108,7 @@ func TestEnterMySpaceship(t *testing.T) {
 			Method:        http.MethodPost,
 		},
 	}
-	testExecutor.TestHTTP(t, tests, map[string]string{"Content-Type": "application/json", "Authorization": fmt.Sprintf("Bearer %s", testUserJwtToken)})
+	testExecutor.TestHTTP(t, tests, map[string]string{"Content-Type": "application/json", "Authorization": fmt.Sprintf("Bearer %s", testUserJwtToken), "X-Astral-ID": testAstral.ID.String()})
 }
 
 func TestExitMySpaceship(t *testing.T) {
@@ -114,6 +116,7 @@ func TestExitMySpaceship(t *testing.T) {
 
 	req := httptest.NewRequest(http.MethodPost, url, nil)
 	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("X-Astral-ID", testAstral.ID.String())
 	req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", testUserJwtToken))
 
 	res, err := testApp.Test(req, -1)
@@ -128,14 +131,14 @@ func TestExitMySpaceship(t *testing.T) {
 		s, err := testStateObj.S.FindOneSpaceship(testSpaceship.ID)
 		assert.NoError(t, err)
 
-		p, err := testStateObj.S.FindOneUser(testUser.ID)
+		a, err := testStateObj.S.FindOneAstral(testAstral.ID)
 		assert.NoError(t, err)
 
 		assert.NotEmpty(t, response)
 		assert.Equal(t, true, response.Ok)
 		assert.Equal(t, 1, response.CustomStatusCode)
 		assert.Equal(t, false, s.PlayerSitIn)
-		assert.Equal(t, false, p.InSpaceship)
+		assert.Equal(t, false, a.InSpaceship)
 	}
 }
 
@@ -147,6 +150,7 @@ func TestRenameMySpaceship(t *testing.T) {
 
 	req := httptest.NewRequest(http.MethodPatch, url, bytes.NewReader(b))
 	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("X-Astral-ID", testAstral.ID.String())
 	req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", testUserJwtToken))
 
 	res, err := testApp.Test(req, -1)
