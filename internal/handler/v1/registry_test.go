@@ -18,7 +18,7 @@ func TestGetItemByCode(t *testing.T) {
 	assert.Equal(t, http.StatusNotFound, resNotFound.StatusCode)
 
 	code := "test"
-	url := fmt.Sprintf("/registry/items/%s", code)
+	url := fmt.Sprintf("/v1/registry/items/%s", code)
 	request := httptest.NewRequest(http.MethodGet, url, nil)
 	request.Header.Set("Content-Type", "application/json")
 	res, err := testApp.Test(request, -1)

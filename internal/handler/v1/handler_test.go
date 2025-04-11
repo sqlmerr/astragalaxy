@@ -54,7 +54,7 @@ func TestMain(m *testing.M) {
 	setup(stateObj)
 
 	h := NewHandler(stateObj)
-	h.Register(testApp)
+	h.Register(testApp.Group("/v1"))
 
 	code := m.Run()
 
