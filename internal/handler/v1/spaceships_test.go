@@ -1,4 +1,4 @@
-package handler
+package v1
 
 import (
 	"astragalaxy/internal/schema"
@@ -21,7 +21,7 @@ func TestGetMySpaceships(t *testing.T) {
 			Method:        http.MethodGet,
 			ExpectedCode:  http.StatusOK,
 			ExpectedError: false,
-			Route:         "/spaceships/my",
+			Route:         "/v1/spaceships/my",
 			BodyValidator: func(body []byte) {
 				var res schema.DataGenericResponse[[]schema.Spaceship]
 				err := json.Unmarshal(body, &res)
@@ -45,7 +45,7 @@ func TestGetSpaceshipByID(t *testing.T) {
 	tests := []test.HTTPTest{
 		{
 			Description:   "testSpaceship found",
-			Route:         fmt.Sprintf("/spaceships/%s", testSpaceship.ID),
+			Route:         fmt.Sprintf("/v1/spaceships/%s", testSpaceship.ID),
 			ExpectedError: false,
 			ExpectedCode:  200,
 			BodyValidator: func(body []byte) {
@@ -60,7 +60,7 @@ func TestGetSpaceshipByID(t *testing.T) {
 		},
 		{
 			Description:   "invalid id",
-			Route:         "/spaceships/123",
+			Route:         "/v1/spaceships/123",
 			ExpectedError: true,
 			ExpectedCode:  400,
 			Method:        http.MethodGet,
@@ -79,7 +79,7 @@ func TestEnterMySpaceship(t *testing.T) {
 	tests := []test.HTTPTest{
 		{
 			Description:   "entered testSpaceship",
-			Route:         fmt.Sprintf("/spaceships/my/%s/enter", testSpaceship.ID),
+			Route:         fmt.Sprintf("/v1/spaceships/my/%s/enter", testSpaceship.ID),
 			ExpectedError: false,
 			ExpectedCode:  200,
 			BodyValidator: func(body []byte) {
@@ -93,52 +93,24 @@ func TestEnterMySpaceship(t *testing.T) {
 		},
 		{
 			Description:   "can't enter testSpaceship",
-			Route:         fmt.Sprintf("/spaceships/my/%s/enter", testSpaceship.ID),
+			Route:         fmt.Sprintf("/v1/spaceships/my/%s/enter", testSpaceship.ID),
 			ExpectedError: true,
 			ExpectedCode:  400,
 			Method:        http.MethodPost,
 		},
 		{
 			Description:   "invalid id",
-			Route:         "/spaceships/my/123/enter",
+			Route:         "/v1/spaceships/my/123/enter",
 			ExpectedError: true,
 			ExpectedCode:  400,
 			Method:        http.MethodPost,
 		},
 	}
 	testExecutor.TestHTTP(t, tests, map[string]string{"Content-Type": "application/json", "Authorization": fmt.Sprintf("Bearer %s", testUserJwtToken)})
-
-	//url := fmt.Sprintf("/spaceships/my/%s/enter", testSpaceship.ID.String())
-	//
-	//req := httptest.NewRequest(http.MethodPost, url, nil)
-	//req.Header.Set("Content-Type", "application/json")
-	//req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", testUserJwtToken))
-	//
-	//res, err := testApp.Test(req, -1)
-	//assert.NoError(t, err)
-	//if assert.Equal(t, http.StatusOK, res.StatusCode) {
-	//	body, err := io.ReadAll(res.Body)
-	//	assert.NoError(t, err)
-	//	var response schema.OkResponse
-	//	err = json.Unmarshal(body, &response)
-	//	assert.NoError(t, err)
-	//
-	//	s, err := testStateObj.SpaceshipService.FindOne(testSpaceship.ID)
-	//	assert.NoError(t, err)
-	//
-	//	p, err := testStateObj.UserService.FindOne(testUser.ID)
-	//	assert.NoError(t, err)
-	//
-	//	assert.NotEmpty(t, response)
-	//	assert.Equal(t, true, response.Ok)
-	//	assert.Equal(t, 1, response.CustomStatusCode)
-	//	assert.Equal(t, true, s.PlayerSitIn)
-	//	assert.Equal(t, true, p.InSpaceship)
-	//}
 }
 
 func TestExitMySpaceship(t *testing.T) {
-	url := fmt.Sprintf("/spaceships/my/%s/exit", testSpaceship.ID.String())
+	url := fmt.Sprintf("/v1/spaceships/my/%s/exit", testSpaceship.ID.String())
 
 	req := httptest.NewRequest(http.MethodPost, url, nil)
 	req.Header.Set("Content-Type", "application/json")
@@ -168,7 +140,7 @@ func TestExitMySpaceship(t *testing.T) {
 }
 
 func TestRenameMySpaceship(t *testing.T) {
-	url := "/spaceships/my/rename"
+	url := "/v1/spaceships/my/rename"
 	body := &schema.RenameSpaceship{SpaceshipID: testSpaceship.ID, Name: "testSpaceship"}
 	b, err := json.Marshal(body)
 	assert.NoError(t, err)

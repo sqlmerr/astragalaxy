@@ -1,4 +1,4 @@
-package handler
+package v1
 
 import (
 	"astragalaxy/internal/model"
@@ -21,7 +21,7 @@ import (
 //	@Failure		403	{object}	util.Error
 //	@Failure		422	{object}	util.Error
 //	@Security		SudoToken
-//	@Router			/systems [post]
+//	@Router			/v1/systems [post]
 func (h *Handler) createSystem(c *fiber.Ctx) error {
 	req := &schema.CreateSystem{}
 	if err := util.BodyParser(req, c); err != nil {
@@ -48,7 +48,7 @@ func (h *Handler) createSystem(c *fiber.Ctx) error {
 //	@Failure		403	{object}	util.Error
 //	@Failure		422	{object}	util.Error
 //	@Security		JwtAuth
-//	@Router			/systems/{id}/planets [get]
+//	@Router			/v1/systems/{id}/planets [get]
 func (h *Handler) getSystemPlanets(c *fiber.Ctx) error {
 	ID := c.Params("id")
 	if ID == "" {
@@ -77,7 +77,7 @@ func (h *Handler) getSystemPlanets(c *fiber.Ctx) error {
 //	@Failure		403	{object}	util.Error
 //	@Failure		422	{object}	util.Error
 //	@Security		JwtAuth
-//	@Router			/systems [get]
+//	@Router			/v1/systems [get]
 func (h *Handler) getAllSystems(c *fiber.Ctx) error {
 	systems := h.s.FindAllSystems()
 	data := schema.DataResponse{Data: systems}
@@ -96,7 +96,7 @@ func (h *Handler) getAllSystems(c *fiber.Ctx) error {
 //	@Failure		403	{object}	util.Error
 //	@Failure		422	{object}	util.Error
 //	@Security		JwtAuth
-//	@Router			/systems/{id} [get]
+//	@Router			/v1/systems/{id} [get]
 func (h *Handler) getSystemByID(c *fiber.Ctx) error {
 	ID := c.Params("id")
 	if ID == "" {

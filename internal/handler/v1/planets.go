@@ -1,4 +1,4 @@
-package handler
+package v1
 
 import (
 	"astragalaxy/internal/schema"
@@ -21,7 +21,7 @@ import (
 //	@Failure		403	{object}	util.Error
 //	@Failure		422	{object}	util.Error
 //	@Security		SudoToken
-//	@Router			/planets [post]
+//	@Router			/v1/planets [post]
 func (h *Handler) createPlanet(c *fiber.Ctx) error {
 	req := &schema.CreatePlanet{}
 

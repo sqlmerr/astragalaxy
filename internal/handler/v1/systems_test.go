@@ -1,4 +1,4 @@
-package handler
+package v1
 
 import (
 	"astragalaxy/internal/schema"
@@ -18,7 +18,7 @@ func TestCreateSystem(t *testing.T) {
 	b, err := json.Marshal(body)
 	assert.NoError(t, err)
 
-	req := httptest.NewRequest(http.MethodPost, "/systems", bytes.NewBuffer(b))
+	req := httptest.NewRequest(http.MethodPost, "/v1/systems", bytes.NewBuffer(b))
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("secret-token", testStateObj.Config.SecretToken)
 
@@ -41,7 +41,7 @@ func TestGetSystemPlanets(t *testing.T) {
 	system, err := testStateObj.S.FindOneSystemByName("initial")
 	assert.NoError(t, err)
 
-	req, err := http.NewRequest(http.MethodGet, fmt.Sprintf("/systems/%s/planets", system.ID), nil)
+	req, err := http.NewRequest(http.MethodGet, fmt.Sprintf("/v1/systems/%s/planets", system.ID), nil)
 	assert.NoError(t, err)
 
 	req.Header.Set("Content-Type", "application/json")
@@ -70,7 +70,7 @@ func TestGetSystemByID(t *testing.T) {
 	system, err := testStateObj.S.FindOneSystemByName("initial")
 	assert.NoError(t, err)
 
-	req := httptest.NewRequest(http.MethodGet, fmt.Sprintf("/systems/%s", system.ID), nil)
+	req := httptest.NewRequest(http.MethodGet, fmt.Sprintf("/v1/systems/%s", system.ID), nil)
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("Authorization", fmt.Sprintf("Bearer %v", testUserJwtToken))
 	res, err := testApp.Test(req, -1)
@@ -91,7 +91,7 @@ func TestGetAllSystems(t *testing.T) {
 	system, err := testStateObj.S.FindOneSystemByName("initial")
 	assert.NoError(t, err)
 
-	req := httptest.NewRequest(http.MethodGet, "/systems", nil)
+	req := httptest.NewRequest(http.MethodGet, "/v1/systems", nil)
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("Authorization", fmt.Sprintf("Bearer %v", testUserJwtToken))
 	res, err := testApp.Test(req, -1)

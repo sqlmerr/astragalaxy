@@ -1,4 +1,4 @@
-package handler
+package v1
 
 import (
 	"astragalaxy/internal/model"
@@ -26,7 +26,7 @@ import (
 //	@Failure		403	{object}	util.Error
 //	@Failure		422	{object}	util.Error
 //	@Security		JwtAuth
-//	@Router			/spaceships/{id} [get]
+//	@Router			/v1/spaceships/{id} [get]
 func (h *Handler) getSpaceshipByID(c *fiber.Ctx) error {
 	ID, err := uuid.Parse(c.Params("id"))
 	if err != nil {
@@ -55,7 +55,7 @@ func (h *Handler) getSpaceshipByID(c *fiber.Ctx) error {
 //	@Failure		403	{object}	util.Error
 //	@Failure		422	{object}	util.Error
 //	@Security		JwtAuth
-//	@Router			/spaceships/my [get]
+//	@Router			/v1/spaceships/my [get]
 func (h *Handler) getMySpaceships(c *fiber.Ctx) error {
 	user := c.Locals("user").(*schema.User)
 	spaceships, err := h.s.FindAllSpaceships(&model.Spaceship{UserID: user.ID})
@@ -79,7 +79,7 @@ func (h *Handler) getMySpaceships(c *fiber.Ctx) error {
 //	@Failure		403	{object}	util.Error
 //	@Failure		422	{object}	util.Error
 //	@Security		JwtAuth
-//	@Router			/spaceships/my/{id}/enter [post]
+//	@Router			/v1/spaceships/my/{id}/enter [post]
 func (h *Handler) enterMySpaceship(c *fiber.Ctx) error {
 	ID, err := uuid.Parse(c.Params("id"))
 	if err != nil {
@@ -107,7 +107,7 @@ func (h *Handler) enterMySpaceship(c *fiber.Ctx) error {
 //	@Failure		403	{object}	util.Error
 //	@Failure		422	{object}	util.Error
 //	@Security		JwtAuth
-//	@Router			/spaceships/my/{id}/exit [post]
+//	@Router			/v1/spaceships/my/{id}/exit [post]
 func (h *Handler) exitMySpaceship(c *fiber.Ctx) error {
 	ID, err := uuid.Parse(c.Params("id"))
 	if err != nil {
@@ -136,7 +136,7 @@ func (h *Handler) exitMySpaceship(c *fiber.Ctx) error {
 //	@Failure		403	{object}	util.Error
 //	@Failure		422	{object}	util.Error
 //	@Security		JwtAuth
-//	@Router			/spaceships/my/rename [patch]
+//	@Router			/v1/spaceships/my/rename [patch]
 func (h *Handler) renameMySpaceship(c *fiber.Ctx) error {
 	req := &schema.RenameSpaceship{}
 	if err := util.BodyParser(req, c); err != nil {

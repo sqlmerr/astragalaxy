@@ -1,4 +1,4 @@
-package handler
+package v1
 
 import (
 	"astragalaxy/internal/schema"
@@ -23,7 +23,7 @@ import (
 //	@Failure		403		{object}	util.Error
 //	@Failure		404		{object}	util.Error
 //	@Failure		422		{object}	util.Error
-//	@Router			/registry/items/{code} [get]
+//	@Router			/v1/registry/items/{code} [get]
 func (h *Handler) getItemByCode(c *fiber.Ctx) error {
 	code := c.Params("code")
 	if code == "" {
@@ -50,7 +50,7 @@ func (h *Handler) getItemByCode(c *fiber.Ctx) error {
 //	@Failure		400	{object}	util.Error
 //	@Failure		403	{object}	util.Error
 //	@Failure		422	{object}	util.Error
-//	@Router			/registry/items [get]
+//	@Router			/v1/registry/items [get]
 func (h *Handler) getItems(c *fiber.Ctx) error {
 	items := h.state.MasterRegistry.Item.All()
 	return c.JSON(schema.DataResponse{Data: items})
@@ -67,7 +67,7 @@ func (h *Handler) getItems(c *fiber.Ctx) error {
 //	@Failure		400	{object}	util.Error
 //	@Failure		403	{object}	util.Error
 //	@Failure		422	{object}	util.Error
-//	@Router			/registry/locations [get]
+//	@Router			/v1/registry/locations [get]
 func (h *Handler) getLocations(c *fiber.Ctx) error {
 	locations := h.state.MasterRegistry.Location.All()
 	return c.JSON(schema.DataResponse{Data: locations})
@@ -87,7 +87,7 @@ func (h *Handler) getLocations(c *fiber.Ctx) error {
 //	@Failure		403		{object}	util.Error
 //	@Failure		404		{object}	util.Error
 //	@Failure		422		{object}	util.Error
-//	@Router			/registry/locations/{code} [get]
+//	@Router			/v1/registry/locations/{code} [get]
 func (h *Handler) getLocationByCode(c *fiber.Ctx) error {
 	code := c.Params("code")
 	if code == "" {

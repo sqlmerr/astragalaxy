@@ -1,4 +1,4 @@
-package handler
+package v1
 
 import (
 	"astragalaxy/internal/schema"
@@ -19,7 +19,7 @@ func TestRegister(t *testing.T) {
 	b, err := json.Marshal(body)
 	assert.NoError(t, err)
 
-	request := httptest.NewRequest(http.MethodPost, "/auth/register", bytes.NewReader(b))
+	request := httptest.NewRequest(http.MethodPost, "/v1/auth/register", bytes.NewReader(b))
 	request.Header.Set("Content-Type", "application/json")
 	request.Header.Set("secret-token", testSudoToken)
 
@@ -48,7 +48,7 @@ func TestRegister(t *testing.T) {
 func TestLoginByToken(t *testing.T) {
 	body := fmt.Sprintf(`{"token":"%s"}`, testUserToken)
 
-	request := httptest.NewRequest(http.MethodPost, "/auth/login/token", strings.NewReader(body))
+	request := httptest.NewRequest(http.MethodPost, "/v1/auth/login/token", strings.NewReader(body))
 	request.Header.Set("Content-Type", "application/json")
 
 	res, err := testApp.Test(request, -1)
@@ -69,7 +69,7 @@ func TestLoginByToken(t *testing.T) {
 func TestLogin(t *testing.T) {
 	body := fmt.Sprintf(`{"username":"%s","password":"%s"}`, testUser.Username, "testPassword")
 
-	request := httptest.NewRequest(http.MethodPost, "/auth/login", strings.NewReader(body))
+	request := httptest.NewRequest(http.MethodPost, "/v1/auth/login", strings.NewReader(body))
 	request.Header.Set("Content-Type", "application/json")
 
 	res, err := testApp.Test(request, -1)
@@ -88,7 +88,7 @@ func TestLogin(t *testing.T) {
 }
 
 func TestGetUserTokenSudo(t *testing.T) {
-	request := httptest.NewRequest(http.MethodGet, fmt.Sprintf("/auth/token/sudo?id=%s", testUser.ID.String()), nil)
+	request := httptest.NewRequest(http.MethodGet, fmt.Sprintf("/v1/auth/token/sudo?id=%s", testUser.ID.String()), nil)
 	request.Header.Set("Content-Type", "application/json")
 	request.Header.Set("secret-token", testSudoToken)
 
@@ -107,7 +107,7 @@ func TestGetUserTokenSudo(t *testing.T) {
 }
 
 func TestGetMe(t *testing.T) {
-	url := "/auth/me"
+	url := "/v1/auth/me"
 	request := httptest.NewRequest(http.MethodGet, url, nil)
 	request.Header.Set("Content-Type", "application/json")
 	request.Header.Set("Authorization", fmt.Sprintf("Bearer %s", testUserJwtToken))
