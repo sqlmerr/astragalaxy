@@ -4,108 +4,87 @@ import (
 	"astragalaxy/internal/model"
 	"astragalaxy/internal/schema"
 	"astragalaxy/internal/util"
+	"context"
+	"github.com/danielgtaylor/huma/v2"
 	"net/http"
-
-	"github.com/gofiber/fiber/v2"
 )
 
-// createSystem godoc
-//
-//	@Summary		Create system
-//	@Description	Sudo Token required
-//	@Tags			systems
-//	@Produce		json
-//	@Param			req	body		schema.CreateSystem	true	"create system schema"
-//	@Success		201	{object}	schema.System
-//	@Failure		500	{object}	util.Error
-//	@Failure		403	{object}	util.Error
-//	@Failure		422	{object}	util.Error
-//	@Security		SudoToken
-//	@Router			/v1/systems [post]
-func (h *Handler) createSystem(c *fiber.Ctx) error {
-	req := &schema.CreateSystem{}
-	if err := util.BodyParser(req, c); err != nil {
-		return util.AnswerWithError(c, util.New(err.Error(), http.StatusUnprocessableEntity))
-	}
+func (h *Handler) registerSystemsGroup(api huma.API) {
+	tags := []string{"systems"}
 
-	system, err := h.s.CreateSystem(*req)
-	if err != nil {
-		return c.Status(http.StatusInternalServerError).JSON(util.NewError(util.ErrServerError))
-	}
-
-	return c.Status(http.StatusCreated).JSON(&system)
+	huma.Register(api, huma.Operation{
+		Method:        http.MethodPost,
+		Path:          "/",
+		Middlewares:   []Middleware{h.SudoMiddleware(api)},
+		Security:      []map[string][]string{{"sudoAuth": {}}},
+		Tags:          tags,
+		DefaultStatus: 201,
+	}, h.createSystem)
+	huma.Register(api, huma.Operation{
+		Method:      http.MethodGet,
+		Path:        "/{id}/planets",
+		Middlewares: []Middleware{h.JWTMiddleware(api)},
+		Security:    []map[string][]string{{"bearerAuth": {}}},
+		Tags:        tags,
+	}, h.getSystemPlanets)
+	huma.Register(api, huma.Operation{
+		Method:      http.MethodGet,
+		Path:        "/{id}",
+		Middlewares: []Middleware{h.JWTMiddleware(api)},
+		Security:    []map[string][]string{{"bearerAuth": {}}},
+		Tags:        tags,
+	}, h.getSystemByID)
+	huma.Register(api, huma.Operation{
+		Method:      http.MethodGet,
+		Path:        "/",
+		Middlewares: []Middleware{h.JWTMiddleware(api)},
+		Security:    []map[string][]string{{"bearerAuth": {}}},
+		Tags:        tags,
+	}, h.getAllSystems)
 }
 
-// getSystemPlanets godoc
-//
-//	@Summary		get system planets
-//	@Description	Jwt Token required
-//	@Tags			systems
-//	@Produce		json
-//	@Param			id	path		string	true	"system id"
-//	@Success		200	{object}	schema.DataResponse{data=[]schema.Planet}
-//	@Failure		500	{object}	util.Error
-//	@Failure		403	{object}	util.Error
-//	@Failure		422	{object}	util.Error
-//	@Security		JwtAuth
-//	@Router			/v1/systems/{id}/planets [get]
-func (h *Handler) getSystemPlanets(c *fiber.Ctx) error {
-	ID := c.Params("id")
-	if ID == "" {
-		return util.AnswerWithError(c, util.New("invalid id", 400))
+func (h *Handler) createSystem(_ context.Context, input *schema.BaseRequest[schema.CreateSystem]) (*schema.BaseResponse[schema.System], error) {
+	sys, err := h.s.CreateSystem(input.Body)
+	if err != nil {
+		return nil, util.ErrServerError
+	}
+	return &schema.BaseResponse[schema.System]{Body: *sys}, nil
+}
+
+func (h *Handler) getSystemPlanets(_ context.Context, input *struct {
+	ID string `path:"id"`
+}) (*schema.BaseDataResponse[[]schema.Planet], error) {
+	if input.ID == "" {
+		return nil, util.New("invalid id", 400)
 	}
 
-	planets, err := h.s.FindAllPlanets(&model.Planet{SystemID: ID})
+	planets, err := h.s.FindAllPlanets(&model.Planet{SystemID: input.ID})
 	if err != nil {
-		return util.AnswerWithError(c, err)
+		return nil, err
 	}
 	if planets == nil {
-		return c.JSON(schema.DataResponse{Data: []model.Planet{}})
+		return &schema.BaseDataResponse[[]schema.Planet]{Body: schema.DataGenericResponse[[]schema.Planet]{Data: []schema.Planet{}}}, nil
 	}
 
-	return c.JSON(schema.DataResponse{Data: planets})
+	return &schema.BaseDataResponse[[]schema.Planet]{Body: schema.DataGenericResponse[[]schema.Planet]{Data: planets}}, nil
 }
 
-// getAllSystems godoc
-//
-//	@Summary		get all systems
-//	@Description	Jwt Token required
-//	@Tags			systems
-//	@Produce		json
-//	@Success		200	{object}	schema.DataResponse{data=[]schema.System}
-//	@Failure		500	{object}	util.Error
-//	@Failure		403	{object}	util.Error
-//	@Failure		422	{object}	util.Error
-//	@Security		JwtAuth
-//	@Router			/v1/systems [get]
-func (h *Handler) getAllSystems(c *fiber.Ctx) error {
+func (h *Handler) getAllSystems(_ context.Context, _ *struct{}) (*schema.BaseDataResponse[[]schema.System], error) {
 	systems := h.s.FindAllSystems()
-	data := schema.DataResponse{Data: systems}
-	return c.JSON(data)
+	data := schema.DataGenericResponse[[]schema.System]{Data: systems}
+	return &schema.BaseDataResponse[[]schema.System]{Body: data}, nil
 }
 
-// getSystemByID godoc
-//
-//	@Summary		get one system
-//	@Description	Jwt Token required
-//	@Tags			systems
-//	@Produce		json
-//	@Param			id	path		string	true	"system id"
-//	@Success		200	{object}	schema.System
-//	@Failure		500	{object}	util.Error
-//	@Failure		403	{object}	util.Error
-//	@Failure		422	{object}	util.Error
-//	@Security		JwtAuth
-//	@Router			/v1/systems/{id} [get]
-func (h *Handler) getSystemByID(c *fiber.Ctx) error {
-	ID := c.Params("id")
-	if ID == "" {
-		return util.AnswerWithError(c, util.New("id must be valid", 400))
+func (h *Handler) getSystemByID(_ context.Context, input *struct {
+	ID string `path:"id"`
+}) (*schema.BaseResponse[schema.System], error) {
+	if input.ID == "" {
+		return nil, util.New("id must be valid", 400)
 	}
 
-	system, err := h.s.FindOneSystem(ID)
+	system, err := h.s.FindOneSystem(input.ID)
 	if err != nil || system == nil {
-		return util.AnswerWithError(c, err)
+		return nil, err
 	}
-	return c.JSON(system)
+	return &schema.BaseResponse[schema.System]{Body: *system}, nil
 }

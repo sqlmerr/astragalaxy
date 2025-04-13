@@ -6,6 +6,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"github.com/danielgtaylor/huma/v2/humatest"
 	"io"
 	"net/http"
 	"net/http/httptest"
@@ -15,6 +16,9 @@ import (
 )
 
 func TestGetMySpaceships(t *testing.T) {
+	_, api := humatest.New(t)
+	testHandler.Register(api)
+
 	tests := []test.HTTPTest{
 		{
 			Description:   "Should return 200 OK response",
@@ -35,7 +39,8 @@ func TestGetMySpaceships(t *testing.T) {
 		},
 	}
 
-	testExecutor.TestHTTP(t, tests, map[string]string{
+	executor := test.New(api)
+	executor.TestHTTP(t, tests, map[string]string{
 		"Content-Type":  "application/json",
 		"Authorization": fmt.Sprintf("Bearer %s", testUserJwtToken),
 		"X-Astral-ID":   testAstral.ID.String()},

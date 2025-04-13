@@ -4,10 +4,9 @@ import (
 	"astragalaxy/internal/handler/v1"
 	"astragalaxy/internal/state"
 	"astragalaxy/internal/util"
-	"github.com/MarceloPetrucio/go-scalar-api-reference"
+	"github.com/danielgtaylor/huma/v2"
+	"github.com/danielgtaylor/huma/v2/adapters/humafiber"
 	"log"
-
-	_ "astragalaxy/docs"
 
 	_ "ariga.io/atlas-provider-gorm/gormschema"
 
@@ -53,28 +52,35 @@ func main() {
 		})
 	})
 
-	app.Get("/docs", func(c *fiber.Ctx) error {
-		htmlContent, err := scalar.ApiReferenceHTML(&scalar.Options{
-			SpecURL: "./docs/swagger.json",
-			CustomOptions: scalar.CustomOptions{
-				PageTitle: "Astragalaxy API",
-			},
-			DarkMode: true,
-		})
+	humaConfig := huma.DefaultConfig("Astragalaxy API", "0.6.0")
+	humaConfig.CreateHooks = nil
+	humaConfig.Components.SecuritySchemes = map[string]*huma.SecurityScheme{
+		"bearerAuth": {
+			Type:         "http",
+			Name:         "Bearer",
+			Scheme:       "bearer",
+			BearerFormat: "JWT",
+		},
+		"sudoAuth": {
+			Type: "apiKey",
+			In:   "header",
+			Name: "secret-token",
+		},
+	}
+	humaConfig.Info.License = &huma.License{Name: "MIT", URL: "https://opensource.org/licenses/MIT", Identifier: "MIT"}
+	humaConfig.Info.Description = "🚀 <b>Tiny game about space travelling.</b> </br> <a href='https://github.com/sqlmerr/astragalaxy'>Github</a>"
 
-		if err != nil {
-			return util.AnswerWithError(c, err)
-		}
+	api := humafiber.New(app, humaConfig)
+	humaAPIV1 := huma.NewGroup(api, "/v1")
 
-		c.Set("Content-Type", "text/html; charset=utf-8")
-		_, err = c.WriteString(htmlContent)
-		return err
-	})
+	huma.NewError = func(status int, message string, _ ...error) huma.StatusError {
+		return util.New(message, status)
+	}
 
 	stateObj := state.New(db)
 
 	h := v1.NewHandler(stateObj)
-	h.Register(app.Group("/v1"))
+	h.Register(humaAPIV1)
 
 	log.Fatal(app.Listen(":8000"))
 }

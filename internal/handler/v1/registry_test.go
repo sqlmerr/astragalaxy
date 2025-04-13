@@ -26,7 +26,7 @@ func TestGetItemByCode(t *testing.T) {
 
 	if assert.Equal(t, http.StatusOK, res.StatusCode) {
 		body, _ := io.ReadAll(res.Body)
-		var item registry.Item
+		var item registry.RItem
 		err := json.Unmarshal(body, &item)
 		assert.NoError(t, err)
 

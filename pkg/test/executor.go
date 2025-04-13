@@ -2,7 +2,7 @@ package test
 
 import (
 	"bytes"
-	"github.com/gofiber/fiber/v2"
+	"github.com/danielgtaylor/huma/v2/humatest"
 	"github.com/stretchr/testify/assert"
 	"io"
 	"net/http/httptest"
@@ -10,10 +10,10 @@ import (
 )
 
 type Executor struct {
-	app *fiber.App
+	app humatest.TestAPI
 }
 
-func New(app *fiber.App) *Executor {
+func New(app humatest.TestAPI) *Executor {
 	return &Executor{app: app}
 }
 
@@ -30,10 +30,9 @@ func (e *Executor) TestHTTP(t *testing.T, tests []HTTPTest, headers ...map[strin
 			}
 		}
 
-		res, err := e.app.Test(req, -1)
+		res := e.app.Do(test.Method, test.Route)
 
-		assert.NoError(t, err, test.Description)
-		assert.Equalf(t, test.ExpectedCode, res.StatusCode, test.Description)
+		assert.Equalf(t, test.ExpectedCode, res.Code, test.Description)
 		if test.ExpectedError || test.BodyValidator == nil {
 			continue
 		}

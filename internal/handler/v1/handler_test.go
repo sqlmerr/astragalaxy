@@ -12,13 +12,12 @@ import (
 	"os"
 	"testing"
 
-	"github.com/gofiber/fiber/v2"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
 
 var (
-	testApp          *fiber.App
+	testHandler      *Handler
 	testUser         *schema.User
 	testAstral       *schema.Astral
 	testUserJwtToken string
@@ -49,13 +48,11 @@ func TestMain(m *testing.M) {
 		panic(err)
 	}
 
-	testApp = fiber.New()
-
 	stateObj := state.New(db)
 	setup(stateObj)
 
 	h := NewHandler(stateObj)
-	h.Register(testApp.Group("/v1"))
+	testHandler = &h
 
 	code := m.Run()
 
@@ -117,9 +114,6 @@ func setup(state *state.State) {
 	if err != nil {
 		panic(err)
 	}
-
-	testExecutor = test.New(testApp)
-
 	testUserJwtToken = *jwtToken
 	testUserToken = token
 	testUser = user

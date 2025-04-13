@@ -1,104 +1,83 @@
 package v1
 
 import (
+	"astragalaxy/internal/registry"
 	"astragalaxy/internal/schema"
 	"astragalaxy/internal/util"
-	"errors"
+	"context"
+	"github.com/danielgtaylor/huma/v2"
 	"net/http"
-
-	"github.com/gofiber/fiber/v2"
 )
 
-// getItemByCode godoc
-//
-//	@Summary		Get item from registry by code
-//	@Description	Jwt Token required
-//	@Tags			registry
-//	@Accept			json
-//	@Produce		json
-//	@Param			code	path		string	true	"Item Code"
-//	@Success		200		{object}	registry.Item
-//	@Failure		500		{object}	util.Error
-//	@Failure		400		{object}	util.Error
-//	@Failure		403		{object}	util.Error
-//	@Failure		404		{object}	util.Error
-//	@Failure		422		{object}	util.Error
-//	@Router			/v1/registry/items/{code} [get]
-func (h *Handler) getItemByCode(c *fiber.Ctx) error {
-	code := c.Params("code")
-	if code == "" {
-		return c.Status(fiber.StatusUnprocessableEntity).JSON(util.NewError(errors.New("code must not be empty")))
+func (h *Handler) registerRegistryGroup(api huma.API) {
+	tags := []string{"registry"}
+
+	huma.Register(api, huma.Operation{
+		Method:      http.MethodGet,
+		Path:        "/items/{code}",
+		Description: "get item by code",
+		Tags:        tags,
+	}, h.getItemByCode)
+	huma.Register(api, huma.Operation{
+		Method:      http.MethodGet,
+		Path:        "/items",
+		Description: "get all items",
+		Tags:        tags,
+	}, h.getItems)
+	huma.Register(api, huma.Operation{
+		Method:      http.MethodGet,
+		Path:        "/locations/{code}",
+		Description: "get location by code",
+		Tags:        tags,
+	}, h.getLocationByCode)
+	huma.Register(api, huma.Operation{
+		Method:      http.MethodGet,
+		Path:        "/locations",
+		Description: "get all locations",
+		Tags:        tags,
+	}, h.getLocations)
+}
+
+func (h *Handler) getItemByCode(_ context.Context, input *struct {
+	Code string `path:"code"`
+}) (*schema.BaseResponse[registry.RItem], error) {
+	if input.Code == "" {
+		return nil, util.ErrInvalidCode
 	}
 
-	item, err := h.state.MasterRegistry.Item.FindOne(code)
+	item, err := h.state.MasterRegistry.Item.FindOne(input.Code)
 	if err != nil && item == nil {
-		return util.AnswerWithError(c, util.ErrNotFound)
+		return nil, util.ErrNotFound
 	} else if err != nil {
-		return util.AnswerWithError(c, err)
+		return nil, err
 	}
-	return c.JSON(item)
+	return &schema.BaseResponse[registry.RItem]{Body: *item}, nil
 }
 
-// getItems godoc
-//
-//	@Summary		Get all items from registry
-//	@Description	Jwt Token required
-//	@Tags			registry
-//	@Produce		json
-//	@Success		200	{object}	schema.DataResponse{data=[]registry.Item}
-//	@Failure		500	{object}	util.Error
-//	@Failure		400	{object}	util.Error
-//	@Failure		403	{object}	util.Error
-//	@Failure		422	{object}	util.Error
-//	@Router			/v1/registry/items [get]
-func (h *Handler) getItems(c *fiber.Ctx) error {
+func (h *Handler) getItems(_ context.Context, _ *struct{}) (*schema.BaseDataResponse[[]registry.RItem], error) {
 	items := h.state.MasterRegistry.Item.All()
-	return c.JSON(schema.DataResponse{Data: items})
+	res := schema.DataGenericResponse[[]registry.RItem]{Data: items}
+	return &schema.BaseDataResponse[[]registry.RItem]{Body: res}, nil
 }
 
-// getLocations godoc
-//
-//	@Summary		Get all locations from registry
-//	@Description	Jwt Token required
-//	@Tags			registry
-//	@Produce		json
-//	@Success		200	{object}	schema.DataResponse{data=[]registry.Location}
-//	@Failure		500	{object}	util.Error
-//	@Failure		400	{object}	util.Error
-//	@Failure		403	{object}	util.Error
-//	@Failure		422	{object}	util.Error
-//	@Router			/v1/registry/locations [get]
-func (h *Handler) getLocations(c *fiber.Ctx) error {
-	locations := h.state.MasterRegistry.Location.All()
-	return c.JSON(schema.DataResponse{Data: locations})
+func (h *Handler) getLocations(_ context.Context, _ *struct{}) (*schema.BaseDataResponse[[]registry.Location], error) {
+	locs := h.state.MasterRegistry.Location.All()
+	res := schema.DataGenericResponse[[]registry.Location]{Data: locs}
+	return &schema.BaseDataResponse[[]registry.Location]{Body: res}, nil
 }
 
-// getLocationByCode godoc
-//
-//	@Summary		Get location from registry by code
-//	@Description	Jwt Token required
-//	@Tags			registry
-//	@Accept			json
-//	@Produce		json
-//	@Param			code	path		string	true	"Location Code"
-//	@Success		200		{object}	registry.Location
-//	@Failure		500		{object}	util.Error
-//	@Failure		400		{object}	util.Error
-//	@Failure		403		{object}	util.Error
-//	@Failure		404		{object}	util.Error
-//	@Failure		422		{object}	util.Error
-//	@Router			/v1/registry/locations/{code} [get]
-func (h *Handler) getLocationByCode(c *fiber.Ctx) error {
-	code := c.Params("code")
-	if code == "" {
-		return util.AnswerWithError(c, util.New("code must not be empty", http.StatusUnprocessableEntity))
+func (h *Handler) getLocationByCode(_ context.Context, input *struct {
+	Code string `path:"code"`
+}) (*schema.BaseResponse[registry.Location], error) {
+	if input.Code == "" {
+		return nil, util.ErrInvalidCode
 	}
 
-	location, err := h.state.MasterRegistry.Location.FindOne(code)
+	location, err := h.state.MasterRegistry.Location.FindOne(input.Code)
 	if err != nil && location == nil {
-		return c.Status(fiber.StatusNotFound).JSON(util.NewError(util.ErrNotFound))
+		return nil, util.ErrNotFound
 	} else if err != nil {
-		return util.AnswerWithError(c, err)
+		return nil, err
 	}
-	return c.JSON(location)
+	return &schema.BaseResponse[registry.Location]{Body: *location}, nil
 }

@@ -2,6 +2,7 @@ package util
 
 import (
 	"errors"
+	"github.com/danielgtaylor/huma/v2"
 	"github.com/gofiber/fiber/v2"
 	"net/http"
 )
@@ -14,6 +15,10 @@ type APIError struct {
 // Error implements error.
 func (e APIError) Error() string {
 	return e.Message
+}
+
+func (e APIError) GetStatus() int {
+	return e.Status
 }
 
 func New(msg string, status int) APIError {
@@ -76,4 +81,14 @@ func NewError(err error) Error {
 		e.Message = v.Error()
 	}
 	return e
+}
+
+func WriteError(api huma.API, ctx huma.Context, err error) {
+	var apiErr APIError
+	ok := errors.As(err, &apiErr)
+	if ok {
+		huma.WriteErr(api, ctx, apiErr.Status, apiErr.Message, err)
+	} else {
+		huma.WriteErr(api, ctx, 500, err.Error(), err)
+	}
 }
