@@ -1,7 +1,7 @@
 package test
 
 import (
-	"bytes"
+	"fmt"
 	"github.com/danielgtaylor/huma/v2/humatest"
 	"github.com/stretchr/testify/assert"
 	"io"
@@ -19,18 +19,23 @@ func New(app humatest.TestAPI) *Executor {
 
 func (e *Executor) TestHTTP(t *testing.T, tests []HTTPTest, headers ...map[string]string) {
 	for _, test := range tests {
-		var bodyReader io.Reader
-		if test.Body != nil {
-			bodyReader = bytes.NewReader(test.Body)
-		}
-		req := httptest.NewRequest(test.Method, test.Route, bodyReader)
+		var args []any
 		for _, header := range headers {
 			for k, v := range header {
-				req.Header.Set(k, v)
+				args = append(args, fmt.Sprintf("%s: %s", k, v))
 			}
 		}
 
-		res := e.app.Do(test.Method, test.Route)
+		fmt.Println("headers:", args)
+		var res *httptest.ResponseRecorder
+		if test.Body != nil {
+			args = append(args, test.Body)
+		}
+		if test.Body == nil {
+			res = e.app.Do(test.Method, test.Route, args...)
+		} else {
+			res = e.app.Do(test.Method, test.Route, args...)
+		}
 
 		assert.Equalf(t, test.ExpectedCode, res.Code, test.Description)
 		if test.ExpectedError || test.BodyValidator == nil {

@@ -77,12 +77,15 @@ func (h *Handler) getItemData(ctx context.Context, input *struct {
 	}
 
 	item, err := h.s.FindOneItem(itemID)
-	if err != nil || item == nil {
+	if err != nil {
 		return nil, err
+	}
+	if item == nil {
+		return nil, util.ErrNotFound
 	}
 
 	if item.AstralID != astral.ID {
-		return nil, err
+		return nil, util.ErrNotFound
 	}
 
 	data := h.s.GetItemDataTags(itemID)

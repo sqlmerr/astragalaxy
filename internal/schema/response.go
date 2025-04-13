@@ -14,8 +14,7 @@ type DataGenericResponse[T any] struct {
 }
 
 type BaseResponse[B any] struct {
-	Body   B
-	Status int
+	Body B
 }
 
 type BaseDataResponse[T any] BaseResponse[DataGenericResponse[T]]

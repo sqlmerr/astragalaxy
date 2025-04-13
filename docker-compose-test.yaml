@@ -1,5 +1,5 @@
 services:
-  db:
+  test-db:
     image: postgres:16.2-alpine
     command: -p 5433
     expose:

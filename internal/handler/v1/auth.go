@@ -43,7 +43,7 @@ func (h *Handler) registerUser(_ context.Context, input *schema.BaseRequest[sche
 		return nil, err
 	}
 
-	return &schema.BaseResponse[schema.User]{Body: *user, Status: http.StatusCreated}, nil
+	return &schema.BaseResponse[schema.User]{Body: *user}, nil
 }
 
 func (h *Handler) loginByToken(_ context.Context, input *schema.BaseRequest[schema.AuthPayloadToken]) (*schema.BaseResponse[schema.AuthBody], error) {

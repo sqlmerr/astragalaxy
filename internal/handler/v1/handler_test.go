@@ -6,9 +6,10 @@ import (
 	"astragalaxy/internal/schema"
 	"astragalaxy/internal/state"
 	"astragalaxy/internal/util"
-	"astragalaxy/pkg/test"
 	"context"
 	"fmt"
+	"github.com/danielgtaylor/huma/v2"
+	"github.com/danielgtaylor/huma/v2/humatest"
 	"os"
 	"testing"
 
@@ -25,7 +26,6 @@ var (
 	testSudoToken    string
 	testStateObj     *state.State
 	testSpaceship    *schema.Spaceship
-	testExecutor     *test.Executor
 	testItem         *schema.Item
 )
 
@@ -121,4 +121,11 @@ func setup(state *state.State) {
 	testSudoToken = state.Config.SecretToken
 	testStateObj = state
 	testSpaceship = spcship
+}
+
+func createAPI(t testing.TB) humatest.TestAPI {
+	_, api := humatest.New(t)
+	humaAPIV1 := huma.NewGroup(api, "/v1")
+	testHandler.Register(humaAPIV1)
+	return api
 }
