@@ -3,18 +3,18 @@ package v1
 import (
 	"astragalaxy/internal/schema"
 	"astragalaxy/pkg/test"
-	"bytes"
 	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
-	"net/http/httptest"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 )
 
 func TestGetMySpaceships(t *testing.T) {
+	api := createAPI(t)
+
 	tests := []test.HTTPTest{
 		{
 			Description:   "Should return 200 OK response",
@@ -35,13 +35,18 @@ func TestGetMySpaceships(t *testing.T) {
 		},
 	}
 
-	testExecutor.TestHTTP(t, tests, map[string]string{
+	executor := test.New(api)
+	executor.TestHTTP(t, tests, map[string]string{
 		"Content-Type":  "application/json",
-		"Authorization": fmt.Sprintf("Bearer %s", testUserJwtToken)},
+		"Authorization": fmt.Sprintf("Bearer %s", testUserJwtToken),
+		"X-Astral-ID":   testAstral.ID.String()},
 	)
 }
 
 func TestGetSpaceshipByID(t *testing.T) {
+	api := createAPI(t)
+	executor := test.New(api)
+
 	tests := []test.HTTPTest{
 		{
 			Description:   "testSpaceship found",
@@ -54,7 +59,7 @@ func TestGetSpaceshipByID(t *testing.T) {
 				assert.NoError(t, err)
 				assert.Equal(t, testSpaceship.ID.String(), b["id"].(string))
 				assert.Equal(t, testSpaceship.Name, b["name"].(string))
-				assert.Equal(t, testSpaceship.UserID.String(), b["user_id"].(string))
+				assert.Equal(t, testSpaceship.AstralID.String(), b["astral_id"].(string))
 			},
 			Method: http.MethodGet,
 		},
@@ -67,15 +72,19 @@ func TestGetSpaceshipByID(t *testing.T) {
 		},
 	}
 
-	testExecutor.TestHTTP(
+	executor.TestHTTP(
 		t, tests,
 		map[string]string{
 			"Content-Type":  "application/json",
-			"Authorization": fmt.Sprintf("Bearer %s", testUserJwtToken)},
+			"Authorization": fmt.Sprintf("Bearer %s", testUserJwtToken),
+			"X-Astral-ID":   testAstral.ID.String()},
 	)
 }
 
 func TestEnterMySpaceship(t *testing.T) {
+	api := createAPI(t)
+	executor := test.New(api)
+
 	tests := []test.HTTPTest{
 		{
 			Description:   "entered testSpaceship",
@@ -106,19 +115,15 @@ func TestEnterMySpaceship(t *testing.T) {
 			Method:        http.MethodPost,
 		},
 	}
-	testExecutor.TestHTTP(t, tests, map[string]string{"Content-Type": "application/json", "Authorization": fmt.Sprintf("Bearer %s", testUserJwtToken)})
+	executor.TestHTTP(t, tests, map[string]string{"Content-Type": "application/json", "Authorization": fmt.Sprintf("Bearer %s", testUserJwtToken), "X-Astral-ID": testAstral.ID.String()})
 }
 
 func TestExitMySpaceship(t *testing.T) {
+	api := createAPI(t)
 	url := fmt.Sprintf("/v1/spaceships/my/%s/exit", testSpaceship.ID.String())
 
-	req := httptest.NewRequest(http.MethodPost, url, nil)
-	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", testUserJwtToken))
-
-	res, err := testApp.Test(req, -1)
-	assert.NoError(t, err)
-	if assert.Equal(t, http.StatusOK, res.StatusCode) {
+	res := api.Post(url, fmt.Sprintf("X-Astral-ID: %s", testAstral.ID.String()), fmt.Sprintf("Authorization: %s", testUserJwtToken))
+	if assert.Equal(t, http.StatusOK, res.Code) {
 		body, err := io.ReadAll(res.Body)
 		assert.NoError(t, err)
 		var response schema.OkResponse
@@ -128,31 +133,25 @@ func TestExitMySpaceship(t *testing.T) {
 		s, err := testStateObj.S.FindOneSpaceship(testSpaceship.ID)
 		assert.NoError(t, err)
 
-		p, err := testStateObj.S.FindOneUser(testUser.ID)
+		a, err := testStateObj.S.FindOneAstral(testAstral.ID)
 		assert.NoError(t, err)
 
 		assert.NotEmpty(t, response)
 		assert.Equal(t, true, response.Ok)
 		assert.Equal(t, 1, response.CustomStatusCode)
 		assert.Equal(t, false, s.PlayerSitIn)
-		assert.Equal(t, false, p.InSpaceship)
+		assert.Equal(t, false, a.InSpaceship)
 	}
 }
 
 func TestRenameMySpaceship(t *testing.T) {
+	api := createAPI(t)
 	url := "/v1/spaceships/my/rename"
 	body := &schema.RenameSpaceship{SpaceshipID: testSpaceship.ID, Name: "testSpaceship"}
-	b, err := json.Marshal(body)
-	assert.NoError(t, err)
 
-	req := httptest.NewRequest(http.MethodPatch, url, bytes.NewReader(b))
-	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", testUserJwtToken))
+	res := api.Patch(url, fmt.Sprintf("X-Astral-ID: %s", testAstral.ID.String()), fmt.Sprintf("Authorization: %s", testUserJwtToken), body)
 
-	res, err := testApp.Test(req, -1)
-	assert.NoError(t, err)
-
-	if assert.Equal(t, http.StatusOK, res.StatusCode) {
+	if assert.Equal(t, http.StatusOK, res.Code) {
 		body, err := io.ReadAll(res.Body)
 		assert.NoError(t, err)
 		var response schema.OkResponse

@@ -4,10 +4,9 @@ import (
 	"astragalaxy/internal/handler/v1"
 	"astragalaxy/internal/state"
 	"astragalaxy/internal/util"
-	"github.com/MarceloPetrucio/go-scalar-api-reference"
+	"github.com/danielgtaylor/huma/v2"
+	"github.com/danielgtaylor/huma/v2/adapters/humafiber"
 	"log"
-
-	_ "astragalaxy/docs"
 
 	_ "ariga.io/atlas-provider-gorm/gormschema"
 
@@ -19,7 +18,7 @@ import (
 )
 
 //	@title Astragalaxy API
-//	@version 0.5.4
+//	@version 0.6.0
 //	@description Astragalaxy API
 //	@license.name MIT
 
@@ -53,51 +52,35 @@ func main() {
 		})
 	})
 
-	//doc := redoc.Redoc{
-	//	Title:       "Astragalaxy API",
-	//	Description: "AstraGalaxyAPI",
-	//	SpecFile:    "./docs/swagger.json",
-	//	SpecPath:    "/docs/openapi.json",
-	//	DocsPath:    "/docs",
-	//}
-	//app.Use(fiberredoc.New(doc))
+	humaConfig := huma.DefaultConfig("Astragalaxy API", "0.6.0")
+	humaConfig.CreateHooks = nil
+	humaConfig.Components.SecuritySchemes = map[string]*huma.SecurityScheme{
+		"bearerAuth": {
+			Type:         "http",
+			Name:         "Bearer",
+			Scheme:       "bearer",
+			BearerFormat: "JWT",
+		},
+		"sudoAuth": {
+			Type: "apiKey",
+			In:   "header",
+			Name: "secret-token",
+		},
+	}
+	humaConfig.Info.License = &huma.License{Name: "MIT", URL: "https://opensource.org/licenses/MIT", Identifier: "MIT"}
+	humaConfig.Info.Description = "🚀 <b>Tiny game about space travelling.</b> </br> <a href='https://github.com/sqlmerr/astragalaxy'>Github</a>"
 
-	//app.Get("/docs/*", swagger.HandlerDefault) // default
-	//
-	//app.Get("/docs/*", swagger.New(swagger.Config{ // custom
-	//	URL:         "http://localhost:8000/doc.json",
-	//	DeepLinking: false,
-	//	// Expand ("list") or Collapse ("none") tag groups by default
-	//	DocExpansion: "none",
-	//}))
+	api := humafiber.New(app, humaConfig)
+	humaAPIV1 := huma.NewGroup(api, "/v1")
 
-	app.Get("/docs", func(c *fiber.Ctx) error {
-		htmlContent, err := scalar.ApiReferenceHTML(&scalar.Options{
-			// SpecURL: "https://generator3.swagger.io/openapi.json",// allow external URL or local path file
-			SpecURL: "./docs/swagger.json",
-			CustomOptions: scalar.CustomOptions{
-				PageTitle: "Simple API",
-			},
-			DarkMode: true,
-		})
-
-		if err != nil {
-			return util.AnswerWithError(c, err)
-		}
-
-		c.Set("Content-Type", "text/html; charset=utf-8")
-		_, err = c.WriteString(htmlContent)
-		return err
-	})
+	huma.NewError = func(status int, message string, _ ...error) huma.StatusError {
+		return util.New(message, status)
+	}
 
 	stateObj := state.New(db)
 
 	h := v1.NewHandler(stateObj)
-	h.Register(app.Group("/v1"))
-
-	//app.Use(func(c *fiber.Ctx) error {
-	//	return util.AnswerWithError(c, util.ErrNotFound)
-	//})
+	h.Register(humaAPIV1)
 
 	log.Fatal(app.Listen(":8000"))
 }

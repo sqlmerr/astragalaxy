@@ -16,7 +16,7 @@ const (
 	ITEM_RARITY_IMMORTAL  ItemRarity = "immortal"
 )
 
-type Item struct {
+type RItem struct {
 	Code         string     `json:"code"`
 	Emoji        string     `json:"emoji"`
 	DamagePerUse int        `json:"damagePerUse"`
@@ -25,7 +25,7 @@ type Item struct {
 }
 
 type ItemRegistry struct {
-	items []Item
+	items []RItem
 }
 
 func NewItem() ItemRegistry {
@@ -45,7 +45,7 @@ func (r *ItemRegistry) Load(filePath string) error {
 		return err
 	}
 
-	var items []Item
+	var items []RItem
 
 	err = json.Unmarshal(byteValue, &items)
 	if err != nil {
@@ -57,11 +57,11 @@ func (r *ItemRegistry) Load(filePath string) error {
 	return nil
 }
 
-func (r *ItemRegistry) All() []Item {
+func (r *ItemRegistry) All() []RItem {
 	return r.items
 }
 
-func (r *ItemRegistry) FindOne(code string) (*Item, error) {
+func (r *ItemRegistry) FindOne(code string) (*RItem, error) {
 	for _, i := range r.items {
 		if i.Code == code {
 			return &i, nil

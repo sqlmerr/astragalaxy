@@ -19,7 +19,7 @@ func (s *Service) CreateSpaceship(data schema.CreateSpaceship) (*schema.Spaceshi
 
 	spaceship := model.Spaceship{
 		Name:     data.Name,
-		UserID:   data.UserID,
+		AstralID: data.AstralID,
 		FlightID: *flightInfo,
 		Location: data.Location,
 		SystemID: data.SystemID,
@@ -63,7 +63,7 @@ func (s *Service) UpdateSpaceship(ID uuid.UUID, data schema.UpdateSpaceship) err
 	spaceship := model.Spaceship{
 		ID:          ID,
 		Name:        data.Name,
-		UserID:      data.UserID,
+		AstralID:    data.AstralID,
 		Location:    data.Location,
 		SystemID:    data.SystemID,
 		PlanetID:    data.PlanetID,

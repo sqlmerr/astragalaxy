@@ -3,13 +3,7 @@ package util
 import (
 	"reflect"
 	"strings"
-
-	"github.com/gofiber/fiber/v2"
 )
-
-func BodyParser(out interface{}, c *fiber.Ctx) error {
-	return c.BodyParser(&out)
-}
 
 func StructToMap(obj interface{}) map[string]interface{} {
 	result := make(map[string]interface{})

@@ -12,3 +12,13 @@ type DataResponse struct {
 type DataGenericResponse[T any] struct {
 	Data T `json:"data"`
 }
+
+type BaseResponse[B any] struct {
+	Body B
+}
+
+type BaseDataResponse[T any] BaseResponse[DataGenericResponse[T]]
+
+type BaseRequest[B any] struct {
+	Body B
+}

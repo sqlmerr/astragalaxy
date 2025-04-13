@@ -1,51 +1,99 @@
 package v1
 
 import (
+	"astragalaxy/internal/schema"
 	"astragalaxy/internal/util"
+	"github.com/danielgtaylor/huma/v2"
+	"github.com/google/uuid"
 	"net/http"
+	"strings"
 
-	jwtware "github.com/gofiber/contrib/jwt"
-	"github.com/gofiber/fiber/v2"
 	"github.com/golang-jwt/jwt/v5"
 )
 
-func (h *Handler) SudoMiddleware(c *fiber.Ctx) error {
-	header := c.Get("secret-token", "")
-	if header != h.state.Config.SecretToken {
-		return c.Status(http.StatusForbidden).JSON(util.NewError(util.ErrInvalidToken))
-	}
+type Middleware = func(ctx huma.Context, next func(huma.Context))
 
-	return c.Next()
+func (h *Handler) SudoMiddleware(api huma.API) Middleware {
+	return func(ctx huma.Context, next func(huma.Context)) {
+		header := ctx.Header("secret-token")
+		if header != h.state.Config.SecretToken {
+			util.WriteError(api, ctx, util.ErrInvalidToken)
+			return
+		}
+
+		next(ctx)
+	}
 }
 
-func (h *Handler) UserGetter(c *fiber.Ctx) error {
-	token := c.Locals("jwtToken").(*jwt.Token)
-	claims := token.Claims.(jwt.MapClaims)
-	username := claims["sub"].(string)
+func (h *Handler) UserGetter(api huma.API) func(ctx huma.Context, next func(huma.Context)) {
+	return func(ctx huma.Context, next func(huma.Context)) {
+		username := ctx.Context().Value("subject").(string)
 
-	user, err := h.s.FindOneUserByUsername(username)
-	if err != nil || user == nil {
-		return c.Status(http.StatusForbidden).JSON(util.NewError(util.ErrInvalidToken))
+		user, err := h.s.FindOneUserByUsername(username)
+		if err != nil || user == nil {
+			util.WriteError(api, ctx, util.ErrInvalidToken)
+			return
+		}
+
+		ctx = huma.WithValue(ctx, "user", user)
+
+		next(ctx)
 	}
-
-	c.Locals("user", user)
-
-	return c.Next()
 }
 
-func (h *Handler) JwtMiddleware() fiber.Handler {
-	return jwtware.New(jwtware.Config{
-		SigningKey:   jwtware.SigningKey{Key: []byte(h.state.Config.JwtSecret)},
-		ErrorHandler: jwtError,
-		ContextKey:   "jwtToken",
-	})
+func (h *Handler) AstralGetter(api huma.API) func(ctx huma.Context, next func(huma.Context)) {
+	return func(ctx huma.Context, next func(huma.Context)) {
+		user := ctx.Context().Value("user").(*schema.User)
+
+		astralID := ctx.Header("X-Astral-ID")
+		baseErr := util.ErrInvalidAstralIDHeader
+		if astralID == "" {
+			util.WriteError(api, ctx, baseErr)
+			return
+		}
+
+		ID, err := uuid.Parse(astralID)
+		if err != nil {
+			util.WriteError(api, ctx, baseErr)
+			return
+		}
+
+		astral, err := h.s.FindOneAstral(ID)
+		if err != nil || astral == nil {
+			util.WriteError(api, ctx, baseErr)
+			return
+		}
+
+		if astral.UserID != user.ID {
+			util.WriteError(api, ctx, baseErr)
+			return
+		}
+
+		ctx = huma.WithValue(ctx, "astral", astral)
+		next(ctx)
+	}
 }
 
-func jwtError(c *fiber.Ctx, err error) error {
-	if err.Error() == "Missing or malformed JWT" {
-		return c.Status(fiber.StatusBadRequest).
-			JSON(util.NewError(err))
+func (h *Handler) JWTMiddleware(api huma.API) func(ctx huma.Context, next func(huma.Context)) {
+	return func(ctx huma.Context, next func(huma.Context)) {
+		token := strings.TrimPrefix(ctx.Header("Authorization"), "Bearer ")
+		if token == "" {
+			huma.WriteErr(api, ctx, http.StatusUnauthorized, "Missing token")
+			return
+		}
+		parsed, err := jwt.Parse(token, func(token *jwt.Token) (interface{}, error) {
+			return []byte(h.state.Config.JwtSecret), nil
+		})
+		if err != nil {
+			huma.WriteErr(api, ctx, http.StatusUnauthorized, "Malformed token")
+			return
+		}
+		sub, err := parsed.Claims.GetSubject()
+		if err != nil {
+			huma.WriteErr(api, ctx, http.StatusUnauthorized, "Malformed token")
+			return
+		}
+		ctx = huma.WithValue(ctx, "subject", sub)
+		next(ctx)
 	}
-	return c.Status(fiber.StatusUnauthorized).
-		JSON(util.NewError(err))
 }

@@ -5,7 +5,7 @@ import "github.com/google/uuid"
 type Spaceship struct {
 	ID          uuid.UUID `gorm:"type:uuid;default:gen_random_uuid();primaryKey"`
 	Name        string    `gorm:"not null"`
-	UserID      uuid.UUID
+	AstralID    uuid.UUID
 	Location    string
 	Flight      FlightInfo
 	FlightID    uuid.UUID `gorm:"default:null"`

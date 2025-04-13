@@ -2,30 +2,21 @@ package v1
 
 import (
 	"astragalaxy/internal/schema"
-	"bytes"
 	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
-	"net/http/httptest"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 )
 
 func TestCreateSystem(t *testing.T) {
+	api := createAPI(t)
 	body := &schema.CreateSystem{Name: "testSystem"}
-	b, err := json.Marshal(body)
-	assert.NoError(t, err)
+	res := api.Post("/v1/systems/", fmt.Sprintf("secret-token: %s", testStateObj.Config.SecretToken), body)
 
-	req := httptest.NewRequest(http.MethodPost, "/v1/systems", bytes.NewBuffer(b))
-	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("secret-token", testStateObj.Config.SecretToken)
-
-	res, err := testApp.Test(req, -1)
-	assert.NoError(t, err)
-
-	if assert.Equal(t, http.StatusCreated, res.StatusCode) {
+	if assert.Equal(t, http.StatusCreated, res.Code) {
 		body, err := io.ReadAll(res.Body)
 		assert.NoError(t, err)
 
@@ -38,19 +29,15 @@ func TestCreateSystem(t *testing.T) {
 }
 
 func TestGetSystemPlanets(t *testing.T) {
+	api := createAPI(t)
 	system, err := testStateObj.S.FindOneSystemByName("initial")
 	assert.NoError(t, err)
-
-	req, err := http.NewRequest(http.MethodGet, fmt.Sprintf("/v1/systems/%s/planets", system.ID), nil)
+	url := fmt.Sprintf("/v1/systems/%s/planets", system.ID)
 	assert.NoError(t, err)
 
-	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("Authorization", fmt.Sprintf("Bearer %v", testUserJwtToken))
+	res := api.Get(url, fmt.Sprintf("Authorization: %s", fmt.Sprintf("Bearer %v", testUserJwtToken)))
 
-	res, err := testApp.Test(req, -1)
-	assert.NoError(t, err)
-
-	if assert.Equal(t, http.StatusOK, res.StatusCode) {
+	if assert.Equal(t, http.StatusOK, res.Code) {
 		body, err := io.ReadAll(res.Body)
 		assert.NoError(t, err)
 
@@ -67,16 +54,14 @@ func TestGetSystemPlanets(t *testing.T) {
 }
 
 func TestGetSystemByID(t *testing.T) {
+	api := createAPI(t)
 	system, err := testStateObj.S.FindOneSystemByName("initial")
 	assert.NoError(t, err)
+	url := fmt.Sprintf("/v1/systems/%s", system.ID)
 
-	req := httptest.NewRequest(http.MethodGet, fmt.Sprintf("/v1/systems/%s", system.ID), nil)
-	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("Authorization", fmt.Sprintf("Bearer %v", testUserJwtToken))
-	res, err := testApp.Test(req, -1)
-	assert.NoError(t, err)
+	res := api.Get(url, fmt.Sprintf("Authorization: %s", fmt.Sprintf("Bearer %v", testUserJwtToken)))
 
-	if assert.Equal(t, http.StatusOK, res.StatusCode) {
+	if assert.Equal(t, http.StatusOK, res.Code) {
 		body, err := io.ReadAll(res.Body)
 		assert.NoError(t, err)
 		var response schema.System
@@ -88,16 +73,12 @@ func TestGetSystemByID(t *testing.T) {
 }
 
 func TestGetAllSystems(t *testing.T) {
+	api := createAPI(t)
 	system, err := testStateObj.S.FindOneSystemByName("initial")
 	assert.NoError(t, err)
+	res := api.Get("/v1/systems/", fmt.Sprintf("Authorization: %s", fmt.Sprintf("Bearer %v", testUserJwtToken)))
 
-	req := httptest.NewRequest(http.MethodGet, "/v1/systems", nil)
-	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("Authorization", fmt.Sprintf("Bearer %v", testUserJwtToken))
-	res, err := testApp.Test(req, -1)
-	assert.NoError(t, err)
-
-	if assert.Equal(t, http.StatusOK, res.StatusCode) {
+	if assert.Equal(t, http.StatusOK, res.Code) {
 		body, err := io.ReadAll(res.Body)
 		assert.NoError(t, err)
 		var r schema.DataGenericResponse[[]schema.System]

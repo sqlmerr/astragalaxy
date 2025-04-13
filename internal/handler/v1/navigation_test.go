@@ -13,15 +13,15 @@ import (
 )
 
 func TestFlightToPlanet(t *testing.T) {
+	api := createAPI(t)
 	planets, err := testStateObj.S.FindAllPlanets(&model.Planet{Name: "testPlanet1"})
 	assert.NoError(t, err)
 	assert.Len(t, planets, 1)
 	planet := planets[0]
-	body, err := json.Marshal(&schema.FlyToPlanet{PlanetID: planet.ID, SpaceshipID: testSpaceship.ID})
-	assert.NoError(t, err)
+	body := &schema.FlyToPlanet{PlanetID: planet.ID, SpaceshipID: testSpaceship.ID}
 
 	if !testSpaceship.PlayerSitIn {
-		err = testStateObj.S.EnterUserSpaceship(*testUser, testSpaceship.ID)
+		err = testStateObj.S.EnterAstralSpaceship(*testAstral, testSpaceship.ID)
 		assert.NoError(t, err)
 	}
 
@@ -47,19 +47,23 @@ func TestFlightToPlanet(t *testing.T) {
 			Method:        http.MethodPost,
 			Route:         "/v1/navigation/planet",
 			ExpectedError: true,
-			ExpectedCode:  http.StatusUnprocessableEntity,
+			ExpectedCode:  http.StatusBadRequest,
 		},
 	}
 
-	testExecutor.TestHTTP(t, tests, map[string]string{
+	executor := test.New(api)
+	executor.TestHTTP(t, tests, map[string]string{
 		"Content-Type":  "application/json",
 		"Authorization": fmt.Sprintf("Bearer %s", testUserJwtToken),
+		"X-Astral-ID":   testAstral.ID.String(),
 	})
 
-	testStateObj.S.ExitUserSpaceship(*testUser, testSpaceship.ID)
+	testStateObj.S.ExitAstralSpaceship(*testAstral, testSpaceship.ID)
 }
 
 func TestHyperJump(t *testing.T) {
+	api := createAPI(t)
+	executor := test.New(api)
 	flying := false
 	err := testStateObj.S.SetFlightInfo(testSpaceship.ID, &model.FlightInfo{Flying: &flying})
 	assert.NoError(t, err)
@@ -67,11 +71,10 @@ func TestHyperJump(t *testing.T) {
 	system, err := testStateObj.S.CreateSystem(schema.CreateSystem{Name: "hyperjumpSystem", Connections: []string{testSpaceship.SystemID}})
 	assert.NoError(t, err)
 
-	body, err := json.Marshal(&schema.HyperJump{Path: fmt.Sprintf("%s->%s", testSpaceship.SystemID, system.ID), SpaceshipID: testSpaceship.ID})
-	assert.NoError(t, err)
+	body := schema.HyperJump{Path: fmt.Sprintf("%s->%s", testSpaceship.SystemID, system.ID), SpaceshipID: testSpaceship.ID}
 
 	if !testSpaceship.PlayerSitIn {
-		err = testStateObj.S.EnterUserSpaceship(*testUser, testSpaceship.ID)
+		err = testStateObj.S.EnterAstralSpaceship(*testAstral, testSpaceship.ID)
 		assert.NoError(t, err)
 	}
 
@@ -97,19 +100,23 @@ func TestHyperJump(t *testing.T) {
 			Method:        http.MethodPost,
 			Route:         "/v1/navigation/hyperjump",
 			ExpectedError: true,
-			ExpectedCode:  http.StatusUnprocessableEntity,
+			ExpectedCode:  http.StatusBadRequest,
 		},
 	}
 
-	testExecutor.TestHTTP(t, tests, map[string]string{
+	executor.TestHTTP(t, tests, map[string]string{
 		"Content-Type":  "application/json",
 		"Authorization": fmt.Sprintf("Bearer %s", testUserJwtToken),
+		"X-Astral-ID":   testAstral.ID.String(),
 	})
 
-	testStateObj.S.ExitUserSpaceship(*testUser, testSpaceship.ID)
+	testStateObj.S.ExitAstralSpaceship(*testAstral, testSpaceship.ID)
 }
 
 func TestCheckFlight(t *testing.T) {
+	api := createAPI(t)
+	executor := test.New(api)
+
 	tests := []test.HTTPTest{
 		{
 			Description:   "Invalid testSpaceship UUID",
@@ -126,15 +133,18 @@ func TestCheckFlight(t *testing.T) {
 			BodyValidator: func(body []byte) {
 				var b *schema.FlyInfo
 				err := json.Unmarshal(body, &b)
-				assert.NoError(t, err)
-				assert.Contains(t, []string{"planet", "system"}, b.Destination)
+				if assert.NoError(t, err) {
+					assert.Contains(t, []string{"planet", "system"}, b.Destination)
+				}
+
 			},
 			Method: http.MethodGet,
 		},
 	}
 
-	testExecutor.TestHTTP(t, tests, map[string]string{
+	executor.TestHTTP(t, tests, map[string]string{
 		"Content-Type":  "application/json",
 		"Authorization": fmt.Sprintf("Bearer %s", testUserJwtToken),
+		"X-Astral-ID":   testAstral.ID.String(),
 	})
 }

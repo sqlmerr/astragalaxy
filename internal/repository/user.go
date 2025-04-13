@@ -41,7 +41,7 @@ func (r UserRepository) FindOne(ID uuid.UUID) (*model.User, error) {
 func (r UserRepository) FindOneFilter(filter *model.User) (*model.User, error) {
 	var m model.User
 
-	if err := r.db.Preload("Spaceships").Where(&filter).First(&m).Error; err != nil {
+	if err := r.db.Where(&filter).First(&m).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, nil
 		}

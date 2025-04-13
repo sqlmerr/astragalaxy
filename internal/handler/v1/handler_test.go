@@ -6,26 +6,26 @@ import (
 	"astragalaxy/internal/schema"
 	"astragalaxy/internal/state"
 	"astragalaxy/internal/util"
-	"astragalaxy/pkg/test"
 	"context"
 	"fmt"
+	"github.com/danielgtaylor/huma/v2"
+	"github.com/danielgtaylor/huma/v2/humatest"
 	"os"
 	"testing"
 
-	"github.com/gofiber/fiber/v2"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
 
 var (
-	testApp          *fiber.App
+	testHandler      *Handler
 	testUser         *schema.User
+	testAstral       *schema.Astral
 	testUserJwtToken string
 	testUserToken    string
 	testSudoToken    string
 	testStateObj     *state.State
 	testSpaceship    *schema.Spaceship
-	testExecutor     *test.Executor
 	testItem         *schema.Item
 )
 
@@ -48,13 +48,11 @@ func TestMain(m *testing.M) {
 		panic(err)
 	}
 
-	testApp = fiber.New()
-
 	stateObj := state.New(db)
 	setup(stateObj)
 
 	h := NewHandler(stateObj)
-	h.Register(testApp.Group("/v1"))
+	testHandler = &h
 
 	code := m.Run()
 
@@ -76,25 +74,30 @@ func setup(state *state.State) {
 
 	fmt.Println("Initial system:", sys)
 
-	user, err := state.S.Register(schema.CreateUser{Password: "testPassword", Username: "tester"}, "space_station", sys.ID)
+	user, err := state.S.Register(schema.CreateUser{Password: "testPassword", Username: "tester"})
 	if err != nil {
 		panic(err)
 	}
 
-	spcship, err := state.S.CreateSpaceship(schema.CreateSpaceship{Name: "initial", UserID: user.ID, Location: "space_station", SystemID: sys.ID})
-	if err != nil {
-		panic(err)
-	}
-	err = state.S.AddUserSpaceship(user.ID, *spcship)
+	astral, err := state.S.CreateAstral(&schema.CreateAstral{Code: "testAstral"}, user.ID, "space_station", sys.ID)
 	if err != nil {
 		panic(err)
 	}
 
-	spaceships, err := state.S.FindAllSpaceships(&model.Spaceship{UserID: user.ID})
+	spcship, err := state.S.CreateSpaceship(schema.CreateSpaceship{Name: "initial", AstralID: astral.ID, Location: "space_station", SystemID: sys.ID})
 	if err != nil {
 		panic(err)
 	}
-	user.Spaceships = spaceships
+	err = state.S.AddAstralSpaceship(astral.ID, *spcship)
+	if err != nil {
+		panic(err)
+	}
+
+	spaceships, err := state.S.FindAllSpaceships(&model.Spaceship{AstralID: astral.ID})
+	if err != nil {
+		panic(err)
+	}
+	astral.Spaceships = spaceships
 
 	usrRaw, err := state.S.FindOneUserRawByUsername(user.Username)
 	if err != nil {
@@ -107,17 +110,22 @@ func setup(state *state.State) {
 		panic(err)
 	}
 
-	testItem, err = state.S.AddItem(usrRaw.ID, "test", map[string]string{"test": "123"})
+	testItem, err = state.S.AddItem(astral.ID, "test", map[string]string{"test": "123"})
 	if err != nil {
 		panic(err)
 	}
-
-	testExecutor = test.New(testApp)
-
 	testUserJwtToken = *jwtToken
 	testUserToken = token
 	testUser = user
+	testAstral = astral
 	testSudoToken = state.Config.SecretToken
 	testStateObj = state
 	testSpaceship = spcship
+}
+
+func createAPI(t testing.TB) humatest.TestAPI {
+	_, api := humatest.New(t)
+	humaAPIV1 := huma.NewGroup(api, "/v1")
+	testHandler.Register(humaAPIV1)
+	return api
 }

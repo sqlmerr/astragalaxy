@@ -1,164 +1,88 @@
 package v1
 
 import (
-	"astragalaxy/internal/model"
 	"astragalaxy/internal/schema"
 	"astragalaxy/internal/util"
+	"context"
+	"github.com/danielgtaylor/huma/v2"
 	"net/http"
 
-	"github.com/gofiber/fiber/v2"
 	"github.com/google/uuid"
 )
 
-// registerUser godoc
-//
-//	@Summary		Register account
-//	@Description	Register account using password and username
-//	@Tags			auth
-//	@Accept			json
-//	@Produce		json
-//	@Param			schema	body		schema.CreateUser	true	"Create User Schema"
-//	@Success		201		{object}	schema.User
-//	@Failure		500		{object}	util.Error
-//	@Failure		403		{object}	util.Error
-//	@Failure		422		{object}	util.Error
-//	@Router			/v1/auth/register [post]
-func (h *Handler) registerUser(c *fiber.Ctx) error {
-	req := &schema.CreateUser{}
-	if err := c.BodyParser(&req); err != nil {
-		return c.Status(http.StatusUnprocessableEntity).JSON(util.NewError(err))
-	}
+func (h *Handler) registerAuthGroup(api huma.API) {
+	huma.Register(api, huma.Operation{Method: http.MethodPost, Path: "/register", DefaultStatus: 201, Tags: []string{"auth"}}, h.registerUser)
+	huma.Register(api, huma.Operation{Method: http.MethodPost, Path: "/login", Tags: []string{"auth"}}, h.login)
+	huma.Register(api, huma.Operation{Method: http.MethodPost, Path: "/login/token", Tags: []string{"auth"}}, h.loginByToken)
+	huma.Register(api, huma.Operation{
+		Method:      http.MethodGet,
+		Path:        "/me",
+		Description: "Get authorized user",
+		Middlewares: huma.Middlewares{h.JWTMiddleware(api), h.UserGetter(api)},
+		Security:    []map[string][]string{{"bearerAuth": {}}},
+		Tags:        []string{"auth"},
+	}, h.getMe)
+	huma.Register(api, huma.Operation{
+		Method:      http.MethodGet,
+		Path:        "/token/sudo",
+		Description: "Get user token sudo",
+		Middlewares: huma.Middlewares{h.SudoMiddleware(api)},
+		Security:    []map[string][]string{{"sudoAuth": {}}},
+		Tags:        []string{"auth"},
+	}, h.getUserTokenSudo)
+}
 
+func (h *Handler) registerUser(_ context.Context, input *schema.BaseRequest[schema.CreateUser]) (*schema.BaseResponse[schema.User], error) {
 	system, err := h.s.FindOneSystemByName("initial")
 	if err != nil || system == nil {
-		return util.AnswerWithError(c, err)
+		return nil, err
 	}
 
-	user, err := h.s.Register(*req, "space_station", system.ID)
+	user, err := h.s.Register(input.Body)
 	if err != nil || user == nil {
-		return util.AnswerWithError(c, err)
+		return nil, err
 	}
 
-	spaceship, err := h.s.CreateSpaceship(schema.CreateSpaceship{
-		Name: "initial", UserID: user.ID, Location: "space_station", SystemID: system.ID,
-	})
-	if err != nil || spaceship == nil {
-		return util.AnswerWithError(c, err)
-	}
-
-	err = h.s.AddUserSpaceship(user.ID, *spaceship)
-	if err != nil {
-		return util.AnswerWithError(c, err)
-	}
-
-	spaceships, err := h.s.FindAllSpaceships(&model.Spaceship{UserID: user.ID})
-	if err != nil {
-		return util.AnswerWithError(c, err)
-	}
-	user.Spaceships = spaceships
-
-	return c.Status(http.StatusCreated).JSON(&user)
+	return &schema.BaseResponse[schema.User]{Body: *user}, nil
 }
 
-// loginByToken godoc
-//
-//	@Summary		Login using user token
-//	@Description	Login. Auth not required.
-//	@Tags			auth
-//	@Accept			json
-//	@Produce		json
-//	@Param			payload	body		schema.AuthPayloadToken	true	"Auth Payload"
-//	@Success		200		{object}	schema.AuthBody
-//	@Failure		500		{object}	util.Error
-//	@Failure		403		{object}	util.Error
-//	@Failure		422		{object}	util.Error
-//	@Router			/v1/auth/login/token [post]
-func (h *Handler) loginByToken(c *fiber.Ctx) error {
-	req := &schema.AuthPayloadToken{}
-
-	if err := c.BodyParser(&req); err != nil {
-		return c.Status(http.StatusUnprocessableEntity).JSON(util.NewError(err))
-	}
-
-	jwtToken, err := h.s.LoginByToken(req.Token)
+func (h *Handler) loginByToken(_ context.Context, input *schema.BaseRequest[schema.AuthPayloadToken]) (*schema.BaseResponse[schema.AuthBody], error) {
+	jwtToken, err := h.s.LoginByToken(input.Body.Token)
 
 	if err != nil || jwtToken == nil {
-		return util.AnswerWithError(c, util.ErrUnauthorized)
+		return nil, util.ErrUnauthorized
 	}
 
-	return c.JSON(schema.AuthBody{AccessToken: *jwtToken, TokenType: "Bearer"})
+	return &schema.BaseResponse[schema.AuthBody]{Body: schema.AuthBody{AccessToken: *jwtToken, TokenType: "Bearer"}}, nil
 }
 
-// login godoc
-//
-//	@Summary		Login using username and password
-//	@Description	Login. Auth not required.
-//	@Tags			auth
-//	@Accept			json
-//	@Produce		json
-//	@Param			payload	body		schema.AuthPayload	true	"Auth Payload"
-//	@Success		200		{object}	schema.AuthBody
-//	@Failure		500		{object}	util.Error
-//	@Failure		403		{object}	util.Error
-//	@Failure		422		{object}	util.Error
-//	@Router			/v1/auth/login [post]
-func (h *Handler) login(c *fiber.Ctx) error {
-	req := &schema.AuthPayload{}
-
-	if err := c.BodyParser(&req); err != nil {
-		return c.Status(http.StatusUnprocessableEntity).JSON(util.NewError(err))
-	}
-
-	jwtToken, err := h.s.Login(req)
+func (h *Handler) login(_ context.Context, input *schema.BaseRequest[schema.AuthPayload]) (*schema.BaseResponse[schema.AuthBody], error) {
+	jwtToken, err := h.s.Login(&input.Body)
 
 	if err != nil || jwtToken == nil {
-		return c.Status(http.StatusUnauthorized).JSON(util.NewError(util.ErrUnauthorized))
+		return nil, util.ErrUnauthorized
 	}
 
-	return c.JSON(schema.AuthBody{AccessToken: *jwtToken, TokenType: "Bearer"})
+	return &schema.BaseResponse[schema.AuthBody]{Body: schema.AuthBody{AccessToken: *jwtToken, TokenType: "Bearer"}}, nil
 }
 
-// getMe godoc
-//
-//	@Summary		GetMe
-//	@Description	Get me. Auth required
-//	@ID				get-me
-//	@Tags			auth
-//	@Produce		json
-//	@Success		200	{object}	schema.User
-//	@Failure		500	{object}	util.Error
-//	@Failure		403	{object}	util.Error
-//	@Security		JwtAuth
-//	@Router			/v1/auth/me [get]
-func (h *Handler) getMe(c *fiber.Ctx) error {
-	user := c.Locals("user").(*schema.User)
-	return c.JSON(&user)
+func (h *Handler) getMe(ctx context.Context, _ *struct{}) (*schema.BaseResponse[schema.User], error) {
+	user := ctx.Value("user").(*schema.User)
+	return &schema.BaseResponse[schema.User]{Body: *user}, nil
 }
 
-// getUserTokenSudo godoc
-//
-//	@Summary		Get user token using sudo token
-//	@Description	Sudo token required
-//	@Tags			auth
-//	@Produce		json
-//	@Param			id	query		string	true	"User id"
-//	@Success		200	{object}	schema.UserTokenResponse
-//	@Failure		500	{object}	util.Error
-//	@Failure		403	{object}	util.Error
-//	@Failure		422	{object}	util.Error
-//	@Security		SudoToken
-//	@Router			/v1/auth/token/sudo [get]
-func (h *Handler) getUserTokenSudo(c *fiber.Ctx) error {
-	userID := c.Query("id", "")
-	ID, err := uuid.Parse(userID)
+func (h *Handler) getUserTokenSudo(_ context.Context, input *struct {
+	UserID string `query:"id" doc:"User id in UUID type" example:"39518366-f039-4a79-961f-611f6a2fe723"`
+}) (*schema.BaseResponse[schema.UserTokenResponse], error) {
+	ID, err := uuid.Parse(input.UserID)
 	if err != nil {
-		return c.Status(http.StatusUnprocessableEntity).JSON(util.NewError(util.New(err.Error(), http.StatusUnprocessableEntity)))
+		return nil, huma.Error422UnprocessableEntity("failed to parse user id", err)
 	}
 
 	user, err := h.s.FindOneUserRaw(ID)
 	if err != nil || user == nil {
-		return util.AnswerWithError(c, err)
+		return nil, err
 	}
 
-	return c.JSON(&schema.UserTokenResponse{Token: user.Token})
+	return &schema.BaseResponse[schema.UserTokenResponse]{Body: schema.UserTokenResponse{Token: user.Token}}, nil
 }

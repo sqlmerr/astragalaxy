@@ -5,12 +5,15 @@ import (
 	"astragalaxy/pkg/test"
 	"encoding/json"
 	"fmt"
+	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
 	"net/http"
 	"testing"
 )
 
 func TestGetMyItems(t *testing.T) {
+	api := createAPI(t)
+	executor := test.New(api)
 	tests := []test.HTTPTest{
 		{
 			Description:   "Get items",
@@ -25,16 +28,18 @@ func TestGetMyItems(t *testing.T) {
 
 				if assert.Len(t, b.Data, 1) {
 					assert.Equal(t, "test", b.Data[0].Code)
-					assert.Equal(t, testUser.ID, b.Data[0].UserID)
+					assert.Equal(t, testAstral.ID, b.Data[0].AstralID)
 				}
 			},
 		},
 	}
 
-	testExecutor.TestHTTP(t, tests, map[string]string{"Content-Type": "application/json", "Authorization": fmt.Sprintf("Bearer %s", testUserJwtToken)})
+	executor.TestHTTP(t, tests, map[string]string{"Content-Type": "application/json", "Authorization": fmt.Sprintf("Bearer %s", testUserJwtToken), "X-Astral-ID": testAstral.ID.String()})
 }
 
 func TestGetMyItemsByCode(t *testing.T) {
+	api := createAPI(t)
+	executor := test.New(api)
 	tests := []test.HTTPTest{
 		{
 			Description:   "Get items by code",
@@ -49,7 +54,7 @@ func TestGetMyItemsByCode(t *testing.T) {
 
 				if assert.Len(t, b.Data, 1) {
 					assert.Equal(t, "test", b.Data[0].Code)
-					assert.Equal(t, testUser.ID, b.Data[0].UserID)
+					assert.Equal(t, testAstral.ID, b.Data[0].AstralID)
 				}
 			},
 		},
@@ -68,10 +73,15 @@ func TestGetMyItemsByCode(t *testing.T) {
 		},
 	}
 
-	testExecutor.TestHTTP(t, tests, map[string]string{"Authorization": fmt.Sprintf("Bearer %s", testUserJwtToken)})
+	executor.TestHTTP(t, tests, map[string]string{"Authorization": fmt.Sprintf("Bearer %s", testUserJwtToken), "X-Astral-ID": testAstral.ID.String()})
 }
 
 func TestGetItemData(t *testing.T) {
+	api := createAPI(t)
+	executor := test.New(api)
+	anotherUuid := uuid.New().String()
+
+	fmt.Println("asdasdasjkklajsdf, ", anotherUuid == testItem.ID.String(), anotherUuid, testItem.ID.String())
 	tests := []test.HTTPTest{
 		{
 			Description:   "Get item data success",
@@ -95,12 +105,12 @@ func TestGetItemData(t *testing.T) {
 		},
 		{
 			Description:   "Item not found",
-			Route:         "/v1/inventory/items/34afa4f5-c0e9-49ca-8e13-7dcb731b1541/data",
+			Route:         fmt.Sprintf("/v1/inventory/items/%s/data", anotherUuid),
 			Method:        http.MethodGet,
 			ExpectedError: true,
 			ExpectedCode:  404,
 		},
 	}
 
-	testExecutor.TestHTTP(t, tests, map[string]string{"Authorization": fmt.Sprintf("Bearer %s", testUserJwtToken)})
+	executor.TestHTTP(t, tests, map[string]string{"Authorization": fmt.Sprintf("Bearer %s", testUserJwtToken), "X-Astral-ID": testAstral.ID.String()})
 }

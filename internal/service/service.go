@@ -10,6 +10,7 @@ type Service struct {
 	f   repository.FlightRepo
 	sy  repository.SystemRepo
 	u   repository.UserRepo
+	a   repository.AstralRepo
 	i   repository.ItemRepo
 	idt repository.ItemDataTagRepo
 	p   repository.PlanetRepo
@@ -22,6 +23,7 @@ func New(
 	f repository.FlightRepo,
 	sy repository.SystemRepo,
 	u repository.UserRepo,
+	a repository.AstralRepo,
 	i repository.ItemRepo,
 	idt repository.ItemDataTagRepo,
 	p repository.PlanetRepo,
@@ -32,6 +34,7 @@ func New(
 		f:   f,
 		sy:  sy,
 		u:   u,
+		a:   a,
 		i:   i,
 		idt: idt,
 		p:   p,

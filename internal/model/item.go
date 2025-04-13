@@ -4,8 +4,8 @@ import "github.com/google/uuid"
 
 type Item struct {
 	ID         uuid.UUID `gorm:"type:uuid;default:gen_random_uuid();primaryKey"`
-	UserID     uuid.UUID
-	User       User
+	AstralID   uuid.UUID
+	Astral     Astral
 	Code       string
 	Durability int `gorm:"default:100"`
 }

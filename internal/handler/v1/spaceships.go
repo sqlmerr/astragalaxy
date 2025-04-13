@@ -4,161 +4,141 @@ import (
 	"astragalaxy/internal/model"
 	"astragalaxy/internal/schema"
 	"astragalaxy/internal/util"
-	"errors"
-	"net/http"
-
-	"github.com/gofiber/fiber/v2"
+	"context"
+	"github.com/danielgtaylor/huma/v2"
 	"github.com/google/uuid"
-	"gorm.io/gorm"
+	"net/http"
 )
 
-// getSpaceshipByID godoc
-//
-//	@Summary		Get testSpaceship by id
-//	@Description	Jwt Token required
-//	@Tags			spaceships
-//	@Accept			json
-//	@Produce		json
-//	@Param			id	path		string	true	"Spaceship ID. Must be a UUID"
-//	@Success		200	{object}	schema.Spaceship
-//	@Failure		500	{object}	util.Error
-//	@Failure		400	{object}	util.Error
-//	@Failure		403	{object}	util.Error
-//	@Failure		422	{object}	util.Error
-//	@Security		JwtAuth
-//	@Router			/v1/spaceships/{id} [get]
-func (h *Handler) getSpaceshipByID(c *fiber.Ctx) error {
-	ID, err := uuid.Parse(c.Params("id"))
+func (h *Handler) registerSpaceshipsGroup(api huma.API) {
+	api.UseMiddleware(h.JWTMiddleware(api))
+	security := []map[string][]string{{"bearerAuth": {}}}
+	tags := []string{"spaceships"}
+	params := []*huma.Param{{Name: "X-Astral-ID", In: "header", Description: "astral id", Required: true, Schema: &huma.Schema{Type: "string"}}}
+	middlewares := []func(ctx huma.Context, next func(huma.Context)){
+		h.UserGetter(api), h.AstralGetter(api),
+	}
+
+	huma.Register(api, huma.Operation{
+		Path:        "/my",
+		Method:      http.MethodGet,
+		Tags:        tags,
+		Security:    security,
+		Middlewares: middlewares,
+		Parameters:  params,
+	}, h.getMySpaceships)
+	huma.Register(api, huma.Operation{
+		Path:        "/my/rename",
+		Method:      http.MethodPatch,
+		Tags:        tags,
+		Security:    security,
+		Middlewares: middlewares,
+		Parameters:  params,
+	}, h.renameMySpaceship)
+	huma.Register(api, huma.Operation{
+		Path:        "/my/{id}/enter",
+		Method:      http.MethodPost,
+		Tags:        tags,
+		Security:    security,
+		Middlewares: middlewares,
+		Parameters:  params,
+	}, h.enterMySpaceship)
+	huma.Register(api, huma.Operation{
+		Path:        "/my/{id}/exit",
+		Method:      http.MethodPost,
+		Tags:        tags,
+		Security:    security,
+		Middlewares: middlewares,
+		Parameters:  params,
+	}, h.exitMySpaceship)
+	huma.Register(api, huma.Operation{
+		Path:     "/{id}",
+		Method:   http.MethodGet,
+		Tags:     tags,
+		Security: security,
+	}, h.getSpaceshipByID)
+}
+
+func (h *Handler) getSpaceshipByID(_ context.Context, input *struct {
+	ID string `path:"id" example:"39518366-f039-4a79-961f-611f6a2fe723"`
+}) (*schema.BaseResponse[schema.Spaceship], error) {
+	ID, err := uuid.Parse(input.ID)
 	if err != nil {
-		return util.AnswerWithError(c, util.ErrIDMustBeUUID)
+		return nil, util.ErrIDMustBeUUID
 	}
 
 	spaceship, err := h.s.FindOneSpaceship(ID)
 	if err != nil {
-		return util.AnswerWithError(c, err)
+		return nil, err
 	}
 	if spaceship == nil {
-		return util.AnswerWithError(c, util.ErrNotFound)
+		return nil, util.ErrNotFound
 	}
 
-	return c.JSON(&spaceship)
+	return &schema.BaseResponse[schema.Spaceship]{Body: *spaceship}, nil
 }
 
-// getMySpaceships godoc
-//
-//	@Summary		Get authorized user spaceships
-//	@Description	Jwt Token required
-//	@Tags			spaceships
-//	@Produce		json
-//	@Success		200	{object}	schema.DataResponse{data=[]schema.Spaceship}
-//	@Failure		500	{object}	util.Error
-//	@Failure		403	{object}	util.Error
-//	@Failure		422	{object}	util.Error
-//	@Security		JwtAuth
-//	@Router			/v1/spaceships/my [get]
-func (h *Handler) getMySpaceships(c *fiber.Ctx) error {
-	user := c.Locals("user").(*schema.User)
-	spaceships, err := h.s.FindAllSpaceships(&model.Spaceship{UserID: user.ID})
+func (h *Handler) getMySpaceships(ctx context.Context, _ *struct{}) (*schema.BaseDataResponse[[]schema.Spaceship], error) {
+	astral := ctx.Value("astral").(*schema.Astral)
+	spaceships, err := h.s.FindAllSpaceships(&model.Spaceship{AstralID: astral.ID})
 	if err != nil {
-		return util.AnswerWithError(c, err)
+		return nil, err
 	}
 
-	return c.JSON(schema.DataResponse{Data: spaceships})
+	return &schema.BaseDataResponse[[]schema.Spaceship]{
+		Body: schema.DataGenericResponse[[]schema.Spaceship]{Data: spaceships},
+	}, nil
 }
 
-// enterMySpaceship godoc
-//
-//	@Summary		Enter authorized user testSpaceship
-//	@Description	Jwt Token required
-//	@Tags			spaceships
-//	@Produce		json
-//	@Param			id	path		string	true	"Spaceship ID. Must be a UUID"
-//	@Success		200	{object}	schema.OkResponse
-//	@Failure		500	{object}	util.Error
-//	@Failure		400	{object}	util.Error
-//	@Failure		403	{object}	util.Error
-//	@Failure		422	{object}	util.Error
-//	@Security		JwtAuth
-//	@Router			/v1/spaceships/my/{id}/enter [post]
-func (h *Handler) enterMySpaceship(c *fiber.Ctx) error {
-	ID, err := uuid.Parse(c.Params("id"))
+func (h *Handler) enterMySpaceship(ctx context.Context, input *struct {
+	ID string `path:"id" example:"39518366-f039-4a79-961f-611f6a2fe723"`
+}) (*schema.BaseResponse[schema.OkResponse], error) {
+	ID, err := uuid.Parse(input.ID)
 	if err != nil {
-		return util.AnswerWithError(c, util.New(err.Error(), http.StatusBadRequest))
+		return nil, util.ErrIDMustBeUUID
 	}
 
-	user := c.Locals("user").(*schema.User)
+	astral := ctx.Value("astral").(*schema.Astral)
 
-	err = h.s.EnterUserSpaceship(*user, ID)
+	err = h.s.EnterAstralSpaceship(*astral, ID)
 	if err != nil {
-		return util.AnswerWithError(c, err)
+		return nil, err
 	}
-	return c.JSON(schema.OkResponse{Ok: true, CustomStatusCode: 1})
+	return &schema.BaseResponse[schema.OkResponse]{Body: schema.OkResponse{Ok: true, CustomStatusCode: 1}}, nil
 }
 
-// exitMySpaceship godoc
-//
-//	@Summary		Exit authorized user testSpaceship
-//	@Description	Jwt Token required
-//	@Tags			spaceships
-//	@Produce		json
-//	@Param			id	path		string	true	"Spaceship ID. Must be a UUID"
-//	@Success		200	{object}	schema.OkResponse
-//	@Failure		500	{object}	util.Error
-//	@Failure		403	{object}	util.Error
-//	@Failure		422	{object}	util.Error
-//	@Security		JwtAuth
-//	@Router			/v1/spaceships/my/{id}/exit [post]
-func (h *Handler) exitMySpaceship(c *fiber.Ctx) error {
-	ID, err := uuid.Parse(c.Params("id"))
+func (h *Handler) exitMySpaceship(ctx context.Context, input *struct {
+	ID string `path:"id" example:"39518366-f039-4a79-961f-611f6a2fe723"`
+}) (*schema.BaseResponse[schema.OkResponse], error) {
+	ID, err := uuid.Parse(input.ID)
 	if err != nil {
-		return util.AnswerWithError(c, util.ErrIDMustBeUUID)
+		return nil, util.ErrIDMustBeUUID
 	}
 
-	user := c.Locals("user").(*schema.User)
+	astral := ctx.Value("astral").(*schema.Astral)
 
-	err = h.s.ExitUserSpaceship(*user, ID)
+	err = h.s.ExitAstralSpaceship(*astral, ID)
 	if err != nil {
-		return util.AnswerWithError(c, err)
+		return nil, err
 	}
-	return c.JSON(schema.OkResponse{Ok: true, CustomStatusCode: 1})
+	return &schema.BaseResponse[schema.OkResponse]{Body: schema.OkResponse{Ok: true, CustomStatusCode: 1}}, nil
 }
 
-// renameMySpaceship godoc
-//
-//	@Summary		Rename authorized user testSpaceship
-//	@Description	Jwt Token required
-//	@Tags			spaceships
-//	@Accept			json
-//	@Produce		json
-//	@Param			req	body		schema.RenameSpaceship	true	"rename testSpaceship schema"
-//	@Success		200	{object}	schema.OkResponse
-//	@Failure		500	{object}	util.Error
-//	@Failure		403	{object}	util.Error
-//	@Failure		422	{object}	util.Error
-//	@Security		JwtAuth
-//	@Router			/v1/spaceships/my/rename [patch]
-func (h *Handler) renameMySpaceship(c *fiber.Ctx) error {
-	req := &schema.RenameSpaceship{}
-	if err := util.BodyParser(req, c); err != nil {
-		return c.Status(http.StatusUnprocessableEntity).JSON(util.NewError(err))
-	}
-	user := c.Locals("user").(*schema.User)
-	spaceship, err := h.s.FindOneSpaceship(req.SpaceshipID)
+func (h *Handler) renameMySpaceship(ctx context.Context, input *schema.BaseRequest[schema.RenameSpaceship]) (*schema.BaseResponse[schema.OkResponse], error) {
+	astral := ctx.Value("astral").(*schema.Astral)
+	spaceship, err := h.s.FindOneSpaceship(input.Body.SpaceshipID)
 	if err != nil {
-		return util.AnswerWithError(c, err)
+		return nil, err
 	}
-	if spaceship.UserID != user.ID {
-		return util.AnswerWithError(c, util.ErrNotFound)
+	if spaceship.AstralID != astral.ID {
+		return nil, util.ErrNotFound
 	}
 
-	spaceshipSchema := schema.UpdateSpaceship{Name: req.Name}
-	err = h.s.UpdateSpaceship(req.SpaceshipID, spaceshipSchema)
+	spaceshipSchema := schema.UpdateSpaceship{Name: input.Body.Name}
+	err = h.s.UpdateSpaceship(input.Body.SpaceshipID, spaceshipSchema)
 	if err != nil {
-		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return util.AnswerWithError(c, util.ErrNotFound)
-		}
-		return util.AnswerWithError(c, err)
+		return nil, util.ErrNotFound
 	}
 	response := schema.OkResponse{Ok: true, CustomStatusCode: 1}
-	return c.JSON(&response)
+	return &schema.BaseResponse[schema.OkResponse]{Body: response}, nil
 }

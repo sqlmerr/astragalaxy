@@ -6,27 +6,23 @@ import (
 	"fmt"
 	"io"
 	"net/http"
-	"net/http/httptest"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 )
 
 func TestGetItemByCode(t *testing.T) {
-	resNotFound, err := testApp.Test(httptest.NewRequest(http.MethodGet, "/v1/registry/items/notfound", nil), -1)
-	assert.NoError(t, err)
-	assert.Equal(t, http.StatusNotFound, resNotFound.StatusCode)
+	api := createAPI(t)
+	resNotFound := api.Get("/v1/registry/items/notfound")
+	assert.Equal(t, http.StatusNotFound, resNotFound.Code)
 
 	code := "test"
 	url := fmt.Sprintf("/v1/registry/items/%s", code)
-	request := httptest.NewRequest(http.MethodGet, url, nil)
-	request.Header.Set("Content-Type", "application/json")
-	res, err := testApp.Test(request, -1)
-	assert.NoError(t, err)
+	res := api.Get(url)
 
-	if assert.Equal(t, http.StatusOK, res.StatusCode) {
+	if assert.Equal(t, http.StatusOK, res.Code) {
 		body, _ := io.ReadAll(res.Body)
-		var item registry.Item
+		var item registry.RItem
 		err := json.Unmarshal(body, &item)
 		assert.NoError(t, err)
 
@@ -36,38 +32,33 @@ func TestGetItemByCode(t *testing.T) {
 }
 
 func TestGetItems(t *testing.T) {
-	url := "/v1/registry/items"
-	request := httptest.NewRequest(http.MethodGet, url, nil)
-	request.Header.Set("Content-Type", "application/json")
-	res, err := testApp.Test(request, -1)
+	api := createAPI(t)
 
-	assert.NoError(t, err)
-	assert.Equal(t, http.StatusOK, res.StatusCode)
+	url := "/v1/registry/items"
+	res := api.Get(url)
+
+	assert.Equal(t, http.StatusOK, res.Code)
 }
 
 func TestGetLocations(t *testing.T) {
-	url := "/v1/registry/locations"
-	request := httptest.NewRequest(http.MethodGet, url, nil)
-	request.Header.Set("Content-Type", "application/json")
-	res, err := testApp.Test(request, -1)
+	api := createAPI(t)
 
-	assert.NoError(t, err)
-	assert.Equal(t, http.StatusOK, res.StatusCode)
+	url := "/v1/registry/locations"
+	res := api.Get(url)
+
+	assert.Equal(t, http.StatusOK, res.Code)
 }
 
 func TestGetLocationByCode(t *testing.T) {
-	resNotFound, err := testApp.Test(httptest.NewRequest(http.MethodGet, "/v1/registry/locations/notfound", nil), -1)
-	assert.NoError(t, err)
-	assert.Equal(t, http.StatusNotFound, resNotFound.StatusCode)
+	api := createAPI(t)
+	resNotFound := api.Get("/v1/registry/locations/notfound")
+	assert.Equal(t, http.StatusNotFound, resNotFound.Code)
 
 	code := "space_station"
 	url := fmt.Sprintf("/v1/registry/locations/%s", code)
-	request := httptest.NewRequest(http.MethodGet, url, nil)
-	request.Header.Set("Content-Type", "application/json")
-	res, err := testApp.Test(request, -1)
-	assert.NoError(t, err)
+	res := api.Get(url)
 
-	if assert.Equal(t, http.StatusOK, res.StatusCode) {
+	if assert.Equal(t, http.StatusOK, res.Code) {
 		body, _ := io.ReadAll(res.Body)
 		var location registry.Location
 		err := json.Unmarshal(body, &location)

@@ -2,31 +2,22 @@ package v1
 
 import (
 	"astragalaxy/internal/schema"
-	"bytes"
 	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
-	"net/http/httptest"
-	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 )
 
 func TestRegister(t *testing.T) {
+	api := createAPI(t)
 	body := &schema.CreateUser{Password: "987654321", Username: "tester2"}
-	b, err := json.Marshal(body)
-	assert.NoError(t, err)
 
-	request := httptest.NewRequest(http.MethodPost, "/v1/auth/register", bytes.NewReader(b))
-	request.Header.Set("Content-Type", "application/json")
-	request.Header.Set("secret-token", testSudoToken)
+	res := api.Post("/v1/auth/register", fmt.Sprintf("secret-token: %s", testSudoToken), body)
 
-	res, err := testApp.Test(request, -1)
-	assert.NoError(t, err)
-
-	if assert.Equal(t, res.StatusCode, http.StatusCreated) {
+	if assert.Equal(t, http.StatusCreated, res.Code) {
 		body, err := io.ReadAll(res.Body)
 		assert.NoError(t, err)
 
@@ -36,25 +27,16 @@ func TestRegister(t *testing.T) {
 		assert.NoError(t, err)
 
 		assert.Equal(t, "tester2", response.Username)
-
-		spaceship, err := testStateObj.S.FindOneSpaceship(response.Spaceships[0].ID)
-		assert.NoError(t, err)
-
-		assert.Equal(t, "initial", spaceship.Name)
-		assert.Equal(t, response.ID, spaceship.UserID)
 	}
 }
 
 func TestLoginByToken(t *testing.T) {
-	body := fmt.Sprintf(`{"token":"%s"}`, testUserToken)
+	api := createAPI(t)
+	body := schema.AuthPayloadToken{Token: testUserToken}
 
-	request := httptest.NewRequest(http.MethodPost, "/v1/auth/login/token", strings.NewReader(body))
-	request.Header.Set("Content-Type", "application/json")
+	res := api.Post("/v1/auth/login/token", body)
 
-	res, err := testApp.Test(request, -1)
-	assert.NoError(t, err)
-
-	if assert.Equal(t, http.StatusOK, res.StatusCode) {
+	if assert.Equal(t, http.StatusOK, res.Code) {
 		body, err := io.ReadAll(res.Body)
 		assert.NoError(t, err)
 
@@ -67,15 +49,12 @@ func TestLoginByToken(t *testing.T) {
 }
 
 func TestLogin(t *testing.T) {
-	body := fmt.Sprintf(`{"username":"%s","password":"%s"}`, testUser.Username, "testPassword")
+	api := createAPI(t)
+	body := schema.AuthPayload{Username: testUser.Username, Password: "testPassword"}
 
-	request := httptest.NewRequest(http.MethodPost, "/v1/auth/login", strings.NewReader(body))
-	request.Header.Set("Content-Type", "application/json")
+	res := api.Post("/v1/auth/login", body)
 
-	res, err := testApp.Test(request, -1)
-	assert.NoError(t, err)
-
-	if assert.Equal(t, http.StatusOK, res.StatusCode) {
+	if assert.Equal(t, http.StatusOK, res.Code) {
 		body, err := io.ReadAll(res.Body)
 		assert.NoError(t, err)
 
@@ -88,13 +67,11 @@ func TestLogin(t *testing.T) {
 }
 
 func TestGetUserTokenSudo(t *testing.T) {
-	request := httptest.NewRequest(http.MethodGet, fmt.Sprintf("/v1/auth/token/sudo?id=%s", testUser.ID.String()), nil)
-	request.Header.Set("Content-Type", "application/json")
-	request.Header.Set("secret-token", testSudoToken)
+	api := createAPI(t)
+	url := fmt.Sprintf("/v1/auth/token/sudo?id=%s", testUser.ID.String())
 
-	res, err := testApp.Test(request, -1)
-	assert.NoError(t, err)
-	if assert.Equal(t, http.StatusOK, res.StatusCode) {
+	res := api.Get(url, fmt.Sprintf("secret-token: %s", testSudoToken))
+	if assert.Equal(t, http.StatusOK, res.Code) {
 		body, err := io.ReadAll(res.Body)
 		assert.NoError(t, err)
 
@@ -107,15 +84,11 @@ func TestGetUserTokenSudo(t *testing.T) {
 }
 
 func TestGetMe(t *testing.T) {
+	api := createAPI(t)
 	url := "/v1/auth/me"
-	request := httptest.NewRequest(http.MethodGet, url, nil)
-	request.Header.Set("Content-Type", "application/json")
-	request.Header.Set("Authorization", fmt.Sprintf("Bearer %s", testUserJwtToken))
-	res, err := testApp.Test(request, -1)
+	res := api.Get(url, fmt.Sprintf("Authorization: %s", fmt.Sprintf("Bearer %s", testUserJwtToken)))
 
-	assert.NoError(t, err)
-
-	if assert.Equal(t, http.StatusOK, res.StatusCode) {
+	if assert.Equal(t, http.StatusOK, res.Code) {
 		body, err := io.ReadAll(res.Body)
 		assert.NoError(t, err)
 

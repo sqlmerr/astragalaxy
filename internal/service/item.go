@@ -9,10 +9,10 @@ import (
 	"github.com/google/uuid"
 )
 
-func (s *Service) AddItem(userID uuid.UUID, itemCode string, dataTags map[string]string) (*schema.Item, error) {
+func (s *Service) AddItem(astralID uuid.UUID, itemCode string, dataTags map[string]string) (*schema.Item, error) {
 	item := model.Item{
-		UserID: userID,
-		Code:   itemCode,
+		AstralID: astralID,
+		Code:     itemCode,
 	}
 	err := s.i.Create(&item)
 	if err != nil {
@@ -94,8 +94,8 @@ func (s *Service) GetItemDataTag(itemID uuid.UUID, key string) (*string, error) 
 	return &val, nil
 }
 
-func (s *Service) GetUserItems(userID uuid.UUID) []schema.Item {
-	items, err := s.i.FindAll(&model.Item{UserID: userID})
+func (s *Service) GetAstralItems(astralID uuid.UUID) []schema.Item {
+	items, err := s.i.FindAll(&model.Item{AstralID: astralID})
 	if err != nil {
 		return nil
 	}

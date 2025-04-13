@@ -1,5 +1,5 @@
 services:
-  db:
+  test-db:
     image: postgres:16.2-alpine
     command: -p 5433
     expose:
@@ -8,5 +8,7 @@ services:
         - '5433:5433'
     env_file:
       - .env
+    environment:
+      - PGDATA=/var/lib/postgresql/data2/pgdata2
     tmpfs:
-      - /var/lib/posgresql/data
+      - /var/lib/posgresql/data2
