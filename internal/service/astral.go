@@ -112,8 +112,15 @@ func (s *Service) EnterAstralSpaceship(astral schema.Astral, spaceshipID uuid.UU
 func (s *Service) ExitAstralSpaceship(astral schema.Astral, spaceshipID uuid.UUID) error {
 	for _, sp := range astral.Spaceships {
 		if sp.ID == spaceshipID {
+			flyInfo, err := s.GetFlyInfo(spaceshipID)
+			if err != nil {
+				return err
+			}
+			if flyInfo.Flying {
+				return util.ErrSpaceshipIsFlying
+			}
 			inSpaceship := false
-			err := s.a.Update(&model.Astral{ID: astral.ID, InSpaceship: &inSpaceship})
+			err = s.a.Update(&model.Astral{ID: astral.ID, InSpaceship: &inSpaceship})
 			if err != nil {
 				return err
 			}

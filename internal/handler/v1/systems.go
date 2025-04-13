@@ -46,7 +46,7 @@ func (h *Handler) registerSystemsGroup(api huma.API) {
 func (h *Handler) createSystem(_ context.Context, input *schema.BaseRequest[schema.CreateSystem]) (*schema.BaseResponse[schema.System], error) {
 	sys, err := h.s.CreateSystem(input.Body)
 	if err != nil {
-		return nil, util.ErrServerError
+		return nil, err
 	}
 	return &schema.BaseResponse[schema.System]{Body: *sys}, nil
 }

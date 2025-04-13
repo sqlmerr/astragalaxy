@@ -7,6 +7,13 @@ import (
 )
 
 func (s *Service) CreateSystem(data schema.CreateSystem) (*schema.System, error) {
+	for _, conn := range data.Connections {
+		_, err := s.FindOneSystem(conn)
+		if err != nil {
+			return nil, err
+		}
+	}
+
 	id, err := s.id.Generate(7)
 	if err != nil {
 		return nil, util.ErrServerError

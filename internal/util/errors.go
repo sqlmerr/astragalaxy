@@ -38,6 +38,7 @@ var (
 	ErrItemDataTagNotFound            = ErrNotFound
 	ErrIDMustBeUUID                   = New("id must be valid uuid", 400)
 	ErrSpaceshipAlreadyFlying         = New("spaceship is already flying", http.StatusBadRequest)
+	ErrSpaceshipIsFlying              = New("spaceship is flying", 400)
 	ErrSpaceshipIsInAnotherSystem     = New("spaceship is in another system", http.StatusBadRequest)
 	ErrSpaceshipIsAlreadyInThisPlanet = New("spaceship is already in this planet", http.StatusBadRequest)
 	ErrSpaceshipIsAlreadyInThisSystem = New("spaceship is already in this system", http.StatusBadRequest)
