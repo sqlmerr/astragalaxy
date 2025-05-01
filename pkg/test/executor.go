@@ -26,11 +26,15 @@ func (e *Executor) TestHTTP(t *testing.T, tests []HTTPTest, headers ...map[strin
 			}
 		}
 
-		fmt.Println("headers:", args)
 		var res *httptest.ResponseRecorder
 		if test.Body != nil {
 			args = append(args, test.Body)
 		}
+
+		if test.BeforeRequest != nil {
+			test.BeforeRequest()
+		}
+
 		if test.Body == nil {
 			res = e.app.Do(test.Method, test.Route, args...)
 		} else {
