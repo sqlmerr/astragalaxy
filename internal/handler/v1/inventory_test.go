@@ -11,24 +11,24 @@ import (
 	"testing"
 )
 
-func TestGetMyItems(t *testing.T) {
+func TestGetMyAstralInventory(t *testing.T) {
 	api := createAPI(t)
 	executor := test.New(api)
 	tests := []test.HTTPTest{
 		{
-			Description:   "Get items",
-			Route:         "/v1/inventory/items",
+			Description:   "Get astral inventory",
+			Route:         "/v1/inventory/items/my",
 			Method:        http.MethodGet,
 			ExpectedError: false,
 			ExpectedCode:  200,
 			BodyValidator: func(body []byte) {
-				var b schema.DataGenericResponse[[]schema.Item]
+				var b schema.Inventory
 				err := json.Unmarshal(body, &b)
 				assert.NoError(t, err)
 
-				if assert.Len(t, b.Data, 1) {
-					assert.Equal(t, "test", b.Data[0].Code)
-					assert.Equal(t, testAstral.ID, b.Data[0].AstralID)
+				if assert.Equal(t, testAstral.ID, b.HolderID) && assert.Len(t, b.Items, 1) && assert.Equal(t, b.ID, testAstralInventory.ID) {
+					assert.Equal(t, "test", b.Items[0].Code)
+					assert.Equal(t, b.ID, b.Items[0].InventoryID)
 				}
 			},
 		},
@@ -37,39 +37,49 @@ func TestGetMyItems(t *testing.T) {
 	executor.TestHTTP(t, tests, map[string]string{"Content-Type": "application/json", "Authorization": fmt.Sprintf("Bearer %s", testUserJwtToken), "X-Astral-ID": testAstral.ID.String()})
 }
 
-func TestGetMyItemsByCode(t *testing.T) {
+func TestGetHolderInventory(t *testing.T) {
 	api := createAPI(t)
 	executor := test.New(api)
 	tests := []test.HTTPTest{
 		{
-			Description:   "Get items by code",
-			Route:         "/v1/inventory/items/test",
+			Description:   "Get astral holder inventory",
+			Route:         fmt.Sprintf("/v1/inventory/items/astral/%s", testAstral.ID.String()),
 			Method:        http.MethodGet,
 			ExpectedError: false,
 			ExpectedCode:  200,
 			BodyValidator: func(body []byte) {
-				var b schema.DataGenericResponse[[]schema.Item]
+				var b schema.Inventory
 				err := json.Unmarshal(body, &b)
 				assert.NoError(t, err)
 
-				if assert.Len(t, b.Data, 1) {
-					assert.Equal(t, "test", b.Data[0].Code)
-					assert.Equal(t, testAstral.ID, b.Data[0].AstralID)
+				if assert.Equal(t, testAstral.ID, b.HolderID) && assert.Len(t, b.Items, 1) && assert.Equal(t, b.ID, testAstralInventory.ID) {
+					assert.Equal(t, "test", b.Items[0].Code)
+					assert.Equal(t, b.ID, b.Items[0].InventoryID)
 				}
 			},
 		},
 		{
-			Description:   "Get items by code not found",
-			Route:         "/v1/inventory/items/notfound",
+			Description:   "Get spaceship holder inventory",
+			Route:         fmt.Sprintf("/v1/inventory/items/spaceship/%s", testSpaceship.ID.String()),
 			Method:        http.MethodGet,
 			ExpectedError: false,
 			ExpectedCode:  200,
 			BodyValidator: func(body []byte) {
-				var b schema.DataResponse
+				var b schema.Inventory
 				err := json.Unmarshal(body, &b)
 				assert.NoError(t, err)
-				assert.Len(t, b.Data, 0)
+
+				assert.Equal(t, testSpaceship.ID, b.HolderID)
+				assert.Len(t, b.Items, 0)
+				assert.Equal(t, b.ID, testSpaceshipInventory.ID)
 			},
+		},
+		{
+			Description:   "Inventory not found",
+			Route:         fmt.Sprintf("/v1/inventory/items/notfound/%s", uuid.New().String()),
+			Method:        http.MethodGet,
+			ExpectedError: false,
+			ExpectedCode:  404,
 		},
 	}
 
@@ -80,12 +90,12 @@ func TestGetItemData(t *testing.T) {
 	api := createAPI(t)
 	executor := test.New(api)
 	anotherUuid := uuid.New().String()
+	fmt.Println("arar", testItem.ID)
 
-	fmt.Println("asdasdasjkklajsdf, ", anotherUuid == testItem.ID.String(), anotherUuid, testItem.ID.String())
 	tests := []test.HTTPTest{
 		{
 			Description:   "Get item data success",
-			Route:         fmt.Sprintf("/v1/inventory/items/%s/data", testItem.ID.String()),
+			Route:         fmt.Sprintf("/v1/inventory/items/my/%s/data", testItem.ID.String()),
 			Method:        http.MethodGet,
 			ExpectedError: false,
 			ExpectedCode:  200,
@@ -98,14 +108,14 @@ func TestGetItemData(t *testing.T) {
 		},
 		{
 			Description:   "Invalid uuid",
-			Route:         "/v1/inventory/items/123/data",
+			Route:         "/v1/inventory/items/my/123/data",
 			Method:        http.MethodGet,
 			ExpectedError: true,
 			ExpectedCode:  400,
 		},
 		{
 			Description:   "Item not found",
-			Route:         fmt.Sprintf("/v1/inventory/items/%s/data", anotherUuid),
+			Route:         fmt.Sprintf("/v1/inventory/items/my/%s/data", anotherUuid),
 			Method:        http.MethodGet,
 			ExpectedError: true,
 			ExpectedCode:  404,

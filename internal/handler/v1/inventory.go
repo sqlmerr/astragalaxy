@@ -1,7 +1,6 @@
 package v1
 
 import (
-	"astragalaxy/internal/model"
 	"astragalaxy/internal/schema"
 	"astragalaxy/internal/util"
 	"context"
@@ -18,21 +17,21 @@ func (h *Handler) registerInventoryGroup(api huma.API) {
 
 	huma.Register(api, huma.Operation{
 		Method:     http.MethodGet,
-		Path:       "/items",
+		Path:       "/items/{holder}/{id}",
 		Tags:       tags,
 		Security:   security,
 		Parameters: params,
-	}, h.getMyItems)
+	}, h.getHolderInventory)
 	huma.Register(api, huma.Operation{
 		Method:     http.MethodGet,
-		Path:       "/items/{code}",
+		Path:       "/items/my",
 		Tags:       tags,
 		Security:   security,
 		Parameters: params,
-	}, h.getMyItemsByCode)
+	}, h.getMyAstralInventory)
 	huma.Register(api, huma.Operation{
 		Method:     http.MethodGet,
-		Path:       "/items/{id}/data",
+		Path:       "/items/my/{id}/data",
 		Tags:       tags,
 		Security:   security,
 		Parameters: params,
@@ -40,42 +39,50 @@ func (h *Handler) registerInventoryGroup(api huma.API) {
 
 }
 
-func (h *Handler) getMyItems(ctx context.Context, _ *struct{}) (*schema.BaseDataResponse[[]schema.Item], error) {
-	astral := ctx.Value("astral").(*schema.Astral)
-
-	items := h.s.GetAstralItems(astral.ID)
-	if items == nil {
-		return &schema.BaseDataResponse[[]schema.Item]{Body: schema.DataGenericResponse[[]schema.Item]{Data: []schema.Item{}}}, nil
-	}
-	return &schema.BaseDataResponse[[]schema.Item]{Body: schema.DataGenericResponse[[]schema.Item]{Data: items}}, nil
-}
-
-func (h *Handler) getMyItemsByCode(ctx context.Context, input *struct {
-	Code string `path:"code"`
-}) (*schema.BaseDataResponse[[]schema.Item], error) {
-	astral := ctx.Value("astral").(*schema.Astral)
-	code := input.Code
-	if code == "" {
-		return nil, util.New("invalid item code", 400)
-	}
-
-	items, err := h.s.FindAllItems(&model.Item{Code: code, AstralID: astral.ID})
-	if err != nil {
-		return nil, err
-	}
-	return &schema.BaseDataResponse[[]schema.Item]{Body: schema.DataGenericResponse[[]schema.Item]{Data: items}}, nil
-}
-
-func (h *Handler) getItemData(ctx context.Context, input *struct {
-	ID string `path:"id"`
-}) (*schema.BaseResponse[schema.ItemDataResponse], error) {
-	astral := ctx.Value("astral").(*schema.Astral)
-	id := input.ID
-	itemID, err := uuid.Parse(id)
-	if err != nil || itemID == uuid.Nil {
+func (h *Handler) getHolderInventory(ctx context.Context, input *struct {
+	HolderType string `path:"holder"`
+	HolderID   string `path:"id"`
+}) (*schema.BaseResponse[schema.Inventory], error) {
+	holderID, err := uuid.Parse(input.HolderID)
+	if err != nil || holderID == uuid.Nil {
 		return nil, util.ErrIDMustBeUUID
 	}
 
+	inventory, err := h.s.GetInventoryByHolder(input.HolderType, holderID)
+	if err != nil {
+		return nil, err
+	}
+	items, err := h.s.GetInventoryItems(inventory.ID)
+	if err != nil {
+		return nil, err
+	}
+	resp := schema.Inventory{ID: inventory.ID, Items: items, Holder: input.HolderType, HolderID: holderID}
+
+	return &schema.BaseResponse[schema.Inventory]{Body: resp}, nil
+}
+
+func (h *Handler) getMyAstralInventory(ctx context.Context, _ *struct{}) (*schema.BaseResponse[schema.Inventory], error) {
+	astral := ctx.Value("astral").(*schema.Astral)
+	inventory, err := h.s.GetInventoryByHolder("astral", astral.ID)
+	if err != nil {
+		return nil, err
+	}
+	items, err := h.s.GetInventoryItems(inventory.ID)
+	if err != nil {
+		return nil, err
+	}
+	resp := schema.Inventory{ID: inventory.ID, Items: items, Holder: "astral", HolderID: astral.ID}
+	return &schema.BaseResponse[schema.Inventory]{Body: resp}, nil
+}
+
+func (h *Handler) getItemData(ctx context.Context, input *struct {
+	ItemID string `path:"id"`
+}) (*schema.BaseResponse[schema.ItemDataResponse], error) {
+	astral := ctx.Value("astral").(*schema.Astral)
+	itemID, err := uuid.Parse(input.ItemID)
+	if err != nil || itemID == uuid.Nil {
+		return nil, util.ErrIDMustBeUUID
+	}
 	item, err := h.s.FindOneItem(itemID)
 	if err != nil {
 		return nil, err
@@ -84,7 +91,12 @@ func (h *Handler) getItemData(ctx context.Context, input *struct {
 		return nil, util.ErrNotFound
 	}
 
-	if item.AstralID != astral.ID {
+	inventory, err := h.s.FindOneInventory(item.InventoryID)
+	if err != nil {
+		return nil, err
+	}
+
+	if !util.EnsureAstralHasAccessToInventory(astral, inventory) {
 		return nil, util.ErrNotFound
 	}
 

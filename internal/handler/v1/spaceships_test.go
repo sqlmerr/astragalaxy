@@ -1,6 +1,7 @@
 package v1
 
 import (
+	"astragalaxy/internal/model"
 	"astragalaxy/internal/schema"
 	"astragalaxy/pkg/test"
 	"encoding/json"
@@ -85,6 +86,9 @@ func TestEnterMySpaceship(t *testing.T) {
 	api := createAPI(t)
 	executor := test.New(api)
 
+	err := testStateObj.S.ExitAstralSpaceship(*testAstral, testSpaceship.ID)
+	assert.NoError(t, err)
+
 	tests := []test.HTTPTest{
 		{
 			Description:   "entered testSpaceship",
@@ -120,6 +124,12 @@ func TestEnterMySpaceship(t *testing.T) {
 
 func TestExitMySpaceship(t *testing.T) {
 	api := createAPI(t)
+	err := testStateObj.S.EnterAstralSpaceship(*testAstral, testSpaceship.ID)
+	assert.NoError(t, err)
+	falseBool := false
+	err = testStateObj.S.SetFlightInfo(testSpaceship.ID, &model.FlightInfo{Flying: &falseBool})
+	assert.NoError(t, err)
+
 	url := fmt.Sprintf("/v1/spaceships/my/%s/exit", testSpaceship.ID.String())
 
 	res := api.Post(url, fmt.Sprintf("X-Astral-ID: %s", testAstral.ID.String()), fmt.Sprintf("Authorization: %s", testUserJwtToken))
@@ -142,6 +152,9 @@ func TestExitMySpaceship(t *testing.T) {
 		assert.Equal(t, false, s.PlayerSitIn)
 		assert.Equal(t, false, a.InSpaceship)
 	}
+
+	err = testStateObj.S.ExitAstralSpaceship(*testAstral, testSpaceship.ID)
+	assert.NoError(t, err)
 }
 
 func TestRenameMySpaceship(t *testing.T) {

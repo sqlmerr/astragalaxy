@@ -28,10 +28,11 @@ func New(db *gorm.DB) *State {
 	itemRepository := repository.NewItemRepository(db)
 	itemDataTagRepository := repository.NewItemDataTagRepository(db)
 	systemConnectionRepository := repository.NewSystemConnectionRepository(db)
+	inventoryRepository := repository.NewInventoryRepository(db)
 
 	idGenerator := id.NewHexGenerator()
 
-	s := service.New(spaceshipRepository, flightRepository, systemRepository, userRepository, astralRepository, itemRepository, itemDataTagRepository, planetRepository, systemConnectionRepository, idGenerator)
+	s := service.New(spaceshipRepository, flightRepository, systemRepository, userRepository, astralRepository, itemRepository, itemDataTagRepository, planetRepository, systemConnectionRepository, inventoryRepository, idGenerator)
 
 	projectRoot, err := util.GetProjectRoot()
 	if err != nil {
