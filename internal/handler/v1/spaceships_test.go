@@ -1,6 +1,7 @@
 package v1
 
 import (
+	"astragalaxy/internal/model"
 	"astragalaxy/internal/schema"
 	"astragalaxy/pkg/test"
 	"encoding/json"
@@ -8,6 +9,7 @@ import (
 	"io"
 	"net/http"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -81,7 +83,12 @@ func TestGetSpaceshipByID(t *testing.T) {
 	)
 }
 
-func TestEnterMySpaceship(t *testing.T) {
+func TestSpaceshipOperations(t *testing.T) {
+	t.Run("Exit", ExitMySpaceship)
+	t.Run("Enter", EnterMySpaceship)
+}
+
+func EnterMySpaceship(t *testing.T) {
 	api := createAPI(t)
 	executor := test.New(api)
 
@@ -99,6 +106,11 @@ func TestEnterMySpaceship(t *testing.T) {
 				assert.Equal(t, float64(1), b["custom_status_code"])
 			},
 			Method: http.MethodPost,
+			BeforeRequest: func() {
+				err := testStateObj.S.ExitAstralSpaceship(*testAstral, testSpaceship.ID)
+				assert.NoError(t, err)
+				time.Sleep(1)
+			},
 		},
 		{
 			Description:   "can't enter testSpaceship",
@@ -118,8 +130,14 @@ func TestEnterMySpaceship(t *testing.T) {
 	executor.TestHTTP(t, tests, map[string]string{"Content-Type": "application/json", "Authorization": fmt.Sprintf("Bearer %s", testUserJwtToken), "X-Astral-ID": testAstral.ID.String()})
 }
 
-func TestExitMySpaceship(t *testing.T) {
+func ExitMySpaceship(t *testing.T) {
 	api := createAPI(t)
+	err := testStateObj.S.EnterAstralSpaceship(*testAstral, testSpaceship.ID)
+	assert.NoError(t, err)
+	falseBool := false
+	err = testStateObj.S.SetFlightInfo(testSpaceship.ID, &model.FlightInfo{Flying: &falseBool})
+	assert.NoError(t, err)
+
 	url := fmt.Sprintf("/v1/spaceships/my/%s/exit", testSpaceship.ID.String())
 
 	res := api.Post(url, fmt.Sprintf("X-Astral-ID: %s", testAstral.ID.String()), fmt.Sprintf("Authorization: %s", testUserJwtToken))
@@ -142,6 +160,9 @@ func TestExitMySpaceship(t *testing.T) {
 		assert.Equal(t, false, s.PlayerSitIn)
 		assert.Equal(t, false, a.InSpaceship)
 	}
+
+	err = testStateObj.S.ExitAstralSpaceship(*testAstral, testSpaceship.ID)
+	assert.NoError(t, err)
 }
 
 func TestRenameMySpaceship(t *testing.T) {

@@ -18,15 +18,17 @@ import (
 )
 
 var (
-	testHandler      *Handler
-	testUser         *schema.User
-	testAstral       *schema.Astral
-	testUserJwtToken string
-	testUserToken    string
-	testSudoToken    string
-	testStateObj     *state.State
-	testSpaceship    *schema.Spaceship
-	testItem         *schema.Item
+	testHandler            *Handler
+	testUser               *schema.User
+	testAstral             *schema.Astral
+	testAstralInventory    *model.Inventory
+	testUserJwtToken       string
+	testUserToken          string
+	testSudoToken          string
+	testStateObj           *state.State
+	testSpaceship          *schema.Spaceship
+	testSpaceshipInventory *model.Inventory
+	testItem               *schema.Item
 )
 
 func TestMain(m *testing.M) {
@@ -110,10 +112,20 @@ func setup(state *state.State) {
 		panic(err)
 	}
 
-	testItem, err = state.S.AddItem(astral.ID, "test", map[string]string{"test": "123"})
+	astralInv, err := state.S.CreateInventory("astral", astral.ID)
 	if err != nil {
 		panic(err)
 	}
+	spaceshipInv, err := state.S.CreateInventory("spaceship", spcship.ID)
+	if err != nil {
+		panic(err)
+	}
+
+	item, err := state.S.AddItemToAstral(astral.ID, "test", map[string]string{"test": "123"})
+	if err != nil {
+		panic(err)
+	}
+
 	testUserJwtToken = *jwtToken
 	testUserToken = token
 	testUser = user
@@ -121,6 +133,9 @@ func setup(state *state.State) {
 	testSudoToken = state.Config.SecretToken
 	testStateObj = state
 	testSpaceship = spcship
+	testAstralInventory = astralInv
+	testSpaceshipInventory = spaceshipInv
+	testItem = item
 }
 
 func createAPI(t testing.TB) humatest.TestAPI {

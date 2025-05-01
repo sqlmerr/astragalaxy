@@ -7,5 +7,6 @@ type HTTPTest struct {
 	ExpectedError bool
 	ExpectedCode  int
 	BodyValidator func([]byte)
+	BeforeRequest func()
 	Method        string
 }

@@ -6,18 +6,18 @@ import (
 )
 
 type Item struct {
-	ID         uuid.UUID `json:"id"`
-	AstralID   uuid.UUID `json:"astral_id"`
-	Code       string    `json:"code"`
-	Durability int       `json:"durability"`
+	ID          uuid.UUID `json:"id"`
+	InventoryID uuid.UUID `json:"inventory_id"`
+	Code        string    `json:"code"`
+	Durability  int       `json:"durability"`
 }
 
 func ItemSchemaFromItem(item *model.Item) *Item {
 	schema := Item{
-		ID:         item.ID,
-		AstralID:   item.AstralID,
-		Code:       item.Code,
-		Durability: item.Durability,
+		ID:          item.ID,
+		InventoryID: item.InventoryID,
+		Code:        item.Code,
+		Durability:  item.Durability,
 	}
 	return &schema
 }

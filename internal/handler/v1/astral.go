@@ -63,6 +63,17 @@ func (h *Handler) createAstral(ctx context.Context, input *schema.BaseRequest[sc
 		return nil, err
 	}
 
+	// creating inventories
+	_, err = h.s.CreateInventory("astral", astral.ID)
+	if err != nil {
+		return nil, err
+	}
+
+	_, err = h.s.CreateInventory("spaceship", spaceship.ID)
+	if err != nil {
+		return nil, err
+	}
+
 	spaceships, err := h.s.FindAllSpaceships(&model.Spaceship{AstralID: astral.ID})
 	if err != nil {
 		return nil, err
