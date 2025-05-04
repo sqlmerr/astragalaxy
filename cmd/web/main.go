@@ -4,9 +4,11 @@ import (
 	"ariga.io/atlas-go-sdk/atlasexec"
 	"astragalaxy/internal/config"
 	"astragalaxy/internal/handler/v1"
+	"astragalaxy/internal/schema"
 	"astragalaxy/internal/state"
 	"astragalaxy/internal/util"
 	"context"
+	"errors"
 	"fmt"
 	"github.com/danielgtaylor/huma/v2"
 	"github.com/danielgtaylor/huma/v2/adapters/humafiber"
@@ -32,6 +34,21 @@ func applyMigrations(cfg *config.Config) {
 		URL: cfg.DSN(), // Database URL
 		Env: "gorm",
 	})
+	if err != nil {
+		panic(err)
+	}
+}
+
+func createInitialData(st *state.State) {
+	_, err := st.S.FindOneSystemByName("initial")
+	if errors.Is(err, util.ErrNotFound) {
+		return
+	}
+	if err != nil {
+		panic(err)
+	}
+
+	_, err = st.S.CreateSystem(schema.CreateSystem{Name: "initial", Connections: make([]string, 0)})
 	if err != nil {
 		panic(err)
 	}
@@ -94,6 +111,7 @@ func main() {
 	}
 
 	stateObj := state.New(&cfg, db)
+	createInitialData(stateObj)
 
 	h := v1.NewHandler(stateObj)
 	h.Register(humaAPIV1)
