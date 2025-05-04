@@ -29,5 +29,6 @@ func (h *Handler) Register(api huma.API) {
 	h.registerPlanetsGroup(huma.NewGroup(api, "/planets"))
 	h.registerNavigationGroup(huma.NewGroup(api, "/navigation"))
 	h.registerInventoryGroup(huma.NewGroup(api, "/inventory"))
+	h.registerWalletGroup(huma.NewGroup(api, "/wallets"))
 
 }

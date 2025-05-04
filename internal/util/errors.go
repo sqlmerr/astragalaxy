@@ -3,7 +3,6 @@ package util
 import (
 	"errors"
 	"github.com/danielgtaylor/huma/v2"
-	"github.com/gofiber/fiber/v2"
 	"net/http"
 )
 
@@ -49,15 +48,6 @@ var (
 	ErrTooManyAstrals                 = New("too many astrals", http.StatusBadRequest)
 	ErrInvalidAstralIDHeader          = New("astral id header not specified or invalid", http.StatusUnauthorized)
 )
-
-func AnswerWithError(c *fiber.Ctx, err error) error {
-	var apiErr APIError
-	ok := errors.As(err, &apiErr)
-	if ok {
-		return c.Status(apiErr.Status).JSON(apiErr)
-	}
-	return c.Status(fiber.StatusInternalServerError).JSON(ErrServerError)
-}
 
 type Error struct {
 	Message string `json:"message"`
