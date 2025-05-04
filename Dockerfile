@@ -20,6 +20,7 @@ LABEL org.opencontainers.image.source="https://github.com/sqlmerr/astragalaxy"
 
 WORKDIR /app
 
+COPY --from=arigaio/atlas:latest /atlas /usr/local/bin/atlas
 COPY --from=build /compiler/web .
 COPY --from=build /compiler/atlas.hcl .
 COPY --from=build /compiler/data/items.json ./data/items.json
