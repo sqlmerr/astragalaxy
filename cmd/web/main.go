@@ -5,6 +5,7 @@ import (
 	"astragalaxy/internal/handler/v1"
 	"astragalaxy/internal/state"
 	"astragalaxy/internal/util"
+	"fmt"
 	"github.com/danielgtaylor/huma/v2"
 	"github.com/danielgtaylor/huma/v2/adapters/humafiber"
 	"github.com/joho/godotenv"
@@ -34,7 +35,7 @@ import (
 func main() {
 	err := godotenv.Load(".env")
 	if err != nil {
-		panic("Error loading .env file")
+		fmt.Println("failed to load .env file")
 	}
 	cfg, err := config.FromEnv()
 	if err != nil {
