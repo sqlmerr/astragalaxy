@@ -10,10 +10,11 @@
 [![License](https://img.shields.io/badge/License-MIT-purple)](#license)
 
 
-## What is this?
+# What is this?
 **AstraGalaxy** is a space travelling game. Explore different locations. Travel to interesting systems and planets. Gather resources and create your own base (in future updates). You can play it in telegram bot!
 
-## 👨‍💻 Run
+# 👨‍💻 Run
+## Local
 ### Specify environment variables
 ```bash
 cp .env.example .env  # or just copy .env and edit it
@@ -27,4 +28,43 @@ apt install docker docker-compose -y
 ### And then run in docker.
 ```bash
 docker compose up --build
+```
+
+## Docker
+```bash
+docker run -p "8000:8000" -e POSTGRES_PASSWORD=password -e POSTGRES_USER=postgres -e POSTGRES_HOST=0.0.0.0 -e POSTGRES_PORT=5432 -e JWT_SECRET=secret -e SECRET_TOKEN=token  ghcr.io/sqlmerr/astragalaxy:latest
+```
+
+## Docker Compose
+```yaml
+services:
+  db:
+    image: postgres:16.2-alpine
+    command: -p 5432
+    expose:
+        - 5432
+    ports:
+        - '5432:5432'
+    volumes:
+        - app-db-data:/var/lib/postgresql/
+    env_file:
+        - .env
+    environment:
+        - PGDATA=/var/lib/postgresql/data/pgdata
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+  astragalaxy:
+    image: ghcr.io/sqlmerr/astragalaxy:latest
+    ports:
+      - '8000:8000'
+    env_file:
+      - .env
+    depends_on:
+      db:
+        condition: service_healthy
+volumes:
+  app-db-data:
 ```
