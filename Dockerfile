@@ -23,6 +23,7 @@ WORKDIR /app
 COPY --from=arigaio/atlas:latest /atlas /usr/local/bin/atlas
 COPY --from=build /compiler/web .
 COPY --from=build /compiler/atlas.hcl .
+COPY --from=build /compiler/migrations ./migrations
 COPY --from=build /compiler/data/items.json ./data/items.json
 COPY --from=build /compiler/data/tags.json ./data/tags.json
 COPY --from=build /compiler/data/locations.json ./data/locations.json
