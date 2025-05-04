@@ -1,4 +1,4 @@
-FROM golang:latest AS build
+FROM --platform=$BUILDPLATFORM golang:latest AS build
 
 WORKDIR /compiler
 
@@ -10,7 +10,7 @@ COPY . .
 
 RUN CGO_ENABLED=0 GOOS=linux go build -o web ./cmd/web/main.go
 
-FROM gcr.io/distroless/static-debian12:nonroot
+FROM gcr.io/distroless/static-debian12:nonroot AS run
 
 LABEL authors="sqlmerr"
 LABEL org.opencontainers.image.source="https://github.com/sqlmerr/astragalaxy"
@@ -25,4 +25,4 @@ COPY --from=build /compiler/data/locations.json ./data/locations.json
 USER nonroot
 
 EXPOSE 8000
-CMD ["./web"]
+ENTRYPOINT ["./web"]
