@@ -38,7 +38,6 @@ services:
             - backend
 volumes:
     app-db-data:
-    db-data:
     redis:
     redis-config:
 
