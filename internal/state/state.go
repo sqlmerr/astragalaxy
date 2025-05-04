@@ -1,6 +1,7 @@
 package state
 
 import (
+	"astragalaxy/internal/config"
 	"astragalaxy/internal/registry"
 	"astragalaxy/internal/repository"
 	"astragalaxy/internal/service"
@@ -15,10 +16,10 @@ import (
 type State struct {
 	S              *service.Service
 	MasterRegistry *registry.MasterRegistry
-	Config         *util.Config
+	Config         *config.Config
 }
 
-func New(db *gorm.DB) *State {
+func New(cfg *config.Config, db *gorm.DB) *State {
 	planetRepository := repository.NewPlanetRepository(db)
 	systemRepository := repository.NewSystemRepository(db)
 	spaceshipRepository := repository.NewSpaceshipRepository(db)
@@ -44,7 +45,8 @@ func New(db *gorm.DB) *State {
 		systemConnectionRepository,
 		inventoryRepository,
 		walletRepository,
-		idGenerator)
+		idGenerator,
+		cfg)
 
 	projectRoot, err := util.GetProjectRoot()
 	if err != nil {
@@ -68,11 +70,10 @@ func New(db *gorm.DB) *State {
 	}
 
 	masterRegistry := registry.NewMaster(itemRegistry, tagRegistry, locationRegistry)
-	config := util.NewConfig(".env")
 
 	return &State{
 		S:              s,
 		MasterRegistry: &masterRegistry,
-		Config:         &config,
+		Config:         cfg,
 	}
 }

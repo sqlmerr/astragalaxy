@@ -1,11 +1,13 @@
 package main
 
 import (
+	"astragalaxy/internal/config"
 	"astragalaxy/internal/handler/v1"
 	"astragalaxy/internal/state"
 	"astragalaxy/internal/util"
 	"github.com/danielgtaylor/huma/v2"
 	"github.com/danielgtaylor/huma/v2/adapters/humafiber"
+	"github.com/joho/godotenv"
 	"log"
 
 	_ "ariga.io/atlas-provider-gorm/gormschema"
@@ -30,8 +32,15 @@ import (
 // @in header
 // @name Authorization
 func main() {
-	config := util.NewConfig(".env")
-	db, err := gorm.Open(postgres.Open(config.DatabaseURL), &gorm.Config{})
+	err := godotenv.Load(".env")
+	if err != nil {
+		panic("Error loading .env file")
+	}
+	cfg, err := config.FromEnv()
+	if err != nil {
+		panic(err)
+	}
+	db, err := gorm.Open(postgres.Open(cfg.DSN()), &gorm.Config{})
 	if err != nil {
 		panic("Failed to open database")
 	}
@@ -77,7 +86,7 @@ func main() {
 		return util.New(message, status)
 	}
 
-	stateObj := state.New(db)
+	stateObj := state.New(&cfg, db)
 
 	h := v1.NewHandler(stateObj)
 	h.Register(humaAPIV1)

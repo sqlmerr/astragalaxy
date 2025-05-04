@@ -2,6 +2,7 @@ package v1
 
 import (
 	"ariga.io/atlas-go-sdk/atlasexec"
+	"astragalaxy/internal/config"
 	"astragalaxy/internal/model"
 	"astragalaxy/internal/schema"
 	"astragalaxy/internal/state"
@@ -33,7 +34,16 @@ var (
 )
 
 func TestMain(m *testing.M) {
-	db, err := gorm.Open(postgres.Open(util.GetEnv("TEST_DATABASE_URL")), &gorm.Config{})
+	cfg := config.Config{
+		Database: config.Database{
+			TestDatabaseURL: util.GetEnv("TEST_DATABASE_URL"),
+		},
+		Auth: config.Auth{
+			JwtSecret:   "testJwtSecret",
+			SecretToken: "testToken",
+		},
+	}
+	db, err := gorm.Open(postgres.Open(cfg.TestDatabaseURL), &gorm.Config{})
 	if err != nil {
 		panic("Failed to open database")
 	}
@@ -51,7 +61,7 @@ func TestMain(m *testing.M) {
 		panic(err)
 	}
 
-	stateObj := state.New(db)
+	stateObj := state.New(&cfg, db)
 	setup(stateObj)
 
 	h := NewHandler(stateObj)
