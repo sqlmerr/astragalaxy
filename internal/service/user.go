@@ -55,7 +55,7 @@ func (s *Service) LoginByToken(token string) (*string, error) {
 	claims["sub"] = user.Username
 	claims["exp"] = time.Now().Add(time.Hour * 24).Unix()
 
-	t, err := jwtToken.SignedString([]byte(util.GetEnv("JWT_SECRET")))
+	t, err := jwtToken.SignedString([]byte(s.cfg.JwtSecret))
 	return &t, err
 }
 
@@ -79,7 +79,7 @@ func (s *Service) Login(data *schema.AuthPayload) (*string, error) {
 	claims["sub"] = user.Username
 	claims["exp"] = time.Now().Add(time.Hour * 24).Unix()
 
-	t, err := jwtToken.SignedString([]byte(util.GetEnv("JWT_SECRET")))
+	t, err := jwtToken.SignedString([]byte(s.cfg.JwtSecret))
 	return &t, err
 }
 

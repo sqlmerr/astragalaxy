@@ -1,6 +1,7 @@
 package service
 
 import (
+	"astragalaxy/internal/config"
 	"astragalaxy/internal/repository"
 	"astragalaxy/internal/util/id"
 )
@@ -18,6 +19,7 @@ type Service struct {
 	inv repository.InventoryRepo
 	w   repository.WalletRepo
 	id  id.Generator // only for systems and planets
+	cfg *config.Config
 }
 
 func New(
@@ -32,7 +34,8 @@ func New(
 	syc repository.SystemConnectionRepo,
 	inv repository.InventoryRepo,
 	wallet repository.WalletRepo,
-	id id.Generator) *Service {
+	id id.Generator,
+	cfg *config.Config) *Service {
 	return &Service{
 		sp:  sp,
 		f:   f,
@@ -46,5 +49,6 @@ func New(
 		inv: inv,
 		w:   wallet,
 		id:  id,
+		cfg: cfg,
 	}
 }
