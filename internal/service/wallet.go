@@ -31,7 +31,9 @@ func (s *Service) GetWallet(walletID uuid.UUID) (*schema.Wallet, error) {
 	if wallet == nil {
 		return nil, util.ErrNotFound
 	}
-
+	if wallet.Locked == nil {
+		return nil, util.ErrNotFound
+	}
 	walletSchema := schema.WalletSchemaFromWallet(wallet)
 	return walletSchema, nil
 }
@@ -88,26 +90,26 @@ func (s *Service) ProceedTransaction(walletID uuid.UUID, transaction *schema.Wal
 		return util.New("wallet is locked", 400)
 	}
 
-	updateFrom := model.Wallet{ID: walletID}
-	updateTo := model.Wallet{ID: transaction.ToWallet}
+	updateFrom := map[string]interface{}{}
+	updateTo := map[string]interface{}{}
 	if transaction.Units > 0 {
 		if walletFrom.Units < transaction.Units {
 			return util.New("not enough units", 400)
 		}
-		updateFrom.Units = walletFrom.Units - transaction.Units
-		updateTo.Units = walletTo.Units + transaction.Units
+		updateFrom["units"] = walletFrom.Units - transaction.Units
+		updateTo["units"] = walletTo.Units + transaction.Units
 	}
 	if transaction.Quarks > 0 {
 		if walletFrom.Quarks < transaction.Quarks {
 			return util.New("not enough quarks", 400)
 		}
-		updateFrom.Quarks = walletFrom.Quarks - transaction.Quarks
-		updateTo.Quarks = walletTo.Quarks + transaction.Quarks
+		updateFrom["quarks"] = walletFrom.Quarks - transaction.Quarks
+		updateTo["quarks"] = walletTo.Quarks + transaction.Quarks
 	}
 
-	err = s.w.Update(&updateFrom)
+	err = s.w.UpdateRaw(walletFrom.ID, updateFrom)
 	if err != nil {
 		return err
 	}
-	return s.w.Update(&updateTo)
+	return s.w.UpdateRaw(walletTo.ID, updateTo)
 }

@@ -23,11 +23,12 @@ func (h *Handler) registerWalletGroup(api huma.API) {
 		Parameters: params,
 	}, h.getMyWallets)
 	huma.Register(api, huma.Operation{
-		Method:     http.MethodPost,
-		Path:       "/my",
-		Tags:       tags,
-		Security:   security,
-		Parameters: params,
+		Method:        http.MethodPost,
+		Path:          "/my",
+		Tags:          tags,
+		Security:      security,
+		Parameters:    params,
+		DefaultStatus: 201,
 	}, h.createMyWallet)
 	huma.Register(api, huma.Operation{
 		Method:     http.MethodPost,

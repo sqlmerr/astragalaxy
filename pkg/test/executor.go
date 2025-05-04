@@ -50,5 +50,9 @@ func (e *Executor) TestHTTP(t *testing.T, tests []HTTPTest, headers ...map[strin
 		if test.BodyValidator != nil {
 			test.BodyValidator(body)
 		}
+
+		if test.AfterRequest != nil {
+			test.AfterRequest()
+		}
 	}
 }

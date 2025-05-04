@@ -29,6 +29,7 @@ var (
 	testSpaceship          *schema.Spaceship
 	testSpaceshipInventory *model.Inventory
 	testItem               *schema.Item
+	testWallet             *schema.Wallet
 )
 
 func TestMain(m *testing.M) {
@@ -126,6 +127,11 @@ func setup(state *state.State) {
 		panic(err)
 	}
 
+	wallet, err := state.S.CreateWallet(schema.CreateWallet{Name: "testWallet"}, astral.ID)
+	if err != nil {
+		panic(err)
+	}
+
 	testUserJwtToken = *jwtToken
 	testUserToken = token
 	testUser = user
@@ -136,6 +142,7 @@ func setup(state *state.State) {
 	testAstralInventory = astralInv
 	testSpaceshipInventory = spaceshipInv
 	testItem = item
+	testWallet = wallet
 }
 
 func createAPI(t testing.TB) humatest.TestAPI {

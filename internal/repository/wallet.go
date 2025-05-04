@@ -14,6 +14,7 @@ type WalletRepo interface {
 	FindAll(filter *model.Wallet) ([]model.Wallet, error)
 	Delete(ID uuid.UUID) error
 	Update(m *model.Wallet) error
+	UpdateRaw(ID uuid.UUID, m map[string]interface{}) error
 }
 
 type WalletRepository struct {
@@ -56,4 +57,8 @@ func (r WalletRepository) Delete(ID uuid.UUID) error {
 
 func (r WalletRepository) Update(m *model.Wallet) error {
 	return r.db.Model(&m).Updates(&m).Error
+}
+
+func (r WalletRepository) UpdateRaw(ID uuid.UUID, m map[string]interface{}) error {
+	return r.db.Model(&model.Wallet{ID: ID}).Updates(m).Error
 }
