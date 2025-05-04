@@ -1,10 +1,12 @@
 package main
 
 import (
+	"ariga.io/atlas-go-sdk/atlasexec"
 	"astragalaxy/internal/config"
 	"astragalaxy/internal/handler/v1"
 	"astragalaxy/internal/state"
 	"astragalaxy/internal/util"
+	"context"
 	"fmt"
 	"github.com/danielgtaylor/huma/v2"
 	"github.com/danielgtaylor/huma/v2/adapters/humafiber"
@@ -20,18 +22,21 @@ import (
 	"gorm.io/gorm"
 )
 
-//	@title Astragalaxy API
-//	@version 0.7.0
-//	@description Astragalaxy API
-//	@license.name MIT
+func applyMigrations(cfg *config.Config) {
+	client, err := atlasexec.NewClient(util.Must(util.GetProjectRoot()), "atlas")
+	if err != nil {
+		panic(err)
+	}
 
-//	@securityDefinitions.apikey SudoToken
-//	@in header
-//	@name secret-token
+	_, err = client.MigrateApply(context.Background(), &atlasexec.MigrateApplyParams{
+		URL: cfg.DSN(), // Database URL
+		Env: "gorm",
+	})
+	if err != nil {
+		panic(err)
+	}
+}
 
-// @securityDefinitions.bearerauth JwtAuth
-// @in header
-// @name Authorization
 func main() {
 	err := godotenv.Load(".env")
 	if err != nil {
@@ -45,6 +50,7 @@ func main() {
 	if err != nil {
 		panic("Failed to open database")
 	}
+	applyMigrations(&cfg)
 
 	app := fiber.New()
 
@@ -62,7 +68,7 @@ func main() {
 		})
 	})
 
-	humaConfig := huma.DefaultConfig("Astragalaxy API", "0.6.0")
+	humaConfig := huma.DefaultConfig("Astragalaxy API", "0.7.2")
 	humaConfig.CreateHooks = nil
 	humaConfig.Components.SecuritySchemes = map[string]*huma.SecurityScheme{
 		"bearerAuth": {
