@@ -41,10 +41,7 @@ func applyMigrations(cfg *config.Config) {
 
 func createInitialData(st *state.State) {
 	_, err := st.S.FindOneSystemByName("initial")
-	if errors.Is(err, util.ErrNotFound) {
-		return
-	}
-	if err != nil {
+	if err != nil && !errors.Is(err, util.ErrNotFound) {
 		panic(err)
 	}
 
