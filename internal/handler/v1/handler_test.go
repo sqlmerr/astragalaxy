@@ -1,18 +1,20 @@
 package v1
 
 import (
-	"ariga.io/atlas-go-sdk/atlasexec"
 	"astragalaxy/internal/config"
 	"astragalaxy/internal/model"
+	"astragalaxy/internal/registry"
 	"astragalaxy/internal/schema"
 	"astragalaxy/internal/state"
 	"astragalaxy/internal/util"
 	"context"
 	"fmt"
-	"github.com/danielgtaylor/huma/v2"
-	"github.com/danielgtaylor/huma/v2/humatest"
 	"os"
 	"testing"
+
+	"ariga.io/atlas-go-sdk/atlasexec"
+	"github.com/danielgtaylor/huma/v2"
+	"github.com/danielgtaylor/huma/v2/humatest"
 
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
@@ -92,12 +94,12 @@ func setup(state *state.State) {
 		panic(err)
 	}
 
-	astral, err := state.S.CreateAstral(&schema.CreateAstral{Code: "testAstral"}, user.ID, "space_station", sys.ID)
+	astral, err := state.S.CreateAstral(&schema.CreateAstral{Code: "testAstral"}, user.ID, registry.LocSpaceStationCode, sys.ID)
 	if err != nil {
 		panic(err)
 	}
 
-	spcship, err := state.S.CreateSpaceship(schema.CreateSpaceship{Name: "initial", AstralID: astral.ID, Location: "space_station", SystemID: sys.ID})
+	spcship, err := state.S.CreateSpaceship(schema.CreateSpaceship{Name: "initial", AstralID: astral.ID, Location: registry.LocSpaceStationCode, SystemID: sys.ID})
 	if err != nil {
 		panic(err)
 	}

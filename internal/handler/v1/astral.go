@@ -2,11 +2,13 @@ package v1
 
 import (
 	"astragalaxy/internal/model"
+	"astragalaxy/internal/registry"
 	"astragalaxy/internal/schema"
 	"astragalaxy/internal/util"
 	"context"
-	"github.com/danielgtaylor/huma/v2"
 	"net/http"
+
+	"github.com/danielgtaylor/huma/v2"
 )
 
 func (h *Handler) registerAstralsGroup(api huma.API) {
@@ -46,13 +48,13 @@ func (h *Handler) createAstral(ctx context.Context, input *schema.BaseRequest[sc
 		return nil, util.ErrServerError
 	}
 
-	astral, err := h.s.CreateAstral(&input.Body, user.ID, "space_station", system.ID)
+	astral, err := h.s.CreateAstral(&input.Body, user.ID, registry.LocSpaceStationCode, system.ID)
 	if err != nil {
 		return nil, err
 	}
 
 	spaceship, err := h.s.CreateSpaceship(schema.CreateSpaceship{
-		Name: "initial", AstralID: astral.ID, Location: "space_station", SystemID: system.ID,
+		Name: "initial", AstralID: astral.ID, Location: registry.LocSpaceStationCode, SystemID: system.ID,
 	})
 	if err != nil || spaceship == nil {
 		return nil, err

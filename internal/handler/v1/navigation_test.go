@@ -94,6 +94,9 @@ func TestHyperJump(t *testing.T) {
 				assert.True(t, res.Ok)
 				assert.Equal(t, 1, res.CustomStatusCode)
 			},
+			BeforeRequest: func() {
+				
+			},
 		},
 		{
 			Description:   "Invalid body",
@@ -111,6 +114,62 @@ func TestHyperJump(t *testing.T) {
 	})
 
 	testStateObj.S.ExitAstralSpaceship(*testAstral, testSpaceship.ID)
+	err = testStateObj.S.DeleteSystem(system.ID)
+	assert.NoError(t, err)
+}
+
+func TestNavigateToLocation(t *testing.T) {
+	api := createAPI(t)
+	executor := test.New(api)
+
+	tests := []test.HTTPTest{
+		{
+			Description:   "Invalid body",
+			Method:        http.MethodPost,
+			Route:         "/v1/navigation/location",
+			ExpectedError: true,
+			ExpectedCode:  http.StatusBadRequest,
+		},
+		{
+			Description:   "Success",
+			Method:        http.MethodPost,
+			Route:         "/v1/navigation/location",
+			Body:          &schema.NavigateToLocation{SpaceshipID: testSpaceship.ID, Location: "test"},
+			ExpectedError: false,
+			ExpectedCode:  http.StatusOK,
+			BodyValidator: func(body []byte) {
+				var res schema.OkResponse
+				err := json.Unmarshal(body, &res)
+				assert.NoError(t, err)
+
+				assert.True(t, res.Ok)
+				assert.Equal(t, 1, res.CustomStatusCode)
+
+				sys, err := testStateObj.S.FindOneSystem(testSpaceship.SystemID)
+				assert.NoError(t, err)
+				fmt.Println("    ar aradasd: ", sys.Locations)
+
+				spcship, err := testStateObj.S.FindOneSpaceship(testSpaceship.ID)
+				if assert.NoError(t, err) {
+					assert.Equal(t, "test", spcship.Location)
+				}
+			},
+			BeforeRequest: func() {
+				err := testStateObj.S.UpdateSystem(testSpaceship.SystemID, schema.UpdateSystem{Locations: []string{"space_station", "test"}})
+				assert.NoError(t, err)
+			},
+			AfterRequest: func() {
+				err := testStateObj.S.UpdateSystem(testSpaceship.SystemID, schema.UpdateSystem{Locations: []string{"space_station"}})
+				assert.NoError(t, err)
+			},
+		},
+	}
+
+	executor.TestHTTP(t, tests, map[string]string{
+		"Content-Type":  "application/json",
+		"Authorization": fmt.Sprintf("Bearer %s", testUserJwtToken),
+		"X-Astral-ID":   testAstral.ID.String(),
+	})
 }
 
 func TestCheckFlight(t *testing.T) {
