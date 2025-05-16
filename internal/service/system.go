@@ -18,7 +18,7 @@ func (s *Service) CreateSystem(data schema.CreateSystem) (*schema.System, error)
 	if err != nil {
 		return nil, util.ErrServerError
 	}
-	response, err := s.sy.Create(&model.System{ID: id, Name: data.Name})
+	response, err := s.sy.Create(&model.System{ID: id, Name: data.Name, Locations: data.Locations})
 	if err != nil {
 		return nil, err
 	}
@@ -84,6 +84,7 @@ func (s *Service) UpdateSystem(ID string, data schema.UpdateSystem) error {
 	system := model.System{
 		ID:   ID,
 		Name: data.Name,
+		Locations: data.Locations,
 	}
 	return s.sy.Update(&system)
 }

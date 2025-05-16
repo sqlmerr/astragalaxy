@@ -13,6 +13,12 @@ type Location struct {
 	Multiplayer bool   `json:"multiplayer"`
 }
 
+const (
+	LocOpenSpaceCode = "open_space"
+	LocSpaceStationCode = "space_station"
+	LocPlanetCode = "planet"
+)
+
 type LocationRegistry struct {
 	locations []Location
 }

@@ -1,19 +1,20 @@
 package main
 
 import (
-	"ariga.io/atlas-go-sdk/atlasexec"
 	"astragalaxy/internal/config"
-	"astragalaxy/internal/handler/v1"
+	v1 "astragalaxy/internal/handler/v1"
 	"astragalaxy/internal/schema"
 	"astragalaxy/internal/state"
 	"astragalaxy/internal/util"
 	"context"
 	"errors"
 	"fmt"
+	"log"
+
+	"ariga.io/atlas-go-sdk/atlasexec"
 	"github.com/danielgtaylor/huma/v2"
 	"github.com/danielgtaylor/huma/v2/adapters/humafiber"
 	"github.com/joho/godotenv"
-	"log"
 
 	_ "ariga.io/atlas-provider-gorm/gormschema"
 
@@ -44,8 +45,11 @@ func createInitialData(st *state.State) {
 	if err != nil && !errors.Is(err, util.ErrNotFound) {
 		panic(err)
 	}
+	if err == nil {
+		return
+	}
 
-	_, err = st.S.CreateSystem(schema.CreateSystem{Name: "initial", Connections: make([]string, 0)})
+	_, err = st.S.CreateSystem(schema.CreateSystem{Name: "initial", Connections: make([]string, 0), Locations: []string{"space_station"}})
 	if err != nil {
 		panic(err)
 	}
@@ -82,7 +86,7 @@ func main() {
 		})
 	})
 
-	humaConfig := huma.DefaultConfig("Astragalaxy API", "0.7.2")
+	humaConfig := huma.DefaultConfig("Astragalaxy API", "0.7.3")
 	humaConfig.CreateHooks = nil
 	humaConfig.Components.SecuritySchemes = map[string]*huma.SecurityScheme{
 		"bearerAuth": {

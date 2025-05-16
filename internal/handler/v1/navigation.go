@@ -4,9 +4,10 @@ import (
 	"astragalaxy/internal/schema"
 	"astragalaxy/internal/util"
 	"context"
+	"net/http"
+
 	"github.com/danielgtaylor/huma/v2"
 	"github.com/google/uuid"
-	"net/http"
 )
 
 func (h *Handler) registerNavigationGroup(api huma.API) {
@@ -31,6 +32,14 @@ func (h *Handler) registerNavigationGroup(api huma.API) {
 		Parameters:  params,
 		Tags:        tags,
 	}, h.hyperJump)
+	huma.Register(api, huma.Operation{
+		Method:      http.MethodPost,
+		Path:        "/location",
+		Description: "navigate to location in current system",
+		Security:    security,
+		Parameters:  params,
+		Tags:        tags,
+	}, h.navigateToLocation)
 	huma.Register(api, huma.Operation{
 		Method:      http.MethodGet,
 		Path:        "/info",
@@ -72,6 +81,25 @@ func (h *Handler) hyperJump(ctx context.Context, input *schema.BaseRequest[schem
 	}
 
 	err = h.s.SpaceshipHyperJump(input.Body.SpaceshipID, input.Body.Path)
+	if err != nil {
+		return nil, err
+	}
+	return &schema.BaseResponse[schema.OkResponse]{Body: schema.OkResponse{Ok: true, CustomStatusCode: 1}}, nil
+}
+
+func (h *Handler) navigateToLocation(ctx context.Context, input *schema.BaseRequest[schema.NavigateToLocation]) (*schema.BaseResponse[schema.OkResponse], error) {
+	astral := ctx.Value("astral").(*schema.Astral)
+
+	s, err := h.s.FindOneSpaceship(input.Body.SpaceshipID)
+	if err != nil {
+		return nil, err
+	}
+
+	if s.AstralID != astral.ID {
+		return nil, util.ErrNotFound
+	}
+
+	err = h.s.NavigateLocation(input.Body.SpaceshipID, input.Body.Location)
 	if err != nil {
 		return nil, err
 	}

@@ -23,6 +23,7 @@ func main() {
 	_, err = systemRepository.Create(&model.System{
 		ID:   id.NewHexGenerator().MustGenerate(7),
 		Name: "initial",
+		Locations: []string{"space_station"},
 	})
 	if err != nil {
 		fmt.Print(err)

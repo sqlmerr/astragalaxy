@@ -64,7 +64,7 @@ func (r SystemRepository) FindAll() []model.System {
 }
 
 func (r SystemRepository) Delete(ID string) error {
-	return r.db.Delete(&model.System{}, ID).Error
+	return r.db.Delete(&model.System{ID: ID}).Error
 }
 
 func (r SystemRepository) Update(s *model.System) error {

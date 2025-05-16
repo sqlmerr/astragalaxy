@@ -2,6 +2,7 @@ package service
 
 import (
 	"astragalaxy/internal/model"
+	"astragalaxy/internal/registry"
 	"astragalaxy/internal/schema"
 	"astragalaxy/internal/util"
 	"errors"
@@ -209,7 +210,36 @@ func (s *Service) SpaceshipHyperJump(ID uuid.UUID, path string) error {
 	return s.f.Update(&fl)
 }
 
+func (s *Service) NavigateLocation(ID uuid.UUID, location string) error {
+	spaceship, err := s.sp.FindOne(ID)
+	if err != nil {
+		return err
+	}
+	currentSystem, err := s.FindOneSystem(spaceship.SystemID)
+	if err != nil {
+		return err
+	}
+
+	if !lo.Contains(currentSystem.Locations, location) {
+		return util.New("current system doesn't have this location", 400)
+	}
+
+	if spaceship.Location == location {
+		return util.New("you're already in this location", 400)
+	}
+
+	err = s.sp.Update(&model.Spaceship{ID: spaceship.ID, Location: location})
+	if err != nil {
+		return err
+	}
+	return s.a.Update(&model.Astral{ID: spaceship.AstralID, Location: location})
+}
+
 func (s *Service) CheckFlightEnd(ID uuid.UUID, flight *model.FlightInfo) error {
+	spaceship, err := s.FindOneSpaceship(ID)
+	if err != nil {
+		return nil
+	}
 	if flight.FlownOutAt != 0 && *flight.Flying {
 		now := time.Now().UTC()
 		flownOutAt := time.Unix(flight.FlownOutAt, 0)
@@ -227,16 +257,26 @@ func (s *Service) CheckFlightEnd(ID uuid.UUID, flight *model.FlightInfo) error {
 			}
 
 			var sp model.Spaceship
+			var as model.Astral
 			if flight.Destination == "planet" {
 				sp = model.Spaceship{
 					ID:       ID,
-					Location: flight.Destination,
+					Location: registry.LocPlanetCode,
 					PlanetID: flight.DestinationID,
+				}
+				as = model.Astral{
+					ID: spaceship.AstralID,
+					Location: registry.LocPlanetCode,
 				}
 			} else if flight.Destination == "system" {
 				sp = model.Spaceship{
 					ID:       ID,
-					Location: flight.Destination,
+					Location: registry.LocOpenSpaceCode,
+					SystemID: flight.DestinationID,
+				}
+				as = model.Astral{
+					ID: spaceship.AstralID,
+					Location: registry.LocOpenSpaceCode,
 					SystemID: flight.DestinationID,
 				}
 			} else {
@@ -244,6 +284,11 @@ func (s *Service) CheckFlightEnd(ID uuid.UUID, flight *model.FlightInfo) error {
 			}
 
 			err = s.sp.Update(&sp)
+			if err != nil {
+				return err
+			}
+
+			err = s.a.Update(&as)
 			if err != nil {
 				return err
 			}

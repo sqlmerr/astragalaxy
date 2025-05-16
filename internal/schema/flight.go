@@ -15,6 +15,11 @@ type FlyToPlanet struct {
 	PlanetID    string    `json:"planet_id"`
 }
 
+type NavigateToLocation struct {
+	SpaceshipID uuid.UUID `json:"spaceship_id"`
+	Location string `json:"location"`
+}
+
 type HyperJump struct {
 	SpaceshipID uuid.UUID `json:"spaceship_id"`
 	Path        string    `json:"path" example:"systemid1->loremipsum2->foobar42" doc:"a path describing which systems the spacecraft will pass through"`

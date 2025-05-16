@@ -9,7 +9,6 @@ import (
 	"io"
 	"net/http"
 	"testing"
-	"time"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -109,7 +108,7 @@ func EnterMySpaceship(t *testing.T) {
 			BeforeRequest: func() {
 				err := testStateObj.S.ExitAstralSpaceship(*testAstral, testSpaceship.ID)
 				assert.NoError(t, err)
-				time.Sleep(1)
+				// time.Sleep(1)
 			},
 		},
 		{

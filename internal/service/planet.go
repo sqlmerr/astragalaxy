@@ -24,6 +24,9 @@ func (s *Service) FindOnePlanet(ID string) (*schema.Planet, error) {
 	if err != nil {
 		return nil, err
 	}
+	if response == nil {
+		return nil, util.ErrNotFound
+	}
 	planetSchema := schema.Planet{ID: response.ID, Name: response.Name, SystemID: response.SystemID, Threat: response.Threat}
 	return &planetSchema, nil
 }
