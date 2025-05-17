@@ -86,7 +86,7 @@ func main() {
 		})
 	})
 
-	humaConfig := huma.DefaultConfig("Astragalaxy API", "0.7.3")
+	humaConfig := huma.DefaultConfig("Astragalaxy API", "0.8.0")
 	humaConfig.CreateHooks = nil
 	humaConfig.Components.SecuritySchemes = map[string]*huma.SecurityScheme{
 		"bearerAuth": {

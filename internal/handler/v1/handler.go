@@ -3,6 +3,7 @@ package v1
 import (
 	"astragalaxy/internal/service"
 	"astragalaxy/internal/state"
+
 	"github.com/danielgtaylor/huma/v2"
 )
 
@@ -30,5 +31,6 @@ func (h *Handler) Register(api huma.API) {
 	h.registerNavigationGroup(huma.NewGroup(api, "/navigation"))
 	h.registerInventoryGroup(huma.NewGroup(api, "/inventory"))
 	h.registerWalletGroup(huma.NewGroup(api, "/wallets"))
+	h.registerExplorationGroup(huma.NewGroup(api, "/explore"))
 
 }
