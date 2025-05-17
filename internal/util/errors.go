@@ -52,6 +52,7 @@ var (
 	ErrAlreadyExploring               = New("you are already exploring", 400)
 	ErrInvalidExplorationType         = New("invalid exploration type", 400)
 	ErrAlreadyInThisLocation          = New("you're already in this location", 400)
+	ErrItemIsBroken                   = New("this item is broken. It can't be used or sent", 400)
 )
 
 type Error struct {

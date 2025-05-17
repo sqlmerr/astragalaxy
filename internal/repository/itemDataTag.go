@@ -12,7 +12,7 @@ type ItemDataTagRepo interface {
 	Create(i *model.ItemDataTag) error
 	FindOne(ID uuid.UUID) (*model.ItemDataTag, error)
 	FindOneByFilter(filter *model.ItemDataTag) (*model.ItemDataTag, error)
-	FindOneByKey(key string) (*model.ItemDataTag, error)
+	// FindOneByKey(key string) (*model.ItemDataTag, error)
 	FindAll(filter *model.ItemDataTag) ([]model.ItemDataTag, error)
 	Delete(ID uuid.UUID) error
 	Update(i *model.ItemDataTag) error
@@ -48,9 +48,9 @@ func (r ItemDataTagRepository) FindOneByFilter(filter *model.ItemDataTag) (*mode
 	return &m, nil
 }
 
-func (r ItemDataTagRepository) FindOneByKey(key string) (*model.ItemDataTag, error) {
-	return r.FindOneByFilter(&model.ItemDataTag{Key: key})
-}
+// func (r ItemDataTagRepository) FindOneByKey(key string) (*model.ItemDataTag, error) {
+// 	return r.FindOneByFilter(&model.ItemDataTag{Key: key})
+// }
 
 func (r ItemDataTagRepository) FindAll(filter *model.ItemDataTag) ([]model.ItemDataTag, error) {
 	var m []model.ItemDataTag

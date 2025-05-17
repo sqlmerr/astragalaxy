@@ -15,6 +15,7 @@ type ItemRepo interface {
 	FindAll(filter *model.Item) ([]model.Item, error)
 	Delete(ID uuid.UUID) error
 	Update(m *model.Item) error
+	UpdateRaw(ID uuid.UUID, m map[string]any) error
 }
 
 type ItemRepository struct {
@@ -63,9 +64,13 @@ func (r ItemRepository) FindAll(filter *model.Item) ([]model.Item, error) {
 }
 
 func (r ItemRepository) Delete(ID uuid.UUID) error {
-	return r.db.Delete(&model.Item{}, ID).Error
+	return r.db.Delete(&model.Item{ID: ID}).Error
 }
 
 func (r ItemRepository) Update(m *model.Item) error {
 	return r.db.Model(&m).Updates(&m).Error
+}
+
+func (r ItemRepository) UpdateRaw(ID uuid.UUID, m map[string]any) error {
+	return r.db.Model(&model.Item{ID: ID}).Updates(m).Error
 }

@@ -1,42 +1,65 @@
 package v1
 
 import (
+	"astragalaxy/internal/registry/actions"
 	"astragalaxy/internal/schema"
 	"astragalaxy/internal/util"
 	"context"
+	"net/http"
+
 	"github.com/danielgtaylor/huma/v2"
 	"github.com/google/uuid"
-	"net/http"
 )
 
 func (h *Handler) registerInventoryGroup(api huma.API) {
 	tags := []string{"inventory"}
 	security := []map[string][]string{{"bearerAuth": {}}}
 	params := []*huma.Param{{Name: "X-Astral-ID", In: "header", Description: "astral id", Required: true, Schema: &huma.Schema{Type: "string"}}}
-	api.UseMiddleware(h.JWTMiddleware(api), h.UserGetter(api), h.AstralGetter(api))
+	// api.UseMiddleware(h.JWTMiddleware(api), h.UserGetter(api), h.AstralGetter(api))
+	middlewares := []func(ctx huma.Context, next func(huma.Context)){
+		h.JWTMiddleware(api), h.UserGetter(api), h.AstralGetter(api),
+	}
 
 	huma.Register(api, huma.Operation{
-		Method:     http.MethodGet,
-		Path:       "/items/{holder}/{id}",
-		Tags:       tags,
-		Security:   security,
-		Parameters: params,
+		Method:      http.MethodGet,
+		Path:        "/items/{holder}/{id}",
+		Tags:        tags,
+		Security:    security,
+		Parameters:  params,
+		Middlewares: middlewares,
 	}, h.getHolderInventory)
 	huma.Register(api, huma.Operation{
-		Method:     http.MethodGet,
-		Path:       "/items/my",
-		Tags:       tags,
-		Security:   security,
-		Parameters: params,
+		Method:      http.MethodGet,
+		Path:        "/items/my",
+		Tags:        tags,
+		Security:    security,
+		Parameters:  params,
+		Middlewares: middlewares,
 	}, h.getMyAstralInventory)
 	huma.Register(api, huma.Operation{
-		Method:     http.MethodGet,
-		Path:       "/items/my/{id}/data",
-		Tags:       tags,
-		Security:   security,
-		Parameters: params,
+		Method:      http.MethodGet,
+		Path:        "/items/my/{id}/data",
+		Tags:        tags,
+		Security:    security,
+		Parameters:  params,
+		Middlewares: middlewares,
 	}, h.getItemData)
 
+	huma.Register(api, huma.Operation{
+		Method:      http.MethodPost,
+		Path:        "/items/my/{id}/use",
+		Tags:        tags,
+		Security:    security,
+		Parameters:  params,
+		Middlewares: middlewares,
+	}, h.useItem)
+
+	huma.Register(api, huma.Operation{
+		Method:   http.MethodPost,
+		Path:     "/items/create",
+		Tags:     tags,
+		Security: []map[string][]string{{"sudoAuth": {}}},
+	}, h.createItem)
 }
 
 func (h *Handler) getHolderInventory(ctx context.Context, input *struct {
@@ -104,4 +127,44 @@ func (h *Handler) getItemData(ctx context.Context, input *struct {
 	return &schema.BaseResponse[schema.ItemDataResponse]{Body: schema.ItemDataResponse{
 		Data: data,
 	}}, nil
+}
+
+func (h *Handler) useItem(ctx context.Context, input *struct {
+	Body struct {
+		Data map[string]any `doc:"data which item will handle" json:"data"`
+	}
+	ItemID string `path:"id"`
+}) (*schema.BaseResponse[schema.ItemUsageResponse], error) {
+	astral := ctx.Value("astral").(*schema.Astral)
+	itemID, err := uuid.Parse(input.ItemID)
+	if err != nil || itemID == uuid.Nil {
+		return nil, util.ErrIDMustBeUUID
+	}
+	item, err := h.s.FindOneItem(itemID)
+	if err != nil || item == nil {
+		return nil, err
+	}
+	inv, err := h.s.FindOneInventory(item.InventoryID)
+	if err != nil {
+		return nil, err
+	}
+
+	if !util.EnsureAstralHasAccessToInventory(astral, inv) {
+		return nil, util.ErrNotFound
+	}
+
+	res, err := actions.ExecuteItemAction(input.Body.Data, item, h.state)
+	if err != nil {
+		return nil, err
+	}
+	return &schema.BaseResponse[schema.ItemUsageResponse]{Body: *res}, nil
+}
+
+func (h *Handler) createItem(ctx context.Context, input *schema.BaseRequest[schema.CreateItem]) (*schema.BaseResponse[schema.Item], error) {
+	item, err := h.s.AddItem(input.Body.InventoryID, input.Body.Code, input.Body.DataTags)
+	if err != nil {
+		return nil, err
+	}
+
+	return &schema.BaseResponse[schema.Item]{Body: *item}, nil
 }

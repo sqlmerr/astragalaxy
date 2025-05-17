@@ -4,6 +4,7 @@ import (
 	"astragalaxy/internal/model"
 	"astragalaxy/internal/schema"
 	"astragalaxy/internal/util"
+
 	"github.com/samber/lo"
 
 	"github.com/google/uuid"
@@ -170,4 +171,55 @@ func (s *Service) SendItem(itemID uuid.UUID, fromID uuid.UUID, toID uuid.UUID) e
 	return s.i.Update(&model.Item{
 		InventoryID: inventoryTo.ID,
 	})
+}
+
+func (s *Service) UpdateItemDataTags(itemID uuid.UUID, dataTags map[string]string) error {
+	for k, v := range dataTags {
+		tag, err := s.idt.FindOneByFilter(&model.ItemDataTag{ItemID: itemID, Key: k})
+		if err != nil {
+			return err
+		}
+
+		// TODO: transactions
+		if tag == nil {
+			err = s.idt.Create(&model.ItemDataTag{ItemID: itemID, Key: k, Value: v})
+		} else {
+			err = s.idt.Update(&model.ItemDataTag{ID: tag.ID, Value: v})
+		}
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (s *Service) UpdateItem(data *model.Item) error {
+	return s.i.Update(data)
+}
+
+func (s *Service) UpdateItemRaw(itemID uuid.UUID, data map[string]any) error {
+	return s.i.UpdateRaw(itemID, data)
+}
+
+func (s *Service) DeleteItem(itemID uuid.UUID) error {
+	return s.i.Delete(itemID)
+}
+
+func (s *Service) GetAstralFromInventory(inventory *model.Inventory) (*schema.Astral, error) {
+	var astralID uuid.UUID
+	switch inventory.Holder {
+	case "astral":
+		astralID = inventory.HolderID
+	case "spaceship":
+		spaceship, err := s.FindOneSpaceship(inventory.HolderID)
+		if err != nil {
+			return nil, err
+		}
+		astralID = spaceship.AstralID
+	default:
+		return nil, util.ErrNotFound
+	}
+
+	return s.FindOneAstral(astralID)
 }

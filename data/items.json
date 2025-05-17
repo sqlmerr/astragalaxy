@@ -24,5 +24,12 @@
         "emoji": "\uD83E\uDDEA",
         "damagePerUse": 1,
         "rarity": "immortal"
+    },
+    {
+        "code": "contract",
+        "emoji": "📜",
+        "damagePerUse": 100,
+        "rarity":"rare",
+        "action": "useContract"
     }
 ]

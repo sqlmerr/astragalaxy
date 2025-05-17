@@ -2,6 +2,7 @@ package schema
 
 import (
 	"astragalaxy/internal/model"
+
 	"github.com/google/uuid"
 )
 
@@ -24,4 +25,16 @@ func ItemSchemaFromItem(item *model.Item) *Item {
 
 type ItemDataResponse struct {
 	Data map[string]string `json:"data"`
+}
+
+type ItemUsageResponse struct {
+	Ok      bool           `json:"ok"`
+	Message string         `json:"message"`
+	Data    map[string]any `json:"data"`
+}
+
+type CreateItem struct {
+	InventoryID uuid.UUID         `json:"inventory_id"`
+	Code        string            `json:"code"`
+	DataTags    map[string]string `json:"data_tags"`
 }

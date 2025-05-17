@@ -4,6 +4,7 @@ import (
 	"astragalaxy/internal/model"
 	"astragalaxy/internal/schema"
 	"astragalaxy/internal/util"
+
 	"github.com/google/uuid"
 	"github.com/samber/lo"
 )
@@ -71,6 +72,10 @@ func (s *Service) UpdateWallet(walletID uuid.UUID, wallet schema.UpdateWallet) e
 		ID:   walletID,
 		Name: wallet.Name,
 	})
+}
+
+func (s *Service) UpdateWalletRaw(wallet *model.Wallet) error {
+	return s.w.Update(wallet)
 }
 
 func (s *Service) DeleteWallet(walletID uuid.UUID) error {
