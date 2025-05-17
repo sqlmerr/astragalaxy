@@ -14,9 +14,9 @@ type Location struct {
 }
 
 const (
-	LocOpenSpaceCode = "open_space"
+	LocOpenSpaceCode    = "open_space"
 	LocSpaceStationCode = "space_station"
-	LocPlanetCode = "planet"
+	LocPlanetCode       = "planet"
 )
 
 type LocationRegistry struct {

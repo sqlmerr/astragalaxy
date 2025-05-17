@@ -5,10 +5,11 @@ import (
 	"astragalaxy/pkg/test"
 	"encoding/json"
 	"fmt"
-	"github.com/google/uuid"
-	"github.com/stretchr/testify/assert"
 	"net/http"
 	"testing"
+
+	"github.com/google/uuid"
+	"github.com/stretchr/testify/assert"
 )
 
 func cleanTestWallets(t *testing.T) {
@@ -248,9 +249,8 @@ func TestSendCurrency(t *testing.T) {
 			Method:        http.MethodPost,
 			Body:          schema.WalletTransaction{ToWallet: testWallet2.ID, Units: 100, Quarks: 10},
 			BeforeRequest: func() {
-				wallet, err := testStateObj.S.GetWallet(testWallet.ID)
+				_, err := testStateObj.S.GetWallet(testWallet.ID)
 				assert.NoError(t, err)
-				fmt.Println("arbiz0", wallet.Units, wallet.Quarks)
 			},
 			BodyValidator: func(body []byte) {
 				var b schema.OkResponse
@@ -262,14 +262,10 @@ func TestSendCurrency(t *testing.T) {
 				wallet1, err := testStateObj.S.GetWallet(testWallet.ID)
 				assert.NoError(t, err)
 
-				fmt.Println("arbiz1", wallet1.Units, wallet1.Quarks)
-				fmt.Println("arbiz2", testWallet.Units, testWallet.Quarks)
-				fmt.Println("arbiz3", testWallet2.Units, testWallet2.Quarks)
 				assert.Equal(t, int64(900), wallet1.Units)
 				assert.Equal(t, int64(0), wallet1.Quarks)
 
 				wallet2, err := testStateObj.S.GetWallet(testWallet2.ID)
-				fmt.Println("arbiz4", wallet2.Units, wallet2.Quarks)
 				assert.NoError(t, err)
 				assert.Equal(t, int64(1100), wallet2.Units)
 				assert.Equal(t, int64(20), wallet2.Quarks)

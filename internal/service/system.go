@@ -82,8 +82,8 @@ func (s *Service) DeleteSystem(ID string) error {
 
 func (s *Service) UpdateSystem(ID string, data schema.UpdateSystem) error {
 	system := model.System{
-		ID:   ID,
-		Name: data.Name,
+		ID:        ID,
+		Name:      data.Name,
 		Locations: data.Locations,
 	}
 	return s.sy.Update(&system)

@@ -95,7 +95,7 @@ func TestHyperJump(t *testing.T) {
 				assert.Equal(t, 1, res.CustomStatusCode)
 			},
 			BeforeRequest: func() {
-				
+
 			},
 		},
 		{
@@ -144,10 +144,6 @@ func TestNavigateToLocation(t *testing.T) {
 
 				assert.True(t, res.Ok)
 				assert.Equal(t, 1, res.CustomStatusCode)
-
-				sys, err := testStateObj.S.FindOneSystem(testSpaceship.SystemID)
-				assert.NoError(t, err)
-				fmt.Println("    ar aradasd: ", sys.Locations)
 
 				spcship, err := testStateObj.S.FindOneSpaceship(testSpaceship.ID)
 				if assert.NoError(t, err) {

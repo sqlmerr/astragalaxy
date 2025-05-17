@@ -2,8 +2,9 @@ package util
 
 import (
 	"errors"
-	"github.com/danielgtaylor/huma/v2"
 	"net/http"
+
+	"github.com/danielgtaylor/huma/v2"
 )
 
 type APIError struct {
@@ -43,10 +44,13 @@ var (
 	ErrSpaceshipIsAlreadyInThisSystem = New("spaceship is already in this system", http.StatusBadRequest)
 	ErrPlayerAlreadyInSpaceship       = New("player already in spaceship", http.StatusBadRequest)
 	ErrPlayerNotInSpaceship           = New("player not in spaceship", http.StatusBadRequest)
+	ErrPlayerMustBeOutOfSpaceship     = New("player must be out of spaceship", 400)
 	ErrInvalidHyperJumpPath           = New("invalid hyperjump path", http.StatusBadRequest)
 	ErrInvalidCode                    = New("invalid code", http.StatusBadRequest)
 	ErrTooManyAstrals                 = New("too many astrals", http.StatusBadRequest)
 	ErrInvalidAstralIDHeader          = New("astral id header not specified or invalid", http.StatusUnauthorized)
+	ErrAlreadyExploring               = New("you are already exploring", 400)
+	ErrInvalidExplorationType = New("invalid exploration type", 400)
 )
 
 type Error struct {

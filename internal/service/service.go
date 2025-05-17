@@ -18,6 +18,7 @@ type Service struct {
 	syc repository.SystemConnectionRepo
 	inv repository.InventoryRepo
 	w   repository.WalletRepo
+	e   repository.ExplorationInfoRepo
 	id  id.Generator // only for systems and planets
 	cfg *config.Config
 }
@@ -34,6 +35,7 @@ func New(
 	syc repository.SystemConnectionRepo,
 	inv repository.InventoryRepo,
 	wallet repository.WalletRepo,
+	e repository.ExplorationInfoRepo,
 	id id.Generator,
 	cfg *config.Config) *Service {
 	return &Service{
@@ -48,6 +50,7 @@ func New(
 		syc: syc,
 		inv: inv,
 		w:   wallet,
+		e:   e,
 		id:  id,
 		cfg: cfg,
 	}

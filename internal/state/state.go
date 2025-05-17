@@ -31,6 +31,7 @@ func New(cfg *config.Config, db *gorm.DB) *State {
 	systemConnectionRepository := repository.NewSystemConnectionRepository(db)
 	inventoryRepository := repository.NewInventoryRepository(db)
 	walletRepository := repository.NewWalletRepository(db)
+	explorationInfoRepository := repository.NewExplorationInfoRepository(db)
 
 	idGenerator := id.NewHexGenerator()
 
@@ -45,6 +46,7 @@ func New(cfg *config.Config, db *gorm.DB) *State {
 		systemConnectionRepository,
 		inventoryRepository,
 		walletRepository,
+		explorationInfoRepository,
 		idGenerator,
 		cfg)
 

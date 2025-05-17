@@ -265,7 +265,7 @@ func (s *Service) CheckFlightEnd(ID uuid.UUID, flight *model.FlightInfo) error {
 					PlanetID: flight.DestinationID,
 				}
 				as = model.Astral{
-					ID: spaceship.AstralID,
+					ID:       spaceship.AstralID,
 					Location: registry.LocPlanetCode,
 				}
 			} else if flight.Destination == "system" {
@@ -275,7 +275,7 @@ func (s *Service) CheckFlightEnd(ID uuid.UUID, flight *model.FlightInfo) error {
 					SystemID: flight.DestinationID,
 				}
 				as = model.Astral{
-					ID: spaceship.AstralID,
+					ID:       spaceship.AstralID,
 					Location: registry.LocOpenSpaceCode,
 					SystemID: flight.DestinationID,
 				}

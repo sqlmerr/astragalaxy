@@ -21,8 +21,8 @@ func main() {
 	systemRepository := repository.NewSystemRepository(db)
 
 	_, err = systemRepository.Create(&model.System{
-		ID:   id.NewHexGenerator().MustGenerate(7),
-		Name: "initial",
+		ID:        id.NewHexGenerator().MustGenerate(7),
+		Name:      "initial",
 		Locations: []string{"space_station"},
 	})
 	if err != nil {
