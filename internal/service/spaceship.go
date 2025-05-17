@@ -6,6 +6,7 @@ import (
 	"astragalaxy/internal/schema"
 	"astragalaxy/internal/util"
 	"errors"
+	"fmt"
 	"time"
 
 	"github.com/google/uuid"
@@ -211,7 +212,7 @@ func (s *Service) SpaceshipHyperJump(ID uuid.UUID, path string) error {
 }
 
 func (s *Service) NavigateLocation(ID uuid.UUID, location string) error {
-	spaceship, err := s.sp.FindOne(ID)
+	spaceship, err := s.FindOneSpaceship(ID)
 	if err != nil {
 		return err
 	}
@@ -220,18 +221,24 @@ func (s *Service) NavigateLocation(ID uuid.UUID, location string) error {
 		return err
 	}
 
-	if !lo.Contains(currentSystem.Locations, location) {
+	if location == "planet" {
+		return util.New("you can't navigate to this location", 400)
+	}
+
+	if location != registry.LocOpenSpaceCode && !lo.Contains(currentSystem.Locations, location) {
 		return util.New("current system doesn't have this location", 400)
 	}
 
 	if spaceship.Location == location {
-		return util.New("you're already in this location", 400)
+		return util.ErrAlreadyInThisLocation
 	}
 
-	err = s.sp.Update(&model.Spaceship{ID: spaceship.ID, Location: location})
+	err = s.sp.UpdateRaw(ID, map[string]any{"location": location, "planet_id": nil})
 	if err != nil {
 		return err
 	}
+
+	fmt.Println(spaceship)
 	return s.a.Update(&model.Astral{ID: spaceship.AstralID, Location: location})
 }
 

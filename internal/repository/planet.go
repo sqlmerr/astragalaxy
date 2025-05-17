@@ -52,7 +52,7 @@ func (r PlanetRepository) FindAll(filter *model.Planet) ([]model.Planet, error) 
 }
 
 func (r PlanetRepository) Delete(ID string) error {
-	return r.db.Delete(&model.Planet{}, ID).Error
+	return r.db.Delete(&model.Planet{ID: ID}).Error
 }
 
 func (r PlanetRepository) Update(p *model.Planet) error {

@@ -11,7 +11,7 @@ type Spaceship struct {
 	FlightID    uuid.UUID `gorm:"default:null"`
 	SystemID    string
 	System      System
-	PlanetID    string `gorm:"default:null"`
-	Planet      Planet
-	PlayerSitIn *bool `gorm:"default:false"`
+	PlanetID    string `gorm:"default:null;"`
+	Planet      Planet `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
+	PlayerSitIn *bool  `gorm:"default:false"`
 }

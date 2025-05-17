@@ -83,3 +83,7 @@ func (s *Service) StartExploration(astralID uuid.UUID, Type model.ExplorationTyp
 		"required_time": requiredTime,
 	})
 }
+
+func (s *Service) SetExplorationInfo(id uuid.UUID, data map[string]any) error {
+	return s.e.Update(id, data)
+}

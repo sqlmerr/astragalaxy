@@ -3,8 +3,10 @@ package v1
 import (
 	"astragalaxy/internal/model"
 	"astragalaxy/internal/schema"
+	"astragalaxy/internal/util"
 	"astragalaxy/pkg/test"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"net/http"
@@ -106,7 +108,7 @@ func EnterMySpaceship(t *testing.T) {
 			},
 			Method: http.MethodPost,
 			BeforeRequest: func() {
-				err := testStateObj.S.ExitAstralSpaceship(*testAstral, testSpaceship.ID)
+				err := testStateObj.S.ExitAstralSpaceship(testAstral.ID, testSpaceship.ID)
 				assert.NoError(t, err)
 				// time.Sleep(1)
 			},
@@ -131,8 +133,11 @@ func EnterMySpaceship(t *testing.T) {
 
 func ExitMySpaceship(t *testing.T) {
 	api := createAPI(t)
-	err := testStateObj.S.EnterAstralSpaceship(*testAstral, testSpaceship.ID)
-	assert.NoError(t, err)
+	err := testStateObj.S.EnterAstralSpaceship(testAstral.ID, testSpaceship.ID)
+	if !errors.Is(err, util.ErrPlayerAlreadyInSpaceship) {
+		assert.NoError(t, err)
+	}
+
 	falseBool := false
 	err = testStateObj.S.SetFlightInfo(testSpaceship.ID, &model.FlightInfo{Flying: &falseBool})
 	assert.NoError(t, err)
@@ -160,7 +165,7 @@ func ExitMySpaceship(t *testing.T) {
 		assert.Equal(t, false, a.InSpaceship)
 	}
 
-	err = testStateObj.S.ExitAstralSpaceship(*testAstral, testSpaceship.ID)
+	err = testStateObj.S.ExitAstralSpaceship(testAstral.ID, testSpaceship.ID)
 	assert.NoError(t, err)
 }
 

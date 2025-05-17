@@ -11,8 +11,8 @@ const (
 
 type Planet struct {
 	ID       string `gorm:"not null;primaryKey"`
-	Name     string
-	SystemID string
+	Name     string `gorm:"default:undefined"`
+	SystemID string `gorm:"not null"`
 	System   System
 	Threat   string
 }

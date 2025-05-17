@@ -79,6 +79,10 @@ func (s *Service) UpdateAstral(ID uuid.UUID, data schema.UpdateAstral) error {
 	return s.a.Update(&astral)
 }
 
+func (s *Service) UpdateAstralRaw(data *model.Astral) error {
+	return s.a.Update(data)
+}
+
 func (s *Service) AddAstralSpaceship(astralID uuid.UUID, spaceship schema.Spaceship) error {
 	astral, err := s.FindOneAstral(astralID)
 	if err != nil {
@@ -93,42 +97,61 @@ func (s *Service) AddAstralSpaceship(astralID uuid.UUID, spaceship schema.Spaces
 	})
 }
 
-func (s *Service) EnterAstralSpaceship(astral schema.Astral, spaceshipID uuid.UUID) error {
-	for _, sp := range astral.Spaceships {
-		if sp.ID == spaceshipID {
-			if sp.PlayerSitIn || astral.InSpaceship {
-				return util.ErrPlayerAlreadyInSpaceship
-			}
-			err := s.UpdateAstral(astral.ID, schema.UpdateAstral{InSpaceship: true})
-			if err != nil {
-				return err
-			}
-			return s.UpdateSpaceship(spaceshipID, schema.UpdateSpaceship{PlayerSitIn: true})
-		}
+func (s *Service) EnterAstralSpaceship(astralID uuid.UUID, spaceshipID uuid.UUID) error {
+	spaceship, err := s.FindOneSpaceship(spaceshipID)
+	if err != nil {
+		return err
+	}
+	if spaceship.AstralID != astralID {
+		return util.ErrNotFound
 	}
 
-	return util.ErrSpaceshipNotFound
+	astral, err := s.FindOneAstral(astralID)
+	if err != nil {
+		return err
+	}
+
+	if spaceship.PlayerSitIn || astral.InSpaceship {
+		return util.ErrPlayerAlreadyInSpaceship
+	}
+	err = s.UpdateAstral(astral.ID, schema.UpdateAstral{InSpaceship: true})
+	if err != nil {
+		return err
+	}
+	return s.UpdateSpaceship(spaceshipID, schema.UpdateSpaceship{PlayerSitIn: true})
 }
 
-func (s *Service) ExitAstralSpaceship(astral schema.Astral, spaceshipID uuid.UUID) error {
-	for _, sp := range astral.Spaceships {
-		if sp.ID == spaceshipID {
-			flyInfo, err := s.GetFlyInfo(spaceshipID)
-			if err != nil {
-				return err
-			}
-			if flyInfo.Flying {
-				return util.ErrSpaceshipIsFlying
-			}
-			inSpaceship := false
-			err = s.a.Update(&model.Astral{ID: astral.ID, InSpaceship: &inSpaceship})
-			if err != nil {
-				return err
-			}
-			playerSitIn := false
-			return s.sp.Update(&model.Spaceship{ID: spaceshipID, PlayerSitIn: &playerSitIn})
-		}
+func (s *Service) ExitAstralSpaceship(astralID uuid.UUID, spaceshipID uuid.UUID) error {
+	spaceship, err := s.FindOneSpaceship(spaceshipID)
+	if err != nil {
+		return err
+	}
+	if spaceship.AstralID != astralID {
+		return util.ErrNotFound
 	}
 
-	return util.ErrSpaceshipNotFound
+	astral, err := s.FindOneAstral(astralID)
+	if err != nil {
+		return err
+	}
+
+	if astral.Location == "open_space" {
+		return util.New("you can't exit spaceship in open_space location", 400)
+	}
+
+	flyInfo, err := s.GetFlyInfo(spaceshipID)
+	if err != nil {
+		return err
+	}
+	if flyInfo.Flying {
+		return util.ErrSpaceshipIsFlying
+	}
+	inSpaceship := false
+	err = s.a.Update(&model.Astral{ID: astral.ID, InSpaceship: &inSpaceship})
+	if err != nil {
+		return err
+	}
+	playerSitIn := false
+	return s.sp.Update(&model.Spaceship{ID: spaceshipID, PlayerSitIn: &playerSitIn})
+
 }

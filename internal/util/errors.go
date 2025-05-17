@@ -50,7 +50,8 @@ var (
 	ErrTooManyAstrals                 = New("too many astrals", http.StatusBadRequest)
 	ErrInvalidAstralIDHeader          = New("astral id header not specified or invalid", http.StatusUnauthorized)
 	ErrAlreadyExploring               = New("you are already exploring", 400)
-	ErrInvalidExplorationType = New("invalid exploration type", 400)
+	ErrInvalidExplorationType         = New("invalid exploration type", 400)
+	ErrAlreadyInThisLocation          = New("you're already in this location", 400)
 )
 
 type Error struct {

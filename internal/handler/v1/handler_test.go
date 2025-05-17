@@ -33,6 +33,7 @@ var (
 	testSpaceshipInventory *model.Inventory
 	testItem               *schema.Item
 	testWallet             *schema.Wallet
+	testPlanet             *schema.Planet
 )
 
 func TestMain(m *testing.M) {
@@ -82,7 +83,7 @@ func setup(state *state.State) {
 		panic(err)
 	}
 
-	_, err = state.S.CreatePlanet(schema.CreatePlanet{Name: "testPlanet1", SystemID: sys.ID, Threat: "TOXINS"})
+	pl, err := state.S.CreatePlanet(schema.CreatePlanet{Name: "testPlanet1", SystemID: sys.ID, Threat: "TOXINS"})
 	if err != nil {
 		panic(err)
 	}
@@ -155,6 +156,7 @@ func setup(state *state.State) {
 	testSpaceshipInventory = spaceshipInv
 	testItem = item
 	testWallet = wallet
+	testPlanet = pl
 }
 
 func createAPI(t testing.TB) humatest.TestAPI {

@@ -16,7 +16,7 @@ func (h *Handler) registerExplorationGroup(api huma.API) {
 	api.UseMiddleware(h.JWTMiddleware(api), h.UserGetter(api), h.AstralGetter(api))
 
 	huma.Register(api, huma.Operation{
-		Method:      http.MethodPost,
+		Method:      http.MethodGet,
 		Path:        "/info",
 		Description: "get current exploration info",
 		Security:    security,

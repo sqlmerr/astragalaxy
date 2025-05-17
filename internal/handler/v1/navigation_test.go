@@ -3,8 +3,10 @@ package v1
 import (
 	"astragalaxy/internal/model"
 	"astragalaxy/internal/schema"
+	"astragalaxy/internal/util"
 	"astragalaxy/pkg/test"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"net/http"
 	"testing"
@@ -14,15 +16,13 @@ import (
 
 func TestFlightToPlanet(t *testing.T) {
 	api := createAPI(t)
-	planets, err := testStateObj.S.FindAllPlanets(&model.Planet{Name: "testPlanet1"})
-	assert.NoError(t, err)
-	assert.Len(t, planets, 1)
-	planet := planets[0]
-	body := &schema.FlyToPlanet{PlanetID: planet.ID, SpaceshipID: testSpaceship.ID}
+	body := &schema.FlyToPlanet{PlanetID: testPlanet.ID, SpaceshipID: testSpaceship.ID}
 
 	if !testSpaceship.PlayerSitIn {
-		err = testStateObj.S.EnterAstralSpaceship(*testAstral, testSpaceship.ID)
-		assert.NoError(t, err)
+		err := testStateObj.S.EnterAstralSpaceship(testAstral.ID, testSpaceship.ID)
+		if !errors.Is(err, util.ErrPlayerAlreadyInSpaceship) {
+			assert.NoError(t, err)
+		}
 	}
 
 	tests := []test.HTTPTest{
@@ -35,11 +35,17 @@ func TestFlightToPlanet(t *testing.T) {
 			ExpectedCode:  http.StatusOK,
 			BodyValidator: func(body []byte) {
 				var res schema.OkResponse
-				err = json.Unmarshal(body, &res)
+				err := json.Unmarshal(body, &res)
 				assert.NoError(t, err)
 
 				assert.True(t, res.Ok)
 				assert.Equal(t, 1, res.CustomStatusCode)
+			},
+			BeforeRequest: func() {
+				err := testStateObj.S.NavigateLocation(testSpaceship.ID, "open_space")
+				if !errors.Is(err, util.ErrAlreadyInThisLocation) {
+					assert.NoError(t, err)
+				}
 			},
 		},
 		{
@@ -58,7 +64,7 @@ func TestFlightToPlanet(t *testing.T) {
 		"X-Astral-ID":   testAstral.ID.String(),
 	})
 
-	testStateObj.S.ExitAstralSpaceship(*testAstral, testSpaceship.ID)
+	testStateObj.S.ExitAstralSpaceship(testAstral.ID, testSpaceship.ID)
 }
 
 func TestHyperJump(t *testing.T) {
@@ -74,8 +80,10 @@ func TestHyperJump(t *testing.T) {
 	body := schema.HyperJump{Path: fmt.Sprintf("%s->%s", testSpaceship.SystemID, system.ID), SpaceshipID: testSpaceship.ID}
 
 	if !testSpaceship.PlayerSitIn {
-		err = testStateObj.S.EnterAstralSpaceship(*testAstral, testSpaceship.ID)
-		assert.NoError(t, err)
+		err = testStateObj.S.EnterAstralSpaceship(testAstral.ID, testSpaceship.ID)
+		if !errors.Is(err, util.ErrPlayerAlreadyInSpaceship) {
+			assert.NoError(t, err)
+		}
 	}
 
 	tests := []test.HTTPTest{
@@ -113,7 +121,7 @@ func TestHyperJump(t *testing.T) {
 		"X-Astral-ID":   testAstral.ID.String(),
 	})
 
-	testStateObj.S.ExitAstralSpaceship(*testAstral, testSpaceship.ID)
+	testStateObj.S.ExitAstralSpaceship(testAstral.ID, testSpaceship.ID)
 	err = testStateObj.S.DeleteSystem(system.ID)
 	assert.NoError(t, err)
 }

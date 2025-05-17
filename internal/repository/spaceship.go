@@ -14,6 +14,7 @@ type SpaceshipRepo interface {
 	FindAll(filter *model.Spaceship) ([]model.Spaceship, error)
 	Delete(ID uuid.UUID) error
 	Update(s *model.Spaceship) error
+	UpdateRaw(id uuid.UUID, s map[string]any) error
 }
 
 type SpaceshipRepository struct {
@@ -58,4 +59,8 @@ func (r SpaceshipRepository) Delete(ID uuid.UUID) error {
 
 func (r SpaceshipRepository) Update(s *model.Spaceship) error {
 	return r.db.Model(&s).Updates(&s).Error
+}
+
+func (r SpaceshipRepository) UpdateRaw(id uuid.UUID, s map[string]any) error {
+	return r.db.Model(&model.Spaceship{ID: id}).Updates(&s).Error
 }

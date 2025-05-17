@@ -5,9 +5,10 @@ import (
 	"astragalaxy/internal/schema"
 	"astragalaxy/internal/util"
 	"context"
+	"net/http"
+
 	"github.com/danielgtaylor/huma/v2"
 	"github.com/google/uuid"
-	"net/http"
 )
 
 func (h *Handler) registerSpaceshipsGroup(api huma.API) {
@@ -100,7 +101,7 @@ func (h *Handler) enterMySpaceship(ctx context.Context, input *struct {
 
 	astral := ctx.Value("astral").(*schema.Astral)
 
-	err = h.s.EnterAstralSpaceship(*astral, ID)
+	err = h.s.EnterAstralSpaceship(astral.ID, ID)
 	if err != nil {
 		return nil, err
 	}
@@ -117,7 +118,7 @@ func (h *Handler) exitMySpaceship(ctx context.Context, input *struct {
 
 	astral := ctx.Value("astral").(*schema.Astral)
 
-	err = h.s.ExitAstralSpaceship(*astral, ID)
+	err = h.s.ExitAstralSpaceship(astral.ID, ID)
 	if err != nil {
 		return nil, err
 	}
