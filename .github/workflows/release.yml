@@ -35,6 +35,6 @@ jobs:
           platforms: linux/amd64
           file: ./Dockerfile
           push: true
-          tags: ghcr.io/sqlmerr/astragalaxy:latest
+          tags: ghcr.io/sqlmerr/astragalaxy:${{github.ref_name}}
           cache-from: type=gha
           cache-to: type=gha,mode=max
