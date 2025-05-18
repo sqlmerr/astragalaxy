@@ -6,6 +6,7 @@ import (
 	"astragalaxy/internal/util"
 
 	"github.com/samber/lo"
+	"gorm.io/gorm"
 
 	"github.com/google/uuid"
 )
@@ -15,6 +16,11 @@ func (s *Service) CreateInventory(holder string, holderID uuid.UUID) (*model.Inv
 		Holder: holder, HolderID: holderID,
 	}
 	err := s.inv.Create(inventory)
+	if err != nil {
+		return nil, err
+	}
+
+	_, err = s.b.Create(s.txManager.DB(), &model.Bundle{InventoryID: inventory.ID, Resources: map[string]int{}})
 	if err != nil {
 		return nil, err
 	}
@@ -222,4 +228,51 @@ func (s *Service) GetAstralFromInventory(inventory *model.Inventory) (*schema.As
 	}
 
 	return s.FindOneAstral(astralID)
+}
+
+// --- Bundle methods ---
+
+func (s *Service) FindOneBundle(id uuid.UUID) (*model.Bundle, error) {
+	return s.b.FindOne(s.txManager.DB(), id)
+}
+
+func (s *Service) GetBundleByInventory(inventoryID uuid.UUID) (*model.Bundle, error) {
+	bundle, err := s.b.FindOneByFilter(s.txManager.DB(), &model.Bundle{InventoryID: inventoryID})
+	if err != nil {
+		return nil, err
+	}
+	if bundle == nil {
+		return nil, util.ErrNotFound
+	}
+	return bundle, nil
+}
+
+func (s *Service) InsertOrUpdateBundleResources(bundleID uuid.UUID, resources map[string]int) error {
+	// Validate resources
+	for k := range resources {
+		r, err := s.r.Resource.FindOne(k)
+		if err != nil || r == nil {
+			return util.ErrNotFound
+		}
+	}
+
+	return s.txManager.WithTx(func(tx *gorm.DB) error {
+		bundle, err := s.b.FindOne(tx, bundleID)
+		if err != nil {
+			return err
+		}
+		if bundle == nil {
+			return util.ErrNotFound
+		}
+
+		currentResources := bundle.Resources
+		for k, v := range resources {
+			currentResources[k] = v
+		}
+		err = s.b.Update(tx, &model.Bundle{ID: bundleID, Resources: currentResources})
+		if err != nil {
+			return err
+		}
+		return nil
+	})
 }

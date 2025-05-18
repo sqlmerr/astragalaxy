@@ -31,7 +31,7 @@ func (r ExplorationInfoRepository) Create(p *model.ExplorationInfo) (*uuid.UUID,
 
 // Delete implements ExplorationInfoRepo.
 func (r ExplorationInfoRepository) Delete(ID uuid.UUID) error {
-	return r.db.Delete(&model.FlightInfo{ID: ID}).Error
+	return r.db.Delete(&model.ExplorationInfo{ID: ID}).Error
 }
 
 // FindAll implements ExplorationInfoRepo.

@@ -1,0 +1,15 @@
+[
+    {"id": "wood"},
+    {"id": "stone"},
+    {"id": "string"},
+    {"id": "raw_iron", "groups": ["ores"]}, 
+    {"id": "iron_bar", "groups": ["bars"]}, 
+    {"id": "iron_plate", "groups": ["plates"]},
+    {"id": "raw_copper", "groups": ["ores"]},
+    {"id": "copper_bar", "groups": ["bars"]}, 
+    {"id": "copper_plate", "groups": ["plates"]},
+    {"id": "coal", "groups": ["ores"]},
+    {"id": "clay"},
+    {"id": "sand"},
+    {"id": "processor", "groups": ["industrial"]}
+]

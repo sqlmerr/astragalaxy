@@ -5,10 +5,11 @@ import (
 	"astragalaxy/pkg/test"
 	"encoding/json"
 	"fmt"
-	"github.com/google/uuid"
-	"github.com/stretchr/testify/assert"
 	"net/http"
 	"testing"
+
+	"github.com/google/uuid"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestGetMyAstralInventory(t *testing.T) {
@@ -90,7 +91,6 @@ func TestGetItemData(t *testing.T) {
 	api := createAPI(t)
 	executor := test.New(api)
 	anotherUuid := uuid.New().String()
-	fmt.Println("arar", testItem.ID)
 
 	tests := []test.HTTPTest{
 		{
@@ -116,6 +116,82 @@ func TestGetItemData(t *testing.T) {
 		{
 			Description:   "Item not found",
 			Route:         fmt.Sprintf("/v1/inventory/items/my/%s/data", anotherUuid),
+			Method:        http.MethodGet,
+			ExpectedError: true,
+			ExpectedCode:  404,
+		},
+	}
+
+	executor.TestHTTP(t, tests, map[string]string{"Authorization": fmt.Sprintf("Bearer %s", testUserJwtToken), "X-Astral-ID": testAstral.ID.String()})
+}
+
+func TestGetAstralBundle(t *testing.T) {
+	api := createAPI(t)
+	executor := test.New(api)
+	bundle, err := testStateObj.S.GetBundleByInventory(testAstralInventory.ID)
+	assert.NoError(t, err)
+
+	tests := []test.HTTPTest{
+		{
+			Description:   "success",
+			Route:         "/v1/inventory/my/bundle",
+			Method:        http.MethodGet,
+			ExpectedError: false,
+			ExpectedCode:  200,
+			BodyValidator: func(b []byte) {
+				var body schema.Bundle
+				err = json.Unmarshal(b, &body)
+				assert.NoError(t, err)
+				assert.Equal(t, body.ID, bundle.ID)
+				assert.Equal(t, body.InventoryID, bundle.InventoryID)
+			},
+		},
+	}
+
+	executor.TestHTTP(t, tests, map[string]string{"Authorization": fmt.Sprintf("Bearer %s", testUserJwtToken), "X-Astral-ID": testAstral.ID.String()})
+}
+
+func TestGetBundle(t *testing.T) {
+	api := createAPI(t)
+	executor := test.New(api)
+	bundleAstral, err := testStateObj.S.GetBundleByInventory(testAstralInventory.ID)
+	assert.NoError(t, err)
+
+	bundleSpaceship, err := testStateObj.S.GetBundleByInventory(testSpaceshipInventory.ID)
+	assert.NoError(t, err)
+
+	tests := []test.HTTPTest{
+		{
+			Description:   "Successfully got astral bundle",
+			Route:         fmt.Sprintf("/v1/inventory/%s/bundle", testAstralInventory.ID.String()),
+			Method:        http.MethodGet,
+			ExpectedError: false,
+			ExpectedCode:  200,
+			BodyValidator: func(b []byte) {
+				var body schema.Bundle
+				err = json.Unmarshal(b, &body)
+				assert.NoError(t, err)
+				assert.Equal(t, body.ID, bundleAstral.ID)
+				assert.Equal(t, body.InventoryID, bundleAstral.InventoryID)
+			},
+		},
+		{
+			Description:   "Successfully got spaceship bundle",
+			Route:         fmt.Sprintf("/v1/inventory/%s/bundle", testSpaceshipInventory.ID.String()),
+			Method:        http.MethodGet,
+			ExpectedError: false,
+			ExpectedCode:  200,
+			BodyValidator: func(b []byte) {
+				var body schema.Bundle
+				err = json.Unmarshal(b, &body)
+				assert.NoError(t, err)
+				assert.Equal(t, body.ID, bundleSpaceship.ID)
+				assert.Equal(t, body.InventoryID, bundleSpaceship.InventoryID)
+			},
+		},
+		{
+			Description:   "Not Found",
+			Route:         fmt.Sprintf("/v1/inventory/%s/bundle", uuid.New().String()),
 			Method:        http.MethodGet,
 			ExpectedError: true,
 			ExpectedCode:  404,

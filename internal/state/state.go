@@ -2,6 +2,7 @@ package state
 
 import (
 	"astragalaxy/internal/config"
+	"astragalaxy/internal/database"
 	"astragalaxy/internal/registry"
 	"astragalaxy/internal/repository"
 	"astragalaxy/internal/service"
@@ -20,36 +21,6 @@ type State struct {
 }
 
 func New(cfg *config.Config, db *gorm.DB) *State {
-	planetRepository := repository.NewPlanetRepository(db)
-	systemRepository := repository.NewSystemRepository(db)
-	spaceshipRepository := repository.NewSpaceshipRepository(db)
-	flightRepository := repository.NewFlightRepository(db)
-	userRepository := repository.NewUserRepository(db)
-	astralRepository := repository.NewAstralRepository(db)
-	itemRepository := repository.NewItemRepository(db)
-	itemDataTagRepository := repository.NewItemDataTagRepository(db)
-	systemConnectionRepository := repository.NewSystemConnectionRepository(db)
-	inventoryRepository := repository.NewInventoryRepository(db)
-	walletRepository := repository.NewWalletRepository(db)
-	explorationInfoRepository := repository.NewExplorationInfoRepository(db)
-
-	idGenerator := id.NewHexGenerator()
-
-	s := service.New(spaceshipRepository,
-		flightRepository,
-		systemRepository,
-		userRepository,
-		astralRepository,
-		itemRepository,
-		itemDataTagRepository,
-		planetRepository,
-		systemConnectionRepository,
-		inventoryRepository,
-		walletRepository,
-		explorationInfoRepository,
-		idGenerator,
-		cfg)
-
 	projectRoot, err := util.GetProjectRoot()
 	if err != nil {
 		panic(fmt.Sprintf("Error finding project root: %v", err))
@@ -71,7 +42,48 @@ func New(cfg *config.Config, db *gorm.DB) *State {
 		panic(err)
 	}
 
-	masterRegistry := registry.NewMaster(itemRegistry, tagRegistry, locationRegistry)
+	resourceRegistry := registry.NewResource()
+	err = resourceRegistry.Load(filepath.Join(projectRoot, "data", "locations.json"))
+	if err != nil {
+		panic(err)
+	}
+
+	masterRegistry := registry.NewMaster(itemRegistry, tagRegistry, locationRegistry, resourceRegistry)
+
+	planetRepository := repository.NewPlanetRepository(db)
+	systemRepository := repository.NewSystemRepository(db)
+	spaceshipRepository := repository.NewSpaceshipRepository(db)
+	flightRepository := repository.NewFlightRepository(db)
+	userRepository := repository.NewUserRepository(db)
+	astralRepository := repository.NewAstralRepository(db)
+	itemRepository := repository.NewItemRepository(db)
+	itemDataTagRepository := repository.NewItemDataTagRepository(db)
+	systemConnectionRepository := repository.NewSystemConnectionRepository(db)
+	inventoryRepository := repository.NewInventoryRepository(db)
+	walletRepository := repository.NewWalletRepository(db)
+	explorationInfoRepository := repository.NewExplorationInfoRepository(db)
+	bundleRepository := repository.NewBundleRepository()
+
+	idGenerator := id.NewHexGenerator()
+	txManager := database.NewTxManager(db)
+
+	s := service.New(spaceshipRepository,
+		flightRepository,
+		systemRepository,
+		userRepository,
+		astralRepository,
+		itemRepository,
+		itemDataTagRepository,
+		planetRepository,
+		systemConnectionRepository,
+		inventoryRepository,
+		walletRepository,
+		explorationInfoRepository,
+		bundleRepository,
+		idGenerator,
+		cfg,
+		masterRegistry,
+		txManager)
 
 	return &State{
 		S:              s,

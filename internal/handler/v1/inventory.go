@@ -60,6 +60,26 @@ func (h *Handler) registerInventoryGroup(api huma.API) {
 		Tags:     tags,
 		Security: []map[string][]string{{"sudoAuth": {}}},
 	}, h.createItem)
+
+	huma.Register(api, huma.Operation{
+		Method:      http.MethodGet,
+		Path:        "/my/bundle",
+		Description: "get authorized astral bundle",
+		Tags:        tags,
+		Security:    security,
+		Parameters:  params,
+		Middlewares: middlewares,
+	}, h.getAstralBundle)
+
+	huma.Register(api, huma.Operation{
+		Method:      http.MethodGet,
+		Path:        "/{id}/bundle",
+		Description: "get inventory bundle",
+		Tags:        tags,
+		Security:    security,
+		Parameters:  params,
+		Middlewares: middlewares,
+	}, h.getBundle)
 }
 
 func (h *Handler) getHolderInventory(ctx context.Context, input *struct {
@@ -167,4 +187,45 @@ func (h *Handler) createItem(ctx context.Context, input *schema.BaseRequest[sche
 	}
 
 	return &schema.BaseResponse[schema.Item]{Body: *item}, nil
+}
+
+func (h *Handler) getAstralBundle(ctx context.Context, input *struct{}) (*schema.BaseResponse[schema.Bundle], error) {
+	astral := ctx.Value("astral").(*schema.Astral)
+	inv, err := h.s.GetInventoryByHolder("astral", astral.ID)
+	if err != nil {
+		return nil, err
+	}
+
+	bundle, err := h.s.GetBundleByInventory(inv.ID)
+	if err != nil {
+		return nil, err
+	}
+	bundleSchema := schema.BundleSchemaFromBundle(bundle)
+	return &schema.BaseResponse[schema.Bundle]{Body: bundleSchema}, nil
+}
+
+func (h *Handler) getBundle(ctx context.Context, input *struct {
+	InventoryID string `path:"id"`
+}) (*schema.BaseResponse[schema.Bundle], error) {
+	astral := ctx.Value("astral").(*schema.Astral)
+	inventoryID, err := uuid.Parse(input.InventoryID)
+	if err != nil || inventoryID == uuid.Nil {
+		return nil, util.ErrIDMustBeUUID
+	}
+
+	inv, err := h.s.FindOneInventory(inventoryID)
+	if err != nil {
+		return nil, err
+	}
+
+	if !util.EnsureAstralHasAccessToInventory(astral, inv) {
+		return nil, util.ErrNotFound
+	}
+
+	bundle, err := h.s.GetBundleByInventory(inv.ID)
+	if err != nil {
+		return nil, err
+	}
+	bundleSchema := schema.BundleSchemaFromBundle(bundle)
+	return &schema.BaseResponse[schema.Bundle]{Body: bundleSchema}, nil
 }
