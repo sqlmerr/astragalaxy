@@ -19,4 +19,6 @@ class Spaceship(Base):
     system: Mapped[System] = relationship()
     system_id: Mapped[UUID] = mapped_column(ForeignKey("systems.id"))
     planet: Mapped[Planet] = relationship()
-    planet_id: Mapped[UUID] = mapped_column(ForeignKey("planets.id", ondelete="SET NULL", onupdate="CASCADE"), nullable=True)
+    planet_id: Mapped[UUID] = mapped_column(
+        ForeignKey("planets.id", ondelete="SET NULL", onupdate="CASCADE"), nullable=True
+    )

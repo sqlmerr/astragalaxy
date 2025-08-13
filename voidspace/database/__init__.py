@@ -3,6 +3,7 @@ from sqlalchemy.orm import DeclarativeBase
 
 from voidspace.config import Settings
 
+
 class Base(DeclarativeBase):
     pass
 

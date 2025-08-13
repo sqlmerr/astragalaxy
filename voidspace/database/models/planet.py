@@ -15,6 +15,7 @@ class PlanetThreatEnum(Enum):
     FREEZING = "freezing"
     HEAT = "heat"
 
+
 class Planet(Base):
     __tablename__ = "planets"
     id: Mapped[str] = mapped_column(primary_key=True)

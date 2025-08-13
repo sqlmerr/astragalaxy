@@ -1,10 +1,12 @@
 from typing import AsyncGenerator
 
-from dishka import Provider, make_async_container, provide, Scope, AsyncContainer
+from dishka import Provider, make_async_container, provide, Scope, AsyncContainer, AnyOf
 from sqlalchemy.ext.asyncio import async_sessionmaker, AsyncSession
 from sqlalchemy.exc import SQLAlchemyError
 
 from voidspace.config import Settings
+from voidspace.interfaces.user.repo import UserRepo
+from voidspace.repositories.user import UserRepository
 
 
 class ConfigProvider(Provider):
@@ -16,13 +18,14 @@ class ConfigProvider(Provider):
     def get_settings(self) -> Settings:
         return self.settings
 
+
 class DatabaseProvider(Provider):
     def __init__(self, session_maker: async_sessionmaker):
         super().__init__()
         self.session_maker = session_maker
 
     @provide(scope=Scope.REQUEST)
-    async def session(self) -> AsyncGenerator[AsyncSession]:
+    async def get_session(self) -> AsyncGenerator[AsyncSession]:
         async with self.session_maker() as session:
             try:
                 yield session
@@ -32,10 +35,15 @@ class DatabaseProvider(Provider):
                 await session.commit()
 
 
+class RepositoryProvider(Provider):
+    @provide(scope=Scope.REQUEST, provides=AnyOf[UserRepo, UserRepository])
+    async def get_user_repo(self, session: AsyncSession):
+        return UserRepository(session)
+
+
 def init_di(config: Settings, session_maker: async_sessionmaker) -> AsyncContainer:
     container = make_async_container(
-        DatabaseProvider(session_maker),
-        ConfigProvider(config)
+        DatabaseProvider(session_maker), ConfigProvider(config), RepositoryProvider()
     )
 
     return container
