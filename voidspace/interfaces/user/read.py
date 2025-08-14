@@ -2,7 +2,7 @@ from uuid import UUID
 
 from typing import Protocol
 
-from voidspace.dto.user import UserDTO
+from voidspace.dto.user import UserDTO, LoginUserDTO
 
 
 class UserReader(Protocol):
@@ -10,4 +10,7 @@ class UserReader(Protocol):
         raise NotImplementedError
 
     async def get_user_by_username(self, username: str) -> UserDTO:
+        raise NotImplementedError
+
+    async def login(self, data: LoginUserDTO) -> str:
         raise NotImplementedError

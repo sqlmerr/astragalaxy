@@ -1,0 +1,17 @@
+[
+  {
+    "code": "space_station",
+    "emoji": "🛰️",
+    "multiplayer": true
+  },
+  {
+    "code": "open_space",
+    "emoji": "🌠",
+    "multiplayer": false
+  },
+  {
+    "code": "planet",
+    "emoji": "\uD83E\uDE90",
+    "multiplayer": false
+  }
+]

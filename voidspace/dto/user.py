@@ -26,3 +26,9 @@ class UserDTO:
 class CreateUserDTO:
     username: str
     password: str
+
+
+@dataclass(frozen=True)
+class LoginUserDTO:
+    username: str
+    password: str

@@ -8,6 +8,7 @@ dependencies = [
     "asyncpg>=0.30.0",
     "dishka>=1.6.0",
     "fastapi>=0.116.1",
+    "pwdlib[argon2]>=0.2.1",
     "pydantic-settings>=2.10.1",
     "pyjwt>=2.10.1",
     "sqlalchemy>=2.0.43",
