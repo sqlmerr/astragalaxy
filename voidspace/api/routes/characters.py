@@ -24,7 +24,7 @@ async def create_character(
         CreateCharacterDTO(user_id=user_id, code=data.code)
     )
 
-    return CharacterSchema.from_dto(character)v
+    return CharacterSchema.from_dto(character)
 
 
 @router.get("/my", dependencies=[JwtSecurity])
