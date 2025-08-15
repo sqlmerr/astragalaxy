@@ -12,13 +12,19 @@ from voidspace.interfaces.character.create import CharacterWriter
 from voidspace.interfaces.character.delete import CharacterDeleter
 from voidspace.interfaces.character.read import CharacterReader
 from voidspace.interfaces.character.repo import CharacterRepo
+from voidspace.interfaces.system.create import SystemWriter
+from voidspace.interfaces.system.delete import SystemDeleter
+from voidspace.interfaces.system.read import SystemReader
+from voidspace.interfaces.system.repo import SystemRepo
 from voidspace.interfaces.user import UserReader, UserWriter
 from voidspace.interfaces.user.repo import UserRepo
 from voidspace.jwt_token_processor import JwtTokenProcessor
 from voidspace.password_hasher import PasswordHasher
 from voidspace.repositories.character import CharacterRepository
+from voidspace.repositories.system import SystemRepository
 from voidspace.repositories.user import UserRepository
 from voidspace.services.character import CharacterService
+from voidspace.services.system import SystemService
 from voidspace.services.user import UserService
 
 
@@ -80,6 +86,12 @@ class RepositoryProvider(Provider):
         provides=AnyOf[CharacterRepo, CharacterRepository],
     )
 
+    system_repo = provide(
+        SystemRepository,
+        scope=Scope.REQUEST,
+        provides=AnyOf[SystemRepo, SystemRepository],
+    )
+
 
 class ServiceProvider(Provider):
     user_service = provide(
@@ -94,6 +106,12 @@ class ServiceProvider(Provider):
         provides=AnyOf[
             CharacterReader, CharacterWriter, CharacterDeleter, CharacterService
         ],
+    )
+
+    system_service = provide(
+        SystemService,
+        scope=Scope.REQUEST,
+        provides=AnyOf[SystemReader, SystemWriter, SystemDeleter],
     )
 
 

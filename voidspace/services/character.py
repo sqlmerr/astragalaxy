@@ -6,6 +6,7 @@ from voidspace.dto.character import CharacterDTO, CreateCharacterDTO
 from voidspace.exceptions.character import (
     CharacterNotFound,
     CharacterCodeAlreadyOccupied,
+    TooManyCharacters,
 )
 from voidspace.interfaces.character.create import CharacterWriter
 from voidspace.interfaces.character.delete import CharacterDeleter
@@ -36,6 +37,10 @@ class CharacterService(CharacterReader, CharacterWriter, CharacterDeleter):
         return [CharacterDTO.from_model(character) for character in characters]
 
     async def create_character(self, data: CreateCharacterDTO) -> CharacterDTO:
+        user_characters = await self.get_characters_by_user(data.user_id)
+        if len(user_characters) >= 5:
+            raise TooManyCharacters
+
         character = await self.repo.find_one_character_by_code(data.code.lower())
         if character:
             raise CharacterCodeAlreadyOccupied

@@ -1,8 +1,6 @@
-from uuid import UUID, uuid4
-
 from sqlalchemy import String
-from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy.dialects.postgresql import ARRAY
+from sqlalchemy.orm import Mapped, mapped_column
 
 from voidspace.database import Base
 
