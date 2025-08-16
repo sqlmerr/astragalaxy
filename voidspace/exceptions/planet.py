@@ -4,7 +4,7 @@ from . import NotFoundError
 
 
 @dataclass(eq=False)
-class SystemNotFound(NotFoundError):
+class PlanetNotFound(NotFoundError):
     @property
     def message(self) -> str:
-        return "System not found"
+        return "Planet not found"

@@ -1,12 +1,10 @@
-from uuid import UUID, uuid4
 from enum import Enum
 
 from sqlalchemy import ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, relationship
-from sqlalchemy.dialects.postgresql import ARRAY
 
-from .system import System
 from voidspace.database import Base
+from .system import System
 
 
 class PlanetThreatEnum(Enum):

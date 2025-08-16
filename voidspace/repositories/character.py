@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from uuid import UUID
 
-from sqlalchemy import select, insert, delete
+from sqlalchemy import select, delete
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from voidspace.database.models import Character
@@ -12,19 +12,8 @@ from voidspace.interfaces.character.repo import CharacterRepo
 class CharacterRepository(CharacterRepo):
     session: AsyncSession
 
-    async def create_character(self, character: Character) -> UUID:
-        stmt = (
-            insert(Character)
-            .values(
-                code=character.code,
-                location=character.location,
-                user_id=character.user_id,
-            )
-            .returning(Character.id)
-        )
-        result = await self.session.execute(stmt)
-
-        return result.scalar_one()
+    def create_character(self, character: Character) -> None:
+        self.session.add(character)
 
     async def find_one_character(self, id: UUID) -> Character | None:
         stmt = select(Character).where(Character.id == id)

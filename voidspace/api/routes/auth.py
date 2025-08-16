@@ -6,26 +6,24 @@ from voidspace.api.dependencies import JwtSecurity
 from voidspace.api.schemas.auth import AuthRegisterSchema, AuthLoginSchema, TokenSchema
 from voidspace.api.schemas.user import UserSchema
 from voidspace.identity_provider import IdentityProvider
-from voidspace.interfaces.user import UserWriter, UserReader
+from voidspace.use_cases.login import Login
+from voidspace.use_cases.register import Register
 
 router = APIRouter(prefix="/auth", route_class=DishkaRoute, tags=["Auth"])
 
 
 @router.post("/register")
 async def register_user(
-    data: AuthRegisterSchema, user_writer: FromDishka[UserWriter]
+    data: AuthRegisterSchema, use_case: FromDishka[Register]
 ) -> UserSchema:
-    user = await user_writer.create_user(data.into_dto())
-
+    user = await use_case.execute(data.into_dto())
     return UserSchema.from_dto(user)
 
 
 @router.post("/login")
-async def login(
-    data: AuthLoginSchema, user_reader: FromDishka[UserReader]
-) -> TokenSchema:
-    token = await user_reader.login(data.into_dto())
-    return TokenSchema(access_token=token)
+async def login(data: AuthLoginSchema, use_case: FromDishka[Login]) -> TokenSchema:
+    token = await use_case.execute(data.into_dto())
+    return TokenSchema(access_token=token.access_token, token_type=token.token_type)
 
 
 @router.get("/me", dependencies=[JwtSecurity])

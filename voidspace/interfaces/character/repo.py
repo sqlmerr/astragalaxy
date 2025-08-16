@@ -5,7 +5,7 @@ from voidspace.database.models import Character
 
 
 class CharacterRepo(Protocol):
-    async def create_character(self, character: Character) -> UUID:
+    def create_character(self, character: Character) -> None:
         raise NotImplementedError
 
     async def find_one_character(self, id: UUID) -> Character | None:

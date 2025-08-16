@@ -1,11 +1,34 @@
-from typing import ClassVar
+from dataclasses import dataclass
 
 
+@dataclass(eq=False)
 class AppError(Exception):
-    status: ClassVar[int]
-    message: ClassVar[str]
+    @property
+    def status(self) -> int:
+        return 500
+
+    @property
+    def message(self) -> str:
+        return "Server Error"
 
 
+@dataclass(eq=False)
 class NotFoundError(AppError):
-    status = 404
-    message = "Not found"
+    @property
+    def status(self) -> int:
+        return 404
+
+    @property
+    def message(self) -> str:
+        return "Not found"
+
+
+@dataclass(eq=False)
+class AccessDeniedError(AppError):
+    @property
+    def status(self) -> int:
+        return 403
+
+    @property
+    def message(self) -> str:
+        return "Access denied"

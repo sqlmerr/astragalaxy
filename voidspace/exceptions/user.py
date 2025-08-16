@@ -1,20 +1,42 @@
+from dataclasses import dataclass
+
 from . import NotFoundError, AppError
 
 
+@dataclass(eq=False)
 class UserNotFound(NotFoundError):
-    message = "User not found"
+    @property
+    def message(self) -> str:
+        return "User not found"
 
 
+@dataclass(eq=False)
 class UsernameAlreadyOccupied(AppError):
-    message = "This username already occupied"
-    status = 409
+    @property
+    def status(self) -> int:
+        return 409
+
+    @property
+    def message(self) -> str:
+        return "This username already occupied"
 
 
+@dataclass(eq=False)
 class InvalidCredentials(AppError):
-    status = 401
-    message = "Invalid credentials"
+    @property
+    def status(self) -> int:
+        return 401
+
+    @property
+    def message(self) -> str:
+        return "Invalid credentials"
 
 
 class InvalidToken(AppError):
-    status = 401
-    message = "Invalid token"
+    @property
+    def status(self) -> int:
+        return 401
+
+    @property
+    def message(self) -> str:
+        return "Invalid token"

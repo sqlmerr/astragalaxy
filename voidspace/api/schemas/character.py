@@ -14,7 +14,14 @@ class CharacterSchema(BaseModel):
     code: str
     location: str
     user_id: UUID
+    system_id: str
 
     @classmethod
     def from_dto(cls, dto: CharacterDTO) -> "CharacterSchema":
-        return cls(id=dto.id, code=dto.code, location=dto.location, user_id=dto.user_id)
+        return cls(
+            id=dto.id,
+            code=dto.code,
+            location=dto.location,
+            user_id=dto.user_id,
+            system_id=dto.system_id,
+        )

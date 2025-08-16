@@ -1,6 +1,5 @@
-from uuid import UUID
-
 from dataclasses import dataclass
+from uuid import UUID
 
 from voidspace.database.models import User
 
@@ -32,3 +31,9 @@ class CreateUserDTO:
 class LoginUserDTO:
     username: str
     password: str
+
+
+@dataclass(frozen=True)
+class AuthTokenDTO:
+    access_token: str
+    token_type: str = "Bearer"
