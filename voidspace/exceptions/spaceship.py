@@ -63,3 +63,14 @@ class CharacterNeedsToBeInSpaceship(AppError):
     @property
     def message(self) -> str:
         return "Character needs to be in spaceship"
+
+
+@dataclass(eq=False)
+class InvalidHyperjumpPath(AppError):
+    @property
+    def status(self) -> int:
+        return 400
+
+    @property
+    def message(self) -> str:
+        return "Invalid hyperjump path"

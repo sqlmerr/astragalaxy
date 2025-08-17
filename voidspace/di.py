@@ -23,6 +23,7 @@ from voidspace.interfaces.cooldown.repo import CooldownRepo
 from voidspace.interfaces.planet.repo import PlanetRepo
 from voidspace.interfaces.spaceship.repo import SpaceshipRepo
 from voidspace.interfaces.system.repo import SystemRepo
+from voidspace.interfaces.system_connection.repo import SystemConnectionRepo
 from voidspace.interfaces.user.repo import UserRepo
 from voidspace.jwt_token_processor import JwtTokenProcessor
 from voidspace.password_hasher import PasswordHasher
@@ -31,6 +32,7 @@ from voidspace.repositories.cooldown import CooldownRepository
 from voidspace.repositories.planet import PlanetRepository
 from voidspace.repositories.spaceship import SpaceshipRepository
 from voidspace.repositories.system import SystemRepository
+from voidspace.repositories.system_connection import SystemConnectionRepository
 from voidspace.repositories.user import UserRepository
 from voidspace.use_cases.add_spaceship import AddSpaceship
 from voidspace.use_cases.create_character import CreateCharacter
@@ -50,6 +52,7 @@ from voidspace.use_cases.get_spaceship import (
 )
 from voidspace.use_cases.get_system import GetSystem, GetSystemsPaginated
 from voidspace.use_cases.get_user import GetUserById, GetUserByUsername
+from voidspace.use_cases.hyperjump import Hyperjump
 from voidspace.use_cases.login import Login
 from voidspace.use_cases.navigate_to_planet import NavigateToPlanet
 from voidspace.use_cases.register import Register
@@ -146,6 +149,12 @@ class RepositoryProvider(Provider):
         provides=AnyOf[CooldownRepo, CooldownRepository],
     )
 
+    system_connection_repo = provide(
+        SystemConnectionRepository,
+        scope=Scope.REQUEST,
+        provides=AnyOf[SystemConnectionRepo, SystemConnectionRepository],
+    )
+
 
 class UseCaseProvider(Provider):
     use_cases = provide_all(
@@ -173,6 +182,7 @@ class UseCaseProvider(Provider):
         EnterSpaceship,
         ExitSpaceship,
         NavigateToPlanet,
+        Hyperjump,
         scope=Scope.REQUEST,
     )
 
