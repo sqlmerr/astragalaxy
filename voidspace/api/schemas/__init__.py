@@ -8,3 +8,7 @@ class DataSchema[T: BaseModel](BaseModel):
 class Pagination(BaseModel):
     per_page: int = 10
     page: int = 0
+
+
+class OkSchema(BaseModel):
+    ok: bool

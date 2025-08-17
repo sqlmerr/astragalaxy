@@ -36,4 +36,4 @@ class CreateSpaceshipDTO:
 @dataclass(frozen=True)
 class RenameSpaceshipDTO:
     name: str
-    spaceship_id: str
+    spaceship_id: UUID

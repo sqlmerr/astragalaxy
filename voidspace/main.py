@@ -6,7 +6,7 @@ from fastapi.responses import JSONResponse
 
 from voidspace.api.routes import v1_router
 from voidspace.config import Settings
-from voidspace.database import init_db
+from voidspace.database import init_db, init_redis
 from voidspace.database.models import System
 from voidspace.di import init_di
 from voidspace.exceptions import AppError
@@ -15,7 +15,8 @@ from voidspace.utils import generate_random_id
 
 config = Settings()
 session_maker = init_db(config)
-container = init_di(config, session_maker)
+redis = init_redis(config)
+container = init_di(config, session_maker, redis)
 
 
 @asynccontextmanager

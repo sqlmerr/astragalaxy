@@ -11,12 +11,15 @@ from dishka import (
 )
 from dishka.integrations.fastapi import FastapiProvider
 from fastapi import Request
+from redis.asyncio import Redis
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.ext.asyncio import async_sessionmaker, AsyncSession
 
 from voidspace.config import Settings
+from voidspace.cooldown_manager import CooldownManager
 from voidspace.identity_provider import IdentityProvider
 from voidspace.interfaces.character.repo import CharacterRepo
+from voidspace.interfaces.cooldown.repo import CooldownRepo
 from voidspace.interfaces.planet.repo import PlanetRepo
 from voidspace.interfaces.spaceship.repo import SpaceshipRepo
 from voidspace.interfaces.system.repo import SystemRepo
@@ -24,6 +27,7 @@ from voidspace.interfaces.user.repo import UserRepo
 from voidspace.jwt_token_processor import JwtTokenProcessor
 from voidspace.password_hasher import PasswordHasher
 from voidspace.repositories.character import CharacterRepository
+from voidspace.repositories.cooldown import CooldownRepository
 from voidspace.repositories.planet import PlanetRepository
 from voidspace.repositories.spaceship import SpaceshipRepository
 from voidspace.repositories.system import SystemRepository
@@ -35,6 +39,8 @@ from voidspace.use_cases.create_system import CreateSystem
 from voidspace.use_cases.delete_character import DeleteCharacter
 from voidspace.use_cases.delete_planet import DeletePlanet
 from voidspace.use_cases.delete_system import DeleteSystem
+from voidspace.use_cases.enter_spaceship import EnterSpaceship
+from voidspace.use_cases.exit_spaceship import ExitSpaceship
 from voidspace.use_cases.get_character import GetUserCharacters
 from voidspace.use_cases.get_planet import GetPlanet, GetSystemPlanets
 from voidspace.use_cases.get_spaceship import (
@@ -80,11 +86,14 @@ class CommonProvider(Provider):
             character_repo=character_repo,
         )
 
+    cooldown_manager = provide(CooldownManager, scope=Scope.APP)
+
 
 class DatabaseProvider(Provider):
-    def __init__(self, session_maker: async_sessionmaker):
+    def __init__(self, session_maker: async_sessionmaker, redis: Redis):
         super().__init__()
         self.session_maker = session_maker
+        self.redis = redis
 
     @provide(scope=Scope.REQUEST)
     async def get_session(self) -> AsyncGenerator[AsyncSession]:
@@ -95,6 +104,10 @@ class DatabaseProvider(Provider):
                 await session.rollback()
             finally:
                 await session.commit()
+
+    @provide(scope=Scope.APP)
+    def get_redis(self) -> Redis:
+        return self.redis
 
 
 class RepositoryProvider(Provider):
@@ -126,6 +139,12 @@ class RepositoryProvider(Provider):
         provides=AnyOf[SpaceshipRepository, SpaceshipRepo],
     )
 
+    cooldown_repo = provide(
+        CooldownRepository,
+        scope=Scope.APP,
+        provides=AnyOf[CooldownRepo, CooldownRepository],
+    )
+
 
 class UseCaseProvider(Provider):
     use_cases = provide_all(
@@ -150,13 +169,17 @@ class UseCaseProvider(Provider):
         AddSpaceship,
         RenameSpaceship,
         GetUserCharacters,
+        EnterSpaceship,
+        ExitSpaceship,
         scope=Scope.REQUEST,
     )
 
 
-def init_di(config: Settings, session_maker: async_sessionmaker) -> AsyncContainer:
+def init_di(
+    config: Settings, session_maker: async_sessionmaker, redis: Redis
+) -> AsyncContainer:
     container = make_async_container(
-        DatabaseProvider(session_maker),
+        DatabaseProvider(session_maker, redis),
         CommonProvider(config),
         RepositoryProvider(),
         FastapiProvider(),

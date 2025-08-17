@@ -34,3 +34,6 @@ class CharacterRepository(CharacterRepo):
     async def delete_character(self, id: UUID) -> Character | None:
         stmt = delete(Character).where(Character.id == id)
         await self.session.execute(stmt)
+
+    def update_character(self, character: Character) -> None:
+        self.session.add(character)

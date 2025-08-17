@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 from uuid import UUID
 
+from voidspace.dto.spaceship import SpaceshipDTO
 from voidspace.exceptions.spaceship import SpaceshipNotFoundError
 from voidspace.identity_provider import IdentityProvider
 from voidspace.interfaces.spaceship.repo import SpaceshipRepo
@@ -11,7 +12,7 @@ class SetActiveSpaceship:
     repo: SpaceshipRepo
     idp: IdentityProvider
 
-    async def execute(self, data: UUID) -> None:
+    async def execute(self, data: UUID) -> SpaceshipDTO:
         current_character = await self.idp.get_current_character()
         spaceships = await self.repo.find_all_by_character_id(current_character.id)
 
@@ -25,10 +26,11 @@ class SetActiveSpaceship:
         for sp in spaceships:
             if sp.id != data:
                 continue
-            active_spaceship.active = False
-            self.repo.save_spaceship(active_spaceship)
+            if active_spaceship:
+                active_spaceship.active = False
+                self.repo.save_spaceship(active_spaceship)
             sp.active = True
             self.repo.save_spaceship(sp)
-            return
+            return SpaceshipDTO.from_model(sp)
 
         raise SpaceshipNotFoundError()

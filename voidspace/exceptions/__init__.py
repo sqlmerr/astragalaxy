@@ -32,3 +32,14 @@ class AccessDeniedError(AppError):
     @property
     def message(self) -> str:
         return "Access denied"
+
+
+@dataclass(eq=False)
+class CharacterInCooldown(AppError):
+    @property
+    def status(self) -> int:
+        return 400
+
+    @property
+    def message(self) -> str:
+        return "Character in cooldown"

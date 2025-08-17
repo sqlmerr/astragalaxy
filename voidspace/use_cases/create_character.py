@@ -54,7 +54,7 @@ class CreateCharacter(BaseUseCase[CreateCharacterDTO, CharacterDTO]):
             name="initial",
             location="space_station",
             character_id=c.id,
-            active=False,
+            active=True,
             system_id=system.id,
             planet_id=None,
         )

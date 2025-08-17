@@ -19,3 +19,6 @@ class CharacterRepo(Protocol):
 
     async def delete_character(self, id: UUID) -> Character | None:
         raise NotImplementedError
+
+    def update_character(self, character: Character) -> None:
+        raise NotImplementedError

@@ -15,6 +15,7 @@ class CharacterSchema(BaseModel):
     location: str
     user_id: UUID
     system_id: str
+    in_spaceship: bool
 
     @classmethod
     def from_dto(cls, dto: CharacterDTO) -> "CharacterSchema":
@@ -24,4 +25,5 @@ class CharacterSchema(BaseModel):
             location=dto.location,
             user_id=dto.user_id,
             system_id=dto.system_id,
+            in_spaceship=dto.in_spaceship,
         )

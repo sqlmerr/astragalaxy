@@ -8,6 +8,8 @@ class Settings(BaseSettings):
     POSTGRES_PASSWORD: str
     POSTGRES_DATABASE: str = ""
 
+    REDIS_URL: str
+
     JWT_SECRET: str
 
     def build_postgres_dsn(self) -> str:

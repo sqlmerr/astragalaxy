@@ -48,12 +48,17 @@ class IdentityProvider:
 
         return UserDTO.from_model(user)
 
-    async def get_current_character(self) -> CharacterDTO:
+    def get_current_character_id(self) -> UUID:
         header = self.headers.get("X-Character-ID")
         if not header:
             raise CharacterNotFound()
 
-        character = await self.character_repo.find_one_character(UUID(header))
+        return UUID(header)
+
+    async def get_current_character(self) -> CharacterDTO:
+        character_id = self.get_current_character_id()
+
+        character = await self.character_repo.find_one_character(character_id)
         if not character:
             raise CharacterNotFound()
         current_user_id = self.get_current_user_id()
