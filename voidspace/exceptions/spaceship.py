@@ -52,3 +52,14 @@ class CharacterAlreadyOutOfSpaceship(AppError):
     @property
     def message(self) -> str:
         return "Character already out of spaceship"
+
+
+@dataclass(eq=False)
+class CharacterNeedsToBeInSpaceship(AppError):
+    @property
+    def status(self) -> int:
+        return 400
+
+    @property
+    def message(self) -> str:
+        return "Character needs to be in spaceship"

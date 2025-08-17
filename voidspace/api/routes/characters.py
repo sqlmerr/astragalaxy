@@ -5,6 +5,8 @@ from fastapi import APIRouter
 from ..dependencies import JwtSecurity, CharacterSecurity
 from ..schemas import DataSchema
 from ..schemas.character import CreateCharacterSchema, CharacterSchema
+from ..schemas.cooldown import CooldownSchema
+from ...cooldown_manager import CooldownManager
 from ...dto.character import CreateCharacterDTO
 from ...identity_provider import IdentityProvider
 from ...use_cases.create_character import CreateCharacter
@@ -33,9 +35,20 @@ async def get_my_characters(
     return DataSchema(data=schemas)
 
 
-@router.get("/", dependencies=[JwtSecurity, CharacterSecurity])
+@router.get("/current", dependencies=[JwtSecurity, CharacterSecurity])
 async def get_current_character(
     identity_provider: FromDishka[IdentityProvider],
 ) -> CharacterSchema:
     character = await identity_provider.get_current_character()
     return CharacterSchema.from_dto(character)
+
+
+@router.get("/current/cooldown", dependencies=[JwtSecurity, CharacterSecurity])
+async def get_cooldown(
+    cooldown_manager: FromDishka[CooldownManager],
+    identity_provider: FromDishka[IdentityProvider],
+) -> CooldownSchema:
+    current_character = await identity_provider.get_current_character()
+    cooldown = await cooldown_manager.get(current_character.id)
+
+    return CooldownSchema.from_dto(cooldown)

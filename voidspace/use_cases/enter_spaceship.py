@@ -28,7 +28,7 @@ class EnterSpaceship:
         if not current_character:
             raise AppError()
         cooldown = await self.cooldown_manager.get(current_character.id)
-        if cooldown.seconds > 0:
+        if cooldown.remaining_seconds > 0:
             raise CharacterInCooldown()
 
         active_spaceship = await self.repo.find_one_active_by_character(

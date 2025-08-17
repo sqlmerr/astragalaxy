@@ -4,6 +4,7 @@ from sqlalchemy import ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from voidspace.database import Base
+from .planet import Planet
 from .system import System
 from .user import User
 
@@ -18,3 +19,5 @@ class Character(Base):
     user_id: Mapped[UUID] = mapped_column(ForeignKey("users.id"))
     system: Mapped[System] = relationship()
     system_id: Mapped[str] = mapped_column(ForeignKey("systems.id"))
+    planet: Mapped[Planet] = relationship()
+    planet_id: Mapped[str] = mapped_column(ForeignKey("planets.id"), nullable=True)

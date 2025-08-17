@@ -51,6 +51,7 @@ from voidspace.use_cases.get_spaceship import (
 from voidspace.use_cases.get_system import GetSystem, GetSystemsPaginated
 from voidspace.use_cases.get_user import GetUserById, GetUserByUsername
 from voidspace.use_cases.login import Login
+from voidspace.use_cases.navigate_to_planet import NavigateToPlanet
 from voidspace.use_cases.register import Register
 from voidspace.use_cases.rename_spaceship import RenameSpaceship
 from voidspace.use_cases.set_active_spaceship import SetActiveSpaceship
@@ -171,6 +172,7 @@ class UseCaseProvider(Provider):
         GetUserCharacters,
         EnterSpaceship,
         ExitSpaceship,
+        NavigateToPlanet,
         scope=Scope.REQUEST,
     )
 
