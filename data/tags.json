@@ -1,0 +1,15 @@
+[
+  {
+    "name": "upgrades",
+    "items": [
+      "speedUpgrade"
+    ]
+  },
+  {
+    "name": "can_be_found_in_structures",
+    "items": [
+      "orbisKey",
+      "spaceshipBlueprint"
+    ]
+  }
+]

@@ -17,10 +17,14 @@ from sqlalchemy.ext.asyncio import async_sessionmaker, AsyncSession
 
 from voidspace.config import Settings
 from voidspace.cooldown_manager import CooldownManager
-from voidspace.identity_provider import IdentityProvider
+from voidspace.identity_provider import IdentityProviderImpl
 from voidspace.interfaces.character.repo import CharacterRepo
 from voidspace.interfaces.cooldown.repo import CooldownRepo
+from voidspace.interfaces.identity_provider import IdentityProvider
+from voidspace.interfaces.inventory.repo import InventoryRepo
+from voidspace.interfaces.item.repo import ItemRepo
 from voidspace.interfaces.planet.repo import PlanetRepo
+from voidspace.interfaces.resource.repo import ResourceRepo
 from voidspace.interfaces.spaceship.repo import SpaceshipRepo
 from voidspace.interfaces.system.repo import SystemRepo
 from voidspace.interfaces.system_connection.repo import SystemConnectionRepo
@@ -29,7 +33,10 @@ from voidspace.jwt_token_processor import JwtTokenProcessor
 from voidspace.password_hasher import PasswordHasher
 from voidspace.repositories.character import CharacterRepository
 from voidspace.repositories.cooldown import CooldownRepository
+from voidspace.repositories.inventory import InventoryRepository
+from voidspace.repositories.item import ItemRepository
 from voidspace.repositories.planet import PlanetRepository
+from voidspace.repositories.resource import ResourceRepository
 from voidspace.repositories.spaceship import SpaceshipRepository
 from voidspace.repositories.system import SystemRepository
 from voidspace.repositories.system_connection import SystemConnectionRepository
@@ -44,6 +51,7 @@ from voidspace.use_cases.delete_system import DeleteSystem
 from voidspace.use_cases.enter_spaceship import EnterSpaceship
 from voidspace.use_cases.exit_spaceship import ExitSpaceship
 from voidspace.use_cases.get_character import GetUserCharacters
+from voidspace.use_cases.get_inventory import GetInventoryItems, GetInventoryResources
 from voidspace.use_cases.get_planet import GetPlanet, GetSystemPlanets
 from voidspace.use_cases.get_spaceship import (
     GetSpaceship,
@@ -75,15 +83,17 @@ class CommonProvider(Provider):
 
     jwt_token_processor = provide(JwtTokenProcessor, scope=Scope.APP)
 
-    @provide(scope=Scope.REQUEST)
+    @provide(
+        scope=Scope.REQUEST, provides=AnyOf[IdentityProviderImpl, IdentityProvider]
+    )
     def get_identity_provider(
         self,
         request: Request,
         jwt_token_processor: JwtTokenProcessor,
         user_repo: UserRepo,
         character_repo: CharacterRepo,
-    ) -> IdentityProvider:
-        return IdentityProvider(
+    ):
+        return IdentityProviderImpl(
             user_repo=user_repo,
             headers=request.headers,
             jwt_token_processor=jwt_token_processor,
@@ -155,6 +165,22 @@ class RepositoryProvider(Provider):
         provides=AnyOf[SystemConnectionRepo, SystemConnectionRepository],
     )
 
+    inventory_repo = provide(
+        InventoryRepository,
+        scope=Scope.REQUEST,
+        provides=AnyOf[InventoryRepo, InventoryRepository],
+    )
+
+    item_repo = provide(
+        ItemRepository, scope=Scope.REQUEST, provides=AnyOf[ItemRepo, ItemRepository]
+    )
+
+    resource_repo = provide(
+        ResourceRepository,
+        scope=Scope.REQUEST,
+        provides=AnyOf[ResourceRepository, ResourceRepo],
+    )
+
 
 class UseCaseProvider(Provider):
     use_cases = provide_all(
@@ -183,6 +209,8 @@ class UseCaseProvider(Provider):
         ExitSpaceship,
         NavigateToPlanet,
         Hyperjump,
+        GetInventoryItems,
+        GetInventoryResources,
         scope=Scope.REQUEST,
     )
 

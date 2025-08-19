@@ -10,12 +10,13 @@ from voidspace.exceptions import AccessDeniedError
 from voidspace.exceptions.character import CharacterNotFound
 from voidspace.exceptions.user import InvalidToken
 from voidspace.interfaces.character.repo import CharacterRepo
+from voidspace.interfaces.identity_provider import IdentityProvider
 from voidspace.interfaces.user.repo import UserRepo
 from voidspace.jwt_token_processor import JwtTokenProcessor
 
 
 @dataclass(frozen=True)
-class IdentityProvider:
+class IdentityProviderImpl(IdentityProvider):
     user_repo: UserRepo
     character_repo: CharacterRepo
     headers: Headers

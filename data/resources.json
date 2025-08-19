@@ -1,0 +1,128 @@
+[
+  {
+    "id": "flora_vita",
+    "groups": [
+      "organic"
+    ],
+    "tags": {
+      "chance": 0.8
+    }
+  },
+  {
+    "id": "sanguis_root",
+    "groups": [
+      "organic"
+    ],
+    "tags": {
+      "chance": 0.6
+    }
+  },
+  {
+    "id": "moss",
+    "groups": [
+      "organic"
+    ],
+    "tags": {
+      "chance": 0.6
+    }
+  },
+  {
+    "id": "crystal",
+    "groups": [
+      "organic"
+    ],
+    "tags": {
+      "chance": 0.3,
+      "max_size": 100
+    }
+  },
+  {
+    "id": "spores",
+    "groups": [
+      "organic"
+    ],
+    "tags": {
+      "chance": 0.5
+    }
+  },
+  {
+    "id": "aurium_ore",
+    "groups": [
+      "mineable"
+    ],
+    "tags": {
+      "chance": 0.4,
+      "max_size": 200
+    }
+  },
+  {
+    "id": "carbium",
+    "groups": [
+      "mineable"
+    ],
+    "tags": {
+      "chance": 0.9,
+      "max_size": 1000
+    }
+  },
+  {
+    "id": "ferrum_dust",
+    "groups": [
+      "mineable"
+    ],
+    "tags": {
+      "chance": 0.6,
+      "max_size": 500
+    }
+  },
+  {
+    "id": "ignis_shard",
+    "groups": [
+      "mineable"
+    ],
+    "tags": {
+      "chance": 0.2,
+      "max_size": 50
+    }
+  },
+  {
+    "id": "nebullite_fragment",
+    "groups": [
+      "from_asteroids"
+    ],
+    "tags": {
+      "chance": 0.4,
+      "max_size": 100
+    }
+  },
+  {
+    "id": "stellaris_dust",
+    "groups": [
+      "from_asteroids"
+    ],
+    "tags": {
+      "chance": 0.7,
+      "max_size": 500
+    }
+  },
+  {
+    "id": "ferrum_chip",
+    "groups": [
+      "from_asteroids"
+    ],
+    "tags": {
+      "chance": 0.5,
+      "max_size": 100
+    }
+  },
+  {
+    "id": "pulsar_shard",
+    "groups": [
+      "from_asteroids"
+    ],
+    "tags": {
+      "chance": 0.1,
+      "max_size": 50
+    }
+  }
+]

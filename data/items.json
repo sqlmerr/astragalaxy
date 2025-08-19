@@ -1,0 +1,42 @@
+[
+  {
+    "code": "teleporter",
+    "emoji": "🪄",
+    "damage_per_use": 2,
+    "rarity": "rare",
+    "action": "teleport"
+  },
+  {
+    "code": "speedUpgrade",
+    "emoji": "⚡️",
+    "damage_per_use": 0,
+    "rarity": "common"
+  },
+  {
+    "code": "test",
+    "emoji": "\uD83E\uDDEA",
+    "damage_per_use": 1,
+    "rarity": "immortal"
+  },
+  {
+    "code": "contract",
+    "emoji": "📜",
+    "damage_per_use": 100,
+    "rarity": "rare",
+    "action": "use_contract"
+  },
+  {
+    "code": "orbisKey",
+    "emoji": "🔑",
+    "damage_per_use": 4,
+    "rarity": "rare",
+    "action": "open_storage"
+  },
+  {
+    "code": "spaceshipBlueprint",
+    "emoji": "📝",
+    "damage_per_use": 100,
+    "rarity": "legendary",
+    "action": "open_random_spaceship_detail"
+  }
+]

@@ -1,7 +1,8 @@
 from dataclasses import dataclass
 from uuid import uuid4
 
-from voidspace.database.models import Character, Spaceship
+from voidspace.database.models import Character, Spaceship, Inventory
+from voidspace.database.models.inventory import InventoryOwnerEnum
 from voidspace.dto.character import CreateCharacterDTO, CharacterDTO
 from voidspace.exceptions import AppError
 from voidspace.exceptions.character import (
@@ -10,6 +11,7 @@ from voidspace.exceptions.character import (
 )
 from voidspace.identity_provider import IdentityProvider
 from voidspace.interfaces.character.repo import CharacterRepo
+from voidspace.interfaces.inventory.repo import InventoryRepo
 from voidspace.interfaces.spaceship.repo import SpaceshipRepo
 from voidspace.interfaces.system.repo import SystemRepo
 from voidspace.use_cases import BaseUseCase
@@ -19,6 +21,7 @@ from voidspace.use_cases import BaseUseCase
 class CreateCharacter(BaseUseCase[CreateCharacterDTO, CharacterDTO]):
     character_repo: CharacterRepo
     spaceship_repo: SpaceshipRepo
+    inventory_repo: InventoryRepo
     system_repo: SystemRepo
     idp: IdentityProvider
 
@@ -49,6 +52,11 @@ class CreateCharacter(BaseUseCase[CreateCharacterDTO, CharacterDTO]):
         )
         self.character_repo.create_character(c)
 
+        character_inventory = Inventory(
+            id=uuid4(), owner=InventoryOwnerEnum.CHARACTER, owner_id=c.id
+        )
+        self.inventory_repo.add_inventory(character_inventory)
+
         sp = Spaceship(
             id=uuid4(),
             name="initial",
@@ -59,6 +67,11 @@ class CreateCharacter(BaseUseCase[CreateCharacterDTO, CharacterDTO]):
             planet_id=None,
         )
         self.spaceship_repo.add_spaceship(sp)
+
+        spaceship_inventory = Inventory(
+            id=uuid4(), owner=InventoryOwnerEnum.SPACESHIP, owner_id=sp.id
+        )
+        self.inventory_repo.add_inventory(spaceship_inventory)
 
         character = await self.character_repo.find_one_character(c.id)
 

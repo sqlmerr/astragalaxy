@@ -1,4 +1,7 @@
+from typing import Any
+
 from redis.asyncio import Redis
+from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker, AsyncSession
 from sqlalchemy.orm import DeclarativeBase
 
@@ -6,7 +9,7 @@ from voidspace.config import Settings
 
 
 class Base(DeclarativeBase):
-    pass
+    type_annotation_map = {dict[str, Any]: JSONB}
 
 
 def init_db(config: Settings) -> async_sessionmaker[AsyncSession]:
