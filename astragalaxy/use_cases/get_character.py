@@ -31,6 +31,7 @@ class GetCharacterFiltered:
             raise CharacterNotFound()
         return CharacterDTO.from_model(character)
 
+
 @dataclass(frozen=True)
 class GetUserCharacters:
     repo: CharacterRepo

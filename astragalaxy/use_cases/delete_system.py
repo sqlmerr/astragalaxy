@@ -4,6 +4,7 @@ from astragalaxy.exceptions import AccessDeniedError
 from astragalaxy.identity_provider import IdentityProvider
 from astragalaxy.interfaces.system.repo import SystemRepo
 
+
 @dataclass(frozen=True)
 class DeleteSystem:
     repo: SystemRepo

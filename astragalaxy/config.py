@@ -6,7 +6,7 @@ from dotenv import load_dotenv
 
 @dataclass(frozen=True, kw_only=True)
 class Settings:
-    environment: str = "prod" # prod, dev, test
+    environment: str = "prod"  # prod, dev, test
 
     postgres_host: str
     postgres_port: int

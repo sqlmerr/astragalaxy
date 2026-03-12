@@ -3,7 +3,11 @@ from dishka.integrations.fastapi import DishkaRoute
 from fastapi import APIRouter
 
 from astragalaxy.api.dependencies import JwtSecurity
-from astragalaxy.api.schemas.auth import AuthRegisterSchema, AuthLoginSchema, TokenSchema
+from astragalaxy.api.schemas.auth import (
+    AuthRegisterSchema,
+    AuthLoginSchema,
+    TokenSchema,
+)
 from astragalaxy.api.schemas.user import UserSchema
 from astragalaxy.identity_provider import IdentityProvider
 from astragalaxy.use_cases.login import Login
