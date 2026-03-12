@@ -6,13 +6,13 @@ from sqlalchemy.engine import Connection
 from sqlalchemy.ext.asyncio import async_engine_from_config
 
 from alembic import context
-from voidspace.config import Settings
-from voidspace.database import Base, models
+from astragalaxy.config import load_settings_from_env
+from astragalaxy.database import Base, models
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
 config = context.config
-settings = Settings()
+settings = load_settings_from_env()
 config.set_main_option("sqlalchemy.url", settings.build_postgres_dsn())
 
 # Interpret the config file for Python logging.

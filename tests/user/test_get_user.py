@@ -3,12 +3,12 @@ from uuid import uuid4
 
 import pytest
 
-from voidspace.database.models import User
-from voidspace.dto.user import UserDTO
-from voidspace.exceptions import AccessDeniedError
-from voidspace.identity_provider import IdentityProvider
-from voidspace.interfaces.user import UserRepo
-from voidspace.use_cases.get_user import GetUserById
+from astragalaxy.database.models import User
+from astragalaxy.dto.user import UserDTO
+from astragalaxy.exceptions import AccessDeniedError
+from astragalaxy.identity_provider import IdentityProvider
+from astragalaxy.interfaces.user import UserRepo
+from astragalaxy.use_cases.get_user import GetUserById
 
 pytestmark = pytest.mark.asyncio
 
