@@ -4,7 +4,7 @@ from sqlalchemy import ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from astragalaxy.database import Base
-from .system import System
+from .point import Point
 
 
 class PlanetThreatEnum(Enum):
@@ -18,6 +18,6 @@ class Planet(Base):
     __tablename__ = "planets"
     id: Mapped[str] = mapped_column(primary_key=True)
     name: Mapped[str] = mapped_column(default="undefined")
-    system: Mapped[System] = relationship()
-    system_id: Mapped[str] = mapped_column(ForeignKey("systems.id"))
+    point: Mapped[Point] = relationship()
+    point_id: Mapped[str] = mapped_column(ForeignKey("points.id"))
     threat: Mapped[PlanetThreatEnum]

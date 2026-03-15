@@ -11,13 +11,8 @@ from astragalaxy.interfaces.system.repo import SystemRepo
 class SystemRepository(SystemRepo):
     session: AsyncSession
 
-    async def create_system(self, system: System) -> str:
-        stmt = insert(System).values(
-            id=system.id, name=system.name, locations=system.locations
-        )
-        await self.session.execute(stmt)
-
-        return system.id
+    def add(self, system: System) -> None:
+        self.session.add(system)
 
     async def find_one_system(self, id: str) -> System | None:
         stmt = select(System).where(System.id == id)

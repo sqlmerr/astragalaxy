@@ -12,7 +12,7 @@ from astragalaxy.interfaces.character.repo import CharacterRepo
 class CharacterRepository(CharacterRepo):
     session: AsyncSession
 
-    def create_character(self, character: Character) -> None:
+    def add(self, character: Character) -> None:
         self.session.add(character)
 
     async def find_one_character(self, id: UUID) -> Character | None:
@@ -34,6 +34,3 @@ class CharacterRepository(CharacterRepo):
     async def delete_character(self, id: UUID) -> Character | None:
         stmt = delete(Character).where(Character.id == id)
         await self.session.execute(stmt)
-
-    def update_character(self, character: Character) -> None:
-        self.session.add(character)

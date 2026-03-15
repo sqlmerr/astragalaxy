@@ -12,7 +12,7 @@ from astragalaxy.interfaces.spaceship.repo import SpaceshipRepo
 class SpaceshipRepository(SpaceshipRepo):
     session: AsyncSession
 
-    def add_spaceship(self, spaceship: Spaceship) -> None:
+    def add(self, spaceship: Spaceship) -> None:
         self.session.add(spaceship)
 
     async def find_one_by_id(self, id: UUID) -> Spaceship | None:
@@ -36,6 +36,3 @@ class SpaceshipRepository(SpaceshipRepo):
         result = await self.session.execute(stmt)
 
         return result.scalar_one_or_none()
-
-    def save_spaceship(self, spaceship: Spaceship) -> None:
-        self.session.add(spaceship)

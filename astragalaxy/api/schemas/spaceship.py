@@ -8,23 +8,13 @@ from astragalaxy.dto.spaceship import SpaceshipDTO
 class SpaceshipSchema(BaseModel):
     id: UUID
     name: str
-    location: str
     character_id: UUID
     active: bool
-    system_id: str
-    planet_id: str | None
+    point_id: str
 
     @classmethod
     def from_dto(cls, dto: SpaceshipDTO) -> "SpaceshipSchema":
-        return cls(
-            id=dto.id,
-            name=dto.name,
-            location=dto.location,
-            character_id=dto.character_id,
-            active=dto.active,
-            system_id=dto.system_id,
-            planet_id=dto.planet_id,
-        )
+        return cls.model_validate(dto, from_attributes=True)
 
 
 class CreateSpaceshipSchema(BaseModel):

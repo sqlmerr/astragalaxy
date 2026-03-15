@@ -16,13 +16,8 @@ class ItemSchema(BaseModel):
 
     @classmethod
     def from_dto(cls, dto: ItemDTO) -> "ItemSchema":
-        return cls(
-            id=dto.id,
-            code=dto.code,
-            inventory_id=dto.inventory_id,
-            data=dto.data,
-            durability=dto.durabilty,
-        )
+        return cls.model_validate(dto, from_attributes=True)
+
 
 
 class ResourceSchema(BaseModel):
@@ -33,9 +28,5 @@ class ResourceSchema(BaseModel):
 
     @classmethod
     def from_dto(cls, dto: ResourceDTO) -> "ResourceSchema":
-        return cls(
-            id=dto.id,
-            code=dto.code,
-            quantity=dto.quantity,
-            inventory_id=dto.inventory_id,
-        )
+        return cls.model_validate(dto, from_attributes=True)
+

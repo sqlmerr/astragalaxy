@@ -8,6 +8,7 @@ from astragalaxy.exceptions.spaceship import (
 )
 from astragalaxy.identity_provider import IdentityProvider
 from astragalaxy.interfaces.character.repo import CharacterRepo
+from astragalaxy.interfaces.session import Commiter
 from astragalaxy.interfaces.spaceship.repo import SpaceshipRepo
 
 
@@ -16,6 +17,7 @@ class RenameSpaceship:
     repo: SpaceshipRepo
     character_repo: CharacterRepo
     idp: IdentityProvider
+    commiter: Commiter
 
     async def execute(self, data: RenameSpaceshipDTO) -> SpaceshipDTO:
         character = await self.idp.get_current_character()
@@ -38,6 +40,9 @@ class RenameSpaceship:
             raise InvalidSpaceshipNameError()
 
         spaceship.name = data.name
-        self.repo.save_spaceship(spaceship)
+        self.repo.add(spaceship)
 
-        return SpaceshipDTO.from_model(spaceship)
+        await self.commiter.commit()
+
+        dto = SpaceshipDTO.from_model(spaceship)
+        return dto

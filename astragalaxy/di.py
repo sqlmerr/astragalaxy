@@ -24,8 +24,11 @@ from astragalaxy.interfaces.identity_provider import IdentityProvider
 from astragalaxy.interfaces.inventory.repo import InventoryRepo
 from astragalaxy.interfaces.item.repo import ItemRepo
 from astragalaxy.interfaces.planet.repo import PlanetRepo
+from astragalaxy.interfaces.point.repo import PointRepo
 from astragalaxy.interfaces.resource.repo import ResourceRepo
+from astragalaxy.interfaces.session import Commiter, Refresher
 from astragalaxy.interfaces.spaceship.repo import SpaceshipRepo
+from astragalaxy.interfaces.station.repo import StationRepo
 from astragalaxy.interfaces.system.repo import SystemRepo
 from astragalaxy.interfaces.system_connection.repo import SystemConnectionRepo
 from astragalaxy.interfaces.user.repo import UserRepo
@@ -36,14 +39,17 @@ from astragalaxy.repositories.cooldown import CooldownRepository
 from astragalaxy.repositories.inventory import InventoryRepository
 from astragalaxy.repositories.item import ItemRepository
 from astragalaxy.repositories.planet import PlanetRepository
+from astragalaxy.repositories.point import PointRepository
 from astragalaxy.repositories.resource import ResourceRepository
 from astragalaxy.repositories.spaceship import SpaceshipRepository
+from astragalaxy.repositories.station import StationRepository
 from astragalaxy.repositories.system import SystemRepository
 from astragalaxy.repositories.system_connection import SystemConnectionRepository
 from astragalaxy.repositories.user import UserRepository
 from astragalaxy.use_cases.add_spaceship import AddSpaceship
 from astragalaxy.use_cases.create_character import CreateCharacter
 from astragalaxy.use_cases.create_planet import CreatePlanet
+from astragalaxy.use_cases.create_point import CreatePoint
 from astragalaxy.use_cases.create_system import CreateSystem
 from astragalaxy.use_cases.delete_character import DeleteCharacter
 from astragalaxy.use_cases.delete_planet import DeletePlanet
@@ -52,17 +58,22 @@ from astragalaxy.use_cases.enter_spaceship import EnterSpaceship
 from astragalaxy.use_cases.exit_spaceship import ExitSpaceship
 from astragalaxy.use_cases.get_character import GetUserCharacters
 from astragalaxy.use_cases.get_inventory import GetInventoryItems, GetInventoryResources
-from astragalaxy.use_cases.get_planet import GetPlanet, GetSystemPlanets
+from astragalaxy.use_cases.get_planet import GetPlanet
+from astragalaxy.use_cases.get_point import GetPoint
+from astragalaxy.use_cases.get_point_planets import GetPointPlanets
+from astragalaxy.use_cases.get_point_stations import GetPointStations
 from astragalaxy.use_cases.get_spaceship import (
     GetSpaceship,
     GetCharacterSpaceships,
     GetActiveSpaceship,
 )
+from astragalaxy.use_cases.get_station import GetStation
 from astragalaxy.use_cases.get_system import GetSystem, GetSystemsPaginated
+from astragalaxy.use_cases.get_system_points import GetSystemPoints
 from astragalaxy.use_cases.get_user import GetUserById, GetUserByUsername
 from astragalaxy.use_cases.hyperjump import Hyperjump
 from astragalaxy.use_cases.login import Login
-from astragalaxy.use_cases.navigate_to_planet import NavigateToPlanet
+from astragalaxy.use_cases.navigate_to_point import NavigateToPoint
 from astragalaxy.use_cases.register import Register
 from astragalaxy.use_cases.rename_spaceship import RenameSpaceship
 from astragalaxy.use_cases.set_active_spaceship import SetActiveSpaceship
@@ -104,12 +115,12 @@ class CommonProvider(Provider):
 
 
 class DatabaseProvider(Provider):
-    def __init__(self, session_maker: async_sessionmaker, redis: Redis):
+    def __init__(self, session_maker: async_sessionmaker[AsyncSession], redis: Redis):
         super().__init__()
         self.session_maker = session_maker
         self.redis = redis
 
-    @provide(scope=Scope.REQUEST)
+    @provide(scope=Scope.REQUEST, provides=AnyOf[AsyncSession, Commiter, Refresher])
     async def get_session(self) -> AsyncGenerator[AsyncSession]:
         async with self.session_maker() as session:
             try:
@@ -117,7 +128,7 @@ class DatabaseProvider(Provider):
             except SQLAlchemyError:
                 await session.rollback()
             finally:
-                await session.commit()
+                await session.commit() # TODO: remove this shi
 
     @provide(scope=Scope.APP)
     def get_redis(self) -> Redis:
@@ -181,6 +192,18 @@ class RepositoryProvider(Provider):
         provides=AnyOf[ResourceRepository, ResourceRepo],
     )
 
+    point_repo = provide(
+        PointRepository,
+        scope=Scope.REQUEST,
+        provides=AnyOf[PointRepository, PointRepo]
+    )
+
+    station_repo = provide(
+        StationRepository,
+        scope=Scope.REQUEST,
+        provides=AnyOf[StationRepository, StationRepo]
+    )
+
 
 class UseCaseProvider(Provider):
     use_cases = provide_all(
@@ -197,7 +220,6 @@ class UseCaseProvider(Provider):
         CreatePlanet,
         DeletePlanet,
         GetPlanet,
-        GetSystemPlanets,
         GetSpaceship,
         GetCharacterSpaceships,
         GetActiveSpaceship,
@@ -207,10 +229,16 @@ class UseCaseProvider(Provider):
         GetUserCharacters,
         EnterSpaceship,
         ExitSpaceship,
-        NavigateToPlanet,
+        NavigateToPoint,
         Hyperjump,
         GetInventoryItems,
         GetInventoryResources,
+        GetStation,
+        GetSystemPoints,
+        GetPoint,
+        GetPointPlanets,
+        GetPointStations,
+        CreatePoint,
         scope=Scope.REQUEST,
     )
 

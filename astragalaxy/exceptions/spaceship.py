@@ -74,3 +74,14 @@ class InvalidHyperjumpPath(AppError):
     @property
     def message(self) -> str:
         return "Invalid hyperjump path"
+
+
+@dataclass(eq=False)
+class SpaceshipAtDifferentPoint(AppError):
+    @property
+    def status(self) -> int:
+        return 400
+    
+    @property
+    def message(self) -> str:
+        return "spaceship is at different point"

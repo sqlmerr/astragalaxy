@@ -9,4 +9,4 @@ class System(Base):
     __tablename__ = "systems"
     id: Mapped[str] = mapped_column(primary_key=True)
     name: Mapped[str]
-    locations: Mapped[list[str]] = mapped_column(ARRAY(String))
+

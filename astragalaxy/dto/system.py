@@ -4,7 +4,6 @@ from dataclasses import dataclass
 @dataclass(frozen=True)
 class CreateSystemDTO:
     name: str
-    locations: list[str]
     connections: list[str]
 
 
@@ -12,5 +11,4 @@ class CreateSystemDTO:
 class SystemDTO:
     id: str
     name: str
-    locations: list[str]
     connections: list[str]

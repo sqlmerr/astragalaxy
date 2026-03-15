@@ -21,20 +21,3 @@ class GetPlanet:
             raise PlanetNotFound()
 
         return PlanetDTO.from_model(planet)
-
-
-@dataclass(frozen=True)
-class GetSystemPlanets:
-    repo: PlanetRepo
-    system_repo: SystemRepo
-    idp: IdentityProvider
-
-    async def execute(self, data: str) -> list[PlanetDTO]:
-        await self.idp.get_current_user()
-        system = await self.system_repo.find_one_system(data)
-        if not system:
-            raise SystemNotFound()
-
-        planets = await self.repo.find_all_planets_by_system(system.id)
-
-        return [PlanetDTO.from_model(p) for p in planets]

@@ -7,10 +7,11 @@ from fastapi import APIRouter
 from astragalaxy.api.dependencies import JwtSecurity, PaginationDepends
 from astragalaxy.api.schemas import Pagination, DataSchema
 from astragalaxy.api.schemas.planet import PlanetSchema
+from astragalaxy.api.schemas.point import PointSchema
 from astragalaxy.api.schemas.system import SystemSchema
 from astragalaxy.dto.common import PaginationDTO
-from astragalaxy.use_cases.get_planet import GetSystemPlanets
 from astragalaxy.use_cases.get_system import GetSystemsPaginated, GetSystem
+from astragalaxy.use_cases.get_system_points import GetSystemPoints
 
 router = APIRouter(prefix="/systems", route_class=DishkaRoute, tags=["Systems"])
 
@@ -35,10 +36,8 @@ async def get_system(id: str, use_case: FromDishka[GetSystem]) -> SystemSchema:
     return SystemSchema.from_dto(system)
 
 
-@router.get("/{id}/planets", dependencies=[JwtSecurity])
-async def get_system_planets(
-    id: str, use_case: FromDishka[GetSystemPlanets]
-) -> DataSchema[PlanetSchema]:
-    planets = await use_case.execute(id)
+@router.get("/{id}/points", dependencies=[JwtSecurity])
+async def get_system_points(id: str, use_case: FromDishka[GetSystemPoints]) -> DataSchema[PointSchema]:
+    res = await use_case.execute(id)
 
-    return DataSchema(data=[PlanetSchema.from_dto(p) for p in planets])
+    return DataSchema(data=[PointSchema.from_dto(p) for p in res])

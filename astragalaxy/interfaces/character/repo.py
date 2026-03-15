@@ -5,7 +5,7 @@ from astragalaxy.database.models import Character
 
 
 class CharacterRepo(Protocol):
-    def create_character(self, character: Character) -> None:
+    def add(self, character: Character) -> None:
         raise NotImplementedError
 
     async def find_one_character(self, id: UUID) -> Character | None:
@@ -18,7 +18,4 @@ class CharacterRepo(Protocol):
         raise NotImplementedError
 
     async def delete_character(self, id: UUID) -> Character | None:
-        raise NotImplementedError
-
-    def update_character(self, character: Character) -> None:
         raise NotImplementedError

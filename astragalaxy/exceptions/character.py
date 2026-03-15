@@ -11,6 +11,16 @@ class CharacterNotFound(NotFoundError):
 
 
 @dataclass(eq=False)
+class InvalidCharacterCode(AppError):
+    @property
+    def status(self) -> int:
+        return 400
+    
+    @property
+    def message(self) -> str:
+        return "Invalid character code. Allowed characters: 0-9, a-z, A-Z, _"
+
+@dataclass(eq=False)
 class CharacterCodeAlreadyOccupied(AppError):
     @property
     def status(self) -> int:

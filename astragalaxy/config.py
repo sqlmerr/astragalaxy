@@ -25,7 +25,7 @@ class Settings:
 def load_settings_from_env() -> Settings:
     env = os.getenv("ENVIRONMENT")
     if not env:
-        raise ValueError("ENVIRONMENT is not set")
+        env = "prod"
     if env == "prod":
         load_dotenv(".env")
     elif env == "dev":

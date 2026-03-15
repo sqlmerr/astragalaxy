@@ -4,7 +4,7 @@ from astragalaxy.database.models import System
 
 
 class SystemRepo(Protocol):
-    async def create_system(self, system: System) -> str:
+    def add(self, system: System) -> None:
         raise NotImplementedError
 
     async def find_one_system(self, id: str) -> System | None:

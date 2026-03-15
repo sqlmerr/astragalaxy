@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+import random
 
 from astragalaxy.cooldown_manager import CooldownManager
 from astragalaxy.database.models import System
@@ -10,7 +11,10 @@ from astragalaxy.exceptions.spaceship import (
 )
 from astragalaxy.identity_provider import IdentityProvider
 from astragalaxy.interfaces.character.repo import CharacterRepo
+from astragalaxy.interfaces.point.repo import PointRepo
+from astragalaxy.interfaces.session import Commiter
 from astragalaxy.interfaces.spaceship.repo import SpaceshipRepo
+from astragalaxy.interfaces.station.repo import StationRepo
 from astragalaxy.interfaces.system.repo import SystemRepo
 from astragalaxy.interfaces.system_connection.repo import SystemConnectionRepo
 
@@ -25,7 +29,10 @@ class Hyperjump:
     connection_repo: SystemConnectionRepo
     system_repo: SystemRepo
     character_repo: CharacterRepo
+    point_repo: PointRepo
+    station_repo: StationRepo
     idp: IdentityProvider
+    commiter: Commiter
 
     cooldown_manager: CooldownManager
 
@@ -80,9 +87,18 @@ class Hyperjump:
         if not current_character.in_spaceship:
             raise CharacterNeedsToBeInSpaceship()
 
-        systems = await self._process_path(current_character.system_id, parsed_path)
+        point = await self.point_repo.find_one_point(current_character.point_id)
+        if not point:
+            raise AppError()
+
+        systems = await self._process_path(point.system_id, parsed_path)
         destination_system = systems[-1]
         seconds = len(systems) * 60
+
+        stations = await self.station_repo.get_stations_by_system(destination_system.id)
+        if len(stations) == 0:
+            raise AppError()
+        station = random.choice(stations)
 
         cooldown = await self.cooldown_manager.set(
             SetCooldownDTO(
@@ -91,10 +107,12 @@ class Hyperjump:
                 action="navigation_hyperjump",
             )
         )
-        current_character.system_id = destination_system.id
-        spaceship.system_id = destination_system.id
+        
+        current_character.point_id = station.point_id
+        spaceship.point_id = station.point_id
 
-        self.character_repo.update_character(current_character)
-        self.spaceship_repo.save_spaceship(spaceship)
+        self.character_repo.add(current_character)
+        self.spaceship_repo.add(spaceship)
+        await self.commiter.commit()
 
         return cooldown

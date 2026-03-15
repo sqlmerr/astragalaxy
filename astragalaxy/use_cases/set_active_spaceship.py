@@ -4,6 +4,7 @@ from uuid import UUID
 from astragalaxy.dto.spaceship import SpaceshipDTO
 from astragalaxy.exceptions.spaceship import SpaceshipNotFoundError
 from astragalaxy.identity_provider import IdentityProvider
+from astragalaxy.interfaces.session import Commiter
 from astragalaxy.interfaces.spaceship.repo import SpaceshipRepo
 
 
@@ -11,6 +12,7 @@ from astragalaxy.interfaces.spaceship.repo import SpaceshipRepo
 class SetActiveSpaceship:
     repo: SpaceshipRepo
     idp: IdentityProvider
+    commiter: Commiter
 
     async def execute(self, data: UUID) -> SpaceshipDTO:
         current_character = await self.idp.get_current_character()
@@ -28,9 +30,11 @@ class SetActiveSpaceship:
                 continue
             if active_spaceship:
                 active_spaceship.active = False
-                self.repo.save_spaceship(active_spaceship)
+                self.repo.add(active_spaceship)
             sp.active = True
-            self.repo.save_spaceship(sp)
-            return SpaceshipDTO.from_model(sp)
+            self.repo.add(sp)
+            dto = SpaceshipDTO.from_model(sp)
+            await self.commiter.commit()
+            return dto
 
         raise SpaceshipNotFoundError()

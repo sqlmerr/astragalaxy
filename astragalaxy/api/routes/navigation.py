@@ -6,14 +6,14 @@ from astragalaxy.api.dependencies import JwtSecurity, CharacterSecurity
 from astragalaxy.api.schemas.cooldown import CooldownSchema
 from astragalaxy.api.schemas.navigation import PlanetNavigationSchema, HyperjumpSchema
 from astragalaxy.use_cases.hyperjump import Hyperjump
-from astragalaxy.use_cases.navigate_to_planet import NavigateToPlanet
+from astragalaxy.use_cases.navigate_to_point import NavigateToPoint
 
 router = APIRouter(prefix="/navigation", route_class=DishkaRoute, tags=["Navigation"])
 
 
 @router.post("/planet", dependencies=[JwtSecurity, CharacterSecurity])
 async def navigate_to_planet(
-    data: PlanetNavigationSchema, use_case: FromDishka[NavigateToPlanet]
+    data: PlanetNavigationSchema, use_case: FromDishka[NavigateToPoint]
 ) -> CooldownSchema:
     cooldown = await use_case.execute(data.planet_id)
     return CooldownSchema.from_dto(cooldown)

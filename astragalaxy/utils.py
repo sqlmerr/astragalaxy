@@ -16,3 +16,7 @@ def generate_random_id(length: int = 16) -> str:
         out += random.choice(string.ascii_letters)
 
     return out
+
+def is_valid_username(username: str) -> bool:
+    allowed = set(string.ascii_letters + string.digits + "_")
+    return all(ch in allowed for ch in username)

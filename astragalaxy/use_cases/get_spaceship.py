@@ -5,6 +5,7 @@ from astragalaxy.dto.spaceship import SpaceshipDTO
 from astragalaxy.exceptions.spaceship import SpaceshipNotFoundError
 from astragalaxy.identity_provider import IdentityProvider
 from astragalaxy.interfaces.character.repo import CharacterRepo
+from astragalaxy.interfaces.session import Commiter
 from astragalaxy.interfaces.spaceship.repo import SpaceshipRepo
 
 
@@ -38,6 +39,8 @@ class GetActiveSpaceship:
     repo: SpaceshipRepo
     idp: IdentityProvider
 
+    commiter: Commiter
+
     async def execute(self) -> SpaceshipDTO:
         character = await self.idp.get_current_character()
 
@@ -51,8 +54,10 @@ class GetActiveSpaceship:
 
         spaceship = character_spaceships[0]
         spaceship.active = True
-        self.repo.save_spaceship(spaceship)
-        return SpaceshipDTO.from_model(spaceship)
+        self.repo.add(spaceship)
+        dto = SpaceshipDTO.from_model(spaceship)
+        await self.commiter.commit()
+        return dto
 
 
 @dataclass(frozen=True)

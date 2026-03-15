@@ -3,7 +3,7 @@ from dataclasses import dataclass
 from sqlalchemy import insert, select, delete
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from astragalaxy.database.models import Planet
+from astragalaxy.database.models import Planet, Point
 from astragalaxy.interfaces.planet.repo import PlanetRepo
 
 
@@ -11,25 +11,28 @@ from astragalaxy.interfaces.planet.repo import PlanetRepo
 class PlanetRepository(PlanetRepo):
     session: AsyncSession
 
-    async def create_planet(self, planet: Planet) -> str:
-        stmt = insert(Planet).values(
-            id=planet.id,
-            name=planet.name,
-            system_id=planet.system_id,
-            threat=planet.threat,
-        )
-        await self.session.execute(stmt)
-        return planet.id
+    def add(self, planet: Planet) -> None:
+        self.session.add(planet)
 
     async def find_one_planet(self, id: str) -> Planet | None:
         stmt = select(Planet).where(Planet.id == id)
         result = await self.session.execute(stmt)
         return result.scalar_one_or_none()
 
-    async def find_all_planets_by_system(self, system_id: str) -> list[Planet]:
-        stmt = select(Planet).where(Planet.system_id == system_id)
+    async def get_planets_by_point(self, point_id: str) -> list[Planet]:
+        stmt = select(Planet).where(Planet.point_id == point_id)
         result = await self.session.execute(stmt)
         return list(result.scalars().all())
+
+    async def get_planets_by_system(self, system_id: str) -> list[Planet]:
+        stmt = (
+            select(Planet)
+            .join(Planet.point)
+            .where(Point.system_id == system_id)
+        )
+
+        result = await self.session.scalars(stmt)
+        return list(result.all())
 
     async def delete_planet(self, id: str) -> None:
         stmt = delete(Planet).where(Planet.id == id)

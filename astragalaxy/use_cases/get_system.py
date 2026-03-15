@@ -25,7 +25,6 @@ class GetSystem:
         return SystemDTO(
             id=s.id,
             name=s.name,
-            locations=s.locations,
             connections=[c.system_from_id for c in conns],
         )
 
@@ -47,7 +46,6 @@ class GetSystemsPaginated:
                 SystemDTO(
                     id=s.id,
                     name=s.name,
-                    locations=s.locations,
                     connections=[c.system_from_id for c in conns],
                 )
             )

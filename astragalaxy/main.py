@@ -7,9 +7,12 @@ from fastapi.responses import JSONResponse
 from astragalaxy.api.routes import v1_router
 from astragalaxy.config import load_settings_from_env
 from astragalaxy.database import init_db, init_redis
-from astragalaxy.database.models import System
+from astragalaxy.database.models import Point, Station, System
 from astragalaxy.di import init_di
 from astragalaxy.exceptions import AppError
+from astragalaxy.interfaces.point.repo import PointRepo
+from astragalaxy.interfaces.session import Commiter
+from astragalaxy.interfaces.station.repo import StationRepo
 from astragalaxy.interfaces.system.repo import SystemRepo
 from astragalaxy.utils import generate_random_id
 
@@ -25,13 +28,29 @@ async def lifespan(app: FastAPI):
         system_repo = await nested_container.get(SystemRepo)
         system = await system_repo.find_one_system_by_name("initial")
         if not system:
-            await system_repo.create_system(
+            point_repo = await nested_container.get(PointRepo)
+            station_repo = await nested_container.get(StationRepo)
+            commiter = await nested_container.get(Commiter)
+
+            system_id = generate_random_id(8)
+            point_id = generate_random_id(16)
+
+            system_repo.add(
                 System(
-                    id=generate_random_id(8),
+                    id=system_id,
                     name="initial",
-                    locations=[],
                 )
             )
+            point_repo.add(Point(
+                id=point_id,
+                name="station_point",
+                system_id=system_id
+            ))
+            station_repo.add(Station(
+                id=generate_random_id(8),
+                point_id=point_id
+            ))
+            await commiter.commit()
     yield
 
 

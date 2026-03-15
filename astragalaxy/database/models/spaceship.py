@@ -5,7 +5,7 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from astragalaxy.database import Base
 from .character import Character
-from .planet import Planet
+from .point import Point
 from .system import System
 
 
@@ -13,13 +13,10 @@ class Spaceship(Base):
     __tablename__ = "spaceships"
     id: Mapped[UUID] = mapped_column(primary_key=True, default=uuid4)
     name: Mapped[str]
-    location: Mapped[str]
     character: Mapped[Character] = relationship()
     character_id: Mapped[UUID] = mapped_column(ForeignKey("characters.id"))
     active: Mapped[bool]
-    system: Mapped[System] = relationship()
-    system_id: Mapped[str] = mapped_column(ForeignKey("systems.id"))
-    planet: Mapped[Planet] = relationship()
-    planet_id: Mapped[str] = mapped_column(
-        ForeignKey("planets.id", ondelete="SET NULL", onupdate="CASCADE"), nullable=True
+    point: Mapped[Point] = relationship()
+    point_id: Mapped[str] = mapped_column(
+        ForeignKey("points.id", ondelete="SET NULL", onupdate="CASCADE")
     )
