@@ -1,6 +1,6 @@
 [project]
 name = "astragalaxy"
-version = "0.1.0"
+version = "0.7.0"
 description = "API-based space game"
 requires-python = ">=3.13"
 dependencies = [

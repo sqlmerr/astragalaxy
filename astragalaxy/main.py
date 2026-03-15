@@ -54,7 +54,7 @@ async def lifespan(app: FastAPI):
     yield
 
 
-app = FastAPI(title="AstraGalaxy", lifespan=lifespan)
+app = FastAPI(title="AstraGalaxy", lifespan=lifespan, version="0.7.0")
 setup_dishka(container, app)
 
 
