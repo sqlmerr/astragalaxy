@@ -1,0 +1,28 @@
+services:
+  postgres:
+    image: postgres:18.1-bookworm
+    env_file:
+      - .env
+    volumes:
+      - postgres-data:/var/lib/postgresql
+    ports:
+      - '5433:5432'
+    restart: always
+  
+  postgres-migrate:
+    image: migrate/migrate:latest
+    volumes:
+      - ${PROJECT_ROOT}/migrations:/migrations
+  
+  redis:
+    image: bitnami/redis:latest
+    volumes:
+      - redis:/var/lib/redis
+      - redis-config:/usr/local/etc/redis/redis.conf
+    environment:
+      - ALLOW_EMPTY_PASSWORD=yes
+
+volumes:
+  postgres-data:
+  redis:
+  redis-config:
