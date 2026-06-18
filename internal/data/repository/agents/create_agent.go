@@ -5,23 +5,21 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/google/uuid"
 	"github.com/sqlmerr/astragalaxy/internal/data/model"
 	postgres_pool "github.com/sqlmerr/astragalaxy/internal/data/postgres/pool"
 	core_errors "github.com/sqlmerr/astragalaxy/internal/errors"
 )
 
-func (r *AgentRepositoryImpl) GetAgent(ctx context.Context, id uuid.UUID) (model.Agent, error) {
+func (r *AgentRepositoryImpl) CreateAgent(ctx context.Context, data CreateAgent) (model.Agent, error) {
 	ctx, cancel := context.WithTimeout(ctx, r.pool.OpTimeout())
 	defer cancel()
 
 	query := `
-	SELECT id, user_id, username, token_hash, created_at
-	FROM agents
-	WHERE id = $1;
+	INSERT INTO agents (user_id, username, token_hash) VALUES ($1, $2, $3)
+	RETURNING id, user_id, username, token_hash, created_at;
 	`
 
-	row := r.pool.QueryRow(ctx, query, id)
+	row := r.pool.QueryRow(ctx, query, data.UserID, data.Username, data.TokenHash)
 	var a model.Agent
 	err := row.Scan(
 		&a.ID,
@@ -30,11 +28,12 @@ func (r *AgentRepositoryImpl) GetAgent(ctx context.Context, id uuid.UUID) (model
 		&a.TokenHash,
 		&a.CreatedAt,
 	)
+
 	if err != nil {
-		if errors.Is(err, postgres_pool.ErrNoRows) {
+		if errors.Is(err, postgres_pool.ErrViolatesForeignKey) {
 			return model.Agent{}, fmt.Errorf(
-				"agent with id='%s': %w",
-				id,
+				"user with id='%s': %w",
+				data.UserID,
 				core_errors.ErrNotFound,
 			)
 		}

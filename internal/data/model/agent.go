@@ -1,11 +1,15 @@
-package agents_repository
+package model
 
 import (
+	"time"
+
 	"github.com/google/uuid"
 )
 
-type CreateAgent struct {
+type Agent struct {
+	ID        uuid.UUID
 	UserID    uuid.UUID
 	Username  string
 	TokenHash string
+	CreatedAt time.Time
 }
