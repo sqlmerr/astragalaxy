@@ -38,5 +38,5 @@ migrate-down:
         -database "postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}?sslmode=disable" \
         down
 
-run-backend:
+run-server:
     @go mod tidy && go run cmd/server/main.go
