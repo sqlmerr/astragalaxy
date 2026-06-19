@@ -15,7 +15,8 @@ func (r *AgentRepositoryImpl) GetAgentsByUser(ctx context.Context, userID uuid.U
 	query := `
 	SELECT id, user_id, username, token_hash, created_at
 	FROM agents
-	WHERE user_id = $1;
+	WHERE user_id = $1
+	ORDER BY created_at;
 	`
 
 	rows, err := r.pool.Query(ctx, query, userID)
@@ -36,6 +37,7 @@ func (r *AgentRepositoryImpl) GetAgentsByUser(ctx context.Context, userID uuid.U
 		if err != nil {
 			return nil, fmt.Errorf("scan error: %w", err)
 		}
+		agents = append(agents, a)
 	}
 
 	if err := rows.Err(); err != nil {

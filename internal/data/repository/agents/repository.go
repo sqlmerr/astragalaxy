@@ -12,6 +12,9 @@ type AgentRepository interface {
 	CreateAgent(ctx context.Context, data CreateAgent) (model.Agent, error)
 	GetAgent(ctx context.Context, id uuid.UUID) (model.Agent, error)
 	GetAgentsByUser(ctx context.Context, userID uuid.UUID) ([]model.Agent, error)
+	GetAgentByToken(ctx context.Context, tokenHash string) (model.Agent, error)
+	AgentExistsByUsername(ctx context.Context, username string) (bool, error)
+	ChangeAgentToken(ctx context.Context, agentID uuid.UUID, tokenHash string) error
 }
 
 type AgentRepositoryImpl struct {

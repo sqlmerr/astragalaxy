@@ -7,12 +7,15 @@ import (
 	"os/signal"
 	"syscall"
 
+	core_auth "github.com/sqlmerr/astragalaxy/internal/auth"
 	"github.com/sqlmerr/astragalaxy/internal/data"
 	pgx_pool "github.com/sqlmerr/astragalaxy/internal/data/postgres/pool/pgx"
 	agents_repository "github.com/sqlmerr/astragalaxy/internal/data/repository/agents"
+	users_repository "github.com/sqlmerr/astragalaxy/internal/data/repository/users"
 	"github.com/sqlmerr/astragalaxy/internal/game"
 	core_logger "github.com/sqlmerr/astragalaxy/internal/logger"
 	http_handler_agents "github.com/sqlmerr/astragalaxy/internal/transport/http/handler/agents"
+	http_handler_users "github.com/sqlmerr/astragalaxy/internal/transport/http/handler/users"
 	http_middleware "github.com/sqlmerr/astragalaxy/internal/transport/http/middleware"
 	http_server "github.com/sqlmerr/astragalaxy/internal/transport/http/server"
 	"go.uber.org/zap"
@@ -42,16 +45,25 @@ func main() {
 	apiVersionRouter := http_server.NewAPIVersionRouter(http_server.ApiVersionV1)
 
 	log.Debug("Initializing storage")
+	userRepo := users_repository.NewUserRepository(pool)
 	agentRepo := agents_repository.NewAgentRepository(pool)
 
-	storage := data.NewStorage(agentRepo)
+	storage := data.NewStorage(userRepo, agentRepo)
 
 	log.Debug("Initializing game logic")
+	authConfig := core_auth.LoadConfigMust()
+	jwtProcessor := core_auth.NewJWTProcessor(*authConfig)
+	userAuthMiddleware := http_middleware.UserAuth(*jwtProcessor)
+	agentAuthMiddleware := http_middleware.AgentAuth(*jwtProcessor, agentRepo)
+
 	gameConfig := game.NewConfigMust()
-	service := game.NewService(*storage, gameConfig.Seed)
+	service := game.NewService(*storage, gameConfig.Seed, *jwtProcessor)
+
+	usersHandler := http_handler_users.NewUsersHTTPHandler(*service)
+	apiVersionRouter.AddRoutes(usersHandler.Routes(userAuthMiddleware)...)
 
 	agentsHandler := http_handler_agents.NewAgentsHTTPHandler(*service)
-	apiVersionRouter.AddRoutes(agentsHandler.Routes()...)
+	apiVersionRouter.AddRoutes(agentsHandler.Routes(userAuthMiddleware, agentAuthMiddleware)...)
 
 	httpServer := http_server.NewHttpServer(
 		*http_server.LoadConfigMust(),
