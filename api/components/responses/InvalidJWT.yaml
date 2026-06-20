@@ -3,3 +3,7 @@ content:
   application/json:
     schema:
       $ref: "../schemas/ErrorResponse.yaml"
+    example:
+      message: Invalid jwt token
+      code: INVALID_JWT_TOKEN
+      error: ...

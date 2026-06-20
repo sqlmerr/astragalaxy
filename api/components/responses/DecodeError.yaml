@@ -3,3 +3,14 @@ content:
   application/json:
     schema:
       $ref: "../schemas/ErrorResponse.yaml"
+    examples:
+      DecodeError:
+        value:
+          message: Decode error
+          code: DECODE_ERROR
+          error: ...
+      ValidationError:
+        value:
+          message: Validation error
+          code: VALIDATION_ERROR
+          error: ...

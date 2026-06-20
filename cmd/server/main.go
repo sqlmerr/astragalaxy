@@ -75,7 +75,8 @@ func main() {
 	mux.HandleFunc("GET /docs", func(w http.ResponseWriter, r *http.Request) {
 		html, err := scalargo.NewV2(scalargo.WithSpecDir("out"), scalargo.WithBaseFileName("openapi.json"))
 		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
+			log.Error("failed to load openapi.json", zap.Error(err))
+			http.Error(w, "Internal server error", http.StatusInternalServerError)
 			return
 		}
 		fmt.Fprint(w, html)

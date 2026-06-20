@@ -17,4 +17,10 @@ post:
           schema:
             $ref: "../../components/schemas/User.yaml"
     '409':
-      description: Username already occupied
+      description: User's username already occupied
+      content:
+        application/json:
+          schema:
+            $ref: "../../components/schemas/ErrorResponse.yaml"
+    '400':
+      $ref: "../../components/responses/DecodeError.yaml"

@@ -32,7 +32,10 @@ func (r *UserRepositoryImpl) GetUser(ctx context.Context, userID uuid.UUID) (mod
 
 	if err != nil {
 		if errors.Is(err, postgres_pool.ErrNoRows) {
-			return model.User{}, fmt.Errorf("user with id='%s': %w", userID, core_errors.ErrNotFound)
+			return model.User{}, core_errors.NewWithCode(
+				core_errors.CodeUserNotFound,
+				fmt.Errorf("user with id='%s': %w", userID, core_errors.ErrNotFound),
+			)
 		}
 
 		return model.User{}, fmt.Errorf("scan: %w", err)

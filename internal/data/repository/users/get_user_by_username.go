@@ -32,7 +32,10 @@ func (r *UserRepositoryImpl) GetUserByUsername(ctx context.Context, username str
 
 	if err != nil {
 		if errors.Is(err, postgres_pool.ErrNoRows) {
-			return model.User{}, fmt.Errorf("user with username='%s': %w", username, core_errors.ErrNotFound)
+			return model.User{}, core_errors.NewWithCode(
+				core_errors.CodeUserNotFound,
+				fmt.Errorf("user with username='%s': %w", username, core_errors.ErrNotFound),
+			)
 		}
 
 		return model.User{}, fmt.Errorf("scan: %w", err)

@@ -3,3 +3,7 @@ content:
   application/json:
     schema:
       $ref: "../schemas/ErrorResponse.yaml"
+    example:
+      message: Invalid agent token
+      code: INVALID_AGENT_TOKEN
+      error: ...

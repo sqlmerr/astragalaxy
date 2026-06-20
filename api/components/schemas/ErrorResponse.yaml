@@ -2,8 +2,13 @@ type: object
 required:
   - error
   - message
+  - code
 properties:
   error:
     type: string
   message:
     type: string
+  code:
+    type: string
+    description: Error code
+    example: USER_NOT_FOUND

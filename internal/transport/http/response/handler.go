@@ -42,6 +42,7 @@ func (h *HTTPResponseHandler) ErrorResponse(err error, msg string) {
 	switch {
 	case errors.Is(err, core_errors.ErrInternal):
 		statusCode = http.StatusInternalServerError
+		err = core_errors.NewWithCode(core_errors.CodeInternalServerError, err)
 		logFunc = h.log.Error
 	case errors.Is(err, core_errors.ErrInvalidArgument):
 		statusCode = http.StatusBadRequest
@@ -68,11 +69,19 @@ func (h *HTTPResponseHandler) ErrorResponse(err error, msg string) {
 
 	logFunc(msg, zap.Error(err))
 	if statusCode == http.StatusInternalServerError {
-		err = core_errors.ErrInternal
+		err = core_errors.NewWithCode(core_errors.CodeInternalServerError, core_errors.ErrInternal)
+	}
+	var errorWithCode core_errors.WithCode
+	var errorCode core_errors.ErrorCode
+	if errors.As(err, &errorWithCode) {
+		errorCode = errorWithCode.Code
+	} else {
+		errorCode = core_errors.CodeUnknown
 	}
 	response := map[string]string{
 		"message": msg,
 		"error":   err.Error(),
+		"code":    string(errorCode),
 	}
 	h.JSONResponse(statusCode, response)
 }

@@ -18,3 +18,5 @@ post:
             $ref: "../../components/schemas/LoginUserResponse.yaml"
     '401':
       description: Invalid credentials
+    '400':
+      $ref: "../../components/responses/DecodeError.yaml"

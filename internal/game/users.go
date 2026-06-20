@@ -19,7 +19,10 @@ func (s *Service) RegisterUser(ctx context.Context, username, password string) (
 	}
 
 	if userExists {
-		return model.User{}, fmt.Errorf("username='%s' already occupied: %w", username, core_errors.ErrConflict)
+		return model.User{}, core_errors.NewWithCode(
+			core_errors.CodeUserUsernameAlreadyOccupied,
+			fmt.Errorf("username='%s' already occupied: %w", username, core_errors.ErrConflict),
+		)
 	}
 
 	hashedPassword, err := core_auth.HashPassword(password)
@@ -43,13 +46,19 @@ func (s *Service) LoginUser(ctx context.Context, username, password string) (str
 	user, err := s.storage.Users.GetUserByUsername(ctx, username)
 	if err != nil {
 		if errors.Is(err, core_errors.ErrNotFound) {
-			return "", fmt.Errorf("invalid credentials: %w", core_errors.ErrUnauthorized)
+			return "", core_errors.NewWithCode(
+				core_errors.CodeInvalidCredentials,
+				fmt.Errorf("invalid credentials: %w", core_errors.ErrUnauthorized),
+			)
 		}
 		return "", fmt.Errorf("get user: %w", err)
 	}
 
 	if err := core_auth.ComparePassword(user.Password, password); err != nil {
-		return "", fmt.Errorf("invalid credentials: %w", core_errors.ErrUnauthorized)
+		return "", core_errors.NewWithCode(
+			core_errors.CodeInvalidCredentials,
+			fmt.Errorf("invalid credentials: %w", core_errors.ErrUnauthorized),
+		)
 	}
 
 	token, err := s.jwtProcessor.GenerateToken(user.ID)

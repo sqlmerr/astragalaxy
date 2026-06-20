@@ -31,10 +31,13 @@ func (r *AgentRepositoryImpl) CreateAgent(ctx context.Context, data CreateAgent)
 
 	if err != nil {
 		if errors.Is(err, postgres_pool.ErrViolatesForeignKey) {
-			return model.Agent{}, fmt.Errorf(
-				"user with id='%s': %w",
-				data.UserID,
-				core_errors.ErrNotFound,
+			return model.Agent{}, core_errors.NewWithCode(
+				core_errors.CodeUserNotFound,
+				fmt.Errorf(
+					"user with id='%s': %w",
+					data.UserID,
+					core_errors.ErrNotFound,
+				),
 			)
 		}
 

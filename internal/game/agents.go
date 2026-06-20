@@ -18,7 +18,10 @@ func (s *Service) RegisterAgent(ctx context.Context, userID uuid.UUID, username 
 	}
 
 	if exists {
-		return model.Agent{}, "", fmt.Errorf("agent's username already occupied: %w", core_errors.ErrConflict)
+		return model.Agent{}, "", core_errors.NewWithCode(
+			core_errors.CodeAgentUsernameAlreadyOccupied,
+			fmt.Errorf("agent's username already occupied: %w", core_errors.ErrConflict),
+		)
 	}
 
 	rawToken, tokenHash, err := core_auth.GenerateAgentToken()
@@ -58,7 +61,10 @@ func (s *Service) ResetAgentToken(ctx context.Context, userID uuid.UUID, agentID
 		return "", fmt.Errorf("get agent: %w", err)
 	}
 	if agent.UserID != userID {
-		return "", fmt.Errorf("cannot access agent with id='%s': %w", agentID, core_errors.ErrAccessDenied)
+		return "", core_errors.NewWithCode(
+			core_errors.CodeAccessDenied,
+			fmt.Errorf("cannot access agent with id='%s': %w", agentID, core_errors.ErrAccessDenied),
+		)
 	}
 
 	rawToken, tokenHash, err := core_auth.GenerateAgentToken()
