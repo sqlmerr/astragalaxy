@@ -1,0 +1,17 @@
+get:
+  operationId: getCurrentAgent
+  tags:
+    - Agents
+  summary: Get Current Agent
+  description: Get current authorized agent
+  responses:
+    '200':
+      description: Successfully got current agent
+      content:
+        application/json:
+          schema:
+            $ref: "../../components/schemas/Agent.yaml"
+    '401':
+      $ref: "../../components/responses/InvalidAgentToken.yaml"
+  security:
+    - AgentAuth: []

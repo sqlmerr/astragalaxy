@@ -1,0 +1,23 @@
+get:
+  operationId: getMyAgents
+  tags:
+    - Agents
+  summary: Get My Agents
+  description: Get current user's agents
+  responses:
+    '200':
+      description: Successfully got agents
+      content:
+        application/json:
+          schema:
+            type: object
+            required: [data]
+            properties:
+              data:
+                type: array
+                items:
+                  $ref: "../../components/schemas/Agent.yaml"
+    '401':
+      $ref: "../../components/responses/InvalidJWT.yaml"
+  security:
+    - UserAuth: []

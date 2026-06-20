@@ -1,0 +1,33 @@
+post:
+  operationId: resetAgentToken
+  tags:
+    - Agents
+  summary: Reset Agent Token
+  description: Reset current user's agent's token
+  parameters:
+    - in: path
+      name: id
+      schema:
+        type: string
+        format: uuid
+      required: true
+      description: ID of the agent
+
+  responses:
+    '200':
+      description: Successfully reset agent's token
+      content:
+        application/json:
+          schema:
+            $ref: "../../components/schemas/ResetAgentTokenResponse.yaml"
+    '401':
+      $ref: "../../components/responses/InvalidJWT.yaml"
+    '403':
+      description: Cannot access this agent
+      content:
+        application/json:
+          schema:
+            $ref: "../../components/schemas/ErrorResponse.yaml"
+
+  security:
+    - UserAuth: []

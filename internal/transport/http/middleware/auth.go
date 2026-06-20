@@ -25,7 +25,7 @@ func UserAuth(jwtProcessor core_auth.JWTProcessor) Middleware {
 			headerParts := strings.SplitN(authorizationHeader, " ", 2)
 			if len(headerParts) != 2 || headerParts[0] != "Bearer" {
 				responseHandler.ErrorResponse(
-					fmt.Errorf("invalid jwt token: %w", core_errors.ErrAccessDenied),
+					fmt.Errorf("invalid jwt token: %w", core_errors.ErrUnauthorized),
 					"Invalid jwt token. Must be in format 'Bearer <jwt token>'",
 				)
 				return
@@ -48,7 +48,7 @@ type AgentGetter interface {
 	GetAgentByToken(ctx context.Context, tokenHash string) (model.Agent, error)
 }
 
-func AgentAuth(jwtProcessor core_auth.JWTProcessor, agentGetter AgentGetter) Middleware {
+func AgentAuth(agentGetter AgentGetter) Middleware {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			ctx := r.Context()
@@ -59,7 +59,7 @@ func AgentAuth(jwtProcessor core_auth.JWTProcessor, agentGetter AgentGetter) Mid
 			headerParts := strings.SplitN(authorizationHeader, " ", 2)
 			if len(headerParts) != 2 || headerParts[0] != "Bearer" {
 				responseHandler.ErrorResponse(
-					fmt.Errorf("invalid agent token: %w", core_errors.ErrAccessDenied),
+					fmt.Errorf("invalid agent token: %w", core_errors.ErrUnauthorized),
 					"Invalid agent token. Must be in format 'Bearer ag_agent_<token>'",
 				)
 				return

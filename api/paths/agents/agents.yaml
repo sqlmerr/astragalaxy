@@ -1,0 +1,31 @@
+post:
+  operationId: registerAgent
+  tags:
+    - Agents
+  summary: Register Agent
+  description: Register new agent
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: "../../components/schemas/RegisterAgentRequest.yaml"
+  responses:
+    '201':
+      description: Agent successfully created
+      content:
+        application/json:
+          schema:
+            $ref: "../../components/schemas/RegisterAgentResponse.yaml"
+    '400':
+      $ref: "../../components/responses/DecodeError.yaml"
+    '401':
+      $ref: "../../components/responses/InvalidJWT.yaml"
+    '409':
+      description: Agent's username already occupied
+      content:
+        application/json:
+          schema:
+            $ref: "../../components/schemas/ErrorResponse.yaml"
+  security:
+    - UserAuth: []

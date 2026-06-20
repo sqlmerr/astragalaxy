@@ -1,0 +1,11 @@
+type: object
+allOf:
+  - $ref: "./Agent.yaml"
+  - type: object
+    required:
+      - token
+    properties:
+      token:
+        type: string
+        description: "Agent token"
+        example: "ag_agent_xyzabc123456foobar"

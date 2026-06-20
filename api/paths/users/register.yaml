@@ -1,0 +1,20 @@
+post:
+  summary: Register user
+  tags:
+    - Auth
+  operationId: registerUser
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: "../../components/schemas/RegisterUserRequest.yaml"
+  responses:
+    '201':
+      description: User successfully registered
+      content:
+        application/json:
+          schema:
+            $ref: "../../components/schemas/User.yaml"
+    '409':
+      description: Username already occupied

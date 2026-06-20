@@ -1,0 +1,17 @@
+get:
+  operationId: getMe
+  tags:
+    - Auth
+  summary: Get me
+  description: Get current user
+  responses:
+    '200':
+      description: Successfully got current user
+      content:
+        application/json:
+          schema:
+            $ref: "../../components/schemas/User.yaml"
+    '401':
+      $ref: "../../components/responses/InvalidJWT.yaml"
+  security:
+    - UserAuth: []

@@ -3,10 +3,12 @@ package main
 import (
 	"context"
 	"fmt"
+	"net/http"
 	"os"
 	"os/signal"
 	"syscall"
 
+	scalargo "github.com/bdpiprava/scalar-go"
 	core_auth "github.com/sqlmerr/astragalaxy/internal/auth"
 	"github.com/sqlmerr/astragalaxy/internal/data"
 	pgx_pool "github.com/sqlmerr/astragalaxy/internal/data/postgres/pool/pgx"
@@ -54,7 +56,7 @@ func main() {
 	authConfig := core_auth.LoadConfigMust()
 	jwtProcessor := core_auth.NewJWTProcessor(*authConfig)
 	userAuthMiddleware := http_middleware.UserAuth(*jwtProcessor)
-	agentAuthMiddleware := http_middleware.AgentAuth(*jwtProcessor, agentRepo)
+	agentAuthMiddleware := http_middleware.AgentAuth(agentRepo)
 
 	gameConfig := game.NewConfigMust()
 	service := game.NewService(*storage, gameConfig.Seed, *jwtProcessor)
@@ -65,7 +67,22 @@ func main() {
 	agentsHandler := http_handler_agents.NewAgentsHTTPHandler(*service)
 	apiVersionRouter.AddRoutes(agentsHandler.Routes(userAuthMiddleware, agentAuthMiddleware)...)
 
+	httpConfig := http_server.LoadConfigMust()
+	mux := http.NewServeMux()
+	mux.HandleFunc("GET /openapi.json", func(w http.ResponseWriter, r *http.Request) {
+		http.ServeFile(w, r, "out/openapi.json")
+	})
+	mux.HandleFunc("GET /docs", func(w http.ResponseWriter, r *http.Request) {
+		html, err := scalargo.NewV2(scalargo.WithSpecDir("out"), scalargo.WithBaseFileName("openapi.json"))
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		fmt.Fprint(w, html)
+	})
+	log.Debug(fmt.Sprintf("Documentation available at %s/docs", httpConfig.Addr))
 	httpServer := http_server.NewHttpServer(
+		mux,
 		*http_server.LoadConfigMust(),
 		log,
 		http_middleware.RequestID(),

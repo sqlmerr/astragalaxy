@@ -1,0 +1,6 @@
+properties:
+  username:
+    type: string
+    description: Agent's username
+    minLength: 3
+    maxLength: 50

@@ -1,0 +1,11 @@
+type: object
+required:
+  - token
+  - token_type
+properties:
+  token:
+    type: string
+    description: Agent's token
+  token_type:
+    type: string
+    default: Bearer
