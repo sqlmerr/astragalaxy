@@ -12,15 +12,20 @@ import (
 
 const ClaimsContextKey = "claims"
 
-type JWTProcessor struct {
+type JWTProcessor interface {
+	GenerateToken(userID uuid.UUID) (string, error)
+	ValidateToken(tokenString string) (uuid.UUID, error)
+}
+
+type JWTProcessorImpl struct {
 	config Config
 }
 
-func NewJWTProcessor(config Config) *JWTProcessor {
-	return &JWTProcessor{config}
+func NewJWTProcessor(config Config) *JWTProcessorImpl {
+	return &JWTProcessorImpl{config}
 }
 
-func (m *JWTProcessor) GenerateToken(userID uuid.UUID) (string, error) {
+func (m JWTProcessorImpl) GenerateToken(userID uuid.UUID) (string, error) {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 		"sub": userID.String(),
 		"exp": time.Now().Add(m.config.TokenDuration).Unix(),
@@ -31,7 +36,7 @@ func (m *JWTProcessor) GenerateToken(userID uuid.UUID) (string, error) {
 	}
 	return signedString, nil
 }
-func (m *JWTProcessor) ValidateToken(tokenString string) (uuid.UUID, error) {
+func (m JWTProcessorImpl) ValidateToken(tokenString string) (uuid.UUID, error) {
 	claims := &jwt.MapClaims{}
 	token, err := jwt.ParseWithClaims(tokenString, claims, func(token *jwt.Token) (any, error) {
 		return []byte(m.config.JWTSecret), nil

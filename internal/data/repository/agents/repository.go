@@ -15,6 +15,7 @@ type AgentRepository interface {
 	GetAgentByToken(ctx context.Context, tokenHash string) (model.Agent, error)
 	AgentExistsByUsername(ctx context.Context, username string) (bool, error)
 	ChangeAgentToken(ctx context.Context, agentID uuid.UUID, tokenHash string) error
+	CountAgentsByUser(ctx context.Context, userID uuid.UUID) (int, error)
 }
 
 type AgentRepositoryImpl struct {

@@ -14,8 +14,10 @@ import (
 func (s *Service) RegisterAgent(ctx context.Context, userID uuid.UUID, username string) (model.Agent, string, error) {
 	exists, err := s.storage.Agents.AgentExistsByUsername(ctx, username)
 	if err != nil {
-		return model.Agent{}, "", fmt.Errorf("check agent's existance: %w", err)
+		return model.Agent{}, "", fmt.Errorf("check agent's existence: %w", err)
 	}
+
+	// TODO: username format check
 
 	if exists {
 		return model.Agent{}, "", core_errors.NewWithCode(
@@ -29,7 +31,17 @@ func (s *Service) RegisterAgent(ctx context.Context, userID uuid.UUID, username 
 		return model.Agent{}, "", fmt.Errorf("failed to generate token")
 	}
 
-	// TODO: check user's agents count (max=5)
+	agentCount, err := s.storage.Agents.CountAgentsByUser(ctx, userID)
+	if err != nil {
+		return model.Agent{}, "", fmt.Errorf("count agents: %w", err)
+	}
+
+	if agentCount >= 5 {
+		return model.Agent{}, "", core_errors.NewWithCode(
+			core_errors.CodeAgentLimitExceeded,
+			fmt.Errorf("agent limit exceeded: %w", core_errors.ErrAccessDenied),
+		)
+	}
 
 	agent, err := s.storage.Agents.CreateAgent(
 		ctx,

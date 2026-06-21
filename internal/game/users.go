@@ -18,6 +18,8 @@ func (s *Service) RegisterUser(ctx context.Context, username, password string) (
 		return model.User{}, core_errors.ErrInternal
 	}
 
+	// TODO: username format check
+
 	if userExists {
 		return model.User{}, core_errors.NewWithCode(
 			core_errors.CodeUserUsernameAlreadyOccupied,
@@ -25,7 +27,7 @@ func (s *Service) RegisterUser(ctx context.Context, username, password string) (
 		)
 	}
 
-	hashedPassword, err := core_auth.HashPassword(password)
+	hashedPassword, err := core_auth.HashPassword(password) // TODO: add interface PasswordHasher
 	if err != nil {
 		return model.User{}, fmt.Errorf("hash password: %w", err)
 	}
@@ -54,7 +56,7 @@ func (s *Service) LoginUser(ctx context.Context, username, password string) (str
 		return "", fmt.Errorf("get user: %w", err)
 	}
 
-	if err := core_auth.ComparePassword(user.Password, password); err != nil {
+	if err := core_auth.ComparePassword(user.Password, password); err != nil { // TODO: add interface PasswordHasher
 		return "", core_errors.NewWithCode(
 			core_errors.CodeInvalidCredentials,
 			fmt.Errorf("invalid credentials: %w", core_errors.ErrUnauthorized),

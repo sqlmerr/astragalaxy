@@ -43,3 +43,6 @@ gen-docs:
 
 run-server:
     @go mod tidy && go run cmd/server/main.go
+
+test:
+    @go test -v ./internal/game/...

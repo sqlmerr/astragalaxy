@@ -15,6 +15,7 @@ const (
 	CodeAgentNotFound                ErrorCode = "AGENT_NOT_FOUND"
 	CodeAgentUsernameAlreadyOccupied ErrorCode = "AGENT_USERNAME_ALREADY_OCCUPIED"
 	CodeInvalidAgentToken            ErrorCode = "INVALID_AGENT_TOKEN"
+	CodeAgentLimitExceeded           ErrorCode = "AGENT_LIMIT_EXCEEDED"
 )
 
 type WithCode struct {
