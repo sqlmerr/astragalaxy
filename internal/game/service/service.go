@@ -1,4 +1,4 @@
-package game
+package service
 
 import (
 	core_auth "github.com/sqlmerr/astragalaxy/internal/auth"

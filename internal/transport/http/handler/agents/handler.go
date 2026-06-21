@@ -3,17 +3,17 @@ package http_handler_agents
 import (
 	"net/http"
 
-	"github.com/sqlmerr/astragalaxy/internal/game"
+	"github.com/sqlmerr/astragalaxy/internal/game/service"
 	http_middleware "github.com/sqlmerr/astragalaxy/internal/transport/http/middleware"
 	http_server "github.com/sqlmerr/astragalaxy/internal/transport/http/server"
 )
 
 type AgentsHTTPHandler struct {
-	service game.Service
+	service service.Service
 }
 
 func NewAgentsHTTPHandler(
-	service game.Service,
+	service service.Service,
 ) *AgentsHTTPHandler {
 	return &AgentsHTTPHandler{service}
 }

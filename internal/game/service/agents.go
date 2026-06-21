@@ -1,4 +1,4 @@
-package game
+package service
 
 import (
 	"context"

@@ -3,16 +3,16 @@ package http_handler_users
 import (
 	"net/http"
 
-	"github.com/sqlmerr/astragalaxy/internal/game"
+	"github.com/sqlmerr/astragalaxy/internal/game/service"
 	http_middleware "github.com/sqlmerr/astragalaxy/internal/transport/http/middleware"
 	http_server "github.com/sqlmerr/astragalaxy/internal/transport/http/server"
 )
 
 type UsersHTTPHandler struct {
-	service game.Service
+	service service.Service
 }
 
-func NewUsersHTTPHandler(service game.Service) *UsersHTTPHandler {
+func NewUsersHTTPHandler(service service.Service) *UsersHTTPHandler {
 	return &UsersHTTPHandler{service}
 }
 

@@ -14,7 +14,7 @@ import (
 	pgx_pool "github.com/sqlmerr/astragalaxy/internal/data/postgres/pool/pgx"
 	agents_repository "github.com/sqlmerr/astragalaxy/internal/data/repository/agents"
 	users_repository "github.com/sqlmerr/astragalaxy/internal/data/repository/users"
-	"github.com/sqlmerr/astragalaxy/internal/game"
+	"github.com/sqlmerr/astragalaxy/internal/game/service"
 	core_logger "github.com/sqlmerr/astragalaxy/internal/logger"
 	http_handler_agents "github.com/sqlmerr/astragalaxy/internal/transport/http/handler/agents"
 	http_handler_users "github.com/sqlmerr/astragalaxy/internal/transport/http/handler/users"
@@ -58,8 +58,8 @@ func main() {
 	userAuthMiddleware := http_middleware.UserAuth(*jwtProcessor)
 	agentAuthMiddleware := http_middleware.AgentAuth(agentRepo)
 
-	gameConfig := game.NewConfigMust()
-	service := game.NewService(*storage, gameConfig.Seed, *jwtProcessor)
+	gameConfig := service.NewConfigMust()
+	service := service.NewService(*storage, gameConfig.Seed, *jwtProcessor)
 
 	usersHandler := http_handler_users.NewUsersHTTPHandler(*service)
 	apiVersionRouter.AddRoutes(usersHandler.Routes(userAuthMiddleware)...)
