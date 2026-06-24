@@ -5,6 +5,7 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/sqlmerr/astragalaxy/internal/data/model"
+	database "github.com/sqlmerr/astragalaxy/internal/data/postgres/database/sqlc"
 	postgres_pool "github.com/sqlmerr/astragalaxy/internal/data/postgres/pool"
 )
 
@@ -19,9 +20,10 @@ type AgentRepository interface {
 }
 
 type AgentRepositoryImpl struct {
+	q  database.Queries
 	db postgres_pool.DBTx
 }
 
-func NewAgentRepository(db postgres_pool.DBTx) *AgentRepositoryImpl {
-	return &AgentRepositoryImpl{db}
+func NewAgentRepository(q database.Queries, db postgres_pool.DBTx) *AgentRepositoryImpl {
+	return &AgentRepositoryImpl{q, db}
 }

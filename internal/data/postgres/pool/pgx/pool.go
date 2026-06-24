@@ -86,3 +86,7 @@ func (p *Pool) Begin(ctx context.Context) (postgres_pool.Tx, error) {
 
 	return pgxTx{tx, p.OpTimeout()}, nil
 }
+
+func (p *Pool) Raw() *pgxpool.Pool {
+	return p.Pool
+}

@@ -12,7 +12,7 @@ services:
   postgres-migrate:
     image: migrate/migrate:latest
     volumes:
-      - ${PROJECT_ROOT}/migrations:/migrations
+      - ${PROJECT_ROOT}/internal/data/postgres/database/migration:/migration
   
   redis:
     image: bitnami/redis:latest

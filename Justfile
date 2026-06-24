@@ -18,7 +18,7 @@ migrate-create NAME:
         -u $(id -u):$(id -g) \
         postgres-migrate \
         create \
-        -dir /migrations \
+        -dir /migration \
         -ext sql \
         -seq "{{ NAME }}"
 
@@ -26,7 +26,7 @@ migrate-up:
     docker compose -f docker-compose.dev.yaml run --rm \
         -u $(id -u):$(id -g) \
         postgres-migrate \
-        -path /migrations \
+        -path /migration \
         -database "postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}?sslmode=disable" \
         up
 
@@ -34,12 +34,15 @@ migrate-down:
     docker compose -f docker-compose.dev.yaml run --rm \
         -u $(id -u):$(id -g) \
         postgres-migrate \
-        -path /migrations \
+        -path /migration \
         -database "postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}?sslmode=disable" \
         down
 
 gen-docs:
     redocly bundle api/openapi.yaml -o out/openapi.json
+
+gen-db:
+    sqlc generate
 
 run-server:
     @go mod tidy && go run cmd/server/main.go

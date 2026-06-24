@@ -15,25 +15,9 @@ func (r *ShipRepositoryImpl) GetShip(ctx context.Context, shipID uuid.UUID) (mod
 	ctx, cancel := context.WithTimeout(ctx, r.db.OpTimeout())
 	defer cancel()
 
-	query := `
-	SELECT id, agent_id, type, active, system_x, system_y, status, created_at, name
-	FROM ships
-	WHERE id = $1;
-	`
+	s, err := r.q.GetShipByID(ctx, shipID)
+	err = postgres_pool.TranslateError(err)
 
-	row := r.db.QueryRow(ctx, query, shipID)
-	var s model.Ship
-	err := row.Scan(
-		&s.ID,
-		&s.AgentID,
-		&s.Type,
-		&s.Active,
-		&s.SystemX,
-		&s.SystemY,
-		&s.Status,
-		&s.CreatedAt,
-		&s.Name,
-	)
 	if err != nil {
 		if errors.Is(err, postgres_pool.ErrNoRows) {
 			return model.Ship{}, core_errors.NewWithCode(
@@ -45,5 +29,5 @@ func (r *ShipRepositoryImpl) GetShip(ctx context.Context, shipID uuid.UUID) (mod
 		return model.Ship{}, fmt.Errorf("scan: %w", err)
 	}
 
-	return s, nil
+	return convertModel(s), nil
 }

@@ -15,20 +15,8 @@ func (r *UserRepositoryImpl) GetUser(ctx context.Context, userID uuid.UUID) (mod
 	ctx, cancel := context.WithTimeout(ctx, r.db.OpTimeout())
 	defer cancel()
 
-	query := `
-	SELECT id, username, password, created_at
-	FROM users
-	WHERE id = $1;
-	`
-
-	row := r.db.QueryRow(ctx, query, userID)
-	var u model.User
-	err := row.Scan(
-		&u.ID,
-		&u.Username,
-		&u.Password,
-		&u.CreatedAt,
-	)
+	u, err := r.q.GetUserByID(ctx, userID)
+	err = postgres_pool.TranslateError(err)
 
 	if err != nil {
 		if errors.Is(err, postgres_pool.ErrNoRows) {
@@ -41,5 +29,5 @@ func (r *UserRepositoryImpl) GetUser(ctx context.Context, userID uuid.UUID) (mod
 		return model.User{}, fmt.Errorf("scan: %w", err)
 	}
 
-	return u, nil
+	return convertModel(u), nil
 }

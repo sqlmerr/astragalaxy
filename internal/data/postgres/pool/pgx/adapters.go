@@ -2,8 +2,6 @@ package pgx_pool
 
 import (
 	"context"
-	"errors"
-	"fmt"
 	"time"
 
 	"github.com/jackc/pgx/v5"
@@ -20,23 +18,9 @@ type pgxRow struct {
 }
 
 func (r pgxRow) Scan(dest ...any) error {
-	const (
-		postgresViolatesForeignKeyCode = "23503"
-	)
-
 	err := r.Row.Scan(dest...)
 	if err != nil {
-		if errors.Is(err, pgx.ErrNoRows) {
-			return postgres_pool.ErrNoRows
-		}
-		var pgErr *pgconn.PgError
-		if errors.As(err, &pgErr) {
-			if pgErr.Code == postgresViolatesForeignKeyCode {
-				return postgres_pool.ErrViolatesForeignKey
-			}
-		}
-		fmt.Println(err)
-		return postgres_pool.ErrUnknown
+		return postgres_pool.TranslateError(err)
 	}
 
 	return nil
@@ -96,4 +80,8 @@ func (tx pgxTx) Exec(
 
 func (tx pgxTx) OpTimeout() time.Duration {
 	return tx.opTimeout
+}
+
+func (tx pgxTx) Raw() pgx.Tx {
+	return tx.Tx
 }

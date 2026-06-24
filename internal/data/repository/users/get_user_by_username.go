@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"strings"
 
 	"github.com/sqlmerr/astragalaxy/internal/data/model"
 	postgres_pool "github.com/sqlmerr/astragalaxy/internal/data/postgres/pool"
@@ -15,20 +14,8 @@ func (r *UserRepositoryImpl) GetUserByUsername(ctx context.Context, username str
 	ctx, cancel := context.WithTimeout(ctx, r.db.OpTimeout())
 	defer cancel()
 
-	query := `
-	SELECT id, username, password, created_at
-	FROM users
-	WHERE LOWER(username) = $1;
-	`
-
-	row := r.db.QueryRow(ctx, query, strings.ToLower(username))
-	var u model.User
-	err := row.Scan(
-		&u.ID,
-		&u.Username,
-		&u.Password,
-		&u.CreatedAt,
-	)
+	u, err := r.q.GetUserByUsername(ctx, username)
+	err = postgres_pool.TranslateError(err)
 
 	if err != nil {
 		if errors.Is(err, postgres_pool.ErrNoRows) {
@@ -41,5 +28,5 @@ func (r *UserRepositoryImpl) GetUserByUsername(ctx context.Context, username str
 		return model.User{}, fmt.Errorf("scan: %w", err)
 	}
 
-	return u, nil
+	return convertModel(u), nil
 }

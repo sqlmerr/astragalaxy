@@ -14,21 +14,8 @@ func (r *AgentRepositoryImpl) GetAgentByToken(ctx context.Context, tokenHash str
 	ctx, cancel := context.WithTimeout(ctx, r.db.OpTimeout())
 	defer cancel()
 
-	query := `
-	SELECT id, user_id, username, token_hash, created_at
-	FROM agents
-	WHERE token_hash = $1;
-	`
-
-	row := r.db.QueryRow(ctx, query, tokenHash)
-	var a model.Agent
-	err := row.Scan(
-		&a.ID,
-		&a.UserID,
-		&a.Username,
-		&a.TokenHash,
-		&a.CreatedAt,
-	)
+	a, err := r.q.GetAgentByToken(ctx, tokenHash)
+	err = postgres_pool.TranslateError(err)
 	if err != nil {
 		if errors.Is(err, postgres_pool.ErrNoRows) {
 			return model.Agent{}, core_errors.NewWithCode(
@@ -43,5 +30,5 @@ func (r *AgentRepositoryImpl) GetAgentByToken(ctx context.Context, tokenHash str
 		return model.Agent{}, fmt.Errorf("scan: %w", err)
 	}
 
-	return a, nil
+	return convertModel(a), nil
 }

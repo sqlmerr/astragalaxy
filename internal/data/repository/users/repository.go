@@ -5,6 +5,7 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/sqlmerr/astragalaxy/internal/data/model"
+	database "github.com/sqlmerr/astragalaxy/internal/data/postgres/database/sqlc"
 	postgres_pool "github.com/sqlmerr/astragalaxy/internal/data/postgres/pool"
 )
 
@@ -16,9 +17,10 @@ type UserRepository interface {
 }
 
 type UserRepositoryImpl struct {
+	q  database.Queries
 	db postgres_pool.DBTx
 }
 
-func NewUserRepository(db postgres_pool.DBTx) *UserRepositoryImpl {
-	return &UserRepositoryImpl{db}
+func NewUserRepository(q database.Queries, db postgres_pool.DBTx) *UserRepositoryImpl {
+	return &UserRepositoryImpl{q, db}
 }

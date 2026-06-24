@@ -11,6 +11,7 @@ import (
 	scalargo "github.com/bdpiprava/scalar-go"
 	core_auth "github.com/sqlmerr/astragalaxy/internal/auth"
 	"github.com/sqlmerr/astragalaxy/internal/data"
+	database "github.com/sqlmerr/astragalaxy/internal/data/postgres/database/sqlc"
 	pgx_pool "github.com/sqlmerr/astragalaxy/internal/data/postgres/pool/pgx"
 	agents_repository "github.com/sqlmerr/astragalaxy/internal/data/repository/agents"
 	ships_repository "github.com/sqlmerr/astragalaxy/internal/data/repository/ships"
@@ -49,9 +50,10 @@ func main() {
 	apiVersionRouter := http_server.NewAPIVersionRouter(http_server.ApiVersionV1)
 
 	log.Debug("Initializing storage")
-	userRepo := users_repository.NewUserRepository(pool)
-	agentRepo := agents_repository.NewAgentRepository(pool)
-	shipRepo := ships_repository.NewShipRepository(pool)
+	queries := database.New(data.ExtractSQLCDB(pool))
+	userRepo := users_repository.NewUserRepository(*queries, pool)
+	agentRepo := agents_repository.NewAgentRepository(*queries, pool)
+	shipRepo := ships_repository.NewShipRepository(*queries, pool)
 
 	store := data.NewStore(pool, userRepo, agentRepo, shipRepo)
 

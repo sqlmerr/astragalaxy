@@ -5,6 +5,7 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/sqlmerr/astragalaxy/internal/data/model"
+	database "github.com/sqlmerr/astragalaxy/internal/data/postgres/database/sqlc"
 	postgres_pool "github.com/sqlmerr/astragalaxy/internal/data/postgres/pool"
 )
 
@@ -17,9 +18,10 @@ type ShipRepository interface {
 }
 
 type ShipRepositoryImpl struct {
+	q  database.Queries
 	db postgres_pool.DBTx
 }
 
-func NewShipRepository(db postgres_pool.DBTx) *ShipRepositoryImpl {
-	return &ShipRepositoryImpl{db}
+func NewShipRepository(q database.Queries, db postgres_pool.DBTx) *ShipRepositoryImpl {
+	return &ShipRepositoryImpl{q, db}
 }

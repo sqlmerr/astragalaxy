@@ -6,6 +6,7 @@ import (
 	"fmt"
 
 	"github.com/sqlmerr/astragalaxy/internal/data/model"
+	database "github.com/sqlmerr/astragalaxy/internal/data/postgres/database/sqlc"
 	postgres_pool "github.com/sqlmerr/astragalaxy/internal/data/postgres/pool"
 	core_errors "github.com/sqlmerr/astragalaxy/internal/errors"
 )
@@ -14,20 +15,13 @@ func (r *AgentRepositoryImpl) CreateAgent(ctx context.Context, data CreateAgent)
 	ctx, cancel := context.WithTimeout(ctx, r.db.OpTimeout())
 	defer cancel()
 
-	query := `
-	INSERT INTO agents (user_id, username, token_hash) VALUES ($1, $2, $3)
-	RETURNING id, user_id, username, token_hash, created_at;
-	`
+	a, err := r.q.CreateAgent(ctx, database.CreateAgentParams{
+		UserID:    data.UserID,
+		Username:  data.Username,
+		TokenHash: data.TokenHash,
+	})
 
-	row := r.db.QueryRow(ctx, query, data.UserID, data.Username, data.TokenHash)
-	var a model.Agent
-	err := row.Scan(
-		&a.ID,
-		&a.UserID,
-		&a.Username,
-		&a.TokenHash,
-		&a.CreatedAt,
-	)
+	err = postgres_pool.TranslateError(err)
 
 	if err != nil {
 		if errors.Is(err, postgres_pool.ErrViolatesForeignKey) {
@@ -44,5 +38,5 @@ func (r *AgentRepositoryImpl) CreateAgent(ctx context.Context, data CreateAgent)
 		return model.Agent{}, fmt.Errorf("scan: %w", err)
 	}
 
-	return a, nil
+	return convertModel(a), nil
 }

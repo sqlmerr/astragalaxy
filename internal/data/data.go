@@ -4,6 +4,9 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/pgxpool"
+	database "github.com/sqlmerr/astragalaxy/internal/data/postgres/database/sqlc"
 	postgres_pool "github.com/sqlmerr/astragalaxy/internal/data/postgres/pool"
 	agents_repository "github.com/sqlmerr/astragalaxy/internal/data/repository/agents"
 	ships_repository "github.com/sqlmerr/astragalaxy/internal/data/repository/ships"
@@ -58,11 +61,14 @@ func (s *Storage) ExecTx(ctx context.Context, fn func(tx Store) error) error {
 		return fmt.Errorf("begin transaction: %w", err)
 	}
 
+	sqlcDB := ExtractSQLCDB(tx)
+	q := database.New(sqlcDB)
+
 	txStorage := &Storage{
 		pool:   s.pool,
-		users:  users_repository.NewUserRepository(tx),
-		agents: agents_repository.NewAgentRepository(tx),
-		ships:  ships_repository.NewShipRepository(tx),
+		users:  users_repository.NewUserRepository(*q, tx),
+		agents: agents_repository.NewAgentRepository(*q, tx),
+		ships:  ships_repository.NewShipRepository(*q, tx),
 	}
 
 	err = fn(txStorage)
@@ -72,4 +78,16 @@ func (s *Storage) ExecTx(ctx context.Context, fn func(tx Store) error) error {
 	}
 
 	return tx.Commit(ctx)
+}
+
+func ExtractSQLCDB(customDB postgres_pool.DBTx) database.DBTX {
+	if adapter, ok := customDB.(interface{ Raw() *pgxpool.Pool }); ok {
+		return adapter.Raw()
+	}
+
+	if adapter, ok := customDB.(interface{ Raw() pgx.Tx }); ok {
+		return adapter.Raw()
+	}
+
+	panic("unknown DBTx implementation: forgot to implement Raw() in adapter?")
 }

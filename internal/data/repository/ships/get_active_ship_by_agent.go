@@ -15,25 +15,9 @@ func (r *ShipRepositoryImpl) GetActiveShipByAgent(ctx context.Context, agentID u
 	ctx, cancel := context.WithTimeout(ctx, r.db.OpTimeout())
 	defer cancel()
 
-	query := `
-	SELECT id, agent_id, type, active, system_x, system_y, status, created_at, name 
-	FROM ships
-	WHERE agent_id = $1 AND active = true;
-	`
+	s, err := r.q.GetActiveShipByAgent(ctx, agentID)
+	err = postgres_pool.TranslateError(err)
 
-	row := r.db.QueryRow(ctx, query, agentID)
-	var s model.Ship
-	err := row.Scan(
-		&s.ID,
-		&s.AgentID,
-		&s.Type,
-		&s.Active,
-		&s.SystemX,
-		&s.SystemY,
-		&s.Status,
-		&s.CreatedAt,
-		&s.Name,
-	)
 	if err != nil {
 		if errors.Is(err, postgres_pool.ErrNoRows) {
 			return model.Ship{}, core_errors.NewWithCode(core_errors.CodeShipNotFound, fmt.Errorf("ship: %w", core_errors.ErrNotFound))
@@ -42,5 +26,5 @@ func (r *ShipRepositoryImpl) GetActiveShipByAgent(ctx context.Context, agentID u
 		return model.Ship{}, fmt.Errorf("scan: %w", err)
 	}
 
-	return s, nil
+	return convertModel(s), nil
 }

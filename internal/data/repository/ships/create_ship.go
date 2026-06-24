@@ -6,6 +6,7 @@ import (
 	"fmt"
 
 	"github.com/sqlmerr/astragalaxy/internal/data/model"
+	database "github.com/sqlmerr/astragalaxy/internal/data/postgres/database/sqlc"
 	postgres_pool "github.com/sqlmerr/astragalaxy/internal/data/postgres/pool"
 	core_errors "github.com/sqlmerr/astragalaxy/internal/errors"
 )
@@ -14,14 +15,17 @@ func (r *ShipRepositoryImpl) CreateShip(ctx context.Context, data CreateShip) (m
 	ctx, cancel := context.WithTimeout(ctx, r.db.OpTimeout())
 	defer cancel()
 
-	query := `
-	INSERT INTO ships (agent_id, type, active, system_x, system_y, status, name) VALUES ($1, $2, $3, $4, $5, $6, $7)
-	RETURNING id, agent_id, type, active, system_x, system_y, status, name;
-	`
+	s, err := r.q.CreateShip(ctx, database.CreateShipParams{
+		AgentID: data.AgentID,
+		Type:    database.ShipType(data.Type),
+		Active:  data.Active,
+		SystemX: int32(data.SystemX),
+		SystemY: int32(data.SystemY),
+		Status:  database.ShipStatus(data.Status),
+		Name:    data.Name,
+	})
+	err = postgres_pool.TranslateError(err)
 
-	row := r.db.QueryRow(ctx, query, data.AgentID, data.Type, data.Active, data.SystemX, data.SystemY, data.Status, data.Name)
-	var s model.Ship
-	err := row.Scan(&s.ID, &s.AgentID, &s.Type, &s.Active, &s.SystemX, &s.SystemY, &s.Status, &s.Name)
 	if err != nil {
 		if errors.Is(err, postgres_pool.ErrViolatesForeignKey) {
 			return model.Ship{}, core_errors.NewWithCode(
@@ -33,5 +37,5 @@ func (r *ShipRepositoryImpl) CreateShip(ctx context.Context, data CreateShip) (m
 		return model.Ship{}, fmt.Errorf("scan: %w", err)
 	}
 
-	return s, nil
+	return convertModel(s), nil
 }

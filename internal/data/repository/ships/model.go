@@ -3,6 +3,7 @@ package ships_repository
 import (
 	"github.com/google/uuid"
 	"github.com/sqlmerr/astragalaxy/internal/data/model"
+	database "github.com/sqlmerr/astragalaxy/internal/data/postgres/database/sqlc"
 )
 
 type CreateShip struct {
@@ -13,4 +14,18 @@ type CreateShip struct {
 	SystemY int
 	Status  model.ShipStatus
 	Name    string
+}
+
+func convertModel(m database.Ship) model.Ship {
+	return model.Ship{
+		ID:        m.ID,
+		AgentID:   m.AgentID,
+		Type:      model.ShipType(m.Type),
+		Active:    m.Active,
+		SystemX:   int(m.SystemX),
+		SystemY:   int(m.SystemY),
+		Status:    model.ShipStatus(m.Status),
+		CreatedAt: m.CreatedAt.Time,
+		Name:      m.Name,
+	}
 }
