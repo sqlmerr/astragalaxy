@@ -11,7 +11,7 @@ import (
 )
 
 func (r *AgentRepositoryImpl) CreateAgent(ctx context.Context, data CreateAgent) (model.Agent, error) {
-	ctx, cancel := context.WithTimeout(ctx, r.pool.OpTimeout())
+	ctx, cancel := context.WithTimeout(ctx, r.db.OpTimeout())
 	defer cancel()
 
 	query := `
@@ -19,7 +19,7 @@ func (r *AgentRepositoryImpl) CreateAgent(ctx context.Context, data CreateAgent)
 	RETURNING id, user_id, username, token_hash, created_at;
 	`
 
-	row := r.pool.QueryRow(ctx, query, data.UserID, data.Username, data.TokenHash)
+	row := r.db.QueryRow(ctx, query, data.UserID, data.Username, data.TokenHash)
 	var a model.Agent
 	err := row.Scan(
 		&a.ID,

@@ -6,60 +6,92 @@ import (
 
 	"github.com/google/uuid"
 	core_auth "github.com/sqlmerr/astragalaxy/internal/auth"
+	"github.com/sqlmerr/astragalaxy/internal/data"
 	"github.com/sqlmerr/astragalaxy/internal/data/model"
 	agents_repository "github.com/sqlmerr/astragalaxy/internal/data/repository/agents"
+	ships_repository "github.com/sqlmerr/astragalaxy/internal/data/repository/ships"
 	core_errors "github.com/sqlmerr/astragalaxy/internal/errors"
+	"github.com/sqlmerr/astragalaxy/internal/game/worldgen"
 )
 
 func (s *Service) RegisterAgent(ctx context.Context, userID uuid.UUID, username string) (model.Agent, string, error) {
-	exists, err := s.storage.Agents.AgentExistsByUsername(ctx, username)
-	if err != nil {
-		return model.Agent{}, "", fmt.Errorf("check agent's existence: %w", err)
-	}
+	var rawToken string
+	var agent model.Agent
 
-	// TODO: username format check
+	err := s.store.ExecTx(ctx, func(tx data.Store) error {
+		exists, err := tx.Agents().AgentExistsByUsername(ctx, username)
+		if err != nil {
+			return fmt.Errorf("check agent's existence: %w", err)
+		}
 
-	if exists {
-		return model.Agent{}, "", core_errors.NewWithCode(
-			core_errors.CodeAgentUsernameAlreadyOccupied,
-			fmt.Errorf("agent's username already occupied: %w", core_errors.ErrConflict),
+		// TODO: username format check
+
+		if exists {
+			return core_errors.NewWithCode(
+				core_errors.CodeAgentUsernameAlreadyOccupied,
+				fmt.Errorf("agent's username already occupied: %w", core_errors.ErrConflict),
+			)
+		}
+
+		var tokenHash string
+		rawToken, tokenHash, err = core_auth.GenerateAgentToken()
+		if err != nil {
+			return fmt.Errorf("failed to generate token")
+		}
+
+		agentCount, err := tx.Agents().CountAgentsByUser(ctx, userID)
+		if err != nil {
+			return fmt.Errorf("count agents: %w", err)
+		}
+
+		if agentCount >= 5 {
+			return core_errors.NewWithCode(
+				core_errors.CodeAgentLimitExceeded,
+				fmt.Errorf("agent limit exceeded: %w", core_errors.ErrAccessDenied),
+			)
+		}
+
+		agent, err = tx.Agents().CreateAgent(
+			ctx,
+			agents_repository.CreateAgent{
+				UserID:    userID,
+				Username:  username,
+				TokenHash: tokenHash,
+			},
 		)
-	}
+		if err != nil {
+			return fmt.Errorf("create agent: %w", err)
+		}
 
-	rawToken, tokenHash, err := core_auth.GenerateAgentToken()
+		spawnSystem, err := worldgen.FindSpawnSystem(s.gameSeed)
+		if err != nil {
+			return fmt.Errorf("find spawn system: %w", err)
+		}
+		_, err = tx.Ships().CreateShip(ctx, ships_repository.CreateShip{
+			AgentID: agent.ID,
+			Type:    model.ShipTypeScout,
+			Active:  true,
+			SystemX: spawnSystem.X,
+			SystemY: spawnSystem.Y,
+			Status:  model.ShipStatusDocked,
+			Name:    "ship",
+		})
+		if err != nil {
+			return fmt.Errorf("create ship: %w", err)
+		}
+
+		return nil
+	})
+
 	if err != nil {
-		return model.Agent{}, "", fmt.Errorf("failed to generate token")
-	}
-
-	agentCount, err := s.storage.Agents.CountAgentsByUser(ctx, userID)
-	if err != nil {
-		return model.Agent{}, "", fmt.Errorf("count agents: %w", err)
-	}
-
-	if agentCount >= 5 {
-		return model.Agent{}, "", core_errors.NewWithCode(
-			core_errors.CodeAgentLimitExceeded,
-			fmt.Errorf("agent limit exceeded: %w", core_errors.ErrAccessDenied),
-		)
-	}
-
-	agent, err := s.storage.Agents.CreateAgent(
-		ctx,
-		agents_repository.CreateAgent{
-			UserID:    userID,
-			Username:  username,
-			TokenHash: tokenHash,
-		},
-	)
-	if err != nil {
-		return model.Agent{}, "", fmt.Errorf("create agent: %w", err)
+		return model.Agent{}, "", fmt.Errorf("register agent: %w", err)
 	}
 
 	return agent, rawToken, nil
 }
 
 func (s *Service) GetUserAgents(ctx context.Context, userID uuid.UUID) ([]model.Agent, error) {
-	agents, err := s.storage.Agents.GetAgentsByUser(ctx, userID)
+	agents, err := s.store.Agents().GetAgentsByUser(ctx, userID)
 	if err != nil {
 		return nil, fmt.Errorf("get user agents: %w", err)
 	}
@@ -68,7 +100,7 @@ func (s *Service) GetUserAgents(ctx context.Context, userID uuid.UUID) ([]model.
 }
 
 func (s *Service) ResetAgentToken(ctx context.Context, userID uuid.UUID, agentID uuid.UUID) (string, error) {
-	agent, err := s.storage.Agents.GetAgent(ctx, agentID)
+	agent, err := s.store.Agents().GetAgent(ctx, agentID)
 	if err != nil {
 		return "", fmt.Errorf("get agent: %w", err)
 	}
@@ -84,7 +116,7 @@ func (s *Service) ResetAgentToken(ctx context.Context, userID uuid.UUID, agentID
 		return "", fmt.Errorf("generate token: %w", err)
 	}
 
-	err = s.storage.Agents.ChangeAgentToken(ctx, agentID, tokenHash)
+	err = s.store.Agents().ChangeAgentToken(ctx, agentID, tokenHash)
 	if err != nil {
 		return "", fmt.Errorf("set agent token: %w", err)
 	}

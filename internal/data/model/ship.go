@@ -17,7 +17,7 @@ const (
 type ShipStatus string
 
 const (
-	ShipStatusObrit  ShipStatus = "ORBIT"
+	ShipStatusOrbit  ShipStatus = "ORBIT"
 	ShipStatusDocked ShipStatus = "DOCKED"
 )
 
@@ -30,4 +30,5 @@ type Ship struct {
 	SystemY   int
 	Status    ShipStatus
 	CreatedAt time.Time
+	Name      string
 }

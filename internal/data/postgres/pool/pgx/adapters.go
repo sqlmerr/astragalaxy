@@ -1,7 +1,10 @@
 package pgx_pool
 
 import (
+	"context"
 	"errors"
+	"fmt"
+	"time"
 
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgconn"
@@ -32,6 +35,7 @@ func (r pgxRow) Scan(dest ...any) error {
 				return postgres_pool.ErrViolatesForeignKey
 			}
 		}
+		fmt.Println(err)
 		return postgres_pool.ErrUnknown
 	}
 
@@ -40,4 +44,56 @@ func (r pgxRow) Scan(dest ...any) error {
 
 type pgxCommandTag struct {
 	pgconn.CommandTag
+}
+
+type pgxTx struct {
+	pgx.Tx
+	opTimeout time.Duration
+}
+
+func (tx pgxTx) Begin(ctx context.Context) (postgres_pool.Tx, error) {
+	t, err := tx.Tx.Begin(ctx)
+	if err != nil {
+		return pgxTx{}, err
+	}
+
+	return pgxTx{t, tx.OpTimeout()}, nil
+}
+
+func (tx pgxTx) Query(
+	ctx context.Context,
+	sql string,
+	args ...any,
+) (postgres_pool.Rows, error) {
+	rows, err := tx.Tx.Query(ctx, sql, args...)
+	if err != nil {
+		return nil, err
+	}
+	return pgxRows{rows}, nil
+}
+
+func (tx pgxTx) QueryRow(
+	ctx context.Context,
+	sql string,
+	args ...any,
+) postgres_pool.Row {
+	row := tx.Tx.QueryRow(ctx, sql, args...)
+
+	return pgxRow{row}
+}
+
+func (tx pgxTx) Exec(
+	ctx context.Context,
+	sql string,
+	arguments ...any,
+) (postgres_pool.CommandTag, error) {
+	cmdTag, err := tx.Tx.Exec(ctx, sql, arguments...)
+	if err != nil {
+		return nil, err
+	}
+	return pgxCommandTag{cmdTag}, nil
+}
+
+func (tx pgxTx) OpTimeout() time.Duration {
+	return tx.opTimeout
 }

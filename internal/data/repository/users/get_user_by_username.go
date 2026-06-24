@@ -12,7 +12,7 @@ import (
 )
 
 func (r *UserRepositoryImpl) GetUserByUsername(ctx context.Context, username string) (model.User, error) {
-	ctx, cancel := context.WithTimeout(ctx, r.pool.OpTimeout())
+	ctx, cancel := context.WithTimeout(ctx, r.db.OpTimeout())
 	defer cancel()
 
 	query := `
@@ -21,7 +21,7 @@ func (r *UserRepositoryImpl) GetUserByUsername(ctx context.Context, username str
 	WHERE LOWER(username) = $1;
 	`
 
-	row := r.pool.QueryRow(ctx, query, strings.ToLower(username))
+	row := r.db.QueryRow(ctx, query, strings.ToLower(username))
 	var u model.User
 	err := row.Scan(
 		&u.ID,

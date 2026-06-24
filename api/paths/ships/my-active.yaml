@@ -1,0 +1,17 @@
+get:
+  operationId: getMyActiveShip
+  tags:
+    - Ships
+  summary: Get My Active Ship
+  description: Get current agent's active ship
+  responses:
+    '200':
+      description: Successfully got agent's active ship
+      content:
+        application/json:
+          schema:
+            $ref: "../../components/schemas/Ship.yaml"
+    '401':
+      $ref: "../../components/responses/InvalidAgentToken.yaml"
+  security:
+    - AgentAuth: []

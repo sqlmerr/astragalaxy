@@ -9,7 +9,6 @@ import (
 	"github.com/google/uuid"
 	"github.com/samber/lo"
 	core_auth "github.com/sqlmerr/astragalaxy/internal/auth"
-	"github.com/sqlmerr/astragalaxy/internal/data"
 	"github.com/sqlmerr/astragalaxy/internal/data/model"
 	users_repository "github.com/sqlmerr/astragalaxy/internal/data/repository/users"
 	core_errors "github.com/sqlmerr/astragalaxy/internal/errors"
@@ -101,8 +100,8 @@ func TestRegisterUser(t *testing.T) {
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 			repo := test.repo()
-			storage := data.NewStorage(repo, nil)
-			service := Service{storage: *storage}
+			storage := mockStore{users: repo}
+			service := Service{store: &storage}
 
 			user, err := service.RegisterUser(t.Context(), test.username, test.password)
 			if test.err != nil {
@@ -193,8 +192,8 @@ func TestLoginUser(t *testing.T) {
 			jwtProcessor := new(mockJWTProcessor)
 			jwtProcessor.On("GenerateToken", mock.Anything).Return(fmt.Sprintf("%s-token", userOne), nil)
 			repo := test.repo()
-			storage := data.NewStorage(repo, nil)
-			service := Service{storage: *storage, jwtProcessor: jwtProcessor}
+			store := mockStore{users: repo}
+			service := Service{store: &store, jwtProcessor: jwtProcessor}
 
 			token, err := service.LoginUser(t.Context(), test.username, test.password)
 			if test.err != nil {

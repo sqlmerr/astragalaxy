@@ -16,9 +16,9 @@ type UserRepository interface {
 }
 
 type UserRepositoryImpl struct {
-	pool postgres_pool.Pool
+	db postgres_pool.DBTx
 }
 
-func NewUserRepository(pool postgres_pool.Pool) *UserRepositoryImpl {
-	return &UserRepositoryImpl{pool}
+func NewUserRepository(db postgres_pool.DBTx) *UserRepositoryImpl {
+	return &UserRepositoryImpl{db}
 }

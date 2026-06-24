@@ -6,13 +6,13 @@ import (
 )
 
 type Service struct {
-	storage  data.Storage
+	store    data.Store
 	gameSeed int64
 
 	jwtProcessor core_auth.JWTProcessor
 }
 
-func NewService(storage data.Storage, gameSeed int64, jwtProcessor core_auth.JWTProcessor) *Service {
+func NewService(storage data.Store, gameSeed int64, jwtProcessor core_auth.JWTProcessor) *Service {
 	return &Service{
 		storage, gameSeed, jwtProcessor,
 	}

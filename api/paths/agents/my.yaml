@@ -10,13 +10,7 @@ get:
       content:
         application/json:
           schema:
-            type: object
-            required: [data]
-            properties:
-              data:
-                type: array
-                items:
-                  $ref: "../../components/schemas/Agent.yaml"
+            $ref: "../../components/schemas/GetMyAgentsResponse.yaml"
     '401':
       $ref: "../../components/responses/InvalidJWT.yaml"
   security:

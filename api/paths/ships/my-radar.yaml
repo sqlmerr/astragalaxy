@@ -1,0 +1,17 @@
+get:
+  operationId: shipRadar
+  tags:
+    - Ships
+  summary: Use Ship Radar
+  description: Use ship radar to get nearest systems
+  responses:
+    '200':
+      description: Successfully used ship's radar
+      content:
+        application/json:
+          schema:
+            $ref: "../../components/schemas/ShipRadarResponse.yaml"
+    '401':
+      $ref: "../../components/responses/InvalidAgentToken.yaml"
+  security:
+    - AgentAuth: []

@@ -11,7 +11,7 @@ import (
 )
 
 func (r *AgentRepositoryImpl) GetAgentByToken(ctx context.Context, tokenHash string) (model.Agent, error) {
-	ctx, cancel := context.WithTimeout(ctx, r.pool.OpTimeout())
+	ctx, cancel := context.WithTimeout(ctx, r.db.OpTimeout())
 	defer cancel()
 
 	query := `
@@ -20,7 +20,7 @@ func (r *AgentRepositoryImpl) GetAgentByToken(ctx context.Context, tokenHash str
 	WHERE token_hash = $1;
 	`
 
-	row := r.pool.QueryRow(ctx, query, tokenHash)
+	row := r.db.QueryRow(ctx, query, tokenHash)
 	var a model.Agent
 	err := row.Scan(
 		&a.ID,

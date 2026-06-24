@@ -1,0 +1,22 @@
+type: object
+required:
+  - name
+  - x
+  - y
+  - planets
+  - has_station
+properties:
+  name:
+    type: string
+  x:
+    type: integer
+    description: X coordinate
+  y:
+    type: integer
+    description: Y coordinate
+  planets:
+    type: array
+    items:
+      - $ref: "./Planet.yaml"
+  has_station:
+    type: boolean

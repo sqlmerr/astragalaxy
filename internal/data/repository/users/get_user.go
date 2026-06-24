@@ -12,7 +12,7 @@ import (
 )
 
 func (r *UserRepositoryImpl) GetUser(ctx context.Context, userID uuid.UUID) (model.User, error) {
-	ctx, cancel := context.WithTimeout(ctx, r.pool.OpTimeout())
+	ctx, cancel := context.WithTimeout(ctx, r.db.OpTimeout())
 	defer cancel()
 
 	query := `
@@ -21,7 +21,7 @@ func (r *UserRepositoryImpl) GetUser(ctx context.Context, userID uuid.UUID) (mod
 	WHERE id = $1;
 	`
 
-	row := r.pool.QueryRow(ctx, query, userID)
+	row := r.db.QueryRow(ctx, query, userID)
 	var u model.User
 	err := row.Scan(
 		&u.ID,

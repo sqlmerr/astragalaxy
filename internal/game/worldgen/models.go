@@ -23,7 +23,8 @@ type System struct {
 	X    int
 	Y    int
 	// StarType StarType
-	Planets []Planet
+	Planets    []Planet
+	HasStation bool
 }
 
 var (

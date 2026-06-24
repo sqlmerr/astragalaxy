@@ -1,0 +1,9 @@
+description: Access Denied
+content:
+  application/json:
+    schema:
+      $ref: "../schemas/ErrorResponse.yaml"
+    example:
+      message: Access Denied
+      code: ACCESS_DENIED
+      error: ...

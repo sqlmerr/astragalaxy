@@ -19,9 +19,9 @@ type AgentRepository interface {
 }
 
 type AgentRepositoryImpl struct {
-	pool postgres_pool.Pool
+	db postgres_pool.DBTx
 }
 
-func NewAgentRepository(pool postgres_pool.Pool) *AgentRepositoryImpl {
-	return &AgentRepositoryImpl{pool}
+func NewAgentRepository(db postgres_pool.DBTx) *AgentRepositoryImpl {
+	return &AgentRepositoryImpl{db}
 }

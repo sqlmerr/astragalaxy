@@ -13,10 +13,12 @@ import (
 	"github.com/sqlmerr/astragalaxy/internal/data"
 	pgx_pool "github.com/sqlmerr/astragalaxy/internal/data/postgres/pool/pgx"
 	agents_repository "github.com/sqlmerr/astragalaxy/internal/data/repository/agents"
+	ships_repository "github.com/sqlmerr/astragalaxy/internal/data/repository/ships"
 	users_repository "github.com/sqlmerr/astragalaxy/internal/data/repository/users"
 	"github.com/sqlmerr/astragalaxy/internal/game/service"
 	core_logger "github.com/sqlmerr/astragalaxy/internal/logger"
 	http_handler_agents "github.com/sqlmerr/astragalaxy/internal/transport/http/handler/agents"
+	http_handler_ships "github.com/sqlmerr/astragalaxy/internal/transport/http/handler/ships"
 	http_handler_users "github.com/sqlmerr/astragalaxy/internal/transport/http/handler/users"
 	http_middleware "github.com/sqlmerr/astragalaxy/internal/transport/http/middleware"
 	http_server "github.com/sqlmerr/astragalaxy/internal/transport/http/server"
@@ -49,8 +51,9 @@ func main() {
 	log.Debug("Initializing storage")
 	userRepo := users_repository.NewUserRepository(pool)
 	agentRepo := agents_repository.NewAgentRepository(pool)
+	shipRepo := ships_repository.NewShipRepository(pool)
 
-	storage := data.NewStorage(userRepo, agentRepo)
+	store := data.NewStore(pool, userRepo, agentRepo, shipRepo)
 
 	log.Debug("Initializing game logic")
 	authConfig := core_auth.LoadConfigMust()
@@ -59,13 +62,16 @@ func main() {
 	agentAuthMiddleware := http_middleware.AgentAuth(agentRepo)
 
 	gameConfig := service.NewConfigMust()
-	service := service.NewService(*storage, gameConfig.Seed, *jwtProcessor)
+	serviceObj := service.NewService(store, gameConfig.Seed, *jwtProcessor)
 
-	usersHandler := http_handler_users.NewUsersHTTPHandler(*service)
+	usersHandler := http_handler_users.NewUsersHTTPHandler(*serviceObj)
 	apiVersionRouter.AddRoutes(usersHandler.Routes(userAuthMiddleware)...)
 
-	agentsHandler := http_handler_agents.NewAgentsHTTPHandler(*service)
+	agentsHandler := http_handler_agents.NewAgentsHTTPHandler(*serviceObj)
 	apiVersionRouter.AddRoutes(agentsHandler.Routes(userAuthMiddleware, agentAuthMiddleware)...)
+
+	shipsHandler := http_handler_ships.NewShipsHTTPHandler(*serviceObj)
+	apiVersionRouter.AddRoutes(shipsHandler.Routes(agentAuthMiddleware)...)
 
 	httpConfig := http_server.LoadConfigMust()
 	mux := http.NewServeMux()

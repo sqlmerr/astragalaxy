@@ -7,12 +7,12 @@ import (
 )
 
 func (r *AgentRepositoryImpl) AgentExistsByUsername(ctx context.Context, username string) (bool, error) {
-	ctx, cancel := context.WithTimeout(ctx, r.pool.OpTimeout())
+	ctx, cancel := context.WithTimeout(ctx, r.db.OpTimeout())
 	defer cancel()
 
 	query := `SELECT EXISTS(SELECT 1 FROM agents WHERE LOWER(username) = $1);`
 
-	row := r.pool.QueryRow(ctx, query, strings.ToLower(username))
+	row := r.db.QueryRow(ctx, query, strings.ToLower(username))
 	var exists bool
 	err := row.Scan(&exists)
 	if err != nil {

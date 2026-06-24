@@ -1,0 +1,17 @@
+get:
+  operationId: getMyShips
+  tags:
+    - Ships
+  summary: Get My Ships
+  description: Get current agent ships
+  responses:
+    '200':
+      description: Successfully got agent's ships
+      content:
+        application/json:
+          schema:
+            $ref: "../../components/schemas/GetMyShipsResponse.yaml"
+    '401':
+      $ref: "../../components/responses/InvalidAgentToken.yaml"
+  security:
+    - AgentAuth: []

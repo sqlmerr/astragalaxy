@@ -9,7 +9,7 @@ import (
 )
 
 func (r *AgentRepositoryImpl) GetAgentsByUser(ctx context.Context, userID uuid.UUID) ([]model.Agent, error) {
-	ctx, cancel := context.WithTimeout(ctx, r.pool.OpTimeout())
+	ctx, cancel := context.WithTimeout(ctx, r.db.OpTimeout())
 	defer cancel()
 
 	query := `
@@ -19,10 +19,11 @@ func (r *AgentRepositoryImpl) GetAgentsByUser(ctx context.Context, userID uuid.U
 	ORDER BY created_at;
 	`
 
-	rows, err := r.pool.Query(ctx, query, userID)
+	rows, err := r.db.Query(ctx, query, userID)
 	if err != nil {
 		return nil, fmt.Errorf("get agents by user: %w", err)
 	}
+	defer rows.Close()
 
 	var agents []model.Agent
 	for rows.Next() {

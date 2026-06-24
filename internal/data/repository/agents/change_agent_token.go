@@ -9,7 +9,7 @@ import (
 )
 
 func (r *AgentRepositoryImpl) ChangeAgentToken(ctx context.Context, agentID uuid.UUID, tokenHash string) error {
-	ctx, cancel := context.WithTimeout(ctx, r.pool.OpTimeout())
+	ctx, cancel := context.WithTimeout(ctx, r.db.OpTimeout())
 	defer cancel()
 
 	query := `
@@ -19,7 +19,7 @@ func (r *AgentRepositoryImpl) ChangeAgentToken(ctx context.Context, agentID uuid
 	WHERE id = $2;
 	`
 
-	cmdTag, err := r.pool.Exec(ctx, query, tokenHash, agentID)
+	cmdTag, err := r.db.Exec(ctx, query, tokenHash, agentID)
 	if err != nil {
 		return fmt.Errorf("exec update query: %w", err)
 	}

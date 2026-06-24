@@ -77,3 +77,12 @@ func (p *Pool) Exec(
 	}
 	return pgxCommandTag{cmdTag}, nil
 }
+
+func (p *Pool) Begin(ctx context.Context) (postgres_pool.Tx, error) {
+	tx, err := p.Pool.Begin(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	return pgxTx{tx, p.OpTimeout()}, nil
+}

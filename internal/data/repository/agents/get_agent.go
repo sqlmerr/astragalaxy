@@ -12,7 +12,7 @@ import (
 )
 
 func (r *AgentRepositoryImpl) GetAgent(ctx context.Context, id uuid.UUID) (model.Agent, error) {
-	ctx, cancel := context.WithTimeout(ctx, r.pool.OpTimeout())
+	ctx, cancel := context.WithTimeout(ctx, r.db.OpTimeout())
 	defer cancel()
 
 	query := `
@@ -21,7 +21,7 @@ func (r *AgentRepositoryImpl) GetAgent(ctx context.Context, id uuid.UUID) (model
 	WHERE id = $1;
 	`
 
-	row := r.pool.QueryRow(ctx, query, id)
+	row := r.db.QueryRow(ctx, query, id)
 	var a model.Agent
 	err := row.Scan(
 		&a.ID,

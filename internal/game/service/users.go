@@ -13,7 +13,7 @@ import (
 )
 
 func (s *Service) RegisterUser(ctx context.Context, username, password string) (model.User, error) {
-	userExists, err := s.storage.Users.UserExistsByUsername(ctx, username)
+	userExists, err := s.store.Users().UserExistsByUsername(ctx, username)
 	if err != nil {
 		return model.User{}, core_errors.ErrInternal
 	}
@@ -36,7 +36,7 @@ func (s *Service) RegisterUser(ctx context.Context, username, password string) (
 		Username: username,
 		Password: hashedPassword,
 	}
-	user, err := s.storage.Users.CreateUser(ctx, data)
+	user, err := s.store.Users().CreateUser(ctx, data)
 	if err != nil {
 		return model.User{}, fmt.Errorf("create user: %w", err)
 	}
@@ -45,7 +45,7 @@ func (s *Service) RegisterUser(ctx context.Context, username, password string) (
 }
 
 func (s *Service) LoginUser(ctx context.Context, username, password string) (string, error) {
-	user, err := s.storage.Users.GetUserByUsername(ctx, username)
+	user, err := s.store.Users().GetUserByUsername(ctx, username)
 	if err != nil {
 		if errors.Is(err, core_errors.ErrNotFound) {
 			return "", core_errors.NewWithCode(
@@ -72,7 +72,7 @@ func (s *Service) LoginUser(ctx context.Context, username, password string) (str
 }
 
 func (s *Service) GetUserByUsername(ctx context.Context, username string) (model.User, error) {
-	user, err := s.storage.Users.GetUserByUsername(ctx, username)
+	user, err := s.store.Users().GetUserByUsername(ctx, username)
 	if err != nil {
 		return model.User{}, fmt.Errorf("get user: %w", err)
 	}
@@ -81,7 +81,7 @@ func (s *Service) GetUserByUsername(ctx context.Context, username string) (model
 }
 
 func (s *Service) GetUserByID(ctx context.Context, userID uuid.UUID) (model.User, error) {
-	user, err := s.storage.Users.GetUser(ctx, userID)
+	user, err := s.store.Users().GetUser(ctx, userID)
 	if err != nil {
 		return model.User{}, fmt.Errorf("get user: %w", err)
 	}

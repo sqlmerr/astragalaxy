@@ -1,0 +1,33 @@
+patch:
+  operationId: renameMyShip
+  tags:
+    - Ships
+  summary: Rename My Active Ship
+  description: Rename current agent's active ship
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: "../../components/schemas/RenameMyShipRequest.yaml"
+  parameters:
+    - in: path
+      name: id
+      schema:
+        type: string
+        format: uuid
+      required: true
+      description: ID of the ship
+  responses:
+    '200':
+      description: Successfully renamed agent's active ship
+      content:
+        application/json:
+          schema:
+            $ref: "../../components/schemas/Ship.yaml"
+    '400':
+      $ref: "../../components/responses/DecodeError.yaml"
+    '401':
+      $ref: "../../components/responses/InvalidAgentToken.yaml"
+  security:
+    - AgentAuth: []

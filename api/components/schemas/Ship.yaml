@@ -1,0 +1,35 @@
+type: object
+required: [id, agent_id, type, active, system_x, system_y, status, created_at, name]
+properties:
+  id:
+    type: string
+    format: uuid
+  agent_id:
+    type: string
+    format: uuid
+  type:
+    type: string
+    enum:
+      - TRADER
+      - SCOUT
+      - MINER
+  active:
+    type: boolean
+  system_x:
+    type: integer
+    description: X coordinate
+  system_y:
+    type: integer
+    description: Y coordinate
+  status:
+    type: string
+    enum:
+      - ORBIT
+      - DOCKED
+  created_at:
+    type: string
+    format: date-time
+  name:
+    type: string
+    minLength: 1
+    maxLength: 50

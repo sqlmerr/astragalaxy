@@ -6,7 +6,6 @@ import (
 	"testing"
 
 	"github.com/google/uuid"
-	"github.com/sqlmerr/astragalaxy/internal/data"
 	"github.com/sqlmerr/astragalaxy/internal/data/model"
 	agents_repository "github.com/sqlmerr/astragalaxy/internal/data/repository/agents"
 	core_errors "github.com/sqlmerr/astragalaxy/internal/errors"
@@ -120,8 +119,11 @@ func TestRegisterAgent(t *testing.T) {
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 			agentRepo := test.repo()
-			storage := data.NewStorage(nil, agentRepo)
-			service := Service{storage: *storage}
+			shipRepo := new(mockShipRepository)
+			shipRepo.On("CreateShip", mock.Anything).Return(model.Ship{}, nil)
+
+			store := mockStore{agents: agentRepo, ships: shipRepo}
+			service := Service{store: &store}
 
 			_, token, err := service.RegisterAgent(t.Context(), test.userID, test.username)
 			if test.err == nil {
@@ -130,6 +132,7 @@ func TestRegisterAgent(t *testing.T) {
 				agentRepo.AssertCalled(t, "AgentExistsByUsername", test.username)
 				agentRepo.AssertCalled(t, "CountAgentsByUser", test.userID)
 				agentRepo.AssertCalled(t, "CreateAgent", mock.Anything)
+				shipRepo.AssertCalled(t, "CreateShip", mock.Anything)
 			} else {
 				assert.ErrorIs(t, err, test.err)
 				var withCode core_errors.WithCode
@@ -186,8 +189,8 @@ func TestResetAgentToken(t *testing.T) {
 			mockRepo.On("ChangeAgentToken", agentOne, mock.Anything).Return(nil)
 			mockRepo.On("ChangeAgentToken", agentTwo, mock.Anything).Return(core_errors.ErrNotFound)
 
-			storage := data.NewStorage(nil, mockRepo)
-			service := Service{storage: *storage}
+			store := &mockStore{agents: mockRepo}
+			service := Service{store: store}
 
 			token, err := service.ResetAgentToken(t.Context(), test.userID, test.agentID)
 			if test.err == nil {

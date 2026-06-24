@@ -8,7 +8,7 @@ import (
 )
 
 func (r *UserRepositoryImpl) CreateUser(ctx context.Context, data CreateUser) (model.User, error) {
-	ctx, cancel := context.WithTimeout(ctx, r.pool.OpTimeout())
+	ctx, cancel := context.WithTimeout(ctx, r.db.OpTimeout())
 	defer cancel()
 
 	query := `
@@ -17,7 +17,7 @@ func (r *UserRepositoryImpl) CreateUser(ctx context.Context, data CreateUser) (m
 	RETURNING id, username, password, created_at;
 	`
 
-	row := r.pool.QueryRow(ctx, query, data.Username, data.Password)
+	row := r.db.QueryRow(ctx, query, data.Username, data.Password)
 	var u model.User
 	err := row.Scan(
 		&u.ID,

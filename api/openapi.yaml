@@ -21,6 +21,16 @@ paths:
     $ref: "paths/agents/current.yaml"
   /api/v1/agents/{id}/reset-token:
     $ref: "paths/agents/reset-token.yaml"
+  /api/v1/ships/my:
+    $ref: "paths/ships/my.yaml"
+  /api/v1/ships/my/active:
+    $ref: "paths/ships/my-active.yaml"
+  /api/v1/ships/my/{id}/rename:
+    $ref: "paths/ships/my-rename.yaml"
+  /api/v1/ships/my/active/radar:
+    $ref: "paths/ships/my-radar.yaml"
+  /api/v1/ships/my/{id}/active:
+    $ref: "paths/ships/my-activate.yaml"
 components:
   securitySchemes:
     UserAuth:
