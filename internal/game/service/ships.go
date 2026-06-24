@@ -60,7 +60,7 @@ func (s *Service) ShipRadar(ctx context.Context, agentID uuid.UUID) ([]worldgen.
 		return nil, fmt.Errorf("get active ship: %w", err)
 	}
 
-	systems, err := worldgen.GetSystemsInBox(ship.SystemX-10, ship.SystemY-10, ship.SystemX+10, ship.SystemY+10, s.gameSeed)
+	systems, err := s.worldGen.GetSystemsInBox(ship.SystemX-10, ship.SystemY-10, ship.SystemX+10, ship.SystemY+10)
 	if err != nil {
 		return nil, fmt.Errorf("use radar: %w", err)
 	}

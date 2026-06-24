@@ -10,11 +10,19 @@ import (
 	core_errors "github.com/sqlmerr/astragalaxy/internal/errors"
 )
 
+type WorldGen struct {
+	gameSeed int64
+}
+
+func New(gameSeed int64) *WorldGen {
+	return &WorldGen{gameSeed}
+}
+
 // GenerateSystemByCoords creates system by coordinates
 // Returns (nil, false) if there is no system.
-func GenerateSystemByCoords(x, y int, globalSeed int64) (*System, bool) {
+func (w *WorldGen) GenerateSystemByCoords(x, y int) (*System, bool) {
 	h := fnv.New64a()
-	_, _ = h.Write([]byte(fmt.Sprintf("%d:%d:%d", x, y, globalSeed)))
+	_, _ = h.Write([]byte(fmt.Sprintf("%d:%d:%d", x, y, w.gameSeed)))
 	systemSeed := h.Sum64()
 
 	rng := rand.New(rand.NewSource(int64(systemSeed)))
@@ -30,11 +38,11 @@ func GenerateSystemByCoords(x, y int, globalSeed int64) (*System, bool) {
 	)
 
 	system := &System{
-		Name:       systemName,
-		X:          x,
-		Y:          y,
-		Planets:    make([]Planet, 0),
-		HasStation: rng.Float64() < 0.40,
+		Name:      systemName,
+		X:         x,
+		Y:         y,
+		Planets:   make([]Planet, 0),
+		Waypoints: generateWaypoints(rng),
 	}
 
 	numPlanets := rng.Intn(5) + 1
@@ -71,7 +79,17 @@ func generatePlanet(orbitIndex int, rng *rand.Rand) Planet {
 	}
 }
 
-func GetSystemsInBox(minX, minY, maxX, maxY int, globalSeed int64) ([]System, error) {
+func generateWaypoints(rng *rand.Rand) []Waypoint {
+	waypoints := make([]Waypoint, 0)
+	roll := rng.Float64()
+	if roll < 0.40 {
+		waypoints = append(waypoints, Waypoint{Type: WaypointStation})
+	}
+
+	return waypoints
+}
+
+func (w *WorldGen) GetSystemsInBox(minX, minY, maxX, maxY int) ([]System, error) {
 	var foundSystems []System
 
 	if (maxX-minX) > 50 || (maxY-minY) > 50 {
@@ -83,7 +101,7 @@ func GetSystemsInBox(minX, minY, maxX, maxY int, globalSeed int64) ([]System, er
 
 	for x := minX; x <= maxX; x++ {
 		for y := minY; y <= maxY; y++ {
-			if sys, found := GenerateSystemByCoords(x, y, globalSeed); found {
+			if sys, found := w.GenerateSystemByCoords(x, y); found {
 				foundSystems = append(foundSystems, *sys)
 			}
 		}
@@ -92,13 +110,13 @@ func GetSystemsInBox(minX, minY, maxX, maxY int, globalSeed int64) ([]System, er
 	return foundSystems, nil
 }
 
-func FindSpawnSystem(globalSeed int64) (*System, error) {
+func (w *WorldGen) FindSpawnSystem() (*System, error) {
 	for {
 		x := getRandomCoordinate(-200, 200)
 		y := getRandomCoordinate(-200, 200)
 
-		if sys, found := GenerateSystemByCoords(x, y, globalSeed); found {
-			if sys.HasStation {
+		if sys, found := w.GenerateSystemByCoords(x, y); found {
+			if sys.HasStation() {
 				return sys, nil
 			}
 		}

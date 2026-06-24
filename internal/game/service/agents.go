@@ -11,7 +11,6 @@ import (
 	agents_repository "github.com/sqlmerr/astragalaxy/internal/data/repository/agents"
 	ships_repository "github.com/sqlmerr/astragalaxy/internal/data/repository/ships"
 	core_errors "github.com/sqlmerr/astragalaxy/internal/errors"
-	"github.com/sqlmerr/astragalaxy/internal/game/worldgen"
 )
 
 func (s *Service) RegisterAgent(ctx context.Context, userID uuid.UUID, username string) (model.Agent, string, error) {
@@ -63,7 +62,7 @@ func (s *Service) RegisterAgent(ctx context.Context, userID uuid.UUID, username 
 			return fmt.Errorf("create agent: %w", err)
 		}
 
-		spawnSystem, err := worldgen.FindSpawnSystem(s.gameSeed)
+		spawnSystem, err := s.worldGen.FindSpawnSystem()
 		if err != nil {
 			return fmt.Errorf("find spawn system: %w", err)
 		}

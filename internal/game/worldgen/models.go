@@ -1,8 +1,11 @@
 package worldgen
 
+import "slices"
+
 type PlanetType string
 
-//type StarType string
+// type StarType string
+type WaypointType string
 
 const (
 	PlanetTerra    PlanetType = "TERRA"
@@ -10,6 +13,9 @@ const (
 	PlanetScorched PlanetType = "SCORCHED"
 	PlanetGlacial  PlanetType = "GLACIAL"
 	PlanetToxic    PlanetType = "TOXIC"
+
+	WaypointStation  WaypointType = "STATION"
+	WaypointAsteroid WaypointType = "ASTEROID"
 )
 
 type Planet struct {
@@ -18,13 +24,21 @@ type Planet struct {
 	Orbit int
 }
 
+type Waypoint struct {
+	Type WaypointType
+}
+
 type System struct {
 	Name string
 	X    int
 	Y    int
 	// StarType StarType
-	Planets    []Planet
-	HasStation bool
+	Planets   []Planet
+	Waypoints []Waypoint
+}
+
+func (s *System) HasStation() bool {
+	return slices.ContainsFunc(s.Waypoints, func(w Waypoint) bool { return w.Type == WaypointStation })
 }
 
 var (

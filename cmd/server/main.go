@@ -17,6 +17,7 @@ import (
 	ships_repository "github.com/sqlmerr/astragalaxy/internal/data/repository/ships"
 	users_repository "github.com/sqlmerr/astragalaxy/internal/data/repository/users"
 	"github.com/sqlmerr/astragalaxy/internal/game/service"
+	"github.com/sqlmerr/astragalaxy/internal/game/worldgen"
 	core_logger "github.com/sqlmerr/astragalaxy/internal/logger"
 	http_handler_agents "github.com/sqlmerr/astragalaxy/internal/transport/http/handler/agents"
 	http_handler_ships "github.com/sqlmerr/astragalaxy/internal/transport/http/handler/ships"
@@ -64,7 +65,8 @@ func main() {
 	agentAuthMiddleware := http_middleware.AgentAuth(agentRepo)
 
 	gameConfig := service.NewConfigMust()
-	serviceObj := service.NewService(store, gameConfig.Seed, *jwtProcessor)
+	worldGen := worldgen.New(gameConfig.Seed)
+	serviceObj := service.NewService(store, *worldGen, *jwtProcessor)
 
 	usersHandler := http_handler_users.NewUsersHTTPHandler(*serviceObj)
 	apiVersionRouter.AddRoutes(usersHandler.Routes(userAuthMiddleware)...)
