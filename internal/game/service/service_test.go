@@ -5,14 +5,16 @@ import (
 
 	"github.com/sqlmerr/astragalaxy/internal/data"
 	agents_repository "github.com/sqlmerr/astragalaxy/internal/data/repository/agents"
+	inventories_repository "github.com/sqlmerr/astragalaxy/internal/data/repository/inventories"
 	ships_repository "github.com/sqlmerr/astragalaxy/internal/data/repository/ships"
 	users_repository "github.com/sqlmerr/astragalaxy/internal/data/repository/users"
 )
 
 type mockStore struct {
-	users  users_repository.UserRepository
-	agents agents_repository.AgentRepository
-	ships  ships_repository.ShipRepository
+	users       users_repository.UserRepository
+	agents      agents_repository.AgentRepository
+	ships       ships_repository.ShipRepository
+	inventories inventories_repository.InventoryRepository
 }
 
 func (s *mockStore) Users() users_repository.UserRepository {
@@ -25,6 +27,10 @@ func (s *mockStore) Agents() agents_repository.AgentRepository {
 
 func (s *mockStore) Ships() ships_repository.ShipRepository {
 	return s.ships
+}
+
+func (s *mockStore) Inventories() inventories_repository.InventoryRepository {
+	return s.inventories
 }
 
 func (s *mockStore) ExecTx(_ context.Context, fn func(tx data.Store) error) error {

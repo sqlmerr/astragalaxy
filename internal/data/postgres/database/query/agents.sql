@@ -11,7 +11,7 @@ WHERE id = $2;
 SELECT COUNT(*) FROM agents WHERE user_id = $1;
 
 -- name: CreateAgent :one
-INSERT INTO agents (user_id, username, token_hash) VALUES ($1, $2, $3)
+INSERT INTO agents (user_id, username, token_hash, inventory_id) VALUES ($1, $2, $3, $4)
 RETURNING *;
 
 -- name: GetAgentByID :one

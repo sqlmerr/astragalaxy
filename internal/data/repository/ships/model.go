@@ -7,25 +7,27 @@ import (
 )
 
 type CreateShip struct {
-	AgentID uuid.UUID
-	Type    model.ShipType
-	Active  bool
-	SystemX int
-	SystemY int
-	Status  model.ShipStatus
-	Name    string
+	AgentID     uuid.UUID
+	Type        model.ShipType
+	Active      bool
+	SystemX     int
+	SystemY     int
+	Status      model.ShipStatus
+	Name        string
+	InventoryID uuid.UUID
 }
 
 func convertModel(m database.Ship) model.Ship {
 	return model.Ship{
-		ID:        m.ID,
-		AgentID:   m.AgentID,
-		Type:      model.ShipType(m.Type),
-		Active:    m.Active,
-		SystemX:   int(m.SystemX),
-		SystemY:   int(m.SystemY),
-		Status:    model.ShipStatus(m.Status),
-		CreatedAt: m.CreatedAt.Time,
-		Name:      m.Name,
+		ID:          m.ID,
+		AgentID:     m.AgentID,
+		Type:        model.ShipType(m.Type),
+		Active:      m.Active,
+		SystemX:     int(m.SystemX),
+		SystemY:     int(m.SystemY),
+		Status:      model.ShipStatus(m.Status),
+		CreatedAt:   m.CreatedAt.Time,
+		Name:        m.Name,
+		InventoryID: m.InventoryID,
 	}
 }

@@ -7,17 +7,19 @@ import (
 )
 
 type CreateAgent struct {
-	UserID    uuid.UUID
-	Username  string
-	TokenHash string
+	UserID      uuid.UUID
+	Username    string
+	TokenHash   string
+	InventoryID uuid.UUID
 }
 
 func convertModel(m database.Agent) model.Agent {
 	return model.Agent{
-		ID:        m.ID,
-		UserID:    m.UserID,
-		Username:  m.Username,
-		TokenHash: m.TokenHash,
-		CreatedAt: m.CreatedAt.Time,
+		ID:          m.ID,
+		UserID:      m.UserID,
+		Username:    m.Username,
+		TokenHash:   m.TokenHash,
+		CreatedAt:   m.CreatedAt.Time,
+		InventoryID: m.InventoryID,
 	}
 }

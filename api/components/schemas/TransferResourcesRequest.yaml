@@ -1,0 +1,18 @@
+type: object
+required:
+  - from_inventory_id
+  - to_inventory_id
+  - resources
+properties:
+  from_inventory_id:
+    type: string
+    format: uuid
+  to_inventory_id:
+    type: string
+    format: uuid
+  resources:
+    type: object
+    example: '"crystal": 42'
+    additionalProperties:
+      type: integer
+      description: item's Amount

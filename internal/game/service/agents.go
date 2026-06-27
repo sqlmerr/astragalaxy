@@ -9,6 +9,7 @@ import (
 	"github.com/sqlmerr/astragalaxy/internal/data"
 	"github.com/sqlmerr/astragalaxy/internal/data/model"
 	agents_repository "github.com/sqlmerr/astragalaxy/internal/data/repository/agents"
+	inventories_repository "github.com/sqlmerr/astragalaxy/internal/data/repository/inventories"
 	ships_repository "github.com/sqlmerr/astragalaxy/internal/data/repository/ships"
 	core_errors "github.com/sqlmerr/astragalaxy/internal/errors"
 )
@@ -50,12 +51,21 @@ func (s *Service) RegisterAgent(ctx context.Context, userID uuid.UUID, username 
 			)
 		}
 
+		agentInventory, err := tx.Inventories().CreateInventory(ctx, inventories_repository.CreateInventory{
+			MaxItemSlots:      10,
+			MaxResourceVolume: 1000,
+		})
+		if err != nil {
+			return fmt.Errorf("create agent inventory: %w", err)
+		}
+
 		agent, err = tx.Agents().CreateAgent(
 			ctx,
 			agents_repository.CreateAgent{
-				UserID:    userID,
-				Username:  username,
-				TokenHash: tokenHash,
+				UserID:      userID,
+				Username:    username,
+				TokenHash:   tokenHash,
+				InventoryID: agentInventory.ID,
 			},
 		)
 		if err != nil {
@@ -66,14 +76,24 @@ func (s *Service) RegisterAgent(ctx context.Context, userID uuid.UUID, username 
 		if err != nil {
 			return fmt.Errorf("find spawn system: %w", err)
 		}
+
+		shipInventory, err := tx.Inventories().CreateInventory(ctx, inventories_repository.CreateInventory{
+			MaxItemSlots:      15,
+			MaxResourceVolume: 3000,
+		})
+		if err != nil {
+			return fmt.Errorf("create ship inventory: %w", err)
+		}
+
 		_, err = tx.Ships().CreateShip(ctx, ships_repository.CreateShip{
-			AgentID: agent.ID,
-			Type:    model.ShipTypeScout,
-			Active:  true,
-			SystemX: spawnSystem.X,
-			SystemY: spawnSystem.Y,
-			Status:  model.ShipStatusDocked,
-			Name:    "ship",
+			AgentID:     agent.ID,
+			Type:        model.ShipTypeScout,
+			Active:      true,
+			SystemX:     spawnSystem.X,
+			SystemY:     spawnSystem.Y,
+			Status:      model.ShipStatusDocked,
+			Name:        "ship",
+			InventoryID: shipInventory.ID,
 		})
 		if err != nil {
 			return fmt.Errorf("create ship: %w", err)

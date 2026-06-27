@@ -31,6 +31,14 @@ paths:
     $ref: "paths/ships/my-radar.yaml"
   /api/v1/ships/my/{id}/active:
     $ref: "paths/ships/my-activate.yaml"
+  /api/v1/inventories/my:
+    $ref: "paths/inventories/my.yaml"
+  /api/v1/inventories/my/ships/{id}:
+    $ref: "paths/inventories/my-ships.yaml"
+  /api/v1/inventories/transfer-resources:
+    $ref: "paths/inventories/transfer-resources.yaml"
+  /api/v1/inventories/transfer-items:
+    $ref: "paths/inventories/transfer-items.yaml"
 components:
   securitySchemes:
     UserAuth:

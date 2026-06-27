@@ -16,9 +16,10 @@ func (r *AgentRepositoryImpl) CreateAgent(ctx context.Context, data CreateAgent)
 	defer cancel()
 
 	a, err := r.q.CreateAgent(ctx, database.CreateAgentParams{
-		UserID:    data.UserID,
-		Username:  data.Username,
-		TokenHash: data.TokenHash,
+		UserID:      data.UserID,
+		Username:    data.Username,
+		TokenHash:   data.TokenHash,
+		InventoryID: data.InventoryID,
 	})
 
 	err = postgres_pool.TranslateError(err)

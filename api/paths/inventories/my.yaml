@@ -1,0 +1,17 @@
+get:
+  operationId: getMyInventory
+  tags:
+    - Inventories
+  summary: Get My Inventory
+  description: Get current agent's full inventory
+  responses:
+    '200':
+      description: Successfully got agent's inventory
+      content:
+        application/json:
+          schema:
+            $ref: "../../components/schemas/FullInventory.yaml"
+    '401':
+      $ref: "../../components/responses/InvalidAgentToken.yaml"
+  security:
+    - AgentAuth: []

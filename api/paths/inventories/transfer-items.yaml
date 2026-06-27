@@ -1,0 +1,27 @@
+post:
+  operationId: transferItems
+  tags:
+    - Inventories
+  summary: Transfer items
+  description: Transfer items from one inventory to another
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: "../../components/schemas/TransferItemsRequest.yaml"
+  responses:
+    '204':
+      description: 'Successfully transferred items'
+    '401':
+      $ref: "../../components/responses/InvalidAgentToken.yaml"
+    '403':
+      $ref: "../../components/responses/AccessDenied.yaml"
+    '422':
+      description: 'Invalid/unsupported transfer direction'
+      content:
+        application/json:
+          schema:
+            $ref: "../../components/schemas/ErrorResponse.yaml"
+  security:
+    - AgentAuth: []

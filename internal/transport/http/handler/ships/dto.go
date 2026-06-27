@@ -76,21 +76,37 @@ func planetDTOsFromModels(m []worldgen.Planet) []PlanetResponseDTO {
 	})
 }
 
+type WaypointResponseDTO struct {
+	Type string `json:"type"`
+}
+
+func waypointDTOFromModel(m worldgen.Waypoint) WaypointResponseDTO {
+	return WaypointResponseDTO{
+		Type: string(m.Type),
+	}
+}
+
+func waypointDTOsFromModels(m []worldgen.Waypoint) []WaypointResponseDTO {
+	return lo.Map(m, func(i worldgen.Waypoint, _ int) WaypointResponseDTO {
+		return waypointDTOFromModel(i)
+	})
+}
+
 type SystemResponseDTO struct {
-	Name       string              `json:"name"`
-	X          int                 `json:"x"`
-	Y          int                 `json:"y"`
-	Planets    []PlanetResponseDTO `json:"planets"`
-	HasStation bool                `json:"has_station"`
+	Name      string                `json:"name"`
+	X         int                   `json:"x"`
+	Y         int                   `json:"y"`
+	Planets   []PlanetResponseDTO   `json:"planets"`
+	Waypoints []WaypointResponseDTO `json:"waypoints"`
 }
 
 func systemDTOFromModel(m worldgen.System) SystemResponseDTO {
 	return SystemResponseDTO{
-		Name:       m.Name,
-		X:          m.X,
-		Y:          m.Y,
-		Planets:    planetDTOsFromModels(m.Planets),
-		HasStation: m.HasStation,
+		Name:      m.Name,
+		X:         m.X,
+		Y:         m.Y,
+		Planets:   planetDTOsFromModels(m.Planets),
+		Waypoints: waypointDTOsFromModels(m.Waypoints),
 	}
 }
 

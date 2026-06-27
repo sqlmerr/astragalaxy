@@ -54,18 +54,24 @@ func (q *Queries) CountAgentsByUser(ctx context.Context, userID uuid.UUID) (int6
 }
 
 const createAgent = `-- name: CreateAgent :one
-INSERT INTO agents (user_id, username, token_hash) VALUES ($1, $2, $3)
-RETURNING id, user_id, username, token_hash, created_at
+INSERT INTO agents (user_id, username, token_hash, inventory_id) VALUES ($1, $2, $3, $4)
+RETURNING id, user_id, username, token_hash, created_at, inventory_id
 `
 
 type CreateAgentParams struct {
-	UserID    uuid.UUID
-	Username  string
-	TokenHash string
+	UserID      uuid.UUID
+	Username    string
+	TokenHash   string
+	InventoryID uuid.UUID
 }
 
 func (q *Queries) CreateAgent(ctx context.Context, arg CreateAgentParams) (Agent, error) {
-	row := q.db.QueryRow(ctx, createAgent, arg.UserID, arg.Username, arg.TokenHash)
+	row := q.db.QueryRow(ctx, createAgent,
+		arg.UserID,
+		arg.Username,
+		arg.TokenHash,
+		arg.InventoryID,
+	)
 	var i Agent
 	err := row.Scan(
 		&i.ID,
@@ -73,12 +79,13 @@ func (q *Queries) CreateAgent(ctx context.Context, arg CreateAgentParams) (Agent
 		&i.Username,
 		&i.TokenHash,
 		&i.CreatedAt,
+		&i.InventoryID,
 	)
 	return i, err
 }
 
 const getAgentByID = `-- name: GetAgentByID :one
-SELECT id, user_id, username, token_hash, created_at
+SELECT id, user_id, username, token_hash, created_at, inventory_id
 FROM agents
 WHERE id = $1
 `
@@ -92,12 +99,13 @@ func (q *Queries) GetAgentByID(ctx context.Context, id uuid.UUID) (Agent, error)
 		&i.Username,
 		&i.TokenHash,
 		&i.CreatedAt,
+		&i.InventoryID,
 	)
 	return i, err
 }
 
 const getAgentByToken = `-- name: GetAgentByToken :one
-SELECT id, user_id, username, token_hash, created_at
+SELECT id, user_id, username, token_hash, created_at, inventory_id
 FROM agents
 WHERE token_hash = $1
 `
@@ -111,12 +119,13 @@ func (q *Queries) GetAgentByToken(ctx context.Context, tokenHash string) (Agent,
 		&i.Username,
 		&i.TokenHash,
 		&i.CreatedAt,
+		&i.InventoryID,
 	)
 	return i, err
 }
 
 const getAgentsByUser = `-- name: GetAgentsByUser :many
-SELECT id, user_id, username, token_hash, created_at
+SELECT id, user_id, username, token_hash, created_at, inventory_id
 FROM agents
 WHERE user_id = $1
 ORDER BY created_at
@@ -137,6 +146,7 @@ func (q *Queries) GetAgentsByUser(ctx context.Context, userID uuid.UUID) ([]Agen
 			&i.Username,
 			&i.TokenHash,
 			&i.CreatedAt,
+			&i.InventoryID,
 		); err != nil {
 			return nil, err
 		}

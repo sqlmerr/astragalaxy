@@ -17,6 +17,8 @@ properties:
   planets:
     type: array
     items:
-      - $ref: "./Planet.yaml"
-  has_station:
-    type: boolean
+      $ref: "./Planet.yaml"
+  waypoints:
+    type: array
+    items:
+      $ref: "./Waypoint.yaml"

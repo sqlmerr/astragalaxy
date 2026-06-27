@@ -16,3 +16,6 @@ properties:
   created_at:
     type: string
     format: date-time
+  inventory_id:
+    type: string
+    format: uuid

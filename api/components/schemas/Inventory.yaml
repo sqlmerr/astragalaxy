@@ -1,0 +1,13 @@
+type: object
+required:
+  - inventory_id
+  - max_item_slots
+  - max_resource_volume
+properties:
+  inventory_id:
+    type: string
+    format: uuid
+  max_item_slots:
+    type: integer
+  max_resource_volume:
+    type: integer

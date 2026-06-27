@@ -18,6 +18,14 @@ const (
 	CodeAgentLimitExceeded           ErrorCode = "AGENT_LIMIT_EXCEEDED"
 	CodeRadarAreaTooLarge            ErrorCode = "RADAR_AREA_TOO_LARGE"
 	CodeShipNotFound                 ErrorCode = "SHIP_NOT_FOUND"
+	CodeInventoryNotFound            ErrorCode = "INVENTORY_NOT_FOUND"
+	CodeResourceNotFound             ErrorCode = "RESOURCE_NOT_FOUND"
+	CodeItemNotFound                 ErrorCode = "ITEM_NOT_FOUND"
+	CodeShipMustBeActive             ErrorCode = "SHIP_MUST_BE_ACTIVE"
+	CodeInvalidTransferDirection     ErrorCode = "INVALID_TRANSFER_DIRECTION"
+	CodeNotEnoughResources           ErrorCode = "NOT_ENOUGH_RESOURCES"
+	CodeInventoryIsFull              ErrorCode = "INVENTORY_IS_FULL"
+	CodeItemNotInInventory           ErrorCode = "ITEM_NOT_IN_INVENTORY"
 )
 
 type WithCode struct {

@@ -98,23 +98,45 @@ func (ns NullShipType) Value() (driver.Value, error) {
 }
 
 type Agent struct {
-	ID        uuid.UUID
-	UserID    uuid.UUID
-	Username  string
-	TokenHash string
-	CreatedAt pgtype.Timestamp
+	ID          uuid.UUID
+	UserID      uuid.UUID
+	Username    string
+	TokenHash   string
+	CreatedAt   pgtype.Timestamp
+	InventoryID uuid.UUID
+}
+
+type Inventory struct {
+	ID                uuid.UUID
+	MaxItemSlots      int32
+	MaxResourceVolume int32
+}
+
+type InventoryItem struct {
+	ID          uuid.UUID
+	InventoryID uuid.UUID
+	ItemType    string
+	Metadata    []byte
+	CreatedAt   pgtype.Timestamp
+}
+
+type InventoryResource struct {
+	InventoryID  uuid.UUID
+	ResourceType string
+	Amount       int64
 }
 
 type Ship struct {
-	ID        uuid.UUID
-	AgentID   uuid.UUID
-	Type      ShipType
-	Active    bool
-	SystemX   int32
-	SystemY   int32
-	Status    ShipStatus
-	CreatedAt pgtype.Timestamp
-	Name      string
+	ID          uuid.UUID
+	AgentID     uuid.UUID
+	Type        ShipType
+	Active      bool
+	SystemX     int32
+	SystemY     int32
+	Status      ShipStatus
+	CreatedAt   pgtype.Timestamp
+	Name        string
+	InventoryID uuid.UUID
 }
 
 type User struct {

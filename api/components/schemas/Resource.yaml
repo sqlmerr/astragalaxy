@@ -1,0 +1,14 @@
+type: object
+required:
+  - inventory_id
+  - resource_type
+  - amount
+properties:
+  inventory_id:
+    type: string
+    format: uuid
+  resource_type:
+    type: string
+    description: Resource type # TODO: link to docs with available resource types
+  amount:
+    type: integer

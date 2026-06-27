@@ -33,3 +33,6 @@ properties:
     type: string
     minLength: 1
     maxLength: 50
+  inventory_id:
+    type: string
+    format: uuid

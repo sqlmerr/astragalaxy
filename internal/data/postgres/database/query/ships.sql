@@ -1,5 +1,6 @@
 -- name: CreateShip :one
-INSERT INTO ships (agent_id, type, active, system_x, system_y, status, name) VALUES ($1, $2, $3, $4, $5, $6, $7)
+INSERT INTO ships (agent_id, type, active, system_x, system_y, status, name, inventory_id)
+VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
 RETURNING *;
 
 -- name: GetActiveShipByAgent :one

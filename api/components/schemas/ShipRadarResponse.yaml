@@ -4,4 +4,4 @@ properties:
   data:
     type: array
     items:
-      - $ref: "./System.yaml"
+      $ref: "./System.yaml"

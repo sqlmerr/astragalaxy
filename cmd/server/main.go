@@ -14,12 +14,14 @@ import (
 	database "github.com/sqlmerr/astragalaxy/internal/data/postgres/database/sqlc"
 	pgx_pool "github.com/sqlmerr/astragalaxy/internal/data/postgres/pool/pgx"
 	agents_repository "github.com/sqlmerr/astragalaxy/internal/data/repository/agents"
+	inventories_repository "github.com/sqlmerr/astragalaxy/internal/data/repository/inventories"
 	ships_repository "github.com/sqlmerr/astragalaxy/internal/data/repository/ships"
 	users_repository "github.com/sqlmerr/astragalaxy/internal/data/repository/users"
 	"github.com/sqlmerr/astragalaxy/internal/game/service"
 	"github.com/sqlmerr/astragalaxy/internal/game/worldgen"
 	core_logger "github.com/sqlmerr/astragalaxy/internal/logger"
 	http_handler_agents "github.com/sqlmerr/astragalaxy/internal/transport/http/handler/agents"
+	http_handler_inventories "github.com/sqlmerr/astragalaxy/internal/transport/http/handler/inventories"
 	http_handler_ships "github.com/sqlmerr/astragalaxy/internal/transport/http/handler/ships"
 	http_handler_users "github.com/sqlmerr/astragalaxy/internal/transport/http/handler/users"
 	http_middleware "github.com/sqlmerr/astragalaxy/internal/transport/http/middleware"
@@ -55,8 +57,9 @@ func main() {
 	userRepo := users_repository.NewUserRepository(*queries, pool)
 	agentRepo := agents_repository.NewAgentRepository(*queries, pool)
 	shipRepo := ships_repository.NewShipRepository(*queries, pool)
+	inventoryRepo := inventories_repository.NewInventoryRepository(*queries, pool)
 
-	store := data.NewStore(pool, userRepo, agentRepo, shipRepo)
+	store := data.NewStore(pool, userRepo, agentRepo, shipRepo, inventoryRepo)
 
 	log.Debug("Initializing game logic")
 	authConfig := core_auth.LoadConfigMust()
@@ -76,6 +79,9 @@ func main() {
 
 	shipsHandler := http_handler_ships.NewShipsHTTPHandler(*serviceObj)
 	apiVersionRouter.AddRoutes(shipsHandler.Routes(agentAuthMiddleware)...)
+
+	inventoriesHandler := http_handler_inventories.NewInventoriesHTTPHandler(*serviceObj)
+	apiVersionRouter.AddRoutes(inventoriesHandler.Routes(agentAuthMiddleware)...)
 
 	httpConfig := http_server.LoadConfigMust()
 	mux := http.NewServeMux()

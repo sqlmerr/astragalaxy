@@ -30,13 +30,13 @@ migrate-up:
         -database "postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}?sslmode=disable" \
         up
 
-migrate-down:
+migrate-down AMOUNT:
     docker compose -f docker-compose.dev.yaml run --rm \
         -u $(id -u):$(id -g) \
         postgres-migrate \
         -path /migration \
         -database "postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}?sslmode=disable" \
-        down
+        down {{ AMOUNT }}
 
 gen-docs:
     redocly bundle api/openapi.yaml -o out/openapi.json

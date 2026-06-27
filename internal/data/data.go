@@ -9,6 +9,7 @@ import (
 	database "github.com/sqlmerr/astragalaxy/internal/data/postgres/database/sqlc"
 	postgres_pool "github.com/sqlmerr/astragalaxy/internal/data/postgres/pool"
 	agents_repository "github.com/sqlmerr/astragalaxy/internal/data/repository/agents"
+	inventories_repository "github.com/sqlmerr/astragalaxy/internal/data/repository/inventories"
 	ships_repository "github.com/sqlmerr/astragalaxy/internal/data/repository/ships"
 	users_repository "github.com/sqlmerr/astragalaxy/internal/data/repository/users"
 )
@@ -17,6 +18,7 @@ type Store interface {
 	Users() users_repository.UserRepository
 	Agents() agents_repository.AgentRepository
 	Ships() ships_repository.ShipRepository
+	Inventories() inventories_repository.InventoryRepository
 
 	ExecTx(ctx context.Context, fn func(tx Store) error) error
 }
@@ -24,9 +26,10 @@ type Store interface {
 type Storage struct {
 	pool postgres_pool.Pool
 
-	users  users_repository.UserRepository
-	agents agents_repository.AgentRepository
-	ships  ships_repository.ShipRepository
+	users       users_repository.UserRepository
+	agents      agents_repository.AgentRepository
+	ships       ships_repository.ShipRepository
+	inventories inventories_repository.InventoryRepository
 }
 
 func NewStore(
@@ -34,12 +37,14 @@ func NewStore(
 	users users_repository.UserRepository,
 	agents agents_repository.AgentRepository,
 	ships ships_repository.ShipRepository,
+	inventories inventories_repository.InventoryRepository,
 ) *Storage {
 	return &Storage{
-		pool:   pool,
-		users:  users,
-		agents: agents,
-		ships:  ships,
+		pool:        pool,
+		users:       users,
+		agents:      agents,
+		ships:       ships,
+		inventories: inventories,
 	}
 }
 
@@ -55,6 +60,10 @@ func (s *Storage) Ships() ships_repository.ShipRepository {
 	return s.ships
 }
 
+func (s *Storage) Inventories() inventories_repository.InventoryRepository {
+	return s.inventories
+}
+
 func (s *Storage) ExecTx(ctx context.Context, fn func(tx Store) error) error {
 	tx, err := s.pool.Begin(ctx)
 	if err != nil {
@@ -65,10 +74,11 @@ func (s *Storage) ExecTx(ctx context.Context, fn func(tx Store) error) error {
 	q := database.New(sqlcDB)
 
 	txStorage := &Storage{
-		pool:   s.pool,
-		users:  users_repository.NewUserRepository(*q, tx),
-		agents: agents_repository.NewAgentRepository(*q, tx),
-		ships:  ships_repository.NewShipRepository(*q, tx),
+		pool:        s.pool,
+		users:       users_repository.NewUserRepository(*q, tx),
+		agents:      agents_repository.NewAgentRepository(*q, tx),
+		ships:       ships_repository.NewShipRepository(*q, tx),
+		inventories: inventories_repository.NewInventoryRepository(*q, tx),
 	}
 
 	err = fn(txStorage)

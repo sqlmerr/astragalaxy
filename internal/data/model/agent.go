@@ -7,9 +7,10 @@ import (
 )
 
 type Agent struct {
-	ID        uuid.UUID
-	UserID    uuid.UUID
-	Username  string
-	TokenHash string
-	CreatedAt time.Time
+	ID          uuid.UUID
+	UserID      uuid.UUID
+	Username    string
+	TokenHash   string
+	CreatedAt   time.Time
+	InventoryID uuid.UUID
 }

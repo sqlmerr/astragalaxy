@@ -1,0 +1,19 @@
+type: object
+required:
+  - from_inventory_id
+  - to_inventory_id
+  - items
+properties:
+  from_inventory_id:
+    type: string
+    format: uuid
+  to_inventory_id:
+    type: string
+    format: uuid
+  items:
+    description: Item IDs
+    type: array
+    items:
+      type: string
+      format: uuid
+      description: ID of the item

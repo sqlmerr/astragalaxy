@@ -16,13 +16,14 @@ func (r *ShipRepositoryImpl) CreateShip(ctx context.Context, data CreateShip) (m
 	defer cancel()
 
 	s, err := r.q.CreateShip(ctx, database.CreateShipParams{
-		AgentID: data.AgentID,
-		Type:    database.ShipType(data.Type),
-		Active:  data.Active,
-		SystemX: int32(data.SystemX),
-		SystemY: int32(data.SystemY),
-		Status:  database.ShipStatus(data.Status),
-		Name:    data.Name,
+		AgentID:     data.AgentID,
+		Type:        database.ShipType(data.Type),
+		Active:      data.Active,
+		SystemX:     int32(data.SystemX),
+		SystemY:     int32(data.SystemY),
+		Status:      database.ShipStatus(data.Status),
+		Name:        data.Name,
+		InventoryID: data.InventoryID,
 	})
 	err = postgres_pool.TranslateError(err)
 

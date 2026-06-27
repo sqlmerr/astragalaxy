@@ -121,8 +121,10 @@ func TestRegisterAgent(t *testing.T) {
 			agentRepo := test.repo()
 			shipRepo := new(mockShipRepository)
 			shipRepo.On("CreateShip", mock.Anything).Return(model.Ship{}, nil)
+			invRepo := new(mockInventoryRepository)
+			invRepo.On("CreateInventory", mock.Anything).Return(model.Inventory{}, nil)
 
-			store := mockStore{agents: agentRepo, ships: shipRepo}
+			store := mockStore{agents: agentRepo, ships: shipRepo, inventories: invRepo}
 			service := Service{store: &store}
 
 			_, token, err := service.RegisterAgent(t.Context(), test.userID, test.username)
@@ -133,6 +135,7 @@ func TestRegisterAgent(t *testing.T) {
 				agentRepo.AssertCalled(t, "CountAgentsByUser", test.userID)
 				agentRepo.AssertCalled(t, "CreateAgent", mock.Anything)
 				shipRepo.AssertCalled(t, "CreateShip", mock.Anything)
+				invRepo.AssertCalled(t, "CreateInventory", mock.Anything)
 			} else {
 				assert.ErrorIs(t, err, test.err)
 				var withCode core_errors.WithCode

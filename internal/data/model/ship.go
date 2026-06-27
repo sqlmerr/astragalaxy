@@ -22,13 +22,14 @@ const (
 )
 
 type Ship struct {
-	ID        uuid.UUID
-	AgentID   uuid.UUID
-	Type      ShipType
-	Active    bool
-	SystemX   int
-	SystemY   int
-	Status    ShipStatus
-	CreatedAt time.Time
-	Name      string
+	ID          uuid.UUID
+	AgentID     uuid.UUID
+	Type        ShipType
+	Active      bool
+	SystemX     int
+	SystemY     int
+	Status      ShipStatus
+	CreatedAt   time.Time
+	Name        string
+	InventoryID uuid.UUID
 }

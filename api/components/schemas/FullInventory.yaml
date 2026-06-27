@@ -1,0 +1,16 @@
+type: object
+required:
+  - inventory
+  - resources
+  - items
+properties:
+  inventory:
+    $ref: "./Inventory.yaml"
+  resources:
+    type: array
+    items:
+      $ref: "./Resource.yaml"
+  items:
+    type: array
+    items:
+      $ref: "./Item.yaml"
