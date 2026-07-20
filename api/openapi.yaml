@@ -19,6 +19,8 @@ paths:
     $ref: "paths/agents/my.yaml"
   /api/v1/agents/current:
     $ref: "paths/agents/current.yaml"
+  /api/v1/agents/current/cooldown:
+    $ref: "paths/agents/current-cooldown.yaml"
   /api/v1/agents/{id}/reset-token:
     $ref: "paths/agents/reset-token.yaml"
   /api/v1/ships/my:
@@ -43,12 +45,10 @@ components:
   securitySchemes:
     UserAuth:
       type: http
-      name: User JWT auth
+      description: User JWT auth
       bearerFormat: JWT
       scheme: Bearer
-      in: header
     AgentAuth:
       type: http
-      name: Agent auth
+      description: Agent auth
       scheme: Bearer
-      in: header

@@ -13,7 +13,9 @@ import (
 	"github.com/sqlmerr/astragalaxy/internal/data"
 	database "github.com/sqlmerr/astragalaxy/internal/data/postgres/database/sqlc"
 	pgx_pool "github.com/sqlmerr/astragalaxy/internal/data/postgres/pool/pgx"
+	redis_goredis "github.com/sqlmerr/astragalaxy/internal/data/redis/goredis"
 	agents_repository "github.com/sqlmerr/astragalaxy/internal/data/repository/agents"
+	cooldowns_repository "github.com/sqlmerr/astragalaxy/internal/data/repository/cooldowns"
 	inventories_repository "github.com/sqlmerr/astragalaxy/internal/data/repository/inventories"
 	ships_repository "github.com/sqlmerr/astragalaxy/internal/data/repository/ships"
 	users_repository "github.com/sqlmerr/astragalaxy/internal/data/repository/users"
@@ -50,6 +52,13 @@ func main() {
 		os.Exit(1)
 	}
 
+	redisConfig := redis_goredis.LoadConfigMust()
+	rdb, err := redis_goredis.NewClient(ctx, *redisConfig)
+	if err != nil {
+		log.Error("failed to create redis client", zap.Error(err))
+		os.Exit(1)
+	}
+
 	apiVersionRouter := http_server.NewAPIVersionRouter(http_server.ApiVersionV1)
 
 	log.Debug("Initializing storage")
@@ -58,8 +67,9 @@ func main() {
 	agentRepo := agents_repository.NewAgentRepository(*queries, pool)
 	shipRepo := ships_repository.NewShipRepository(*queries, pool)
 	inventoryRepo := inventories_repository.NewInventoryRepository(*queries, pool)
+	cooldownRepo := cooldowns_repository.NewCooldownRepository(rdb)
 
-	store := data.NewStore(pool, userRepo, agentRepo, shipRepo, inventoryRepo)
+	store := data.NewStore(pool, userRepo, agentRepo, shipRepo, inventoryRepo, cooldownRepo)
 
 	log.Debug("Initializing game logic")
 	authConfig := core_auth.LoadConfigMust()

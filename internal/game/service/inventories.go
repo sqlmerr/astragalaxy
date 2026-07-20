@@ -59,6 +59,10 @@ func (s *Service) TransferResources(
 		return nil
 	}
 
+	if err := s.store.Cooldowns().CheckCooldown(ctx, input.AgentID); err != nil {
+		return fmt.Errorf("cooldown: %w", err)
+	}
+
 	if err := s.checkTransferDirection(ctx, input.AgentID, input.FromInventoryID, input.ToInventoryID); err != nil {
 		return fmt.Errorf("check transfer direction: %w", err)
 	}
@@ -142,6 +146,10 @@ type TransferItemsInput struct {
 func (s *Service) TransferItems(ctx context.Context, input TransferItemsInput) error {
 	if input.FromInventoryID == input.ToInventoryID || input.Items == nil || len(input.Items) == 0 {
 		return nil
+	}
+
+	if err := s.store.Cooldowns().CheckCooldown(ctx, input.AgentID); err != nil {
+		return fmt.Errorf("cooldown: %w", err)
 	}
 
 	if err := s.checkTransferDirection(ctx, input.AgentID, input.FromInventoryID, input.ToInventoryID); err != nil {

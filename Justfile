@@ -5,13 +5,13 @@ set dotenv-path := ".env"
 set dotenv-required := true
 
 env-up:
-    docker compose -f docker-compose.dev.yaml up postgres -d
+    docker compose -f docker-compose.dev.yaml up postgres redis -d
 
 env-down:
-    docker compose -f docker-compose.dev.yaml down postgres
+    docker compose -f docker-compose.dev.yaml down postgres redis
 
 env-rm:
-    docker compose -f docker-compose.dev.yaml down postgres -v && echo "Done"
+    docker compose -f docker-compose.dev.yaml down postgres redis -v && echo "Done"
 
 migrate-create NAME:
     docker compose -f docker-compose.dev.yaml run --rm \

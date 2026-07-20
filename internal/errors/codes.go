@@ -26,6 +26,7 @@ const (
 	CodeNotEnoughResources           ErrorCode = "NOT_ENOUGH_RESOURCES"
 	CodeInventoryIsFull              ErrorCode = "INVENTORY_IS_FULL"
 	CodeItemNotInInventory           ErrorCode = "ITEM_NOT_IN_INVENTORY"
+	CodeCharacterInCooldown          ErrorCode = "CHARACTER_IN_COOLDOWN"
 )
 
 type WithCode struct {

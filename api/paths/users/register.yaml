@@ -24,3 +24,4 @@ post:
             $ref: "../../components/schemas/ErrorResponse.yaml"
     '400':
       $ref: "../../components/responses/DecodeError.yaml"
+  security: []

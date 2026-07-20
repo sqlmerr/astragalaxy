@@ -1,0 +1,15 @@
+type: object
+required:
+  - set_at
+  - duration
+  - action
+properties: 
+  set_at:
+    type: string
+    format: date-time
+  duration:
+    type: integer
+    format: duration
+  action:
+    type: string
+    description: The action for which the cooldown was issued

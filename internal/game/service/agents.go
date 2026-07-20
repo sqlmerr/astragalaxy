@@ -142,3 +142,7 @@ func (s *Service) ResetAgentToken(ctx context.Context, userID uuid.UUID, agentID
 
 	return rawToken, nil
 }
+
+func (s *Service) GetAgentCooldown(ctx context.Context, agentID uuid.UUID) (model.Cooldown, error) {
+	return s.store.Cooldowns().GetCooldown(ctx, agentID)
+}

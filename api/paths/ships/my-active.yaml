@@ -13,5 +13,6 @@ get:
             $ref: "../../components/schemas/Ship.yaml"
     '401':
       $ref: "../../components/responses/InvalidAgentToken.yaml"
+      
   security:
     - AgentAuth: []

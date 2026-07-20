@@ -44,5 +44,11 @@ func (h *AgentsHTTPHandler) Routes(userAuthMiddleware http_middleware.Middleware
 			Handler:    h.ResetAgentToken,
 			Middleware: []http_middleware.Middleware{userAuthMiddleware},
 		},
+		{
+			Method:     http.MethodGet,
+			Path:       "/agents/current/cooldown",
+			Handler:    h.GetCurrentAgentCooldown,
+			Middleware: []http_middleware.Middleware{agentAuthMiddleware},
+		},
 	}
 }

@@ -20,3 +20,4 @@ post:
       description: Invalid credentials
     '400':
       $ref: "../../components/responses/DecodeError.yaml"
+  security: []

@@ -4,7 +4,7 @@ required:
   - x
   - y
   - planets
-  - has_station
+  - pla
 properties:
   name:
     type: string
