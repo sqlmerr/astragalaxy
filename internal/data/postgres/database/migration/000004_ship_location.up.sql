@@ -1,0 +1,5 @@
+CREATE TYPE ship_location AS ENUM ('NONE', 'PLANET', 'WAYPOINT');
+
+ALTER TABLE ships ADD COLUMN location ship_location NOT NULL DEFAULT 'NONE';
+
+ALTER TABLE ships ADD COLUMN location_id INT NOT NULL DEFAULT 0;

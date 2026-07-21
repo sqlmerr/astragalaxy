@@ -16,13 +16,15 @@ func (r *ShipRepositoryImpl) SaveShip(ctx context.Context, ship model.Ship) (mod
 	defer cancel()
 
 	s, err := r.q.SaveShip(ctx, database.SaveShipParams{
-		ID:      ship.ID,
-		Type:    database.ShipType(ship.Type),
-		Active:  ship.Active,
-		SystemX: int32(ship.SystemX),
-		SystemY: int32(ship.SystemY),
-		Status:  database.ShipStatus(ship.Status),
-		Name:    ship.Name,
+		ID:         ship.ID,
+		Type:       database.ShipType(ship.Type),
+		Active:     ship.Active,
+		SystemX:    int32(ship.SystemX),
+		SystemY:    int32(ship.SystemY),
+		Status:     database.ShipStatus(ship.Status),
+		Name:       ship.Name,
+		Location:   database.ShipLocation(ship.Location),
+		LocationID: int32(ship.LocationID),
 	})
 	err = postgres_pool.TranslateError(err)
 	if err != nil {

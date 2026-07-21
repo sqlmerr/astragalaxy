@@ -6,6 +6,7 @@ import (
 	"hash/fnv"
 	"math/big"
 	"math/rand"
+	"strings"
 
 	core_errors "github.com/sqlmerr/astragalaxy/internal/errors"
 )
@@ -74,6 +75,7 @@ func generatePlanet(orbitIndex int, rng *rand.Rand) Planet {
 	}
 
 	return Planet{
+		Name:  generatePlanetName(rng),
 		Type:  pType,
 		Orbit: orbitIndex,
 	}
@@ -82,11 +84,42 @@ func generatePlanet(orbitIndex int, rng *rand.Rand) Planet {
 func generateWaypoints(rng *rand.Rand) []Waypoint {
 	waypoints := make([]Waypoint, 0)
 	roll := rng.Float64()
+	lastID := -1
 	if roll < 0.40 {
-		waypoints = append(waypoints, Waypoint{Type: WaypointStation})
+		waypoints = append(waypoints, Waypoint{ID: lastID + 1, Type: WaypointStation})
+		lastID++
 	}
 
 	return waypoints
+}
+
+var (
+	consonants = []string{"b", "c", "d", "f", "g", "k", "l", "m", "n", "p", "r", "s", "t", "v", "x", "z", "kr", "th", "st", "vr", "xl"}
+	vowels     = []string{"a", "e", "i", "o", "u", "y", "ae", "ia", "io", "ou"}
+	suffixes   = []string{" Prime", " Major", " Minor", " Alpha", " Beta", " Gamma", " I", " II", " III", " IV", " V", " X", "-9"}
+)
+
+func generatePlanetName(rng *rand.Rand) string {
+	var nameBuilder strings.Builder
+
+	numSyllables := rng.Intn(3) + 2
+
+	for i := 0; i < numSyllables; i++ {
+		c := consonants[rng.Intn(len(consonants))]
+		v := vowels[rng.Intn(len(vowels))]
+
+		nameBuilder.WriteString(c)
+		nameBuilder.WriteString(v)
+	}
+
+	name := nameBuilder.String()
+	name = strings.ToUpper(string(name[0])) + name[1:]
+
+	if rng.Float32() < 0.25 {
+		name += suffixes[rng.Intn(len(suffixes))]
+	}
+
+	return name
 }
 
 func (w *WorldGen) GetSystemsInBox(minX, minY, maxX, maxY int) ([]System, error) {

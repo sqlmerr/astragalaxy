@@ -1,5 +1,5 @@
 type: object
-required: [id, agent_id, type, active, system_x, system_y, status, created_at, name]
+required: [id, agent_id, type, active, system_x, system_y, status, created_at, name, location, location_id]
 properties:
   id:
     type: string
@@ -36,3 +36,13 @@ properties:
   inventory_id:
     type: string
     format: uuid
+  location:
+    type: string
+    enum:
+      - NONE
+      - PLANET
+      - WAYPOINT
+    description: Location type
+  location_id:
+    type: integer
+    description: Location ID

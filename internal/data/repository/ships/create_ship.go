@@ -24,6 +24,8 @@ func (r *ShipRepositoryImpl) CreateShip(ctx context.Context, data CreateShip) (m
 		Status:      database.ShipStatus(data.Status),
 		Name:        data.Name,
 		InventoryID: data.InventoryID,
+		Location:    database.ShipLocation(data.Location),
+		LocationID:  int32(data.LocationID),
 	})
 	err = postgres_pool.TranslateError(err)
 

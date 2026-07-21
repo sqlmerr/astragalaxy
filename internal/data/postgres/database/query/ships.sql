@@ -1,6 +1,6 @@
 -- name: CreateShip :one
-INSERT INTO ships (agent_id, type, active, system_x, system_y, status, name, inventory_id)
-VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+INSERT INTO ships (agent_id, type, active, system_x, system_y, status, name, inventory_id, location, location_id)
+VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
 RETURNING *;
 
 -- name: GetActiveShipByAgent :one
@@ -27,6 +27,8 @@ SET
     system_x = $4,
     system_y = $5,
     status = $6,
-    name = $7
+    name = $7,
+    location = $8,
+    location_id = $9
 WHERE id = $1
 RETURNING *;

@@ -15,6 +15,8 @@ type CreateShip struct {
 	Status      model.ShipStatus
 	Name        string
 	InventoryID uuid.UUID
+	Location    model.ShipLocation
+	LocationID  int
 }
 
 func convertModel(m database.Ship) model.Ship {
@@ -29,5 +31,7 @@ func convertModel(m database.Ship) model.Ship {
 		CreatedAt:   m.CreatedAt.Time,
 		Name:        m.Name,
 		InventoryID: m.InventoryID,
+		Location:    model.ShipLocation(m.Location),
+		LocationID:  int(m.LocationID),
 	}
 }

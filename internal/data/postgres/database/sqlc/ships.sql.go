@@ -12,9 +12,9 @@ import (
 )
 
 const createShip = `-- name: CreateShip :one
-INSERT INTO ships (agent_id, type, active, system_x, system_y, status, name, inventory_id)
-VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
-RETURNING id, agent_id, type, active, system_x, system_y, status, created_at, name, inventory_id
+INSERT INTO ships (agent_id, type, active, system_x, system_y, status, name, inventory_id, location, location_id)
+VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+RETURNING id, agent_id, type, active, system_x, system_y, status, created_at, name, inventory_id, location, location_id
 `
 
 type CreateShipParams struct {
@@ -26,6 +26,8 @@ type CreateShipParams struct {
 	Status      ShipStatus
 	Name        string
 	InventoryID uuid.UUID
+	Location    ShipLocation
+	LocationID  int32
 }
 
 func (q *Queries) CreateShip(ctx context.Context, arg CreateShipParams) (Ship, error) {
@@ -38,6 +40,8 @@ func (q *Queries) CreateShip(ctx context.Context, arg CreateShipParams) (Ship, e
 		arg.Status,
 		arg.Name,
 		arg.InventoryID,
+		arg.Location,
+		arg.LocationID,
 	)
 	var i Ship
 	err := row.Scan(
@@ -51,12 +55,14 @@ func (q *Queries) CreateShip(ctx context.Context, arg CreateShipParams) (Ship, e
 		&i.CreatedAt,
 		&i.Name,
 		&i.InventoryID,
+		&i.Location,
+		&i.LocationID,
 	)
 	return i, err
 }
 
 const getActiveShipByAgent = `-- name: GetActiveShipByAgent :one
-SELECT id, agent_id, type, active, system_x, system_y, status, created_at, name, inventory_id
+SELECT id, agent_id, type, active, system_x, system_y, status, created_at, name, inventory_id, location, location_id
 FROM ships
 WHERE agent_id = $1 AND active = true
 `
@@ -75,12 +81,14 @@ func (q *Queries) GetActiveShipByAgent(ctx context.Context, agentID uuid.UUID) (
 		&i.CreatedAt,
 		&i.Name,
 		&i.InventoryID,
+		&i.Location,
+		&i.LocationID,
 	)
 	return i, err
 }
 
 const getShipByID = `-- name: GetShipByID :one
-SELECT id, agent_id, type, active, system_x, system_y, status, created_at, name, inventory_id
+SELECT id, agent_id, type, active, system_x, system_y, status, created_at, name, inventory_id, location, location_id
 FROM ships
 WHERE id = $1
 `
@@ -99,12 +107,14 @@ func (q *Queries) GetShipByID(ctx context.Context, id uuid.UUID) (Ship, error) {
 		&i.CreatedAt,
 		&i.Name,
 		&i.InventoryID,
+		&i.Location,
+		&i.LocationID,
 	)
 	return i, err
 }
 
 const getShipsByAgent = `-- name: GetShipsByAgent :many
-SELECT id, agent_id, type, active, system_x, system_y, status, created_at, name, inventory_id
+SELECT id, agent_id, type, active, system_x, system_y, status, created_at, name, inventory_id, location, location_id
 FROM ships
 WHERE agent_id = $1
 ORDER BY created_at DESC
@@ -130,6 +140,8 @@ func (q *Queries) GetShipsByAgent(ctx context.Context, agentID uuid.UUID) ([]Shi
 			&i.CreatedAt,
 			&i.Name,
 			&i.InventoryID,
+			&i.Location,
+			&i.LocationID,
 		); err != nil {
 			return nil, err
 		}
@@ -149,19 +161,23 @@ SET
     system_x = $4,
     system_y = $5,
     status = $6,
-    name = $7
+    name = $7,
+    location = $8,
+    location_id = $9
 WHERE id = $1
-RETURNING id, agent_id, type, active, system_x, system_y, status, created_at, name, inventory_id
+RETURNING id, agent_id, type, active, system_x, system_y, status, created_at, name, inventory_id, location, location_id
 `
 
 type SaveShipParams struct {
-	ID      uuid.UUID
-	Type    ShipType
-	Active  bool
-	SystemX int32
-	SystemY int32
-	Status  ShipStatus
-	Name    string
+	ID         uuid.UUID
+	Type       ShipType
+	Active     bool
+	SystemX    int32
+	SystemY    int32
+	Status     ShipStatus
+	Name       string
+	Location   ShipLocation
+	LocationID int32
 }
 
 func (q *Queries) SaveShip(ctx context.Context, arg SaveShipParams) (Ship, error) {
@@ -173,6 +189,8 @@ func (q *Queries) SaveShip(ctx context.Context, arg SaveShipParams) (Ship, error
 		arg.SystemY,
 		arg.Status,
 		arg.Name,
+		arg.Location,
+		arg.LocationID,
 	)
 	var i Ship
 	err := row.Scan(
@@ -186,6 +204,8 @@ func (q *Queries) SaveShip(ctx context.Context, arg SaveShipParams) (Ship, error
 		&i.CreatedAt,
 		&i.Name,
 		&i.InventoryID,
+		&i.Location,
+		&i.LocationID,
 	)
 	return i, err
 }

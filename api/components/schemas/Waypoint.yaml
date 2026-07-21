@@ -1,7 +1,11 @@
 type: object
 required:
+  - id
   - type
 properties:
+  id:
+    type: integer
+    description: Waypoint's ID inside system
   type:
     type: string
     description: Waypoint's type

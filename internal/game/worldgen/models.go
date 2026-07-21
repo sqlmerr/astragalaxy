@@ -1,6 +1,10 @@
 package worldgen
 
-import "slices"
+import (
+	"slices"
+
+	"github.com/samber/lo"
+)
 
 type PlanetType string
 
@@ -25,6 +29,7 @@ type Planet struct {
 }
 
 type Waypoint struct {
+	ID   int
 	Type WaypointType
 }
 
@@ -39,6 +44,12 @@ type System struct {
 
 func (s *System) HasStation() bool {
 	return slices.ContainsFunc(s.Waypoints, func(w Waypoint) bool { return w.Type == WaypointStation })
+}
+
+func (s *System) FindWaypoints(waypointType WaypointType) []Waypoint {
+	return lo.Filter(s.Waypoints, func(item Waypoint, _ int) bool {
+		return item.Type == waypointType
+	})
 }
 
 var (

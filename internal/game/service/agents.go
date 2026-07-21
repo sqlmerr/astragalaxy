@@ -12,9 +12,13 @@ import (
 	inventories_repository "github.com/sqlmerr/astragalaxy/internal/data/repository/inventories"
 	ships_repository "github.com/sqlmerr/astragalaxy/internal/data/repository/ships"
 	core_errors "github.com/sqlmerr/astragalaxy/internal/errors"
+	"github.com/sqlmerr/astragalaxy/internal/game/worldgen"
+	core_logger "github.com/sqlmerr/astragalaxy/internal/logger"
+	"go.uber.org/zap"
 )
 
 func (s *Service) RegisterAgent(ctx context.Context, userID uuid.UUID, username string) (model.Agent, string, error) {
+	log := core_logger.FromContext(ctx)
 	var rawToken string
 	var agent model.Agent
 
@@ -38,11 +42,13 @@ func (s *Service) RegisterAgent(ctx context.Context, userID uuid.UUID, username 
 		if err != nil {
 			return fmt.Errorf("failed to generate token")
 		}
+		log.Debug("generated agent token")
 
 		agentCount, err := tx.Agents().CountAgentsByUser(ctx, userID)
 		if err != nil {
 			return fmt.Errorf("count agents: %w", err)
 		}
+		log.Debug("got agents count by user", zap.Int("count", agentCount))
 
 		if agentCount >= 5 {
 			return core_errors.NewWithCode(
@@ -58,6 +64,7 @@ func (s *Service) RegisterAgent(ctx context.Context, userID uuid.UUID, username 
 		if err != nil {
 			return fmt.Errorf("create agent inventory: %w", err)
 		}
+		log.Debug("created agent inventory", zap.String("inventory_id", agentInventory.ID.String()))
 
 		agent, err = tx.Agents().CreateAgent(
 			ctx,
@@ -71,11 +78,15 @@ func (s *Service) RegisterAgent(ctx context.Context, userID uuid.UUID, username 
 		if err != nil {
 			return fmt.Errorf("create agent: %w", err)
 		}
+		log.Debug("created agent", zap.String("agent_id", agent.ID.String()))
 
 		spawnSystem, err := s.worldGen.FindSpawnSystem()
 		if err != nil {
 			return fmt.Errorf("find spawn system: %w", err)
 		}
+		log.Debug("found spawn system", zap.Int("x", spawnSystem.X), zap.Int("y", spawnSystem.Y))
+
+		spawnWaypoint := spawnSystem.FindWaypoints(worldgen.WaypointStation)[0]
 
 		shipInventory, err := tx.Inventories().CreateInventory(ctx, inventories_repository.CreateInventory{
 			MaxItemSlots:      15,
@@ -84,8 +95,9 @@ func (s *Service) RegisterAgent(ctx context.Context, userID uuid.UUID, username 
 		if err != nil {
 			return fmt.Errorf("create ship inventory: %w", err)
 		}
+		log.Debug("created ship inventory", zap.String("inventory_id", shipInventory.ID.String()))
 
-		_, err = tx.Ships().CreateShip(ctx, ships_repository.CreateShip{
+		s, err := tx.Ships().CreateShip(ctx, ships_repository.CreateShip{
 			AgentID:     agent.ID,
 			Type:        model.ShipTypeScout,
 			Active:      true,
@@ -94,10 +106,13 @@ func (s *Service) RegisterAgent(ctx context.Context, userID uuid.UUID, username 
 			Status:      model.ShipStatusDocked,
 			Name:        "ship",
 			InventoryID: shipInventory.ID,
+			Location:    model.ShipLocationWaypoint,
+			LocationID:  spawnWaypoint.ID,
 		})
 		if err != nil {
 			return fmt.Errorf("create ship: %w", err)
 		}
+		log.Debug("created ship", zap.String("ship_id", s.ID.String()))
 
 		return nil
 	})

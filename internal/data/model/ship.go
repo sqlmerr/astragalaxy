@@ -21,6 +21,14 @@ const (
 	ShipStatusDocked ShipStatus = "DOCKED"
 )
 
+type ShipLocation string
+
+const (
+	ShipLocationNone     ShipLocation = "NONE"
+	ShipLocationPlanet   ShipLocation = "PLANET"
+	ShipLocationWaypoint ShipLocation = "WAYPOINT"
+)
+
 type Ship struct {
 	ID          uuid.UUID
 	AgentID     uuid.UUID
@@ -32,4 +40,6 @@ type Ship struct {
 	CreatedAt   time.Time
 	Name        string
 	InventoryID uuid.UUID
+	Location    ShipLocation
+	LocationID  int
 }

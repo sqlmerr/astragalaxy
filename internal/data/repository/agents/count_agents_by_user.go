@@ -12,11 +12,11 @@ func (r *AgentRepositoryImpl) CountAgentsByUser(ctx context.Context, userID uuid
 	ctx, cancel := context.WithTimeout(ctx, r.db.OpTimeout())
 	defer cancel()
 
-	count, err := r.CountAgentsByUser(ctx, userID)
+	count, err := r.q.CountAgentsByUser(ctx, userID)
 	err = postgres_pool.TranslateError(err)
 	if err != nil {
 		return 0, fmt.Errorf("scan: %w", err)
 	}
 
-	return count, nil
+	return int(count), nil
 }

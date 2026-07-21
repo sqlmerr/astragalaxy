@@ -12,6 +12,49 @@ import (
 	"github.com/jackc/pgx/v5/pgtype"
 )
 
+type ShipLocation string
+
+const (
+	ShipLocationNONE     ShipLocation = "NONE"
+	ShipLocationPLANET   ShipLocation = "PLANET"
+	ShipLocationWAYPOINT ShipLocation = "WAYPOINT"
+)
+
+func (e *ShipLocation) Scan(src interface{}) error {
+	switch s := src.(type) {
+	case []byte:
+		*e = ShipLocation(s)
+	case string:
+		*e = ShipLocation(s)
+	default:
+		return fmt.Errorf("unsupported scan type for ShipLocation: %T", src)
+	}
+	return nil
+}
+
+type NullShipLocation struct {
+	ShipLocation ShipLocation
+	Valid        bool // Valid is true if ShipLocation is not NULL
+}
+
+// Scan implements the Scanner interface.
+func (ns *NullShipLocation) Scan(value interface{}) error {
+	if value == nil {
+		ns.ShipLocation, ns.Valid = "", false
+		return nil
+	}
+	ns.Valid = true
+	return ns.ShipLocation.Scan(value)
+}
+
+// Value implements the driver Valuer interface.
+func (ns NullShipLocation) Value() (driver.Value, error) {
+	if !ns.Valid {
+		return nil, nil
+	}
+	return string(ns.ShipLocation), nil
+}
+
 type ShipStatus string
 
 const (
@@ -137,6 +180,8 @@ type Ship struct {
 	CreatedAt   pgtype.Timestamp
 	Name        string
 	InventoryID uuid.UUID
+	Location    ShipLocation
+	LocationID  int32
 }
 
 type User struct {
