@@ -30,7 +30,7 @@ paths:
   /api/v1/ships/my/{id}/rename:
     $ref: "paths/ships/my-rename.yaml"
   /api/v1/ships/my/active/radar:
-    $ref: "paths/ships/my-radar.yaml"
+    $ref: "paths/systems/radar.yaml"
   /api/v1/ships/my/{id}/active:
     $ref: "paths/ships/my-activate.yaml"
   /api/v1/ships/my/active/dock:
@@ -51,6 +51,8 @@ paths:
     $ref: "paths/navigation/planet.yaml"
   /api/v1/navigation/waypoint:
     $ref: "paths/navigation/waypoint.yaml"
+  /api/v1/systems/current:
+    $ref: "paths/systems/current.yaml"
 components:
   securitySchemes:
     UserAuth:

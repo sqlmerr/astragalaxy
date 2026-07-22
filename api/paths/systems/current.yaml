@@ -1,0 +1,16 @@
+get:
+  operationId: getCurrentSystem
+  summary: Get Current System
+  tags:
+    - Systems
+  responses:
+    '200':
+      description: Successfully got current system
+      content: 
+        application/json:
+          schema:
+            $ref: ../../components/schemas/System.yaml
+    '401':
+      $ref: ../../components/responses/InvalidAgentToken.yaml
+  security:
+    - AgentAuth: []

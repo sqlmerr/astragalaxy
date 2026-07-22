@@ -11,7 +11,7 @@ import (
 )
 
 type NavigateWaypointRequest struct {
-	ID int `json:"orbit" validate:"required"`
+	ID *int `json:"id" validate:"required"`
 }
 
 func (h *NavigationHTTPHandler) NavigateWaypoint(w http.ResponseWriter, r *http.Request) {
@@ -27,14 +27,14 @@ func (h *NavigationHTTPHandler) NavigateWaypoint(w http.ResponseWriter, r *http.
 
 	agentID := core_auth.GetAgentIDFromContext(ctx)
 
-	cooldown, err := h.service.NavigateWaypoint(ctx, agentID, req.ID)
+	cooldown, err := h.service.NavigateWaypoint(ctx, agentID, *req.ID)
 	if err != nil {
 		responseHandler.ErrorResponse(err, "Failed to navigate")
 		return
 	}
 
 	response := NavigationResponseDTO{
-		Cooldown: http_dto.CooldownDTO(cooldown),
+		Cooldown: http_dto.ColdownFromModel(cooldown),
 	}
 	responseHandler.JSONResponse(http.StatusOK, response)
 }

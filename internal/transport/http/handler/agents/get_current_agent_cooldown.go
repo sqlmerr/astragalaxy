@@ -21,10 +21,6 @@ func (h *AgentsHTTPHandler) GetCurrentAgentCooldown(w http.ResponseWriter, r *ht
 		return
 	}
 
-	dto := http_dto.CooldownDTO{
-		SetAt:    cooldown.SetAt,
-		Duration: cooldown.Duration,
-		Action:   cooldown.Action,
-	}
+	dto := http_dto.ColdownFromModel(cooldown)
 	responseHandler.JSONResponse(http.StatusOK, dto)
 }

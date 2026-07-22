@@ -34,7 +34,7 @@ func (h *NavigationHTTPHandler) Routes(agentAuthMiddleware http_middleware.Middl
 			Method:     http.MethodPost,
 			Path:       "/navigation/waypoint",
 			Middleware: []http_middleware.Middleware{agentAuthMiddleware},
-			Handler:    h.NavigatePlanet,
+			Handler:    h.NavigateWaypoint,
 		},
 	}
 }

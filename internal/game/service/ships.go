@@ -11,7 +11,6 @@ import (
 	cooldowns_repository "github.com/sqlmerr/astragalaxy/internal/data/repository/cooldowns"
 	core_errors "github.com/sqlmerr/astragalaxy/internal/errors"
 	"github.com/sqlmerr/astragalaxy/internal/game/logic"
-	"github.com/sqlmerr/astragalaxy/internal/game/worldgen"
 	core_logger "github.com/sqlmerr/astragalaxy/internal/logger"
 	"go.uber.org/zap"
 )
@@ -54,20 +53,6 @@ func (s *Service) RenameShip(ctx context.Context, agentID uuid.UUID, shipID uuid
 	}
 
 	return newShip, nil
-}
-
-func (s *Service) ShipRadar(ctx context.Context, agentID uuid.UUID) ([]worldgen.System, error) {
-	ship, err := s.store.Ships().GetActiveShipByAgent(ctx, agentID)
-	if err != nil {
-		return nil, fmt.Errorf("get active ship: %w", err)
-	}
-
-	systems, err := s.worldGen.GetSystemsInBox(ship.SystemX-10, ship.SystemY-10, ship.SystemX+10, ship.SystemY+10)
-	if err != nil {
-		return nil, fmt.Errorf("use radar: %w", err)
-	}
-
-	return systems, nil
 }
 
 func (s *Service) ChangeActiveShip(ctx context.Context, agentID uuid.UUID, newActiveShipID uuid.UUID) error {

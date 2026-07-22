@@ -11,7 +11,7 @@ import (
 )
 
 type NavigatePlanetRequest struct {
-	Orbit int `json:"orbit" validate:"required"`
+	Orbit *int `json:"orbit" validate:"required"`
 }
 
 func (h *NavigationHTTPHandler) NavigatePlanet(w http.ResponseWriter, r *http.Request) {
@@ -27,14 +27,14 @@ func (h *NavigationHTTPHandler) NavigatePlanet(w http.ResponseWriter, r *http.Re
 
 	agentID := core_auth.GetAgentIDFromContext(ctx)
 
-	cooldown, err := h.service.NavigatePlanet(ctx, agentID, req.Orbit)
+	cooldown, err := h.service.NavigatePlanet(ctx, agentID, *req.Orbit)
 	if err != nil {
 		responseHandler.ErrorResponse(err, "Failed to navigate")
 		return
 	}
 
 	response := NavigationResponseDTO{
-		Cooldown: http_dto.CooldownDTO(cooldown),
+		Cooldown: http_dto.ColdownFromModel(cooldown),
 	}
 	responseHandler.JSONResponse(http.StatusOK, response)
 }

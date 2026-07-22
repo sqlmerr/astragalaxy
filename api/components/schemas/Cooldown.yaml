@@ -2,6 +2,7 @@ type: object
 required:
   - set_at
   - duration
+  - duration_seconds
   - action
 properties: 
   set_at:
@@ -10,6 +11,9 @@ properties:
   duration:
     type: integer
     format: duration
+  duration_seconds:
+    type: integer
+    description: Duration in seconds
   action:
     type: string
     description: The action for which the cooldown was issued

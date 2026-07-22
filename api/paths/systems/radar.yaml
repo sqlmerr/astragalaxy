@@ -2,6 +2,7 @@ get:
   operationId: shipRadar
   tags:
     - Ships
+    - Systems
   summary: Use Ship Radar
   description: Use ship radar to get nearest systems
   responses:

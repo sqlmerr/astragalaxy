@@ -21,6 +21,6 @@ func (h *ShipsHTTPHandler) DockMyShip(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	dto := http_dto.CooldownDTO(cooldown)
+	dto := http_dto.ColdownFromModel(cooldown)
 	responseHandler.JSONResponse(http.StatusOK, dto)
 }

@@ -35,7 +35,7 @@ func (h *NavigationHTTPHandler) NavigateWarp(w http.ResponseWriter, r *http.Requ
 	}
 
 	response := NavigationResponseDTO{
-		Cooldown: http_dto.CooldownDTO(cooldown),
+		Cooldown: http_dto.ColdownFromModel(cooldown),
 	}
 	responseHandler.JSONResponse(http.StatusOK, response)
 }

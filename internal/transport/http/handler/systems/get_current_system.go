@@ -1,4 +1,4 @@
-package http_handler_ships
+package http_handler_systems
 
 import (
 	"net/http"
@@ -8,22 +8,18 @@ import (
 	http_response "github.com/sqlmerr/astragalaxy/internal/transport/http/response"
 )
 
-type ShipRadarResponse struct {
-	Data []SystemResponseDTO `json:"data"`
-}
-
-func (h *ShipsHTTPHandler) ShipRadar(w http.ResponseWriter, r *http.Request) {
+func (h *SystemsHTTPHandler) GetCurrentSystem(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	log := core_logger.FromContext(ctx)
 	responseHandler := http_response.NewHTTPResponseHandler(log, w)
 
 	agentID := core_auth.GetAgentIDFromContext(ctx)
-	systems, err := h.service.ShipRadar(ctx, agentID)
+	system, err := h.service.GetCurrentAgentSystem(ctx, agentID)
 	if err != nil {
-		responseHandler.ErrorResponse(err, "Ship radar failed")
+		responseHandler.ErrorResponse(err, "Radar failed")
 		return
 	}
 
-	response := ShipRadarResponse{Data: systemDTOsFromModels(systems)}
+	response := systemDTOFromModel(system)
 	responseHandler.JSONResponse(http.StatusOK, response)
 }
