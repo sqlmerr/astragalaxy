@@ -1,9 +1,12 @@
 package core_errors
 
+import "errors"
+
 type ErrorCode string
 
 const (
 	CodeInternalServerError          ErrorCode = "INTERNAL_SERVER_ERROR"
+	CodeAnomaly                      ErrorCode = "ANOMALY" // something unexpected happened in game
 	CodeUnknown                      ErrorCode = "UNKNOWN"
 	CodeDecodeError                  ErrorCode = "DECODE_ERROR"
 	CodeValidationError              ErrorCode = "VALIDATION_ERROR"
@@ -27,6 +30,12 @@ const (
 	CodeInventoryIsFull              ErrorCode = "INVENTORY_IS_FULL"
 	CodeItemNotInInventory           ErrorCode = "ITEM_NOT_IN_INVENTORY"
 	CodeCharacterInCooldown          ErrorCode = "CHARACTER_IN_COOLDOWN"
+	CodeInvalidWarpPath              ErrorCode = "INVALID_WARP_PATH"
+	CodeAlreadyAtDestination         ErrorCode = "ALREADY_AT_DESTINATION"
+	CodeInvalidCoordinates           ErrorCode = "INVALID_COORDINATES"
+	CodeInvalidShipState             ErrorCode = "INVALID_SHIP_STATE"
+	CodeShipAlreadyInThisState       ErrorCode = "SHIP_ALREADY_IN_THIS_STATE"
+	CodeCannotDock                   ErrorCode = "CANNOT_DOCK_HERE"
 )
 
 type WithCode struct {
@@ -47,4 +56,12 @@ func NewWithCode(code ErrorCode, err error) WithCode {
 		Err:  err,
 		Code: code,
 	}
+}
+
+func IsCode(err error, code ErrorCode) bool {
+	if codeErr, ok := errors.AsType[WithCode](err); ok {
+		return codeErr.Code == code
+	}
+
+	return false
 }

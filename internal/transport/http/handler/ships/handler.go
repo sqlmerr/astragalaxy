@@ -48,5 +48,17 @@ func (h *ShipsHTTPHandler) Routes(agentAuthMiddleware http_middleware.Middleware
 			Handler:    h.ChangeActiveShip,
 			Middleware: []http_middleware.Middleware{agentAuthMiddleware},
 		},
+		{
+			Method:     http.MethodPost,
+			Path:       "/ships/my/active/orbit",
+			Handler:    h.OrbitMyShip,
+			Middleware: []http_middleware.Middleware{agentAuthMiddleware},
+		},
+		{
+			Method:     http.MethodPost,
+			Path:       "/ships/my/active/dock",
+			Handler:    h.DockMyShip,
+			Middleware: []http_middleware.Middleware{agentAuthMiddleware},
+		},
 	}
 }

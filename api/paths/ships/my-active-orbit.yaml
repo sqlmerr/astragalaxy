@@ -1,0 +1,17 @@
+post:
+  operationId: orbitMyShip
+  summary: Orbit Ship
+  description: Orbit active ship
+  tags:
+    - Ships
+  responses:
+    '200':
+      description: Successfully orbitted
+      content: 
+        application/json:
+          schema:
+            $ref: ../../components/schemas/Cooldown.yaml
+    '401':
+      $ref: ../../components/responses/InvalidAgentToken.yaml
+  security:
+    - AgentAuth: []

@@ -86,7 +86,7 @@ func generateWaypoints(rng *rand.Rand) []Waypoint {
 	roll := rng.Float64()
 	lastID := -1
 	if roll < 0.40 {
-		waypoints = append(waypoints, Waypoint{ID: lastID + 1, Type: WaypointStation})
+		waypoints = append(waypoints, Waypoint{ID: lastID + 1, Type: WaypointStation, Dockable: true})
 		lastID++
 	}
 

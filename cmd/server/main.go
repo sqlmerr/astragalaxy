@@ -24,6 +24,7 @@ import (
 	core_logger "github.com/sqlmerr/astragalaxy/internal/logger"
 	http_handler_agents "github.com/sqlmerr/astragalaxy/internal/transport/http/handler/agents"
 	http_handler_inventories "github.com/sqlmerr/astragalaxy/internal/transport/http/handler/inventories"
+	http_handler_navigation "github.com/sqlmerr/astragalaxy/internal/transport/http/handler/navigation"
 	http_handler_ships "github.com/sqlmerr/astragalaxy/internal/transport/http/handler/ships"
 	http_handler_users "github.com/sqlmerr/astragalaxy/internal/transport/http/handler/users"
 	http_middleware "github.com/sqlmerr/astragalaxy/internal/transport/http/middleware"
@@ -92,6 +93,9 @@ func main() {
 
 	inventoriesHandler := http_handler_inventories.NewInventoriesHTTPHandler(*serviceObj)
 	apiVersionRouter.AddRoutes(inventoriesHandler.Routes(agentAuthMiddleware)...)
+
+	navigationHandler := http_handler_navigation.New(*serviceObj)
+	apiVersionRouter.AddRoutes(navigationHandler.Routes(agentAuthMiddleware)...)
 
 	httpConfig := http_server.LoadConfigMust()
 	mux := http.NewServeMux()

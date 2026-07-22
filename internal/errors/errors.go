@@ -10,4 +10,5 @@ var (
 	ErrUnauthorized        = errors.New("unauthorized")
 	ErrAccessDenied        = errors.New("access denied")
 	ErrUnprocessableEntity = errors.New("unprocessable entity")
+	ErrNotModified         = errors.New("not modified")
 )

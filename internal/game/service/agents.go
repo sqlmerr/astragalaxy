@@ -18,7 +18,7 @@ import (
 )
 
 func (s *Service) RegisterAgent(ctx context.Context, userID uuid.UUID, username string) (model.Agent, string, error) {
-	log := core_logger.FromContext(ctx)
+	log := core_logger.TryFromContext(ctx)
 	var rawToken string
 	var agent model.Agent
 
@@ -42,13 +42,17 @@ func (s *Service) RegisterAgent(ctx context.Context, userID uuid.UUID, username 
 		if err != nil {
 			return fmt.Errorf("failed to generate token")
 		}
-		log.Debug("generated agent token")
+		if log != nil {
+			log.Debug("generated agent token")
+		}
 
 		agentCount, err := tx.Agents().CountAgentsByUser(ctx, userID)
 		if err != nil {
 			return fmt.Errorf("count agents: %w", err)
 		}
-		log.Debug("got agents count by user", zap.Int("count", agentCount))
+		if log != nil {
+			log.Debug("got agents count by user", zap.Int("count", agentCount))
+		}
 
 		if agentCount >= 5 {
 			return core_errors.NewWithCode(
@@ -64,7 +68,9 @@ func (s *Service) RegisterAgent(ctx context.Context, userID uuid.UUID, username 
 		if err != nil {
 			return fmt.Errorf("create agent inventory: %w", err)
 		}
-		log.Debug("created agent inventory", zap.String("inventory_id", agentInventory.ID.String()))
+		if log != nil {
+			log.Debug("created agent inventory", zap.String("inventory_id", agentInventory.ID.String()))
+		}
 
 		agent, err = tx.Agents().CreateAgent(
 			ctx,
@@ -78,7 +84,9 @@ func (s *Service) RegisterAgent(ctx context.Context, userID uuid.UUID, username 
 		if err != nil {
 			return fmt.Errorf("create agent: %w", err)
 		}
-		log.Debug("created agent", zap.String("agent_id", agent.ID.String()))
+		if log != nil {
+			log.Debug("created agent", zap.String("agent_id", agent.ID.String()))
+		}
 
 		spawnSystem, err := s.worldGen.FindSpawnSystem()
 		if err != nil {
@@ -86,7 +94,7 @@ func (s *Service) RegisterAgent(ctx context.Context, userID uuid.UUID, username 
 		}
 		log.Debug("found spawn system", zap.Int("x", spawnSystem.X), zap.Int("y", spawnSystem.Y))
 
-		spawnWaypoint := spawnSystem.FindWaypoints(worldgen.WaypointStation)[0]
+		spawnWaypoint := spawnSystem.FindWaypointsByType(worldgen.WaypointStation)[0]
 
 		shipInventory, err := tx.Inventories().CreateInventory(ctx, inventories_repository.CreateInventory{
 			MaxItemSlots:      15,
@@ -95,7 +103,9 @@ func (s *Service) RegisterAgent(ctx context.Context, userID uuid.UUID, username 
 		if err != nil {
 			return fmt.Errorf("create ship inventory: %w", err)
 		}
-		log.Debug("created ship inventory", zap.String("inventory_id", shipInventory.ID.String()))
+		if log != nil {
+			log.Debug("created ship inventory", zap.String("inventory_id", shipInventory.ID.String()))
+		}
 
 		s, err := tx.Ships().CreateShip(ctx, ships_repository.CreateShip{
 			AgentID:     agent.ID,
@@ -112,7 +122,9 @@ func (s *Service) RegisterAgent(ctx context.Context, userID uuid.UUID, username 
 		if err != nil {
 			return fmt.Errorf("create ship: %w", err)
 		}
-		log.Debug("created ship", zap.String("ship_id", s.ID.String()))
+		if log != nil {
+			log.Debug("created ship", zap.String("ship_id", s.ID.String()))
+		}
 
 		return nil
 	})

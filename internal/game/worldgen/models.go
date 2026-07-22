@@ -29,8 +29,9 @@ type Planet struct {
 }
 
 type Waypoint struct {
-	ID   int
-	Type WaypointType
+	ID       int
+	Type     WaypointType
+	Dockable bool
 }
 
 type System struct {
@@ -46,10 +47,19 @@ func (s *System) HasStation() bool {
 	return slices.ContainsFunc(s.Waypoints, func(w Waypoint) bool { return w.Type == WaypointStation })
 }
 
-func (s *System) FindWaypoints(waypointType WaypointType) []Waypoint {
+func (s *System) FindWaypointsByType(waypointType WaypointType) []Waypoint {
 	return lo.Filter(s.Waypoints, func(item Waypoint, _ int) bool {
 		return item.Type == waypointType
 	})
+}
+
+func (s *System) FindWaypointByID(id int) *Waypoint {
+	for _, w := range s.Waypoints {
+		if w.ID == id {
+			return &w
+		}
+	}
+	return nil
 }
 
 var (

@@ -62,6 +62,9 @@ func (h *HTTPResponseHandler) ErrorResponse(err error, msg string) {
 	case errors.Is(err, core_errors.ErrUnprocessableEntity):
 		statusCode = http.StatusUnprocessableEntity
 		logFunc = h.log.Warn
+	case errors.Is(err, core_errors.ErrNotModified):
+		statusCode = http.StatusNotModified
+		logFunc = h.log.Debug
 	default:
 		statusCode = http.StatusInternalServerError
 		logFunc = h.log.Error
@@ -71,9 +74,8 @@ func (h *HTTPResponseHandler) ErrorResponse(err error, msg string) {
 	if statusCode == http.StatusInternalServerError {
 		err = core_errors.NewWithCode(core_errors.CodeInternalServerError, core_errors.ErrInternal)
 	}
-	var errorWithCode core_errors.WithCode
 	var errorCode core_errors.ErrorCode
-	if errors.As(err, &errorWithCode) {
+	if errorWithCode, ok := errors.AsType[core_errors.WithCode](err); ok {
 		errorCode = errorWithCode.Code
 	} else {
 		errorCode = core_errors.CodeUnknown

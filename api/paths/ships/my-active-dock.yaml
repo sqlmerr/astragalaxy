@@ -1,0 +1,17 @@
+post:
+  operationId: dockMyShip
+  summary: Dock Ship
+  description: Dock active ship
+  tags:
+    - Ships
+  responses:
+    '200':
+      description: Successfully docked
+      content: 
+        application/json:
+          schema:
+            $ref: ../../components/schemas/Cooldown.yaml
+    '401':
+      $ref: ../../components/responses/InvalidAgentToken.yaml
+  security:
+    - AgentAuth: []

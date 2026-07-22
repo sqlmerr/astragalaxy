@@ -33,6 +33,10 @@ paths:
     $ref: "paths/ships/my-radar.yaml"
   /api/v1/ships/my/{id}/active:
     $ref: "paths/ships/my-activate.yaml"
+  /api/v1/ships/my/active/dock:
+    $ref: "paths/ships/my-active-dock.yaml"
+  /api/v1/ships/my/active/orbit:
+    $ref: "paths/ships/my-active-orbit.yaml"
   /api/v1/inventories/my:
     $ref: "paths/inventories/my.yaml"
   /api/v1/inventories/my/ships/{id}:
@@ -41,6 +45,12 @@ paths:
     $ref: "paths/inventories/transfer-resources.yaml"
   /api/v1/inventories/transfer-items:
     $ref: "paths/inventories/transfer-items.yaml"
+  /api/v1/navigation/warp:
+    $ref: "paths/navigation/warp.yaml"
+  /api/v1/navigation/planet:
+    $ref: "paths/navigation/planet.yaml"
+  /api/v1/navigation/waypoint:
+    $ref: "paths/navigation/waypoint.yaml"
 components:
   securitySchemes:
     UserAuth:

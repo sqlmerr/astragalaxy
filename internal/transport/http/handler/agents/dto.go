@@ -29,9 +29,3 @@ func agentDTOsFromModels(m []model.Agent) []AgentResponseDTO {
 		return agentDTOFromModel(i)
 	})
 }
-
-type CooldownDTO struct {
-	SetAt    time.Time     `json:"set_at"`
-	Duration time.Duration `json:"duration"`
-	Action   string        `json:"action"`
-}

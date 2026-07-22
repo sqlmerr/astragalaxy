@@ -1,0 +1,11 @@
+type: object
+required:
+  - x
+  - y
+properties: 
+  x:
+    type: integer
+    description: System X coordinate
+  y:
+    type: integer
+    description: System Y coordinate

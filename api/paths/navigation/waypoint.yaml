@@ -1,0 +1,29 @@
+post:
+  operationId: navigateWaypoint
+  tags:
+    - Navigation
+  summary: Navigate Waypoint
+  description: Navigate to waypoint in system
+  requestBody:
+    required: true
+    content: 
+      application/json:
+        schema:
+          $ref: "../../components/schemas/NavigateWaypointRequest.yaml"
+  responses:
+    '200':
+      description: Successfully navigated
+      content: 
+        application/json:
+          schema:
+            $ref: "../../components/schemas/NavigationResponse.yaml"
+    '401':
+      $ref: "../../components/responses/InvalidAgentToken.yaml"
+    '422':
+      description: Invalid coordinates
+      content: 
+        application/json:
+          schema:
+            $ref: "../../components/schemas/ErrorResponse.yaml"
+  security:
+    - AgentAuth: []
