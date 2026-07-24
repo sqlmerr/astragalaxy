@@ -62,6 +62,15 @@ func (s *System) FindWaypointByID(id int) *Waypoint {
 	return nil
 }
 
+func (s *System) FindPlanetByOrbit(orbit int) *Planet {
+	for _, p := range s.Planets {
+		if p.Orbit == orbit {
+			return &p
+		}
+	}
+	return nil
+}
+
 var (
 	namePrefixes = []string{"Alpha", "Proxima", "Sirius", "Vega", "Rigel", "Arcturus", "Betelgeuse", "Kepler", "Gliese"}
 	nameSuffixes = []string{"Prime", "Major", "Minor", "B", "C", "Nexus", "Void", "Epsilon", "Zeta"}

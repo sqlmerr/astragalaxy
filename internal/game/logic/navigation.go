@@ -14,7 +14,7 @@ func NavigateWarp(ship model.Ship, newSystem worldgen.System) (model.Ship, time.
 	if ship.Status != model.ShipStatusOrbit {
 		return model.Ship{}, 0, core_errors.NewWithCode(
 			core_errors.CodeInvalidShipState,
-			fmt.Errorf("ship must be in orbit: %w", core_errors.ErrUnprocessableEntity),
+			fmt.Errorf("ship must be in orbit state: %w", core_errors.ErrUnprocessableEntity),
 		)
 	}
 
@@ -37,7 +37,7 @@ func NavigateWarp(ship model.Ship, newSystem worldgen.System) (model.Ship, time.
 			fmt.Errorf(
 				"warp path length: %d is invalid (max=10): %w",
 				int(distance),
-				core_errors.ErrUnprocessableEntity,
+				core_errors.ErrInvalidArgument,
 			),
 		)
 	}
@@ -56,31 +56,27 @@ func NavigatePlanet(ship model.Ship, system worldgen.System, orbitIndex int) (mo
 	if ship.Status != model.ShipStatusOrbit {
 		return model.Ship{}, 0, core_errors.NewWithCode(
 			core_errors.CodeInvalidShipState,
-			fmt.Errorf("ship must be in orbit: %w", core_errors.ErrUnprocessableEntity),
+			fmt.Errorf("ship must be in orbit state: %w", core_errors.ErrUnprocessableEntity),
 		)
 	}
 
 	if ship.Location == model.ShipLocationPlanet && ship.LocationID == orbitIndex {
 		return model.Ship{}, 0, core_errors.NewWithCode(
 			core_errors.CodeAlreadyAtDestination,
-			fmt.Errorf("already at destination: %w", core_errors.ErrUnprocessableEntity),
+			fmt.Errorf("already at destination: %w", core_errors.ErrNotModified),
 		)
 	}
 
-	var planet worldgen.Planet
-	flag := false
-	for _, p := range system.Planets {
-		if p.Orbit == orbitIndex {
-			planet = p
-			flag = true
-			break
-		}
-	}
+	planet := system.FindPlanetByOrbit(orbitIndex)
 
-	if !flag {
+	if planet == nil {
 		return model.Ship{}, 0, core_errors.NewWithCode(
 			core_errors.CodeInvalidCoordinates,
-			fmt.Errorf("planet with orbit=%d: %w", orbitIndex, core_errors.ErrNotFound),
+			fmt.Errorf(
+				"planet with orbit=%d: %w",
+				orbitIndex,
+				core_errors.ErrNotFound,
+			),
 		)
 	}
 
@@ -97,14 +93,14 @@ func NavigateWaypoint(ship model.Ship, system worldgen.System, waypointID int) (
 	if ship.Status != model.ShipStatusOrbit {
 		return model.Ship{}, 0, core_errors.NewWithCode(
 			core_errors.CodeInvalidShipState,
-			fmt.Errorf("ship must be in orbit: %w", core_errors.ErrUnprocessableEntity),
+			fmt.Errorf("ship must be in orbit state: %w", core_errors.ErrUnprocessableEntity),
 		)
 	}
 
 	if ship.Location == model.ShipLocationWaypoint && ship.LocationID == waypointID {
 		return model.Ship{}, 0, core_errors.NewWithCode(
 			core_errors.CodeAlreadyAtDestination,
-			fmt.Errorf("already at destination: %w", core_errors.ErrUnprocessableEntity),
+			fmt.Errorf("already at destination: %w", core_errors.ErrNotModified),
 		)
 	}
 
