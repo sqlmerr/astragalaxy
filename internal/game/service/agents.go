@@ -92,7 +92,9 @@ func (s *Service) RegisterAgent(ctx context.Context, userID uuid.UUID, username 
 		if err != nil {
 			return fmt.Errorf("find spawn system: %w", err)
 		}
-		log.Debug("found spawn system", zap.Int("x", spawnSystem.X), zap.Int("y", spawnSystem.Y))
+		if log != nil {
+			log.Debug("found spawn system", zap.Int("x", spawnSystem.X), zap.Int("y", spawnSystem.Y))
+		}
 
 		spawnWaypoint := spawnSystem.FindWaypointsByType(worldgen.WaypointStation)[0]
 

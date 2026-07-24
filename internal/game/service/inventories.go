@@ -4,10 +4,12 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"time"
 
 	"github.com/google/uuid"
 	"github.com/sqlmerr/astragalaxy/internal/data"
 	"github.com/sqlmerr/astragalaxy/internal/data/model"
+	cooldowns_repository "github.com/sqlmerr/astragalaxy/internal/data/repository/cooldowns"
 	core_errors "github.com/sqlmerr/astragalaxy/internal/errors"
 	core_logger "github.com/sqlmerr/astragalaxy/internal/logger"
 	"go.uber.org/zap"
@@ -112,6 +114,15 @@ func (s *Service) TransferResources(
 			}
 		}
 
+		_, err := tx.Cooldowns().SetCooldown(ctx, cooldowns_repository.SetCooldown{
+			AgentID:  input.AgentID,
+			Duration: 5 * time.Second,
+			Action:   "resource_transfer",
+		})
+		if err != nil {
+			return fmt.Errorf("set cooldown: %w", err)
+		}
+
 		return nil
 	})
 
@@ -202,6 +213,15 @@ func (s *Service) TransferItems(ctx context.Context, input TransferItemsInput) e
 			if err != nil {
 				return fmt.Errorf("save item: %w", err)
 			}
+		}
+
+		_, err := tx.Cooldowns().SetCooldown(ctx, cooldowns_repository.SetCooldown{
+			AgentID:  input.AgentID,
+			Duration: 5 * time.Second,
+			Action:   "resource_transfer",
+		})
+		if err != nil {
+			return fmt.Errorf("set cooldown: %w", err)
 		}
 
 		return nil

@@ -182,7 +182,11 @@ func TestTransferResources(t *testing.T) {
 			shipRepo.On("GetShip", shipOne).Return(model.Ship{ID: shipOne, AgentID: agentOne, InventoryID: shipOneInv, Active: true}, nil)
 			shipRepo.On("GetShip", shipTwo).Return(model.Ship{ID: shipTwo, AgentID: agentTwo, InventoryID: shipTwoInv, Active: true}, nil)
 
-			store := &mockStore{ships: shipRepo, inventories: r}
+			cooldownRepo := new(mockCooldownRepository)
+			cooldownRepo.On("CheckCooldown", mock.Anything).Return(nil)
+			cooldownRepo.On("SetCooldown", mock.Anything).Return(model.Cooldown{}, nil)
+
+			store := &mockStore{ships: shipRepo, inventories: r, cooldowns: cooldownRepo}
 			service := Service{store: store}
 			err := service.TransferResources(t.Context(), TransferResourcesInput{
 				AgentID:         test.agentID,
@@ -352,7 +356,11 @@ func TestTransferItems(t *testing.T) {
 			shipRepo.On("GetShip", shipOne).Return(model.Ship{ID: shipOne, AgentID: agentOne, InventoryID: shipOneInv, Active: true}, nil)
 			shipRepo.On("GetShip", shipTwo).Return(model.Ship{ID: shipTwo, AgentID: agentTwo, InventoryID: shipTwoInv, Active: true}, nil)
 
-			store := &mockStore{ships: shipRepo, inventories: r}
+			cooldownRepo := new(mockCooldownRepository)
+			cooldownRepo.On("CheckCooldown", mock.Anything).Return(nil)
+			cooldownRepo.On("SetCooldown", mock.Anything).Return(model.Cooldown{}, nil)
+
+			store := &mockStore{ships: shipRepo, inventories: r, cooldowns: cooldownRepo}
 			service := Service{store: store}
 			err := service.TransferItems(t.Context(), TransferItemsInput{
 				AgentID:         test.agentID,

@@ -8,7 +8,9 @@ import (
 	"github.com/google/uuid"
 	"github.com/sqlmerr/astragalaxy/internal/data/model"
 	agents_repository "github.com/sqlmerr/astragalaxy/internal/data/repository/agents"
+	cooldowns_repository "github.com/sqlmerr/astragalaxy/internal/data/repository/cooldowns"
 	core_errors "github.com/sqlmerr/astragalaxy/internal/errors"
+	"github.com/sqlmerr/astragalaxy/internal/game/worldgen"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 )
@@ -50,6 +52,25 @@ func (m *mockAgentRepository) ChangeAgentToken(_ context.Context, agentID uuid.U
 func (m *mockAgentRepository) CountAgentsByUser(_ context.Context, userID uuid.UUID) (int, error) {
 	args := m.Called(userID)
 	return args.Int(0), args.Error(1)
+}
+
+type mockCooldownRepository struct {
+	mock.Mock
+}
+
+func (m *mockCooldownRepository) GetCooldown(_ context.Context, agentID uuid.UUID) (model.Cooldown, error) {
+	args := m.Called(agentID)
+	return args.Get(0).(model.Cooldown), args.Error(1)
+}
+
+func (m *mockCooldownRepository) SetCooldown(_ context.Context, data cooldowns_repository.SetCooldown) (model.Cooldown, error) {
+	args := m.Called(data)
+	return args.Get(0).(model.Cooldown), args.Error(1)
+}
+
+func (m *mockCooldownRepository) CheckCooldown(_ context.Context, agentID uuid.UUID) error {
+	args := m.Called(agentID)
+	return args.Error(0)
 }
 
 func TestRegisterAgent(t *testing.T) {
@@ -124,8 +145,10 @@ func TestRegisterAgent(t *testing.T) {
 			invRepo := new(mockInventoryRepository)
 			invRepo.On("CreateInventory", mock.Anything).Return(model.Inventory{}, nil)
 
+			worldGen := worldgen.New(1)
+
 			store := mockStore{agents: agentRepo, ships: shipRepo, inventories: invRepo}
-			service := Service{store: &store}
+			service := Service{store: &store, worldGen: *worldGen}
 
 			_, token, err := service.RegisterAgent(t.Context(), test.userID, test.username)
 			if test.err == nil {
