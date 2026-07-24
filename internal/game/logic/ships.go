@@ -9,6 +9,20 @@ import (
 	"github.com/sqlmerr/astragalaxy/internal/game/worldgen"
 )
 
+func RenameShip(ship model.Ship, name string) model.Ship {
+	ship.Name = name
+	return ship
+}
+
+func ChangeActiveShip(oldActiveShip *model.Ship, newActiveShip model.Ship) (model.Ship, *model.Ship) {
+	if oldActiveShip != nil {
+		oldActiveShip.Active = false
+	}
+	newActiveShip.Active = true
+
+	return newActiveShip, oldActiveShip
+}
+
 func OrbitShip(ship model.Ship) (model.Ship, time.Duration, error) {
 	if ship.Status == model.ShipStatusOrbit {
 		return model.Ship{}, 0, core_errors.NewWithCode(

@@ -45,8 +45,8 @@ func (s *Service) RenameShip(ctx context.Context, agentID uuid.UUID, shipID uuid
 			fmt.Errorf("this ship does not belong to agent: %w", core_errors.ErrAccessDenied),
 		)
 	}
+	ship = logic.RenameShip(ship, newShipName)
 
-	ship.Name = newShipName
 	newShip, err := s.store.Ships().SaveShip(ctx, ship)
 	if err != nil {
 		return model.Ship{}, fmt.Errorf("rename ship: %w", err)
@@ -57,7 +57,8 @@ func (s *Service) RenameShip(ctx context.Context, agentID uuid.UUID, shipID uuid
 
 func (s *Service) ChangeActiveShip(ctx context.Context, agentID uuid.UUID, newActiveShipID uuid.UUID) error {
 	err := s.store.ExecTx(ctx, func(tx data.Store) error {
-		ship, oldActiveErr := tx.Ships().GetActiveShipByAgent(ctx, agentID)
+		oldActiveShip, oldActiveErr := tx.Ships().GetActiveShipByAgent(ctx, agentID)
+		var oldActiveShipToSave *model.Ship
 		if oldActiveErr != nil {
 			if !errors.Is(oldActiveErr, core_errors.ErrNotFound) {
 				return fmt.Errorf("get active ship: %w", oldActiveErr)
@@ -66,6 +67,8 @@ func (s *Service) ChangeActiveShip(ctx context.Context, agentID uuid.UUID, newAc
 			if log != nil {
 				log.Warn("agent does not have active ship", zap.String("agent_id", agentID.String()))
 			}
+		} else {
+			oldActiveShipToSave = &oldActiveShip
 		}
 		newActiveShip, err := tx.Ships().GetShip(ctx, newActiveShipID)
 		if err != nil {
@@ -78,15 +81,15 @@ func (s *Service) ChangeActiveShip(ctx context.Context, agentID uuid.UUID, newAc
 				fmt.Errorf("new active ship does not belong to agent: %w", core_errors.ErrAccessDenied),
 			)
 		}
-		if oldActiveErr == nil {
-			ship.Active = false
-			_, err = tx.Ships().SaveShip(ctx, ship)
+		newActiveShip, oldActiveShipToSave = logic.ChangeActiveShip(oldActiveShipToSave, newActiveShip)
+
+		if oldActiveShipToSave != nil {
+			_, err = tx.Ships().SaveShip(ctx, *oldActiveShipToSave)
 			if err != nil {
 				return fmt.Errorf("save old ship: %w", err)
 			}
 		}
 
-		newActiveShip.Active = true
 		_, err = tx.Ships().SaveShip(ctx, newActiveShip)
 		if err != nil {
 			return fmt.Errorf("save new active ship: %w", err)

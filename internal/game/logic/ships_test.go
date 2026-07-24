@@ -3,11 +3,36 @@ package logic
 import (
 	"testing"
 
+	"github.com/google/uuid"
 	"github.com/sqlmerr/astragalaxy/internal/data/model"
 	core_errors "github.com/sqlmerr/astragalaxy/internal/errors"
 	"github.com/sqlmerr/astragalaxy/internal/game/worldgen"
 	"github.com/stretchr/testify/assert"
 )
+
+func TestRenameShip(t *testing.T) {
+	agentID := uuid.New()
+	ship := model.Ship{AgentID: agentID, Name: "old-name"}
+
+	renamedShip := RenameShip(ship, "new-name")
+	assert.Equal(t, "new-name", renamedShip.Name)
+}
+
+func TestChangeActiveShip(t *testing.T) {
+	agentID := uuid.New()
+	oldActiveShip := model.Ship{AgentID: agentID, Active: true}
+	newActiveShip := model.Ship{AgentID: agentID}
+
+	newActiveShip, oldActiveShipToSave := ChangeActiveShip(&oldActiveShip, newActiveShip)
+	assert.True(t, newActiveShip.Active)
+	if assert.NotNil(t, oldActiveShipToSave) {
+		assert.False(t, oldActiveShipToSave.Active)
+	}
+
+	newActiveShip, oldActiveShipToSave = ChangeActiveShip(nil, model.Ship{AgentID: agentID})
+	assert.True(t, newActiveShip.Active)
+	assert.Nil(t, oldActiveShipToSave)
+}
 
 func TestOrbitShip(t *testing.T) {
 	ship1 := model.Ship{

@@ -11,6 +11,7 @@ import (
 	"github.com/sqlmerr/astragalaxy/internal/data/model"
 	cooldowns_repository "github.com/sqlmerr/astragalaxy/internal/data/repository/cooldowns"
 	core_errors "github.com/sqlmerr/astragalaxy/internal/errors"
+	"github.com/sqlmerr/astragalaxy/internal/game/logic"
 	core_logger "github.com/sqlmerr/astragalaxy/internal/logger"
 	"go.uber.org/zap"
 )
@@ -87,27 +88,22 @@ func (s *Service) TransferResources(
 				return fmt.Errorf("get resource: %w", err)
 			}
 
-			if resourceFrom.Amount < amount {
-				return core_errors.NewWithCode(
-					core_errors.CodeNotEnoughResources,
-					fmt.Errorf("have: %d. Must be at least %d: %w", resourceFrom.Amount, amount, core_errors.ErrUnprocessableEntity),
-				)
-			}
-
 			resourceTo, err := tx.Inventories().GetResource(ctx, input.ToInventoryID, resourceType)
 			if err != nil {
 				return fmt.Errorf("get resource: %w", err)
 			}
 
 			// TODO: check resource volume
+			resourceFrom, resourceTo, err = logic.TransferResource(resourceFrom, resourceTo, amount)
+			if err != nil {
+				return err
+			}
 
-			resourceTo.Amount += amount
 			_, err = tx.Inventories().SaveResource(ctx, resourceTo)
 			if err != nil {
 				return fmt.Errorf("save resource: %w", err)
 			}
 
-			resourceFrom.Amount -= amount
 			_, err = tx.Inventories().SaveResource(ctx, resourceFrom)
 			if err != nil {
 				return fmt.Errorf("save resource: %w", err)
@@ -177,17 +173,8 @@ func (s *Service) TransferItems(ctx context.Context, input TransferItemsInput) e
 		return fmt.Errorf("get inventory items: %w", err)
 	}
 
-	totalItemAmount := len(toInventoryItems) + len(input.Items)
-	if totalItemAmount > toInventory.MaxItemSlots {
-		return core_errors.NewWithCode(
-			core_errors.CodeInventoryIsFull,
-			fmt.Errorf(
-				"to many items: %d. Maximum: %d: %w",
-				totalItemAmount,
-				toInventory.MaxItemSlots,
-				core_errors.ErrUnprocessableEntity,
-			),
-		)
+	if err := logic.CheckItemCapacity(toInventory, len(toInventoryItems), len(input.Items)); err != nil {
+		return err
 	}
 
 	err = s.store.ExecTx(ctx, func(tx data.Store) error {
@@ -197,18 +184,11 @@ func (s *Service) TransferItems(ctx context.Context, input TransferItemsInput) e
 				return fmt.Errorf("get item: %w", err)
 			}
 
-			if item.InventoryID != input.FromInventoryID {
-				return core_errors.NewWithCode(
-					core_errors.CodeItemNotInInventory, fmt.Errorf(
-						"item with id='%s' does not belong to the inventory with id='%s': %w",
-						item.ID,
-						input.FromInventoryID,
-						core_errors.ErrUnprocessableEntity,
-					),
-				)
+			item, err = logic.TransferItem(item, input.FromInventoryID, toInventory.ID)
+			if err != nil {
+				return err
 			}
 
-			item.InventoryID = toInventory.ID
 			_, err = tx.Inventories().SaveItem(ctx, item)
 			if err != nil {
 				return fmt.Errorf("save item: %w", err)
