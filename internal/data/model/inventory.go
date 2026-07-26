@@ -16,6 +16,21 @@ type Inventory struct {
 type ResourceType string
 type ItemType string
 
+const (
+	ResourceIron        ResourceType = "IRON"
+	ResourceCrystal     ResourceType = "CRYSTAL"
+	ResourceCarbon      ResourceType = "CARBON"
+	ResourceIce         ResourceType = "ICE"
+	ResourceCopper      ResourceType = "COPPER"
+	ResourceTitanium    ResourceType = "TITANIUM"
+	ResourceSilicon     ResourceType = "SILICON"
+	ResourceHelium      ResourceType = "HELIUM"
+	ResourceUranium     ResourceType = "URANIUM"
+	ResourceIridium     ResourceType = "IRIDIUM"
+	ResourceDarkMatter  ResourceType = "DARK_MATTER"
+	ResourceBioDisputes ResourceType = "BIO_DISPUTES"
+)
+
 type Resource struct {
 	InventoryID  uuid.UUID
 	ResourceType ResourceType

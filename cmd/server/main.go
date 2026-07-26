@@ -124,6 +124,7 @@ func main() {
 		http_middleware.Logger(log),
 		http_middleware.Panic(),
 		http_middleware.Trace(),
+		http_middleware.CORS([]string{"*"}),
 	)
 	httpServer.RegisterRouters(apiVersionRouter)
 
