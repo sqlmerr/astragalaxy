@@ -9,6 +9,7 @@ interface AgentCardProps {
   isActive?: boolean
   onClick?: () => void
   onInfo?: () => void
+  withInfo?: boolean
 }
 
 function getInitials(username: string): string {
@@ -20,7 +21,13 @@ function getInitials(username: string): string {
     .join("")
 }
 
-export function AgentCard({ agent, isActive, onClick, onInfo }: AgentCardProps) {
+export function AgentCard({
+  agent,
+  isActive,
+  onClick,
+  onInfo,
+  withInfo,
+}: AgentCardProps) {
   return (
     <article
       className={`group border p-3 transition-colors ${
@@ -41,16 +48,18 @@ export function AgentCard({ agent, isActive, onClick, onInfo }: AgentCardProps) 
             </h3>
             <div className="flex items-center gap-1.5">
               {isActive ? <Badge>Active</Badge> : null}
-              <button
-                type="button"
-                className="rounded-md p-1 text-muted-foreground transition-colors hover:text-foreground"
-                onClick={(e) => {
-                  e.stopPropagation()
-                  onInfo?.()
-                }}
-              >
-                <Info className="size-3.5" />
-              </button>
+              {withInfo ? (
+                <button
+                  type="button"
+                  className="rounded-md p-1 text-muted-foreground transition-colors hover:text-foreground"
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    onInfo?.()
+                  }}
+                >
+                  <Info className="size-3.5" />
+                </button>
+              ) : null}
             </div>
           </div>
           <p className="mt-1 flex items-center gap-1.5 truncate text-[11px] text-muted-foreground">

@@ -35,3 +35,8 @@ export type SchemaNavigationResponse =
 export type SchemaResetAgentTokenResponse =
   components["schemas"]["ResetAgentTokenResponse"]
 export type SchemaErrorResponse = components["schemas"]["ErrorResponse"]
+
+export interface SystemExtended {
+  system: SchemaSystem
+  agents: SchemaAgent[]
+}

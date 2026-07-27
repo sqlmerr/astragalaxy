@@ -9,7 +9,7 @@ import {
   GalaxyMap,
   type GalaxyMapRef,
 } from "@/components/features/map/galaxy-map"
-import type { SchemaSystem } from "@/api/types"
+import type { SchemaSystem, SystemExtended } from "@/api/types"
 import { useRef, useState } from "react"
 import { SystemPanel } from "@/components/features/map/system-panel"
 
@@ -17,7 +17,7 @@ export function StarMapLayout() {
   const { data: user } = useMeQuery()
   const { signOut } = useAuth()
   const navigate = useNavigate()
-  const [selectedSystem, setSelectedSystem] = useState<SchemaSystem | null>(
+  const [selectedSystem, setSelectedSystem] = useState<SystemExtended | null>(
     null
   )
   const galaxyMapRef = useRef<GalaxyMapRef>(null)
@@ -48,7 +48,7 @@ export function StarMapLayout() {
           }}
           onCenterCamera={() =>
             selectedSystem &&
-            galaxyMapRef.current?.centerOnSystem(selectedSystem)
+            galaxyMapRef.current?.centerOnSystem(selectedSystem.system)
           }
         />
 

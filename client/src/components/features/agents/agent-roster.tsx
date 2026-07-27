@@ -101,6 +101,7 @@ export function AgentRoster() {
                       isActive={agent.id === currentAgentID}
                       onClick={() => setCurrentAgentID(agent.id)}
                       onInfo={() => setSelectedAgent(agent)}
+                      withInfo={true}
                     />
                   ))}
                 </ScrollArea>

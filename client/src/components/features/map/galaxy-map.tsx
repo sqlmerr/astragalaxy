@@ -6,6 +6,7 @@ import {
   Graphics,
   Point,
   Rectangle,
+  BitmapText,
   Text,
 } from "pixi.js"
 import {
@@ -18,22 +19,28 @@ import {
 } from "react"
 import { ViewportScene } from "./viewport"
 import { Viewport } from "pixi-viewport"
-import { type SchemaSystem } from "@/api/types"
+import {
+  type SchemaAgent,
+  type SchemaSystem,
+  type SystemExtended,
+} from "@/api/types"
 import { useActiveShipQuery, useShipRadarQuery } from "@/api/hooks"
 import { useAuth } from "../auth/auth-provider"
 import { toast } from "@/components/ui/toast"
+import { useAgentsWithShips } from "../auth/use-agents-with-ships"
 
 extend({
   Container,
   Graphics,
   Viewport,
+  BitmapText,
   Text,
 })
 
 const CELL_SIZE: number = 100
 
 interface GalaxyMapProps {
-  onSystemClick: (system: SchemaSystem) => void
+  onSystemClick: (system: SystemExtended) => void
   ref: RefObject<GalaxyMapRef | null>
 }
 
@@ -61,7 +68,7 @@ export function GalaxyMap({ onSystemClick, ref }: GalaxyMapProps) {
     },
   }))
 
-  const { currentAgentID, isReady, agents, currentAgent } = useAuth()
+  const { currentAgentID, isReady, agents } = useAuth()
 
   const { data, isPending, isError } = useShipRadarQuery(
     currentAgentID || undefined
@@ -73,7 +80,33 @@ export function GalaxyMap({ onSystemClick, ref }: GalaxyMapProps) {
     isError: isShipError,
   } = useActiveShipQuery(currentAgentID || undefined)
 
+  const {
+    data: agentsWithShips,
+    isPending: isAgentsPending,
+    isError: isAgentsError,
+  } = useAgentsWithShips()
+
   const systems: SchemaSystem[] = data?.data ?? []
+
+  const agentLocations: Map<string, SchemaAgent[]> = new Map()
+  for (const a of agentsWithShips) {
+    const key = `${a.ship.system_x}:${a.ship.system_y}`
+    const l = agentLocations.get(key) ?? []
+    l.push(a.agent)
+    agentLocations.set(key, l)
+    console.log(key, l)
+  }
+  console.log(agentLocations)
+
+  const extendedSystems: SystemExtended[] = []
+  systems.forEach((s) => {
+    const agentsInSystem = agentLocations.get(`${s.x}:${s.y}`) || []
+
+    extendedSystems.push({
+      system: s,
+      agents: agentsInSystem,
+    })
+  })
 
   const worldRef = useRef<Container>(null)
 
@@ -83,8 +116,7 @@ export function GalaxyMap({ onSystemClick, ref }: GalaxyMapProps) {
 
       g.circle(0, 0, 100)
       for (const system of systems) {
-        g.circle(system.x * CELL_SIZE, system.y * CELL_SIZE, 15)
-        g.fill()
+        g.circle(system.x * CELL_SIZE, system.y * CELL_SIZE, 15).fill()
         if (
           selectedSystem &&
           system.x == selectedSystem.x &&
@@ -112,21 +144,13 @@ export function GalaxyMap({ onSystemClick, ref }: GalaxyMapProps) {
         title: "Error loading agent ship data",
       })
     }
-  }, [isError, isShipError, toast])
-
-  if (
-    isPending ||
-    isShipPending ||
-    isError ||
-    isShipError ||
-    !currentAgentID ||
-    agents === null ||
-    ship == null
-  ) {
-    return null
-  }
-
-  const hitArea = new Rectangle(-100000, -100000, 200000, 200000)
+    if (isAgentsError) {
+      toast.add({
+        type: "error",
+        title: "Error loading agents data",
+      })
+    }
+  }, [isError, isShipError, isAgentsError, toast])
 
   const ready =
     isReady &&
@@ -136,21 +160,25 @@ export function GalaxyMap({ onSystemClick, ref }: GalaxyMapProps) {
     !isShipError &&
     currentAgentID &&
     agents &&
-    ship
+    ship &&
+    !isAgentsError &&
+    !isAgentsPending
+
+  const hitArea = new Rectangle(-100000, -100000, 200000, 200000)
 
   const handleClick = (e: FederatedPointerEvent) => {
     const pos = e.getLocalPosition(worldRef.current!)
 
-    const clicked = systems.find((system) => {
-      const dx = pos.x - system.x * CELL_SIZE
-      const dy = pos.y - system.y * CELL_SIZE
+    const clicked = extendedSystems.find((system) => {
+      const dx = pos.x - system.system.x * CELL_SIZE
+      const dy = pos.y - system.system.y * CELL_SIZE
 
       return dx * dx + dy * dy <= 15 * 15
     })
 
     if (clicked) {
       onSystemClick(clicked)
-      setSelectedSystem(clicked)
+      setSelectedSystem(clicked.system)
     }
   }
 
@@ -172,6 +200,40 @@ export function GalaxyMap({ onSystemClick, ref }: GalaxyMapProps) {
           >
             <pixiGraphics draw={drawCallback} />
             {/* <pixiText text={"Hello"} /> */}
+            <pixiContainer>
+              {extendedSystems.map((s) => {
+                if (s.agents.length == 0) {
+                  return
+                }
+                const parts: string[] = []
+                for (const agent of s.agents) {
+                  if (parts.length < 2) {
+                    parts.push(agent.username)
+                  } else {
+                    parts.push("...")
+                    break
+                  }
+                }
+
+                const label = parts.join(", ")
+                return (
+                  <pixiText
+                    key={`${s.system.x} ${s.system.y}`}
+                    x={s.system.x * CELL_SIZE}
+                    y={s.system.y * CELL_SIZE - 35}
+                    text={label}
+                    style={{
+                      stroke: { color: "black", width: 2 },
+                      fill: "white",
+                      fontFamily: ["Jetbrains Mono Variable", "sans-serif"],
+                      fontSize: 1000,
+                    }}
+                    anchor={0.5}
+                    scale={0.03}
+                  />
+                )
+              })}
+            </pixiContainer>
           </pixiContainer>
         </ViewportScene>
       ) : null}
