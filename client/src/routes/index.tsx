@@ -4,7 +4,7 @@ import { StarMapLayout } from "@/layouts/star-map-layout"
 
 export const Route = createFileRoute("/")({ component: MainPage })
 
-export function MainPage() {
+function MainPage() {
   return (
     <AuthGate>
       <StarMapLayout />

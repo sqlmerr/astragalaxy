@@ -8,7 +8,7 @@ import { LoginForm } from "@/components/features/auth/login-form"
 
 export const Route = createFileRoute("/login")({ component: LoginPage })
 
-export function LoginPage() {
+function LoginPage() {
   const { isAuthenticated, isReady } = useAuth()
   const navigate = useNavigate()
 

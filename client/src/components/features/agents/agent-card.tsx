@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge"
 interface AgentCardProps {
   agent: SchemaAgent
   isActive?: boolean
+  setSelectedAgent: (agent: SchemaAgent) => void
 }
 
 function getInitials(username: string): string {
@@ -18,9 +19,16 @@ function getInitials(username: string): string {
     .join("")
 }
 
-export function AgentCard({ agent, isActive }: AgentCardProps) {
+export function AgentCard({
+  agent,
+  isActive,
+  setSelectedAgent,
+}: AgentCardProps) {
   return (
-    <article className="group border border-transparent p-3 transition-colors hover:border-primary/25 hover:bg-primary/[0.04]">
+    <article
+      className="group border border-transparent p-3 transition-colors hover:border-primary/25 hover:bg-primary/4"
+      onClick={() => setSelectedAgent(agent)}
+    >
       <div className="flex items-start gap-3">
         <Avatar className="transition-transform duration-300 group-hover:scale-105">
           <AvatarFallback>{getInitials(agent.username)}</AvatarFallback>
