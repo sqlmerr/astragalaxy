@@ -6,14 +6,20 @@ import {
   shipRadarQueryOptions,
 } from "@/api/queries/ships"
 
-export function useMyShipsQuery() {
-  return useQuery(myShipsQueryOptions)
+export function useMyShipsQuery(agentID: string) {
+  return useQuery(myShipsQueryOptions(agentID))
 }
 
-export function useActiveShipQuery() {
-  return useQuery(activeShipQueryOptions)
+export function useActiveShipQuery(agentID?: string) {
+  return useQuery({
+    ...activeShipQueryOptions(agentID ?? ""),
+    enabled: !!agentID,
+  })
 }
 
-export function useShipRadarQuery() {
-  return useQuery(shipRadarQueryOptions)
+export function useShipRadarQuery(agentID?: string) {
+  return useQuery({
+    ...shipRadarQueryOptions(agentID ?? ""),
+    enabled: !!agentID,
+  })
 }

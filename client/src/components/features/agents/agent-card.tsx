@@ -1,4 +1,4 @@
-import { UserRound } from "lucide-react"
+import { Info, UserRound } from "lucide-react"
 
 import type { SchemaAgent } from "@/api/types"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
@@ -7,7 +7,8 @@ import { Badge } from "@/components/ui/badge"
 interface AgentCardProps {
   agent: SchemaAgent
   isActive?: boolean
-  setSelectedAgent: (agent: SchemaAgent) => void
+  onClick?: () => void
+  onInfo?: () => void
 }
 
 function getInitials(username: string): string {
@@ -19,15 +20,15 @@ function getInitials(username: string): string {
     .join("")
 }
 
-export function AgentCard({
-  agent,
-  isActive,
-  setSelectedAgent,
-}: AgentCardProps) {
+export function AgentCard({ agent, isActive, onClick, onInfo }: AgentCardProps) {
   return (
     <article
-      className="group border border-transparent p-3 transition-colors hover:border-primary/25 hover:bg-primary/4"
-      onClick={() => setSelectedAgent(agent)}
+      className={`group border p-3 transition-colors ${
+        isActive
+          ? "border-primary/40 bg-primary/8"
+          : "border-transparent hover:border-primary/25 hover:bg-primary/4"
+      }`}
+      onClick={onClick}
     >
       <div className="flex items-start gap-3">
         <Avatar className="transition-transform duration-300 group-hover:scale-105">
@@ -38,7 +39,19 @@ export function AgentCard({
             <h3 className="truncate text-sm font-semibold tracking-wide">
               {agent.username}
             </h3>
-            {isActive ? <Badge>Active</Badge> : null}
+            <div className="flex items-center gap-1.5">
+              {isActive ? <Badge>Active</Badge> : null}
+              <button
+                type="button"
+                className="rounded-md p-1 text-muted-foreground transition-colors hover:text-foreground"
+                onClick={(e) => {
+                  e.stopPropagation()
+                  onInfo?.()
+                }}
+              >
+                <Info className="size-3.5" />
+              </button>
+            </div>
           </div>
           <p className="mt-1 flex items-center gap-1.5 truncate text-[11px] text-muted-foreground">
             <UserRound className="size-3 text-primary/80" aria-hidden="true" />

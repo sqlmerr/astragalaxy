@@ -5,28 +5,37 @@ import type {
   SchemaNavigateWaypointRequest,
 } from "@/api/types"
 
-export async function navigateWarp(body: SchemaNavigateWarpRequest) {
+export async function navigateWarp(
+  agentID: string,
+  body: SchemaNavigateWarpRequest
+) {
   const { data, error } = await api.POST("/api/v1/navigation/warp", {
     body,
-    headers: getAuthHeaders(),
+    headers: getAuthHeaders(agentID),
   })
   if (error) throw error
   return data
 }
 
-export async function navigatePlanet(body: SchemaNavigatePlanetRequest) {
+export async function navigatePlanet(
+  agentID: string,
+  body: SchemaNavigatePlanetRequest
+) {
   const { data, error } = await api.POST("/api/v1/navigation/planet", {
     body,
-    headers: getAuthHeaders(),
+    headers: getAuthHeaders(agentID),
   })
   if (error) throw error
   return data
 }
 
-export async function navigateWaypoint(body: SchemaNavigateWaypointRequest) {
+export async function navigateWaypoint(
+  agentID: string,
+  body: SchemaNavigateWaypointRequest
+) {
   const { data, error } = await api.POST("/api/v1/navigation/waypoint", {
     body,
-    headers: getAuthHeaders(),
+    headers: getAuthHeaders(agentID),
   })
   if (error) throw error
   return data

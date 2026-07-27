@@ -7,12 +7,15 @@ import (
 	"net/http"
 	"strings"
 
+	"github.com/google/uuid"
 	core_auth "github.com/sqlmerr/astragalaxy/internal/auth"
 	"github.com/sqlmerr/astragalaxy/internal/data/model"
 	core_errors "github.com/sqlmerr/astragalaxy/internal/errors"
 	core_logger "github.com/sqlmerr/astragalaxy/internal/logger"
 	http_response "github.com/sqlmerr/astragalaxy/internal/transport/http/response"
 )
+
+const AGENT_ID_HEADER = "X-Agent-ID"
 
 func UserAuth(jwtProcessor core_auth.JWTProcessor) Middleware {
 	return func(next http.Handler) http.Handler {
@@ -46,9 +49,10 @@ func UserAuth(jwtProcessor core_auth.JWTProcessor) Middleware {
 
 type AgentGetter interface {
 	GetAgentByToken(ctx context.Context, tokenHash string) (model.Agent, error)
+	GetAgent(ctx context.Context, id uuid.UUID) (model.Agent, error)
 }
 
-func AgentAuth(agentGetter AgentGetter) Middleware {
+func AgentAuth(jwtProcessor core_auth.JWTProcessor, agentGetter AgentGetter) Middleware {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			ctx := r.Context()
@@ -59,20 +63,64 @@ func AgentAuth(agentGetter AgentGetter) Middleware {
 			headerParts := strings.SplitN(authorizationHeader, " ", 2)
 			if len(headerParts) != 2 || headerParts[0] != "Bearer" {
 				responseHandler.ErrorResponse(
-					core_errors.NewWithCode(core_errors.CodeInvalidAgentToken, fmt.Errorf("invalid agent token: %w", core_errors.ErrUnauthorized)),
-					"Invalid agent token. Must be in format 'Bearer ag_agent_<token>'",
+					core_errors.NewWithCode(core_errors.CodeInvalidAgentToken, fmt.Errorf("invalid token: %w", core_errors.ErrUnauthorized)),
+					"Invalid token. Must be in format 'Bearer <token>'",
 				)
 				return
 			}
-			hashedToken := core_auth.HashRawAgentToken(headerParts[1])
-			agent, err := agentGetter.GetAgentByToken(ctx, hashedToken)
-			if err != nil {
-				if errors.Is(err, core_errors.ErrNotFound) {
-					err = core_errors.NewWithCode(core_errors.CodeInvalidAgentToken, core_errors.ErrUnauthorized)
+
+			var agent model.Agent
+			if strings.HasPrefix(headerParts[1], "ag_agent_") {
+				hashedToken := core_auth.HashRawAgentToken(headerParts[1])
+				var err error
+				agent, err = agentGetter.GetAgentByToken(ctx, hashedToken)
+				if err != nil {
+					if errors.Is(err, core_errors.ErrNotFound) {
+						err = core_errors.NewWithCode(core_errors.CodeInvalidAgentToken, core_errors.ErrUnauthorized)
+					}
+
+					responseHandler.ErrorResponse(err, "Invalid agent token")
+					return
+				}
+			} else {
+				jwtToken := headerParts[1]
+				userID, err := jwtProcessor.ValidateToken(jwtToken)
+				if err != nil {
+					responseHandler.ErrorResponse(core_errors.NewWithCode(core_errors.CodeInvalidJWTToken, err), "Invalid jwt token")
+					return
 				}
 
-				responseHandler.ErrorResponse(err, "Invalid agent token")
-				return
+				agentIDHeader := r.Header.Get(AGENT_ID_HEADER)
+				agentID, err := uuid.Parse(agentIDHeader)
+				if err != nil {
+					responseHandler.ErrorResponse(
+						core_errors.NewWithCode(
+							core_errors.CodeInvalidUUID,
+							fmt.Errorf("parse agent id: %w", err),
+						),
+						fmt.Sprintf("Failed to parse %s agent id header", AGENT_ID_HEADER),
+					)
+					return
+				}
+
+				agent, err = agentGetter.GetAgent(ctx, agentID)
+				if err != nil {
+					if errors.Is(err, core_errors.ErrNotFound) {
+						err = core_errors.NewWithCode(core_errors.CodeAgentNotFound, core_errors.ErrUnauthorized)
+					}
+
+					responseHandler.ErrorResponse(err, "Agent not found")
+					return
+				}
+				if agent.UserID != userID {
+					responseHandler.ErrorResponse(
+						core_errors.NewWithCode(
+							core_errors.CodeAccessDenied,
+							fmt.Errorf("agent with id=%s does not belong to user with id=%s: %w", agent.ID, userID, core_errors.ErrUnauthorized),
+						),
+						"Failed to access agent control",
+					)
+				}
 			}
 
 			ctx = context.WithValue(ctx, core_auth.AgentIDContextKey, agent.ID)

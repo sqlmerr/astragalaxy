@@ -10,11 +10,13 @@ declare module "@pixi/react" {
   }
 }
 
-export function ViewportScene({
-  children,
-}: {
+interface ViewportSceneProps {
+  x: number
+  y: number
   children: ReactNode | ReactNode[]
-}) {
+}
+
+export function ViewportScene({ x, y, children }: ViewportSceneProps) {
   const { app, isInitialised } = useApplication()
 
   const viewportRef = useRef<PixiViewport>(null)
@@ -31,6 +33,7 @@ export function ViewportScene({
     })
 
     const onResize = () => {
+      if (!app.renderer) return
       viewport.resize(
         app.screen.width,
         app.screen.height,
@@ -41,26 +44,35 @@ export function ViewportScene({
 
     window.addEventListener("resize", onResize)
 
-    // сразу после создания
     onResize()
+
+    viewport.moveCenter(x, y)
 
     return () => {
       window.removeEventListener("resize", onResize)
     }
-  }, [app, isInitialised])
+  }, [app, isInitialised, x, y])
 
   if (!isInitialised) {
+    return null
+  }
+
+  const screenWidth = app.renderer ? app.screen.width : 0
+  const screenHeight = app.renderer ? app.screen.height : 0
+  const events = app.renderer?.events
+
+  if (!events) {
     return null
   }
 
   return (
     <viewport
       ref={viewportRef}
-      screenHeight={app.screen.height}
-      screenWidth={app.screen.width}
-      worldHeight={100000}
+      screenWidth={screenWidth}
+      screenHeight={screenHeight}
+      events={events}
       worldWidth={100000}
-      events={app.renderer.events}
+      worldHeight={100000}
     >
       {children}
     </viewport>

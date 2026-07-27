@@ -1,15 +1,21 @@
 import { useMutation } from "@tanstack/react-query"
 
 import { transferItems, transferResources } from "@/api/mutations/inventories"
+import type {
+  SchemaTransferItemsRequest,
+  SchemaTransferResourcesRequest,
+} from "@/api/types"
 
-export function useTransferResourcesMutation() {
+export function useTransferResourcesMutation(agentID: string) {
   return useMutation({
-    mutationFn: transferResources,
+    mutationFn: (body: SchemaTransferResourcesRequest) =>
+      transferResources(agentID, body),
   })
 }
 
-export function useTransferItemsMutation() {
+export function useTransferItemsMutation(agentID: string) {
   return useMutation({
-    mutationFn: transferItems,
+    mutationFn: (body: SchemaTransferItemsRequest) =>
+      transferItems(agentID, body),
   })
 }

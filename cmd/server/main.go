@@ -77,7 +77,7 @@ func main() {
 	authConfig := core_auth.LoadConfigMust()
 	jwtProcessor := core_auth.NewJWTProcessor(*authConfig)
 	userAuthMiddleware := http_middleware.UserAuth(*jwtProcessor)
-	agentAuthMiddleware := http_middleware.AgentAuth(agentRepo)
+	agentAuthMiddleware := http_middleware.AgentAuth(*jwtProcessor, agentRepo)
 
 	gameConfig := service.NewConfigMust()
 	worldGen := worldgen.New(gameConfig.Seed)

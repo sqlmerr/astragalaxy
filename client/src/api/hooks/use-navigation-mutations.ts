@@ -5,21 +5,29 @@ import {
   navigateWarp,
   navigateWaypoint,
 } from "@/api/mutations/navigation"
+import type {
+  SchemaNavigatePlanetRequest,
+  SchemaNavigateWarpRequest,
+  SchemaNavigateWaypointRequest,
+} from "@/api/types"
 
-export function useNavigateWarpMutation() {
+export function useNavigateWarpMutation(agentID: string) {
   return useMutation({
-    mutationFn: navigateWarp,
+    mutationFn: (body: SchemaNavigateWarpRequest) =>
+      navigateWarp(agentID, body),
   })
 }
 
-export function useNavigatePlanetMutation() {
+export function useNavigatePlanetMutation(agentID: string) {
   return useMutation({
-    mutationFn: navigatePlanet,
+    mutationFn: (body: SchemaNavigatePlanetRequest) =>
+      navigatePlanet(agentID, body),
   })
 }
 
-export function useNavigateWaypointMutation() {
+export function useNavigateWaypointMutation(agentID: string) {
   return useMutation({
-    mutationFn: navigateWaypoint,
+    mutationFn: (body: SchemaNavigateWaypointRequest) =>
+      navigateWaypoint(agentID, body),
   })
 }

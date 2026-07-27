@@ -1,17 +1,22 @@
 import { ClientOnly, useNavigate } from "@tanstack/react-router"
-import { LogOut, Satellite, UserRound } from "lucide-react"
+import { LogOut, UserRound } from "lucide-react"
 
 import { useMeQuery } from "@/api/hooks"
 import { Button } from "@/components/ui/button"
-import { Card } from "@/components/ui/card"
 import { AgentRoster } from "@/components/features/agents/agent-roster"
 import { useAuth } from "@/components/features/auth/auth-provider"
 import { GalaxyMap } from "@/components/features/map/galaxy-map"
+import type { SchemaSystem } from "@/api/types"
+import { useState } from "react"
+import { SystemPanel } from "@/components/features/map/system-panel"
 
 export function StarMapLayout() {
   const { data: user } = useMeQuery()
   const { signOut } = useAuth()
   const navigate = useNavigate()
+  const [selectedSystem, setSelectedSystem] = useState<SchemaSystem | null>(
+    null
+  )
 
   function handleSignOut() {
     signOut()
@@ -21,7 +26,7 @@ export function StarMapLayout() {
   return (
     <div className="relative h-screen overflow-hidden bg-background">
       <ClientOnly>
-        <GalaxyMap />
+        <GalaxyMap onSystemClick={setSelectedSystem} />
       </ClientOnly>
 
       <div
@@ -31,6 +36,10 @@ export function StarMapLayout() {
 
       <div className="relative z-20">
         <AgentRoster />
+        <SystemPanel
+          system={selectedSystem}
+          onClose={() => setSelectedSystem(null)}
+        />
 
         <div className="fixed top-4 right-4 flex items-center gap-2 lg:top-6 lg:right-6">
           <div className="hidden items-center gap-2 border border-border bg-card/80 px-3 py-2 backdrop-blur-sm sm:flex">

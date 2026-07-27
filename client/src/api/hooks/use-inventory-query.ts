@@ -5,10 +5,10 @@ import {
   shipInventoryQueryOptions,
 } from "@/api/queries/inventories"
 
-export function useMyInventoryQuery() {
-  return useQuery(myInventoryQueryOptions)
+export function useMyInventoryQuery(agentID: string) {
+  return useQuery(myInventoryQueryOptions(agentID))
 }
 
-export function useShipInventoryQuery(shipId: string) {
-  return useQuery(shipInventoryQueryOptions(shipId))
+export function useShipInventoryQuery(agentID: string, shipId: string) {
+  return useQuery(shipInventoryQueryOptions(agentID, shipId))
 }

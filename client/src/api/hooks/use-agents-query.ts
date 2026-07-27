@@ -7,13 +7,13 @@ import {
 } from "@/api/queries/agents"
 
 export function useMyAgentsQuery() {
-  return useQuery(myAgentsQueryOptions)
+  return useQuery(myAgentsQueryOptions())
 }
 
-export function useCurrentAgentQuery() {
-  return useQuery(currentAgentQueryOptions)
+export function useCurrentAgentQuery(agentID: string) {
+  return useQuery(currentAgentQueryOptions(agentID))
 }
 
-export function useAgentCooldownQuery() {
-  return useQuery(agentCooldownQueryOptions)
+export function useAgentCooldownQuery(agentID: string) {
+  return useQuery(agentCooldownQueryOptions(agentID))
 }
