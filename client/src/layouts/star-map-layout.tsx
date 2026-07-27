@@ -5,9 +5,12 @@ import { useMeQuery } from "@/api/hooks"
 import { Button } from "@/components/ui/button"
 import { AgentRoster } from "@/components/features/agents/agent-roster"
 import { useAuth } from "@/components/features/auth/auth-provider"
-import { GalaxyMap } from "@/components/features/map/galaxy-map"
+import {
+  GalaxyMap,
+  type GalaxyMapRef,
+} from "@/components/features/map/galaxy-map"
 import type { SchemaSystem } from "@/api/types"
-import { useState } from "react"
+import { useRef, useState } from "react"
 import { SystemPanel } from "@/components/features/map/system-panel"
 
 export function StarMapLayout() {
@@ -17,6 +20,7 @@ export function StarMapLayout() {
   const [selectedSystem, setSelectedSystem] = useState<SchemaSystem | null>(
     null
   )
+  const galaxyMapRef = useRef<GalaxyMapRef>(null)
 
   function handleSignOut() {
     signOut()
@@ -26,7 +30,7 @@ export function StarMapLayout() {
   return (
     <div className="relative h-screen overflow-hidden bg-background">
       <ClientOnly>
-        <GalaxyMap onSystemClick={setSelectedSystem} />
+        <GalaxyMap ref={galaxyMapRef} onSystemClick={setSelectedSystem} />
       </ClientOnly>
 
       <div
@@ -38,7 +42,14 @@ export function StarMapLayout() {
         <AgentRoster />
         <SystemPanel
           system={selectedSystem}
-          onClose={() => setSelectedSystem(null)}
+          onClose={() => {
+            setSelectedSystem(null)
+            galaxyMapRef.current?.closeSystem()
+          }}
+          onCenterCamera={() =>
+            selectedSystem &&
+            galaxyMapRef.current?.centerOnSystem(selectedSystem)
+          }
         />
 
         <div className="fixed top-4 right-4 flex items-center gap-2 lg:top-6 lg:right-6">

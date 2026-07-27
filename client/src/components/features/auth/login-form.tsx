@@ -1,23 +1,17 @@
 import { useState } from "react"
-import type { FormEvent } from "react"
+import type { SyntheticEvent } from "react"
 import { useNavigate } from "@tanstack/react-router"
 import { KeyRound, Rocket, ShieldCheck, UserRound } from "lucide-react"
 
 import { useLoginMutation } from "@/api/hooks"
 import { getErrorMessage } from "@/api/errors"
 import { Button } from "@/components/ui/button"
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Separator } from "@/components/ui/separator"
 import { Textarea } from "@/components/ui/textarea"
 import { useAuth } from "@/components/features/auth/auth-provider"
-import { useToast } from "@/lib/toast"
+import { toast } from "@/components/ui/toast"
 
 export function LoginForm() {
   const [username, setUsername] = useState("")
@@ -26,11 +20,10 @@ export function LoginForm() {
   const [jwtError, setJwtError] = useState<string | null>(null)
   const { signIn } = useAuth()
   const navigate = useNavigate()
-  const { addToast } = useToast()
 
   const passwordLogin = useLoginMutation()
 
-  function handlePasswordLogin(event: FormEvent<HTMLFormElement>) {
+  function handlePasswordLogin(event: SyntheticEvent) {
     event.preventDefault()
     passwordLogin.mutate(
       { username, password },
@@ -42,8 +35,8 @@ export function LoginForm() {
           }
         },
         onError: (error) => {
-          addToast({
-            variant: "error",
+          toast.add({
+            type: "error",
             title: "Authentication failed",
             description: getErrorMessage(error),
           })
@@ -52,7 +45,7 @@ export function LoginForm() {
     )
   }
 
-  function handleJwtLogin(event: FormEvent<HTMLFormElement>) {
+  function handleJwtLogin(event: SyntheticEvent) {
     event.preventDefault()
     setJwtError(null)
 

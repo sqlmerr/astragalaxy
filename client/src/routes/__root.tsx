@@ -30,11 +30,9 @@ export const Route = createRootRoute({
     <main className="grid min-h-svh place-items-center bg-background p-6 text-center">
       <div>
         <p className="text-xs font-bold tracking-[0.24em] text-primary uppercase">
-         404
+          404
         </p>
-        <h1 className="mt-2 text-2xl font-semibold">
-          Not found
-        </h1>
+        <h1 className="mt-2 text-2xl font-semibold">Not found</h1>
       </div>
     </main>
   ),

@@ -7,9 +7,8 @@ import { useState } from "react"
 import type { ReactNode } from "react"
 
 import { getErrorMessage } from "@/api/errors"
-import { Toaster } from "@/components/ui/toaster"
+import { Toaster } from "@/components/ui/toast"
 import { AuthProvider } from "@/components/features/auth/auth-provider"
-import { ToastProvider } from "@/lib/toast"
 
 export function AppProviders({ children }: { children: ReactNode }) {
   const [queryClient] = useState(
@@ -49,10 +48,8 @@ export function AppProviders({ children }: { children: ReactNode }) {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <ToastProvider>
-        <AuthProvider>{children}</AuthProvider>
-        <Toaster />
-      </ToastProvider>
+      <AuthProvider>{children}</AuthProvider>
+      <Toaster />
     </QueryClientProvider>
   )
 }

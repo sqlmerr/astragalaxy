@@ -2,23 +2,26 @@ import { Application, extend } from "@pixi/react"
 
 import {
   Container,
-  FederatedEvent,
   FederatedPointerEvent,
   Graphics,
+  Point,
   Rectangle,
   Text,
 } from "pixi.js"
-import { useCallback, useEffect, useRef } from "react"
+import {
+  useCallback,
+  useEffect,
+  useImperativeHandle,
+  useRef,
+  useState,
+  type RefObject,
+} from "react"
 import { ViewportScene } from "./viewport"
 import { Viewport } from "pixi-viewport"
 import { type SchemaSystem } from "@/api/types"
-import {
-  useActiveShipQuery,
-  useMyShipsQuery,
-  useShipRadarQuery,
-} from "@/api/hooks"
+import { useActiveShipQuery, useShipRadarQuery } from "@/api/hooks"
 import { useAuth } from "../auth/auth-provider"
-import { useToast } from "@/lib/toast"
+import { toast } from "@/components/ui/toast"
 
 extend({
   Container,
@@ -31,12 +34,34 @@ const CELL_SIZE: number = 100
 
 interface GalaxyMapProps {
   onSystemClick: (system: SchemaSystem) => void
+  ref: RefObject<GalaxyMapRef | null>
 }
 
-export function GalaxyMap({ onSystemClick }: GalaxyMapProps) {
-  const { currentAgentID, isReady, agents, currentAgent } = useAuth()
+export interface GalaxyMapRef {
+  centerOnSystem(system: SchemaSystem): void
+  closeSystem(): void
+}
 
-  const { addToast } = useToast()
+export function GalaxyMap({ onSystemClick, ref }: GalaxyMapProps) {
+  const [selectedSystem, setSelectedSystem] = useState<SchemaSystem | null>(
+    null
+  )
+  const viewportRef = useRef<Viewport>(null)
+
+  useImperativeHandle(ref, () => ({
+    centerOnSystem(system) {
+      viewportRef.current?.animate({
+        position: new Point(system.x * CELL_SIZE, system.y * CELL_SIZE),
+        time: 500,
+        ease: "easeInOutSine",
+      })
+    },
+    closeSystem() {
+      setSelectedSystem(null)
+    },
+  }))
+
+  const { currentAgentID, isReady, agents, currentAgent } = useAuth()
 
   const { data, isPending, isError } = useShipRadarQuery(
     currentAgentID || undefined
@@ -60,25 +85,34 @@ export function GalaxyMap({ onSystemClick }: GalaxyMapProps) {
       for (const system of systems) {
         g.circle(system.x * CELL_SIZE, system.y * CELL_SIZE, 15)
         g.fill()
+        if (
+          selectedSystem &&
+          system.x == selectedSystem.x &&
+          system.y == selectedSystem.y
+        ) {
+          g.circle(system.x * CELL_SIZE, system.y * CELL_SIZE, 20).stroke({
+            width: 1,
+          })
+        }
       }
     },
-    [systems]
+    [systems, selectedSystem]
   )
 
   useEffect(() => {
     if (isError) {
-      addToast({
-        variant: "error",
+      toast.add({
+        type: "error",
         title: "Error loading radar data",
       })
     }
     if (isShipError) {
-      addToast({
-        variant: "error",
+      toast.add({
+        type: "error",
         title: "Error loading agent ship data",
       })
     }
-  }, [isError, isShipError, addToast])
+  }, [isError, isShipError, toast])
 
   if (
     isPending ||
@@ -116,6 +150,7 @@ export function GalaxyMap({ onSystemClick }: GalaxyMapProps) {
 
     if (clicked) {
       onSystemClick(clicked)
+      setSelectedSystem(clicked)
     }
   }
 
@@ -123,6 +158,7 @@ export function GalaxyMap({ onSystemClick }: GalaxyMapProps) {
     <Application resizeTo={window} className="absoulute inset-0">
       {ready ? (
         <ViewportScene
+          viewportRef={viewportRef}
           x={ship.system_x * CELL_SIZE}
           y={ship.system_y * CELL_SIZE}
         >

@@ -43,33 +43,38 @@ export function AgentRoster() {
       >
         <Card className="overflow-hidden">
           <CardHeader
-            className={`flex-row items-center border-b border-border p-3 ${
-              isCollapsed ? "justify-center border-b-0" : "justify-between"
+            className={`w-full flex-row items-center border-b border-border p-3 ${
+              isCollapsed ? "justify-center border-b-0" : ""
             }`}
           >
-            {!isCollapsed && (
-              <div className="flex items-center gap-2">
-                <UsersRound
-                  className="size-4 text-primary"
-                  aria-hidden="true"
-                />
-                <CardTitle className="text-xs tracking-[0.16em] uppercase">
-                  Your agents
-                </CardTitle>
-              </div>
-            )}
-            <Button
-              variant="ghost"
-              size="icon"
-              className="size-7 shrink-0"
-              onClick={() => setIsCollapsed((prev) => !prev)}
-            >
-              {isCollapsed ? (
-                <ChevronRight className="size-3.5" />
+            <div className="flex w-full items-center justify-between">
+              {!isCollapsed ? (
+                <div className="flex items-center gap-2">
+                  <UsersRound
+                    className="size-4 text-primary"
+                    aria-hidden="true"
+                  />
+                  <CardTitle className="text-xs tracking-[0.16em] uppercase">
+                    Your agents
+                  </CardTitle>
+                </div>
               ) : (
-                <ChevronLeft className="size-3.5" />
+                <span />
               )}
-            </Button>
+
+              <Button
+                variant="ghost"
+                size="icon"
+                className="size-7 shrink-0"
+                onClick={() => setIsCollapsed((prev) => !prev)}
+              >
+                {isCollapsed ? (
+                  <ChevronRight className="size-3.5" />
+                ) : (
+                  <ChevronLeft className="size-3.5" />
+                )}
+              </Button>
+            </div>
           </CardHeader>
           {!isCollapsed && (
             <CardContent className="p-0">

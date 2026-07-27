@@ -17,9 +17,14 @@ import {
 interface SystemPanelProps {
   system: SchemaSystem | null
   onClose: () => void
+  onCenterCamera: () => void
 }
 
-export function SystemPanel({ system, onClose }: SystemPanelProps) {
+export function SystemPanel({
+  system,
+  onClose,
+  onCenterCamera,
+}: SystemPanelProps) {
   return (
     <aside
       className={`fixed top-0 right-0 z-50 h-screen w-96 transform border-l border-border bg-card/95 backdrop-blur-md transition-transform duration-300 ${
@@ -81,7 +86,11 @@ export function SystemPanel({ system, onClose }: SystemPanelProps) {
                   Warp
                 </Button>
 
-                <Button variant="secondary" className="justify-start">
+                <Button
+                  variant="secondary"
+                  className="justify-start"
+                  onClick={onCenterCamera}
+                >
                   <Orbit className="mr-2 size-4" />
                   Center Camera
                 </Button>

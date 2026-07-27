@@ -1,6 +1,6 @@
 import { useApplication, extend, type PixiReactElementProps } from "@pixi/react"
 import { Viewport as PixiViewport } from "pixi-viewport"
-import { useEffect, useRef, type ReactNode } from "react"
+import { useEffect, useRef, type ReactNode, type RefObject } from "react"
 
 extend({ PixiViewport })
 
@@ -11,15 +11,20 @@ declare module "@pixi/react" {
 }
 
 interface ViewportSceneProps {
+  viewportRef: RefObject<PixiViewport | null>
   x: number
   y: number
   children: ReactNode | ReactNode[]
 }
 
-export function ViewportScene({ x, y, children }: ViewportSceneProps) {
+export function ViewportScene({
+  viewportRef,
+  x,
+  y,
+  children,
+}: ViewportSceneProps) {
   const { app, isInitialised } = useApplication()
 
-  const viewportRef = useRef<PixiViewport>(null)
   useEffect(() => {
     if (!viewportRef.current || !isInitialised) return
 
