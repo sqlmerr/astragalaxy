@@ -6,6 +6,7 @@ import {
 import type { SchemaAgent, SchemaShip } from "@/api/types"
 import { useQueries } from "@tanstack/react-query"
 import { useMemo } from "react"
+import { useAuth } from "./auth-provider"
 
 export interface AgentWithShip {
   agent: SchemaAgent
@@ -13,14 +14,17 @@ export interface AgentWithShip {
 }
 
 export function useAgentsWithShips() {
-  const {
-    data: agents = { data: [] },
-    isPending: isAgentsPending,
-    isError: isAgentsError,
-  } = useMyAgentsQuery()
+  const { agents } = useAuth()
+
+  if (!agents) {
+    return {
+      data: [],
+      isPending: true,
+    }
+  }
 
   const shipQueries = useQueries({
-    queries: agents.data.map((agent) => ({
+    queries: agents.map((agent) => ({
       ...activeShipQueryOptions(agent.id),
     })),
   })
@@ -29,7 +33,7 @@ export function useAgentsWithShips() {
   const isShipsError = shipQueries.some((q) => q.isError)
 
   const data = useMemo<AgentWithShip[]>(() => {
-    return agents.data.flatMap((agent, index) => {
+    return agents.flatMap((agent, index) => {
       const ship = shipQueries[index].data
 
       if (!ship) return []
@@ -45,7 +49,7 @@ export function useAgentsWithShips() {
 
   return {
     data,
-    isPending: isAgentsPending || isShipsPending,
-    isError: isAgentsError || isShipsError,
+    isPending: isShipsPending,
+    isError: isShipsError,
   }
 }

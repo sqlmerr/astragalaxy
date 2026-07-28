@@ -1,36 +1,150 @@
 import { ClientOnly, useNavigate } from "@tanstack/react-router"
 import { LogOut, UserRound } from "lucide-react"
 
-import { useMeQuery } from "@/api/hooks"
+import { useActiveShipQuery, useShipRadarQuery } from "@/api/hooks"
 import { Button } from "@/components/ui/button"
 import { AgentRoster } from "@/components/features/agents/agent-roster"
 import { useAuth } from "@/components/features/auth/auth-provider"
 import {
   GalaxyMap,
   type GalaxyMapRef,
-} from "@/components/features/map/galaxy-map"
-import type { SchemaSystem, SystemExtended } from "@/api/types"
-import { useRef, useState } from "react"
-import { SystemPanel } from "@/components/features/map/system-panel"
+} from "@/components/features/map/galaxy/galaxy-map"
+import type {
+  SchemaAgent,
+  SchemaPlanet,
+  SchemaSystem,
+  SystemExtended,
+} from "@/api/types"
+import { useEffect, useRef, useState } from "react"
+import { Panel } from "@/components/features/map/panel/panel"
+import { useAgentsWithShips } from "@/components/features/auth/use-agents-with-ships"
+import { toast } from "@/components/ui/toast"
+import {
+  SystemMap,
+  type SystemMapRef,
+} from "@/components/features/map/system/system-map"
 
 export function StarMapLayout() {
-  const { data: user } = useMeQuery()
-  const { signOut } = useAuth()
+  const { signOut, user, currentAgentID, isReady } = useAuth()
   const navigate = useNavigate()
   const [selectedSystem, setSelectedSystem] = useState<SystemExtended | null>(
     null
   )
+  const [selectedPlanet, setSelectedPlanet] = useState<SchemaPlanet | null>(
+    null
+  )
+  const [openedSystem, setOpenedSystem] = useState<SystemExtended | null>(null)
+
   const galaxyMapRef = useRef<GalaxyMapRef>(null)
+  const systemMapRef = useRef<SystemMapRef>(null)
 
   function handleSignOut() {
     signOut()
     void navigate({ to: "/login", replace: true })
   }
 
+  function closeSystem() {
+    setSelectedSystem(null)
+    setSelectedPlanet(null)
+    setOpenedSystem(null)
+    galaxyMapRef.current?.closeSystem()
+  }
+
+  useEffect(() => {
+    closeSystem()
+  }, [currentAgentID])
+
+  const {
+    data: ship,
+    isPending: isShipPending,
+    isError: isShipError,
+  } = useActiveShipQuery(currentAgentID || undefined)
+
+  const {
+    data: agentsWithShips,
+    isPending: isAgentsPending,
+    isError: isAgentsError,
+  } = useAgentsWithShips()
+
+  const {
+    data: systemsData,
+    isPending: isSystemsPending,
+    isError: isSystemsError,
+  } = useShipRadarQuery(currentAgentID || undefined)
+
+  const systems: SchemaSystem[] = systemsData?.data ?? []
+
+  const agentLocations: Map<string, SchemaAgent[]> = new Map()
+  for (const a of agentsWithShips) {
+    const key = `${a.ship.system_x}:${a.ship.system_y}`
+    const l = agentLocations.get(key) ?? []
+    l.push(a.agent)
+    agentLocations.set(key, l)
+    console.log(key, l)
+  }
+  console.log(agentLocations)
+
+  const extendedSystems: SystemExtended[] = []
+  systems.forEach((s) => {
+    const agentsInSystem = agentLocations.get(`${s.x}:${s.y}`) || []
+
+    extendedSystems.push({
+      system: s,
+      agents: agentsInSystem,
+    })
+  })
+
+  useEffect(() => {
+    if (isSystemsError) {
+      toast.add({
+        type: "error",
+        title: "Error loading radar data",
+      })
+    }
+    if (isShipError) {
+      toast.add({
+        type: "error",
+        title: "Error loading agent ship data",
+      })
+    }
+    if (isAgentsError) {
+      toast.add({
+        type: "error",
+        title: "Error loading agents data",
+      })
+    }
+  }, [isSystemsError, isShipError, isAgentsError, toast])
+
+  const ready =
+    isReady &&
+    !isSystemsPending &&
+    !isShipPending &&
+    !isSystemsError &&
+    !isShipError &&
+    currentAgentID &&
+    ship &&
+    !isAgentsError &&
+    !isAgentsPending
+
   return (
     <div className="relative h-screen overflow-hidden bg-background">
       <ClientOnly>
-        <GalaxyMap ref={galaxyMapRef} onSystemClick={setSelectedSystem} />
+        {ready &&
+          (!openedSystem ? (
+            <GalaxyMap
+              ref={galaxyMapRef}
+              onSystemClick={setSelectedSystem}
+              ship={ship}
+              systems={extendedSystems}
+            />
+          ) : (
+            <SystemMap
+              ref={systemMapRef}
+              system={openedSystem}
+              agents={agentsWithShips}
+              onPlanetClick={setSelectedPlanet}
+            />
+          ))}
       </ClientOnly>
 
       <div
@@ -40,16 +154,24 @@ export function StarMapLayout() {
 
       <div className="relative z-20">
         <AgentRoster />
-        <SystemPanel
+        <Panel
           system={selectedSystem}
-          onClose={() => {
-            setSelectedSystem(null)
-            galaxyMapRef.current?.closeSystem()
-          }}
-          onCenterCamera={() =>
+          selectedPlanet={selectedPlanet || undefined}
+          onClose={closeSystem}
+          onSystemCenterCamera={() =>
             selectedSystem &&
             galaxyMapRef.current?.centerOnSystem(selectedSystem.system)
           }
+          onSystemOpen={() => selectedSystem && setOpenedSystem(selectedSystem)}
+          onPlanetCenterCamera={() =>
+            selectedSystem &&
+            selectedPlanet &&
+            systemMapRef.current?.centerOnPlanet(selectedPlanet)
+          }
+          onSelectPlanet={(p) => {
+            setSelectedPlanet(p)
+            systemMapRef.current?.selectPlanet(p)
+          }}
         />
 
         <div className="fixed top-4 right-4 flex items-center gap-2 lg:top-6 lg:right-6">

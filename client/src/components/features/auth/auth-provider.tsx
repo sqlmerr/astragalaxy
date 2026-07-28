@@ -4,13 +4,12 @@ import {
   useContext,
   useEffect,
   useMemo,
-  useRef,
   useState,
 } from "react"
 import type { ReactNode } from "react"
 
-import { api } from "@/api/client"
 import type { SchemaAgent, SchemaUser } from "@/api/types"
+import { useMeQuery, useMyAgentsQuery } from "@/api/hooks"
 
 const AUTH_TOKEN_KEY = "astragalaxy.auth.token"
 const CURRENT_AGENT_KEY = "astragalaxy.auth.agentID"
@@ -32,23 +31,18 @@ const AuthContext = createContext<AuthContextValue | undefined>(undefined)
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [token, setToken] = useState<string | null>(null)
-  const [user, setUser] = useState<SchemaUser | null>(null)
-  const [agents, setAgents] = useState<SchemaAgent[] | null>(null)
   const [currentAgentID, setCurrentAgentIDState] = useState<string | null>(
     () => {
       if (typeof window === "undefined") return null
       return window.localStorage.getItem(CURRENT_AGENT_KEY)
     }
   )
-  const [isReady, setIsReady] = useState(false)
-  const validatingRef = useRef(false)
 
   const signOut = useCallback(() => {
     window.localStorage.removeItem(AUTH_TOKEN_KEY)
     window.localStorage.removeItem(CURRENT_AGENT_KEY)
     setToken(null)
-    setUser(null)
-    setAgents(null)
+    // setAgents(null)
     setCurrentAgentIDState(null)
   }, [])
 
@@ -63,89 +57,74 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [])
 
   useEffect(() => {
-    if (!token) {
-      setUser(null)
-      setAgents(null)
-      setIsReady(true)
-      return
-    }
-    validatingRef.current = true
-
-    api
-      .GET("/api/v1/auth/me", {
-        headers: { Authorization: `Bearer ${token}` },
-      })
-      .then(({ data, error }) => {
-        if (!validatingRef.current) return
-        if (error) {
-          signOut()
-        } else {
-          setUser(data)
-        }
-      })
-      .catch(() => {
-        if (!validatingRef.current) return
-        signOut()
-      })
-      .finally(() => {
-        if (validatingRef.current) {
-          setIsReady(true)
-          validatingRef.current = false
-        }
-      })
-
-    return () => {
-      validatingRef.current = false
-    }
-  }, [token])
-
-  useEffect(() => {
-    if (!user) return
-
-    api
-      .GET("/api/v1/agents/my", {
-        headers: { Authorization: `Bearer ${token}` },
-      })
-      .then(({ data, error }) => {
-        if (!error && data?.data) {
-          setAgents(data.data)
-
-          if (
-            currentAgentID &&
-            data.data.some((a) => a.id === currentAgentID)
-          ) {
-            return
-          }
-
-          if (data.data.length > 0) {
-            setCurrentAgentID(data.data[0].id)
-          }
-        }
-      })
-      .catch(() => {})
-  }, [user])
-
-  useEffect(() => {
     const stored = localStorage.getItem(AUTH_TOKEN_KEY)
     setToken(stored)
   }, [])
+  const {
+    data: userData,
+    isPending: isMePending,
+    isError: isMeError,
+  } = useMeQuery(!!token)
+  const {
+    data: agents = { data: [] },
+    isPending: isAgentsPending,
+    isError: isAgentsError,
+  } = useMyAgentsQuery(!!userData)
+
+  useEffect(() => {
+    if (isMeError) {
+      signOut()
+      return
+    }
+  }, [isMeError, isMePending, userData, signOut])
+
+  useEffect(() => {
+    if (isAgentsPending || isAgentsError) return
+
+    if (!currentAgentID || !agents.data.some((a) => a.id === currentAgentID)) {
+      if (agents.data.length > 0) {
+        setCurrentAgentID(agents.data[0].id)
+      }
+    }
+  }, [
+    isAgentsPending,
+    isAgentsError,
+    agents.data,
+    currentAgentID,
+    setCurrentAgentID,
+  ])
+
+  // if (isMeError) {
+  //   signOut()
+  // } else if (!isMeError && !isMePending && userData) {
+  //   setIsReady(true)
+  // }
+
+  // if (!isAgentsPending && !isAgentsError) {
+  //   if (!(currentAgentID && agents.data.some((a) => a.id == currentAgentID)))
+  //     if (agents.data.length > 0) {
+  //       setCurrentAgentID(agents.data[0].id)
+  //     }
+  // }
+
+  const isReady = token === null || (!isMePending && !isMeError)
 
   const value = useMemo<AuthContextValue>(
     () => ({
       token,
-      user,
-      agents,
+      user: userData || null,
+      agents: agents.data,
       currentAgentID,
-      isAuthenticated: token !== null && user !== null,
+      isAuthenticated: token !== null && userData !== null,
       isReady,
       signIn,
       signOut,
       setCurrentAgentID,
-      currentAgent: agents?.find((v) => v.id == currentAgentID) || null,
+      currentAgent: agents.data.find((v) => v.id == currentAgentID) || null,
     }),
     [
       token,
-      user,
+      userData,
       agents,
       currentAgentID,
       isReady,

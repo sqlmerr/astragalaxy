@@ -41,7 +41,7 @@ export function AgentRoster() {
         }`}
         aria-label="Player agents"
       >
-        <Card className="overflow-hidden">
+        <Card className="overflow-hidde2">
           <CardHeader
             className={`w-full flex-row items-center border-b border-border p-3 ${
               isCollapsed ? "justify-center border-b-0" : ""
@@ -54,7 +54,7 @@ export function AgentRoster() {
                     className="size-4 text-primary"
                     aria-hidden="true"
                   />
-                  <CardTitle className="text-xs tracking-[0.16em] uppercase">
+                  <CardTitle className="tracking-[0.16em] uppercase">
                     Your agents
                   </CardTitle>
                 </div>

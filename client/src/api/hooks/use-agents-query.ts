@@ -6,8 +6,8 @@ import {
   myAgentsQueryOptions,
 } from "@/api/queries/agents"
 
-export function useMyAgentsQuery() {
-  return useQuery(myAgentsQueryOptions())
+export function useMyAgentsQuery(enabled: boolean = true) {
+  return useQuery({ ...myAgentsQueryOptions(), enabled: enabled })
 }
 
 export function useCurrentAgentQuery(agentID: string) {
