@@ -3,9 +3,11 @@ import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area"
 import { SystemPanel } from "./system-panel"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { PlanetPanel } from "./planet-panel"
+import type { AgentWithShip } from "../../auth/use-agents-with-ships"
 
 interface PanelProps {
   system: SystemExtended | null
+  currentAgent: AgentWithShip
   selectedPlanet?: SchemaPlanet
   onClose: () => void
   onSystemCenterCamera: () => void
@@ -16,6 +18,7 @@ interface PanelProps {
 
 export function Panel({
   system,
+  currentAgent,
   selectedPlanet,
   onClose,
   onSystemCenterCamera,
@@ -47,10 +50,12 @@ export function Panel({
         >
           <ScrollArea className="w-full whitespace-nowrap">
             <TabsList className="w-max">
-              <TabsTrigger value="system">System</TabsTrigger>
+              <TabsTrigger value="system">
+                System: {system?.system.name}
+              </TabsTrigger>
               {system?.system.planets.map((p) => (
                 <TabsTrigger key={p.orbit} value={`planet-${p.orbit}`}>
-                  Planet {p.orbit + 1}
+                  {p.name}
                 </TabsTrigger>
               ))}
             </TabsList>
@@ -61,6 +66,7 @@ export function Panel({
           <TabsContent value="system">
             {system && (
               <SystemPanel
+                currentAgent={currentAgent}
                 system={system}
                 onCenterCamera={onSystemCenterCamera}
                 onClose={onClose}
@@ -71,6 +77,8 @@ export function Panel({
           {system?.system.planets.map((p) => (
             <TabsContent key={p.orbit} value={`planet-${p.orbit}`}>
               <PlanetPanel
+                currentAgent={currentAgent}
+                system={system}
                 planet={p}
                 onCenterCamera={onPlanetCenterCamera}
                 onClose={onClose}

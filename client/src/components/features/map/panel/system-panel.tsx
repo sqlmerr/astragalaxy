@@ -5,9 +5,10 @@ import { Card } from "@/components/ui/card"
 import { ArrowRight, Orbit, SquareArrowOutUpRight, X } from "lucide-react"
 import { AgentCard } from "../../agents/agent-card"
 import { Separator } from "@/components/ui/separator"
-import { useAuth } from "../../auth/auth-provider"
+import type { AgentWithShip } from "../../auth/use-agents-with-ships"
 
 interface SystemPanelProps {
+  currentAgent: AgentWithShip
   system: SystemExtended
   onClose: () => void
   onCenterCamera: () => void
@@ -15,6 +16,7 @@ interface SystemPanelProps {
 }
 
 export function SystemPanel({
+  currentAgent,
   system,
   onClose,
   onCenterCamera,
@@ -84,7 +86,15 @@ export function SystemPanel({
           <h3 className="mb-3 font-semibold">Available Actions</h3>
 
           <div className="flex flex-col gap-2">
-            <Button className="justify-start">
+            <Button
+              className="justify-start"
+              hidden={
+                currentAgent.ship.system_x === system.system.x &&
+                currentAgent.ship.system_y === system.system.y
+                  ? true
+                  : false
+              }
+            >
               <ArrowRight className="mr-2 size-4" />
               Warp
             </Button>

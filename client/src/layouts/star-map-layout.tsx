@@ -156,6 +156,9 @@ export function StarMapLayout() {
         <AgentRoster />
         <Panel
           system={selectedSystem}
+          currentAgent={agentsWithShips.find(
+            (a) => a.agent.id === currentAgentID
+          )!}
           selectedPlanet={selectedPlanet || undefined}
           onClose={closeSystem}
           onSystemCenterCamera={() =>

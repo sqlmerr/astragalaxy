@@ -1,17 +1,22 @@
-import type { SchemaPlanet } from "@/api/types"
+import type { SchemaPlanet, SystemExtended } from "@/api/types"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { ArrowRight, Orbit, X } from "lucide-react"
 import { Separator } from "@/components/ui/separator"
+import type { AgentWithShip } from "../../auth/use-agents-with-ships"
 
 interface PlanetPanelProps {
+  currentAgent: AgentWithShip
+  system: SystemExtended
   planet: SchemaPlanet
   onClose: () => void
   onCenterCamera: () => void
 }
 
 export function PlanetPanel({
+  currentAgent,
+  system,
   planet,
   onClose,
   onCenterCamera,
@@ -67,7 +72,15 @@ export function PlanetPanel({
           <h3 className="mb-3 font-semibold">Available Actions</h3>
 
           <div className="flex flex-col gap-2">
-            <Button className="justify-start">
+            <Button
+              className="justify-start"
+              variant={
+                currentAgent.ship.system_x === system.system.x &&
+                currentAgent.ship.system_y === system.system.y
+                  ? "default"
+                  : "destructive"
+              }
+            >
               <ArrowRight className="mr-2 size-4" />
               Navigate
             </Button>
