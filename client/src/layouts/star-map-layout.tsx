@@ -166,11 +166,6 @@ export function StarMapLayout() {
             galaxyMapRef.current?.centerOnSystem(selectedSystem.system)
           }
           onSystemOpen={() => selectedSystem && setOpenedSystem(selectedSystem)}
-          onPlanetCenterCamera={() =>
-            selectedSystem &&
-            selectedPlanet &&
-            systemMapRef.current?.centerOnPlanet(selectedPlanet)
-          }
           onSelectPlanet={(p) => {
             setSelectedPlanet(p)
             systemMapRef.current?.selectPlanet(p)

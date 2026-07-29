@@ -12,7 +12,6 @@ interface PanelProps {
   onClose: () => void
   onSystemCenterCamera: () => void
   onSystemOpen: () => void
-  onPlanetCenterCamera: () => void
   onSelectPlanet: (p: SchemaPlanet | null) => void
 }
 
@@ -23,7 +22,6 @@ export function Panel({
   onClose,
   onSystemCenterCamera,
   onSystemOpen,
-  onPlanetCenterCamera,
   onSelectPlanet,
 }: PanelProps) {
   return (
@@ -80,7 +78,6 @@ export function Panel({
                 currentAgent={currentAgent}
                 system={system}
                 planet={p}
-                onCenterCamera={onPlanetCenterCamera}
                 onClose={onClose}
               />
             </TabsContent>

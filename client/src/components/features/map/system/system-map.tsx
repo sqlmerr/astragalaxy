@@ -20,7 +20,6 @@ interface SystemMapProps {
 }
 
 export interface SystemMapRef {
-  centerOnPlanet(planet: SchemaPlanet): void
   selectPlanet(planet: SchemaPlanet | null): void
 }
 
@@ -38,9 +37,6 @@ export function SystemMap({
   )
 
   useImperativeHandle(ref, () => ({
-    centerOnPlanet(planet) {
-      // TODO
-    },
     selectPlanet(planet: SchemaPlanet | null) {
       setSelectedPlanet(planet)
     },

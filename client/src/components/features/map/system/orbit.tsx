@@ -1,7 +1,7 @@
 import type { SchemaPlanet } from "@/api/types"
 import { useTick } from "@pixi/react"
 import type { Container, FederatedPointerEvent, Graphics } from "pixi.js"
-import { useCallback, useRef, type ReactNode } from "react"
+import { useCallback, useEffect, useRef, useState, type ReactNode } from "react"
 import { PLANET_PARAMS } from "../constants"
 import { getOrbitRadius } from "../utils"
 
@@ -14,12 +14,24 @@ interface OrbitProps {
 export function OrbitPlanet({ planet, onClick, isSelected }: OrbitProps) {
   const params = PLANET_PARAMS[planet.type]
   const orbitRadius = getOrbitRadius(planet.orbit)
-
+  const [coords, setCoords] = useState<{ x: number; y: number }>({
+    x: orbitRadius,
+    y: 0,
+  })
   const ref = useRef<Container>(null)
+
+  useEffect(() => {
+    const angle = Math.random() * 360
+    const x = Math.cos(angle) * orbitRadius
+    const y = Math.sin(angle) * orbitRadius
+
+    setCoords({ x, y })
+  }, [planet])
 
   useTick((ticker) => {
     if (ref.current) {
-      ref.current.rotation += params.rotationSpeed * ticker.deltaTime
+      ref.current.rotation +=
+        params.rotationSpeed * ticker.deltaTime * ((planet.orbit + 1) / 10)
     }
   })
 
@@ -47,7 +59,8 @@ export function OrbitPlanet({ planet, onClick, isSelected }: OrbitProps) {
     <pixiContainer ref={ref}>
       <pixiGraphics draw={drawOrbitOutline} />
       <pixiContainer
-        x={orbitRadius}
+        x={coords.x}
+        y={coords.y}
         onClick={onClick}
         cursor="pointer"
         eventMode="static"

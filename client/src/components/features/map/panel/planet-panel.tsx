@@ -11,7 +11,6 @@ interface PlanetPanelProps {
   system: SystemExtended
   planet: SchemaPlanet
   onClose: () => void
-  onCenterCamera: () => void
 }
 
 export function PlanetPanel({
@@ -19,7 +18,6 @@ export function PlanetPanel({
   system,
   planet,
   onClose,
-  onCenterCamera,
 }: PlanetPanelProps) {
   return (
     <>
@@ -66,7 +64,7 @@ export function PlanetPanel({
               </div>
             )}
           </div>
-        </Card> */}
+        </Card> TODO  */}
 
         <Card className="p-4">
           <h3 className="mb-3 font-semibold">Available Actions</h3>
@@ -83,15 +81,6 @@ export function PlanetPanel({
             >
               <ArrowRight className="mr-2 size-4" />
               Navigate
-            </Button>
-
-            <Button
-              variant="secondary"
-              className="justify-start"
-              onClick={onCenterCamera}
-            >
-              <Orbit className="mr-2 size-4" />
-              Center Camera
             </Button>
           </div>
         </Card>
