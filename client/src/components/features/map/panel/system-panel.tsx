@@ -5,7 +5,7 @@ import { Card } from "@/components/ui/card"
 import { ArrowRight, Orbit, SquareArrowOutUpRight, X } from "lucide-react"
 import { AgentCard } from "../../agents/agent-card"
 import { Separator } from "@/components/ui/separator"
-import type { AgentWithShip } from "../../auth/use-agents-with-ships"
+import type { AgentWithShip } from "@/api/types"
 
 interface SystemPanelProps {
   currentAgent: AgentWithShip
@@ -13,6 +13,7 @@ interface SystemPanelProps {
   onClose: () => void
   onCenterCamera: () => void
   onSystemOpen: () => void
+  onWarp: () => void
 }
 
 export function SystemPanel({
@@ -21,6 +22,7 @@ export function SystemPanel({
   onClose,
   onCenterCamera,
   onSystemOpen,
+  onWarp,
 }: SystemPanelProps) {
   return (
     <>
@@ -73,7 +75,7 @@ export function SystemPanel({
 
           <div className="flex flex-col gap-2">
             {system.agents.length > 0 ? (
-              system.agents.map((a) => <AgentCard key={a.id} agent={a} />)
+              system.agents.map((a) => <AgentCard key={a.agent.id} agent={a} />)
             ) : (
               <div className="flex min-h-20 place-items-center justify-center border border-dashed text-sm text-muted-foreground">
                 No agents in this system
@@ -94,6 +96,7 @@ export function SystemPanel({
                   ? true
                   : false
               }
+              onClick={onWarp}
             >
               <ArrowRight className="mr-2 size-4" />
               Warp

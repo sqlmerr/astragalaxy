@@ -4,7 +4,6 @@ import type { paths } from "@/api/schema"
 
 const AUTH_TOKEN_KEY = "astragalaxy.auth.token"
 const API_URL = import.meta.env.VITE_API_URL
-console.log(API_URL)
 
 function getAuthToken(): string | null {
   if (typeof window === "undefined") return null

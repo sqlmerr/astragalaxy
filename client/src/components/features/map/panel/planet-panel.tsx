@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { ArrowRight, Orbit, X } from "lucide-react"
 import { Separator } from "@/components/ui/separator"
-import type { AgentWithShip } from "../../auth/use-agents-with-ships"
+import type { AgentWithShip } from "@/api/types"
 
 interface PlanetPanelProps {
   currentAgent: AgentWithShip

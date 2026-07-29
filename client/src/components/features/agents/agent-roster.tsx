@@ -25,13 +25,15 @@ import { Spinner } from "@/components/ui/spinner"
 
 import SyntaxHighlighter from "react-syntax-highlighter"
 import { gruvboxDark } from "react-syntax-highlighter/dist/esm/styles/hljs"
+import { Json } from "@/components/ui/json"
+import { useAgentsWithShips } from "../auth/use-agents-with-ships"
 
 export function AgentRoster() {
-  const { data, isPending, isError } = useMyAgentsQuery()
+  const { data, isPending, isError } = useAgentsWithShips()
   const { currentAgentID, setCurrentAgentID } = useAuth()
   const [selectedAgent, setSelectedAgent] = useState<SchemaAgent | null>(null)
   const [isCollapsed, setIsCollapsed] = useState(false)
-  const agents = data?.data ?? []
+  const agents = data ?? []
 
   return (
     <>
@@ -96,11 +98,11 @@ export function AgentRoster() {
                 <ScrollArea className="max-h-60 divide-y divide-border">
                   {agents.map((agent) => (
                     <AgentCard
-                      key={agent.id}
+                      key={agent.agent.id}
                       agent={agent}
-                      isActive={agent.id === currentAgentID}
-                      onClick={() => setCurrentAgentID(agent.id)}
-                      onInfo={() => setSelectedAgent(agent)}
+                      isActive={agent.agent.id === currentAgentID}
+                      onClick={() => setCurrentAgentID(agent.agent.id)}
+                      onInfo={() => setSelectedAgent(agent.agent)}
                       withInfo={true}
                     />
                   ))}
@@ -149,9 +151,7 @@ export function AgentRoster() {
                   <AccordionTrigger>JSON</AccordionTrigger>
                   <AccordionContent>
                     <div className="overflow-x-auto rounded-lg bg-muted p-2 text-xs">
-                      <SyntaxHighlighter language="json" style={gruvboxDark}>
-                        {JSON.stringify(selectedAgent, null, 2)}
-                      </SyntaxHighlighter>
+                      <Json data={selectedAgent} />
                     </div>
                   </AccordionContent>
                 </AccordionItem>

@@ -30,7 +30,7 @@ func (r *CooldownRepositoryImpl) CheckCooldown(ctx context.Context, agentID uuid
 	timeLeft := time.Until(c.SetAt.Add(c.Duration))
 	if timeLeft > 0 {
 		return core_errors.NewWithCode(
-			core_errors.CodeCharacterInCooldown,
+			core_errors.CodeAgentInCooldown,
 			fmt.Errorf(
 				"cooldown %.0fs left: %w",
 				timeLeft.Seconds(),

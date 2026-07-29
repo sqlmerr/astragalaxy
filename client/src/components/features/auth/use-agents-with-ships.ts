@@ -3,15 +3,10 @@ import {
   activeShipQueryOptions,
   myShipsQueryOptions,
 } from "@/api/queries/ships"
-import type { SchemaAgent, SchemaShip } from "@/api/types"
+import type { AgentWithShip } from "@/api/types"
 import { useQueries } from "@tanstack/react-query"
 import { useMemo } from "react"
 import { useAuth } from "./auth-provider"
-
-export interface AgentWithShip {
-  agent: SchemaAgent
-  ship: SchemaShip
-}
 
 export function useAgentsWithShips() {
   const { agents } = useAuth()

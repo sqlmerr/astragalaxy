@@ -11,7 +11,7 @@ export function Labels({ systems }: { systems: SystemExtended[] }) {
         const parts: string[] = []
         for (const agent of s.agents) {
           if (parts.length < 2) {
-            parts.push(agent.username)
+            parts.push(agent.agent.username)
           } else {
             parts.push("...")
             break

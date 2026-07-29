@@ -29,7 +29,7 @@ const (
 	CodeNotEnoughResources           ErrorCode = "NOT_ENOUGH_RESOURCES"
 	CodeInventoryIsFull              ErrorCode = "INVENTORY_IS_FULL"
 	CodeItemNotInInventory           ErrorCode = "ITEM_NOT_IN_INVENTORY"
-	CodeCharacterInCooldown          ErrorCode = "CHARACTER_IN_COOLDOWN"
+	CodeAgentInCooldown              ErrorCode = "AGENT_IN_COOLDOWN"
 	CodeInvalidWarpPath              ErrorCode = "INVALID_WARP_PATH"
 	CodeAlreadyAtDestination         ErrorCode = "ALREADY_AT_DESTINATION"
 	CodeInvalidCoordinates           ErrorCode = "INVALID_COORDINATES"

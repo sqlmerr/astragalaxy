@@ -9,7 +9,7 @@ import { MapCanvas } from "../map-canvas"
 import type { Viewport } from "pixi-viewport"
 import { FederatedPointerEvent, type Container, type Graphics } from "pixi.js"
 import type { SchemaPlanet, SystemExtended } from "@/api/types"
-import type { AgentWithShip } from "../../auth/use-agents-with-ships"
+import type { AgentWithShip } from "@/api/types"
 import { OrbitPlanet } from "./orbit"
 
 interface SystemMapProps {
@@ -51,9 +51,7 @@ export function SystemMap({
   const handleClick = (orbit: number) => (e: FederatedPointerEvent) => {
     // e.preventDefault()
     const planet = system.system.planets.find((p) => p.orbit === orbit)
-    console.log("clicked")
     if (planet) {
-      console.log("clicked")
       setSelectedPlanet(planet)
       onPlanetClick(planet)
     }

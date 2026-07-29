@@ -11,10 +11,10 @@ import type {
   SchemaNavigateWaypointRequest,
 } from "@/api/types"
 
-export function useNavigateWarpMutation(agentID: string) {
+export function useNavigateWarpMutation() {
   return useMutation({
-    mutationFn: (body: SchemaNavigateWarpRequest) =>
-      navigateWarp(agentID, body),
+    mutationFn: (data: { agentId: string; body: SchemaNavigateWarpRequest }) =>
+      navigateWarp(data.agentId, data.body),
   })
 }
 

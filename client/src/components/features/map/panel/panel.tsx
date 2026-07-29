@@ -3,7 +3,7 @@ import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area"
 import { SystemPanel } from "./system-panel"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { PlanetPanel } from "./planet-panel"
-import type { AgentWithShip } from "../../auth/use-agents-with-ships"
+import type { AgentWithShip } from "@/api/types"
 
 interface PanelProps {
   system: SystemExtended | null
@@ -13,6 +13,7 @@ interface PanelProps {
   onSystemCenterCamera: () => void
   onSystemOpen: () => void
   onSelectPlanet: (p: SchemaPlanet | null) => void
+  onSystemWarp: () => void
 }
 
 export function Panel({
@@ -23,6 +24,7 @@ export function Panel({
   onSystemCenterCamera,
   onSystemOpen,
   onSelectPlanet,
+  onSystemWarp,
 }: PanelProps) {
   return (
     <aside
@@ -69,6 +71,7 @@ export function Panel({
                 onCenterCamera={onSystemCenterCamera}
                 onClose={onClose}
                 onSystemOpen={onSystemOpen}
+                onWarp={onSystemWarp}
               />
             )}
           </TabsContent>

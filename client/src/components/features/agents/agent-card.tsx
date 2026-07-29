@@ -3,9 +3,11 @@ import { Info, UserRound } from "lucide-react"
 import type { SchemaAgent } from "@/api/types"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
+import type { AgentWithShip } from "@/api/types"
+import { AgentActionsMenu } from "./actions-menu"
 
 interface AgentCardProps {
-  agent: SchemaAgent
+  agent: AgentWithShip
   isActive?: boolean
   onClick?: () => void
   onInfo?: () => void
@@ -39,16 +41,16 @@ export function AgentCard({
     >
       <div className="flex items-start gap-3">
         <Avatar className="transition-transform duration-300 group-hover:scale-105">
-          <AvatarFallback>{getInitials(agent.username)}</AvatarFallback>
+          <AvatarFallback>{getInitials(agent.agent.username)}</AvatarFallback>
         </Avatar>
         <div className="min-w-0 flex-1">
           <div className="flex items-center justify-between gap-2">
             <h3 className="truncate text-sm font-semibold tracking-wide">
-              {agent.username}
+              {agent.agent.username}
             </h3>
             <div className="flex items-center gap-1.5">
               {isActive ? <Badge>Active</Badge> : null}
-              {withInfo ? (
+              {withInfo && (
                 <button
                   type="button"
                   className="rounded-md p-1 text-muted-foreground transition-colors hover:text-foreground"
@@ -59,12 +61,17 @@ export function AgentCard({
                 >
                   <Info className="size-3.5" />
                 </button>
-              ) : null}
+              )}
+
+              <AgentActionsMenu
+                btnClassName="rounded-md p-1 text-muted-foreground transition-colors hover:text-foreground"
+                agent={agent}
+              />
             </div>
           </div>
           <p className="mt-1 flex items-center gap-1.5 truncate text-[11px] text-muted-foreground">
             <UserRound className="size-3 text-primary/80" aria-hidden="true" />
-            ID: {agent.id.slice(0, 8)}...
+            ID: {agent.agent.id.slice(0, 8)}...
           </p>
         </div>
       </div>

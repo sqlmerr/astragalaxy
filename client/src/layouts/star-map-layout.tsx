@@ -1,7 +1,11 @@
 import { ClientOnly, useNavigate } from "@tanstack/react-router"
 import { LogOut, UserRound } from "lucide-react"
 
-import { useActiveShipQuery, useShipRadarQuery } from "@/api/hooks"
+import {
+  useActiveShipQuery,
+  useNavigateWarpMutation,
+  useShipRadarQuery,
+} from "@/api/hooks"
 import { Button } from "@/components/ui/button"
 import { AgentRoster } from "@/components/features/agents/agent-roster"
 import { useAuth } from "@/components/features/auth/auth-provider"
@@ -10,12 +14,14 @@ import {
   type GalaxyMapRef,
 } from "@/components/features/map/galaxy/galaxy-map"
 import type {
+  AgentWithShip,
   SchemaAgent,
+  SchemaErrorResponse,
   SchemaPlanet,
   SchemaSystem,
   SystemExtended,
 } from "@/api/types"
-import { useEffect, useRef, useState } from "react"
+import { useCallback, useEffect, useRef, useState } from "react"
 import { Panel } from "@/components/features/map/panel/panel"
 import { useAgentsWithShips } from "@/components/features/auth/use-agents-with-ships"
 import { toast } from "@/components/ui/toast"
@@ -23,8 +29,12 @@ import {
   SystemMap,
   type SystemMapRef,
 } from "@/components/features/map/system/system-map"
+import { useQueryClient } from "@tanstack/react-query"
+import { queryKeys } from "@/api/query-keys"
+import { handleError } from "@/components/features/utils"
 
 export function StarMapLayout() {
+  const queryClient = useQueryClient()
   const { signOut, user, currentAgentID, isReady } = useAuth()
   const navigate = useNavigate()
   const [selectedSystem, setSelectedSystem] = useState<SystemExtended | null>(
@@ -38,6 +48,8 @@ export function StarMapLayout() {
   const galaxyMapRef = useRef<GalaxyMapRef>(null)
   const systemMapRef = useRef<SystemMapRef>(null)
 
+  const warpMutation = useNavigateWarpMutation()
+
   function handleSignOut() {
     signOut()
     void navigate({ to: "/login", replace: true })
@@ -48,6 +60,35 @@ export function StarMapLayout() {
     setSelectedPlanet(null)
     setOpenedSystem(null)
     galaxyMapRef.current?.closeSystem()
+  }
+
+  async function warp() {
+    if (!selectedSystem || !currentAgentID) {
+      return
+    }
+
+    await warpMutation.mutateAsync(
+      {
+        agentId: currentAgentID,
+        body: { x: selectedSystem.system.x, y: selectedSystem.system.y },
+      },
+      {
+        onError(err) {
+          handleError(err, "Failed to warp")
+        },
+        onSuccess(data) {
+          // TODO: cooldown
+          toast.add({
+            type: "success",
+            title: "Success",
+            description: "Successfully warped to another system",
+          })
+          queryClient.invalidateQueries({
+            queryKey: queryKeys.agents.my,
+          })
+        },
+      }
+    )
   }
 
   useEffect(() => {
@@ -74,15 +115,13 @@ export function StarMapLayout() {
 
   const systems: SchemaSystem[] = systemsData?.data ?? []
 
-  const agentLocations: Map<string, SchemaAgent[]> = new Map()
+  const agentLocations: Map<string, AgentWithShip[]> = new Map()
   for (const a of agentsWithShips) {
     const key = `${a.ship.system_x}:${a.ship.system_y}`
     const l = agentLocations.get(key) ?? []
-    l.push(a.agent)
+    l.push(a)
     agentLocations.set(key, l)
-    console.log(key, l)
   }
-  console.log(agentLocations)
 
   const extendedSystems: SystemExtended[] = []
   systems.forEach((s) => {
@@ -170,6 +209,7 @@ export function StarMapLayout() {
             setSelectedPlanet(p)
             systemMapRef.current?.selectPlanet(p)
           }}
+          onSystemWarp={warp}
         />
 
         <div className="fixed top-4 right-4 flex items-center gap-2 lg:top-6 lg:right-6">
