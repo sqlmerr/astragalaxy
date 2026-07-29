@@ -79,7 +79,7 @@ export function AgentRoster() {
             </div>
           </CardHeader>
           {!isCollapsed && (
-            <CardContent className="p-0">
+            <CardContent className="">
               {isPending ? (
                 <div className="flex h-48 items-center justify-center gap-2 text-xs text-muted-foreground">
                   <Spinner className="text-primary" />
@@ -95,7 +95,7 @@ export function AgentRoster() {
                   operations.
                 </div>
               ) : (
-                <ScrollArea className="max-h-60 divide-y divide-border">
+                <ScrollArea className="flex max-h-60 flex-col divide-y divide-border">
                   {agents.map((agent) => (
                     <AgentCard
                       key={agent.agent.id}
@@ -127,22 +127,17 @@ export function AgentRoster() {
               <Card className="p-4">
                 <h3 className="mb-3 font-semibold">Information</h3>
 
-                <div className="space-y-2 text-sm">
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">ID</span>
+                <div className="grid grid-cols-[80px_1fr] gap-x-3 gap-y-2 text-sm">
+                  <span className="text-muted-foreground">ID</span>
+                  <code className="font-mono break-all">
+                    {selectedAgent.id}
+                  </code>
 
-                    <code className="font-mono break-all">
-                      {selectedAgent.id}
-                    </code>
-                  </div>
+                  <span className="text-muted-foreground">User ID</span>
 
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">User ID</span>
-
-                    <code className="font-mono break-all">
-                      {selectedAgent.user_id}
-                    </code>
-                  </div>
+                  <code className="font-mono break-all">
+                    {selectedAgent.user_id}
+                  </code>
                 </div>
               </Card>
               <Separator />
@@ -150,7 +145,7 @@ export function AgentRoster() {
                 <AccordionItem value="json">
                   <AccordionTrigger>JSON</AccordionTrigger>
                   <AccordionContent>
-                    <div className="overflow-x-auto rounded-lg bg-muted p-2 text-xs">
+                    <div className="rounded-lg bg-muted p-2 text-xs">
                       <Json data={selectedAgent} />
                     </div>
                   </AccordionContent>
