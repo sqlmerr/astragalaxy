@@ -26,14 +26,14 @@ export function useChangeActiveShipMutation(agentID: string) {
   })
 }
 
-export function useDockShipMutation(agentID: string) {
+export function useDockShipMutation() {
   return useMutation({
-    mutationFn: () => dockShip(agentID),
+    mutationFn: ({ agentID }: { agentID: string }) => dockShip(agentID),
   })
 }
 
-export function useOrbitShipMutation(agentID: string) {
+export function useOrbitShipMutation() {
   return useMutation({
-    mutationFn: () => orbitShip(agentID),
+    mutationFn: ({ agentID }: { agentID: string }) => orbitShip(agentID),
   })
 }

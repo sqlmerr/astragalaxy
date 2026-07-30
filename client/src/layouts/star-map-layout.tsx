@@ -13,11 +13,12 @@ import {
   GalaxyMap,
   type GalaxyMapRef,
 } from "@/components/features/map/galaxy/galaxy-map"
-import type {
-  AgentWithShip,
-  SchemaPlanet,
-  SchemaSystem,
-  SystemExtended,
+import {
+  type SchemaWaypoint,
+  type AgentWithShip,
+  type SchemaPlanet,
+  type SchemaSystem,
+  type SystemExtended,
 } from "@/api/types"
 import { useCallback, useEffect, useRef, useState } from "react"
 import { Panel } from "@/components/features/map/panel/panel"
@@ -42,6 +43,8 @@ export function StarMapLayout() {
   const [selectedPlanet, setSelectedPlanet] = useState<SchemaPlanet | null>(
     null
   )
+  const [selectedWaypoint, setSelectedWaypoint] =
+    useState<SchemaWaypoint | null>(null)
   const [openedSystem, setOpenedSystem] = useState<SystemExtended | null>(null)
 
   const galaxyMapRef = useRef<GalaxyMapRef>(null)
@@ -57,6 +60,7 @@ export function StarMapLayout() {
   function closeSystem() {
     setSelectedSystem(null)
     setSelectedPlanet(null)
+    setSelectedWaypoint(null)
     setOpenedSystem(null)
     galaxyMapRef.current?.closeSystem()
   }
@@ -83,7 +87,7 @@ export function StarMapLayout() {
             description: "Successfully warped to another system",
           })
           queryClient.invalidateQueries({
-            queryKey: queryKeys.agents.my,
+            queryKey: queryKeys.ships.active(currentAgentID),
           })
         },
       }
@@ -180,7 +184,14 @@ export function StarMapLayout() {
               ref={systemMapRef}
               system={openedSystem}
               agents={agentsWithShips}
-              onPlanetClick={setSelectedPlanet}
+              onPlanetClick={(p) => {
+                setSelectedPlanet(p)
+                setSelectedWaypoint(null)
+              }}
+              onWaypointClick={(w) => {
+                setSelectedWaypoint(w)
+                setSelectedPlanet(null)
+              }}
             />
           ))}
       </ClientOnly>
@@ -198,6 +209,7 @@ export function StarMapLayout() {
             (a) => a.agent.id === currentAgentID
           )!}
           selectedPlanet={selectedPlanet || undefined}
+          selectedWaypoint={selectedWaypoint || undefined}
           onClose={closeSystem}
           onSystemCenterCamera={() =>
             selectedSystem &&
@@ -206,9 +218,20 @@ export function StarMapLayout() {
           onSystemOpen={() => selectedSystem && setOpenedSystem(selectedSystem)}
           onSelectPlanet={(p) => {
             setSelectedPlanet(p)
+            setSelectedWaypoint(null)
             systemMapRef.current?.selectPlanet(p)
           }}
           onSystemWarp={warp}
+          onSelectWaypoint={(w) => {
+            setSelectedWaypoint(w)
+            setSelectedPlanet(null)
+            systemMapRef.current?.selectWaypoint(w)
+          }}
+          onSelectNone={() => {
+            setSelectedPlanet(null)
+            setSelectedWaypoint(null)
+            systemMapRef.current?.selectNone()
+          }}
         />
 
         <div className="fixed top-4 right-4 flex items-center gap-2 lg:top-6 lg:right-6">

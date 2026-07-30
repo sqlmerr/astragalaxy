@@ -8,25 +8,30 @@ import {
 import { MapCanvas } from "../map-canvas"
 import type { Viewport } from "pixi-viewport"
 import { FederatedPointerEvent, type Container, type Graphics } from "pixi.js"
-import type { SchemaPlanet, SystemExtended } from "@/api/types"
+import type { SchemaPlanet, SchemaWaypoint, SystemExtended } from "@/api/types"
 import type { AgentWithShip } from "@/api/types"
 import { OrbitPlanet } from "./orbit"
+import { Waypoint } from "./waypoint"
 
 interface SystemMapProps {
   system: SystemExtended
   agents: AgentWithShip[]
   onPlanetClick: (planet: SchemaPlanet) => void
+  onWaypointClick: (waypoint: SchemaWaypoint) => void
   ref: RefObject<SystemMapRef | null>
 }
 
 export interface SystemMapRef {
-  selectPlanet(planet: SchemaPlanet | null): void
+  selectPlanet(planet: SchemaPlanet): void
+  selectWaypoint(waypoint: SchemaWaypoint): void
+  selectNone(): void
 }
 
 export function SystemMap({
   system,
   agents,
   onPlanetClick,
+  onWaypointClick,
   ref,
 }: SystemMapProps) {
   const viewportRef = useRef<Viewport>(null)
@@ -35,10 +40,21 @@ export function SystemMap({
   const [selectedPlanet, setSelectedPlanet] = useState<SchemaPlanet | null>(
     null
   )
+  const [selectedWaypoint, setSelectedWaypoint] =
+    useState<SchemaWaypoint | null>(null)
 
   useImperativeHandle(ref, () => ({
-    selectPlanet(planet: SchemaPlanet | null) {
+    selectPlanet(planet: SchemaPlanet) {
       setSelectedPlanet(planet)
+      setSelectedWaypoint(null)
+    },
+    selectWaypoint(waypoint: SchemaWaypoint) {
+      setSelectedWaypoint(waypoint)
+      setSelectedPlanet(null)
+    },
+    selectNone() {
+      setSelectedWaypoint(null)
+      setSelectedPlanet(null)
     },
   }))
 
@@ -48,12 +64,22 @@ export function SystemMap({
     g.circle(0, 0, 40).fill({ color: 0xffffff })
   }, [])
 
-  const handleClick = (orbit: number) => (e: FederatedPointerEvent) => {
+  const handlePlanetClick = (orbit: number) => (e: FederatedPointerEvent) => {
     // e.preventDefault()
     const planet = system.system.planets.find((p) => p.orbit === orbit)
     if (planet) {
       setSelectedPlanet(planet)
+      setSelectedWaypoint(null)
       onPlanetClick(planet)
+    }
+  }
+
+  const handleWaypointClick = (id: number) => (e: FederatedPointerEvent) => {
+    const waypoint = system.system.waypoints.find((w) => w.id === id)
+    if (waypoint) {
+      setSelectedWaypoint(waypoint)
+      setSelectedPlanet(null)
+      onWaypointClick(waypoint)
     }
   }
 
@@ -65,11 +91,20 @@ export function SystemMap({
           <OrbitPlanet
             key={p.orbit}
             planet={p}
-            onClick={handleClick(p.orbit)}
+            onClick={handlePlanetClick(p.orbit)}
             isSelected={selectedPlanet?.orbit === p.orbit}
           />
         )
       })}
+      {system.system.waypoints.map((w) => (
+        <Waypoint
+          key={w.id}
+          waypoint={w}
+          system={system.system}
+          onClick={handleWaypointClick(w.id)}
+          isSelected={selectedWaypoint?.id === w.id}
+        />
+      ))}
     </MapCanvas>
   )
 }

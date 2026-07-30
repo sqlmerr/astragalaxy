@@ -4,6 +4,7 @@ import type { Container, FederatedPointerEvent, Graphics } from "pixi.js"
 import { useCallback, useEffect, useRef, useState, type ReactNode } from "react"
 import { PLANET_PARAMS } from "../constants"
 import { getOrbitRadius } from "../utils"
+import { degreesToRadians } from "@/lib/utils"
 
 interface OrbitProps {
   planet: SchemaPlanet
@@ -21,7 +22,7 @@ export function OrbitPlanet({ planet, onClick, isSelected }: OrbitProps) {
   const ref = useRef<Container>(null)
 
   useEffect(() => {
-    const angle = Math.random() * 360
+    const angle = degreesToRadians(Math.random() * 360)
     const x = Math.cos(angle) * orbitRadius
     const y = Math.sin(angle) * orbitRadius
 

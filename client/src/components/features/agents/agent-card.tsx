@@ -11,7 +11,7 @@ interface AgentCardProps {
   isActive?: boolean
   onClick?: () => void
   onInfo?: () => void
-  withInfo?: boolean
+  expanded?: boolean
 }
 
 function getInitials(username: string): string {
@@ -28,7 +28,7 @@ export function AgentCard({
   isActive,
   onClick,
   onInfo,
-  withInfo,
+  expanded,
 }: AgentCardProps) {
   return (
     <article
@@ -50,23 +50,24 @@ export function AgentCard({
             </h3>
             <div className="flex items-center gap-1.5">
               {isActive ? <Badge>Active</Badge> : null}
-              {withInfo && (
-                <button
-                  type="button"
-                  className="rounded-md p-1 text-muted-foreground transition-colors hover:text-foreground"
-                  onClick={(e) => {
-                    e.stopPropagation()
-                    onInfo?.()
-                  }}
-                >
-                  <Info className="size-3.5" />
-                </button>
+              {expanded && (
+                <>
+                  <button
+                    type="button"
+                    className="rounded-md p-1 text-muted-foreground transition-colors hover:text-foreground"
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      onInfo?.()
+                    }}
+                  >
+                    <Info className="size-3.5" />
+                  </button>
+                  <AgentActionsMenu
+                    btnClassName="rounded-md p-1 text-muted-foreground transition-colors hover:text-foreground"
+                    agent={agent}
+                  />
+                </>
               )}
-
-              <AgentActionsMenu
-                btnClassName="rounded-md p-1 text-muted-foreground transition-colors hover:text-foreground"
-                agent={agent}
-              />
             </div>
           </div>
           <p className="mt-1 flex items-center gap-1.5 truncate text-[11px] text-muted-foreground">
