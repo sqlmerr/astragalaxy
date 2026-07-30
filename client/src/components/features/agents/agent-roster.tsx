@@ -2,7 +2,6 @@ import { ChevronLeft, ChevronRight, UsersRound } from "lucide-react"
 import { useState } from "react"
 import type { SchemaAgent } from "@/api/types"
 
-import { useMyAgentsQuery } from "@/api/hooks"
 import { useAuth } from "@/components/features/auth/auth-provider"
 import { AgentCard } from "@/components/features/agents/agent-card"
 import {
@@ -23,8 +22,6 @@ import { ScrollArea } from "@/components/ui/scroll-area"
 import { Separator } from "@/components/ui/separator"
 import { Spinner } from "@/components/ui/spinner"
 
-import SyntaxHighlighter from "react-syntax-highlighter"
-import { gruvboxDark } from "react-syntax-highlighter/dist/esm/styles/hljs"
 import { Json } from "@/components/ui/json"
 import { useAgentsWithShips } from "../auth/use-agents-with-ships"
 

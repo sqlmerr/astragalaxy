@@ -10,7 +10,6 @@ import {
   type FederatedEventHandler,
 } from "pixi.js"
 import { CELL_SIZE } from "./constants"
-import { Labels } from "./galaxy/labels"
 import { ViewportScene } from "./viewport"
 import type { ReactNode, RefObject } from "react"
 

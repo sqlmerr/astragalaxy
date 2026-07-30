@@ -1,11 +1,10 @@
-import { Application, extend } from "@pixi/react"
+import { extend } from "@pixi/react"
 
 import {
   Container,
   FederatedPointerEvent,
   Graphics,
   Point,
-  Rectangle,
   BitmapText,
   Text,
 } from "pixi.js"
@@ -16,7 +15,6 @@ import {
   useState,
   type RefObject,
 } from "react"
-import { ViewportScene } from "../viewport"
 import { Viewport } from "pixi-viewport"
 import {
   type SchemaShip,

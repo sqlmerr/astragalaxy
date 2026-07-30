@@ -47,10 +47,14 @@ export function AgentActionsMenu({
       <DropdownMenuContent>
         {actions.map((a) => (
           <>
-            <DropdownMenuGroup>
+            <DropdownMenuGroup key={a.groupLabel}>
               <DropdownMenuLabel>{a.groupLabel}</DropdownMenuLabel>
               {a.items.map((i) => (
-                <DropdownMenuItem onClick={i.action} disabled={!i.visible}>
+                <DropdownMenuItem
+                  key={i.label}
+                  onClick={i.action}
+                  disabled={!i.visible}
+                >
                   {i.label}
                 </DropdownMenuItem>
               ))}

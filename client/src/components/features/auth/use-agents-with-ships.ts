@@ -1,8 +1,4 @@
-import { useMyAgentsQuery } from "@/api/hooks"
-import {
-  activeShipQueryOptions,
-  myShipsQueryOptions,
-} from "@/api/queries/ships"
+import { activeShipQueryOptions } from "@/api/queries/ships"
 import type { AgentWithShip } from "@/api/types"
 import { useQueries } from "@tanstack/react-query"
 import { useMemo } from "react"

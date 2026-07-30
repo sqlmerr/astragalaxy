@@ -15,8 +15,6 @@ import {
 } from "@/components/features/map/galaxy/galaxy-map"
 import type {
   AgentWithShip,
-  SchemaAgent,
-  SchemaErrorResponse,
   SchemaPlanet,
   SchemaSystem,
   SystemExtended,
@@ -31,10 +29,11 @@ import {
 } from "@/components/features/map/system/system-map"
 import { useQueryClient } from "@tanstack/react-query"
 import { queryKeys } from "@/api/query-keys"
-import { handleError } from "@/components/features/utils"
+import { useErrorHandler } from "@/errors/utils"
 
 export function StarMapLayout() {
   const queryClient = useQueryClient()
+  const handleError = useErrorHandler()
   const { signOut, user, currentAgentID, isReady } = useAuth()
   const navigate = useNavigate()
   const [selectedSystem, setSelectedSystem] = useState<SystemExtended | null>(

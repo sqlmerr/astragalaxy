@@ -9,6 +9,8 @@ import type { ReactNode } from "react"
 import { getErrorMessage } from "@/api/errors"
 import { Toaster } from "@/components/ui/toast"
 import { AuthProvider } from "@/components/features/auth/auth-provider"
+import { ErrorProvider } from "@/errors/store"
+import { ErrorDialog } from "@/errors/error-dialog"
 
 export function AppProviders({ children }: { children: ReactNode }) {
   const [queryClient] = useState(
@@ -48,7 +50,11 @@ export function AppProviders({ children }: { children: ReactNode }) {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <AuthProvider>{children}</AuthProvider>
+      <ErrorProvider>
+        <AuthProvider>{children}</AuthProvider>
+        <ErrorDialog />
+      </ErrorProvider>
+
       <Toaster />
     </QueryClientProvider>
   )
