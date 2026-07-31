@@ -5,10 +5,10 @@ import { Card } from "@/components/ui/card"
 import { ArrowRight, Orbit, SquareArrowOutUpRight, X } from "lucide-react"
 import { AgentCard } from "../../agents/agent-card"
 import { Separator } from "@/components/ui/separator"
-import type { AgentWithShip } from "@/api/types"
+import type { AgentExtended } from "@/api/types"
 
 interface SystemPanelProps {
-  currentAgent: AgentWithShip
+  currentAgent: AgentExtended
   system: SystemExtended
   onClose: () => void
   onCenterCamera: () => void

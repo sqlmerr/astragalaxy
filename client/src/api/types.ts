@@ -36,12 +36,13 @@ export type SchemaResetAgentTokenResponse =
   components["schemas"]["ResetAgentTokenResponse"]
 export type SchemaErrorResponse = components["schemas"]["ErrorResponse"]
 
-export interface AgentWithShip {
+export interface AgentExtended {
   agent: SchemaAgent
   ship: SchemaShip
+  cooldown: SchemaCooldown
 }
 
 export interface SystemExtended {
   system: SchemaSystem
-  agents: AgentWithShip[]
+  agents: AgentExtended[]
 }

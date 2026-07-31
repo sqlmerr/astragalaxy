@@ -1,4 +1,4 @@
-import type { AgentWithShip, SchemaPlanet } from "@/api/types"
+import type { AgentExtended, SchemaPlanet } from "@/api/types"
 import { useTick } from "@pixi/react"
 import type { Container, FederatedPointerEvent, Graphics } from "pixi.js"
 import { useCallback, useEffect, useRef, useState, type ReactNode } from "react"
@@ -11,7 +11,7 @@ interface OrbitProps {
   planet: SchemaPlanet
   onClick?: (e: FederatedPointerEvent) => void
   isSelected?: boolean
-  agents: AgentWithShip[]
+  agents: AgentExtended[]
 }
 
 export function OrbitPlanet({

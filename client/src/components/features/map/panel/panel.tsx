@@ -3,13 +3,13 @@ import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area"
 import { SystemPanel } from "./system-panel"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { PlanetPanel } from "./planet-panel"
-import type { AgentWithShip } from "@/api/types"
+import type { AgentExtended } from "@/api/types"
 import { WaypointPanel } from "./waypoint-panel"
 import { WAYPOINT_PARAMS } from "../constants"
 
 interface PanelProps {
   system: SystemExtended | null
-  currentAgent: AgentWithShip
+  currentAgent: AgentExtended
   selectedPlanet?: SchemaPlanet
   selectedWaypoint?: SchemaWaypoint
   onClose: () => void

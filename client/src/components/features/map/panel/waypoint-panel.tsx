@@ -4,11 +4,11 @@ import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { ArrowRight, X } from "lucide-react"
 import { Separator } from "@/components/ui/separator"
-import type { AgentWithShip } from "@/api/types"
+import type { AgentExtended } from "@/api/types"
 import { WAYPOINT_PARAMS } from "../constants"
 
 interface WaypointPanelProps {
-  currentAgent: AgentWithShip
+  currentAgent: AgentExtended
   system: SystemExtended
   waypoint: SchemaWaypoint
   onClose: () => void

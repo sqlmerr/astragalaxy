@@ -11,6 +11,7 @@ import { Toaster } from "@/components/ui/toast"
 import { AuthProvider } from "@/components/features/auth/auth-provider"
 import { ErrorProvider } from "@/errors/store"
 import { ErrorDialog } from "@/errors/error-dialog"
+import { TimeProvider } from "./time-provider"
 
 export function AppProviders({ children }: { children: ReactNode }) {
   const [queryClient] = useState(
@@ -50,10 +51,12 @@ export function AppProviders({ children }: { children: ReactNode }) {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <ErrorProvider>
-        <AuthProvider>{children}</AuthProvider>
-        <ErrorDialog />
-      </ErrorProvider>
+      <TimeProvider>
+        <ErrorProvider>
+          <AuthProvider>{children}</AuthProvider>
+          <ErrorDialog />
+        </ErrorProvider>
+      </TimeProvider>
 
       <Toaster />
     </QueryClientProvider>

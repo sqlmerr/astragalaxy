@@ -8,22 +8,24 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import type { AgentWithShip } from "@/api/types"
+import type { AgentExtended } from "@/api/types"
 import { useDockShipMutation, useOrbitShipMutation } from "@/api/hooks"
 import { useErrorHandler } from "@/errors/utils"
 import { toast } from "@/components/ui/toast"
 import { useQueryClient } from "@tanstack/react-query"
 import { queryKeys } from "@/api/query-keys"
+import { useAgents } from "../auth/use-agents"
 
 interface AgentActionsMenuProps {
   btnClassName?: string
-  agent: AgentWithShip
+  agent: AgentExtended
 }
 
 export function AgentActionsMenu({
   btnClassName,
   agent,
 }: AgentActionsMenuProps) {
+  const { setCooldown } = useAgents()
   const queryClient = useQueryClient()
   const handleError = useErrorHandler()
   const dockMutation = useDockShipMutation()
@@ -44,7 +46,6 @@ export function AgentActionsMenu({
                   handleError(err, "Failed to dock ship")
                 },
                 onSuccess(data) {
-                  // TOOD: cooldowns
                   toast.add({
                     type: "success",
                     title: "Success",
@@ -53,6 +54,7 @@ export function AgentActionsMenu({
                   queryClient.invalidateQueries({
                     queryKey: queryKeys.ships.active(agent.agent.id),
                   })
+                  setCooldown(agent.agent.id, data)
                 },
               }
             )
@@ -69,7 +71,6 @@ export function AgentActionsMenu({
                   handleError(err, "Failed to orbit ship")
                 },
                 onSuccess(data) {
-                  // TOOD: cooldowns
                   toast.add({
                     type: "success",
                     title: "Success",
@@ -78,6 +79,7 @@ export function AgentActionsMenu({
                   queryClient.invalidateQueries({
                     queryKey: queryKeys.ships.active(agent.agent.id),
                   })
+                  setCooldown(agent.agent.id, data)
                 },
               }
             )

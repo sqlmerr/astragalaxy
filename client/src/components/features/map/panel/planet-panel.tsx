@@ -4,10 +4,10 @@ import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { ArrowRight, Orbit, X } from "lucide-react"
 import { Separator } from "@/components/ui/separator"
-import type { AgentWithShip } from "@/api/types"
+import type { AgentExtended } from "@/api/types"
 
 interface PlanetPanelProps {
-  currentAgent: AgentWithShip
+  currentAgent: AgentExtended
   system: SystemExtended
   planet: SchemaPlanet
   onClose: () => void

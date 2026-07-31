@@ -17,14 +17,14 @@ import {
 } from "@/components/features/map/galaxy/galaxy-map"
 import {
   type SchemaWaypoint,
-  type AgentWithShip,
+  type AgentExtended,
   type SchemaPlanet,
   type SchemaSystem,
   type SystemExtended,
 } from "@/api/types"
 import { useCallback, useEffect, useRef, useState } from "react"
 import { Panel } from "@/components/features/map/panel/panel"
-import { useAgentsWithShips } from "@/components/features/auth/use-agents-with-ships"
+import { useAgents } from "@/components/features/auth/use-agents"
 import { toast } from "@/components/ui/toast"
 import {
   SystemMap,
@@ -55,6 +55,13 @@ export function StarMapLayout() {
   const warpMutation = useNavigateWarpMutation()
   const waypointNavigateMutation = useNavigateWaypointMutation()
   const planetNavigateMutation = useNavigatePlanetMutation()
+
+  const {
+    data: agentsWithShips,
+    isPending: isAgentsPending,
+    isError: isAgentsError,
+    setCooldown,
+  } = useAgents()
 
   function handleSignOut() {
     signOut()
@@ -93,6 +100,7 @@ export function StarMapLayout() {
           queryClient.invalidateQueries({
             queryKey: queryKeys.ships.active(currentAgentID),
           })
+          setCooldown(currentAgentID, data.cooldown)
         },
       }
     )
@@ -122,6 +130,7 @@ export function StarMapLayout() {
           queryClient.invalidateQueries({
             queryKey: queryKeys.ships.active(currentAgentID),
           })
+          setCooldown(currentAgentID, data.cooldown)
         },
       }
     )
@@ -151,6 +160,7 @@ export function StarMapLayout() {
           queryClient.invalidateQueries({
             queryKey: queryKeys.ships.active(currentAgentID),
           })
+          setCooldown(currentAgentID, data.cooldown)
         },
       }
     )
@@ -167,12 +177,6 @@ export function StarMapLayout() {
   } = useActiveShipQuery(currentAgentID || undefined)
 
   const {
-    data: agentsWithShips,
-    isPending: isAgentsPending,
-    isError: isAgentsError,
-  } = useAgentsWithShips()
-
-  const {
     data: systemsData,
     isPending: isSystemsPending,
     isError: isSystemsError,
@@ -180,7 +184,7 @@ export function StarMapLayout() {
 
   const systems: SchemaSystem[] = systemsData?.data ?? []
 
-  const agentLocations: Map<string, AgentWithShip[]> = new Map()
+  const agentLocations: Map<string, AgentExtended[]> = new Map()
   for (const a of agentsWithShips) {
     const key = `${a.ship.system_x}:${a.ship.system_y}`
     const l = agentLocations.get(key) ?? []

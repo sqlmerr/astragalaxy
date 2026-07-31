@@ -23,10 +23,10 @@ import { Separator } from "@/components/ui/separator"
 import { Spinner } from "@/components/ui/spinner"
 
 import { Json } from "@/components/ui/json"
-import { useAgentsWithShips } from "../auth/use-agents-with-ships"
+import { useAgents } from "../auth/use-agents"
 
 export function AgentRoster() {
-  const { data, isPending, isError } = useAgentsWithShips()
+  const { data, isPending, isError } = useAgents()
   const { currentAgentID, setCurrentAgentID } = useAuth()
   const [selectedAgent, setSelectedAgent] = useState<SchemaAgent | null>(null)
   const [isCollapsed, setIsCollapsed] = useState(false)

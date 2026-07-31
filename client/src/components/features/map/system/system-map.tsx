@@ -7,15 +7,15 @@ import {
 } from "react"
 import { MapCanvas } from "../map-canvas"
 import type { Viewport } from "pixi-viewport"
-import { FederatedPointerEvent, type Container, type Graphics } from "pixi.js"
+import { FederatedPointerEvent, Graphics, type Container } from "pixi.js"
 import type { SchemaPlanet, SchemaWaypoint, SystemExtended } from "@/api/types"
-import type { AgentWithShip } from "@/api/types"
+import type { AgentExtended } from "@/api/types"
 import { OrbitPlanet } from "./orbit"
 import { Waypoint } from "./waypoint"
 
 interface SystemMapProps {
   system: SystemExtended
-  agents: AgentWithShip[]
+  agents: AgentExtended[]
   onPlanetClick: (planet: SchemaPlanet) => void
   onWaypointClick: (waypoint: SchemaWaypoint) => void
   ref: RefObject<SystemMapRef | null>
@@ -58,7 +58,7 @@ export function SystemMap({
     },
   }))
 
-  const drawCallback = useCallback((g: Graphics) => {
+  const drawStar = useCallback((g: Graphics) => {
     g.clear()
 
     g.circle(0, 0, 40).fill({ color: 0xffffff })
@@ -90,7 +90,7 @@ export function SystemMap({
 
   return (
     <MapCanvas x={0} y={0} worldRef={worldRef} viewportRef={viewportRef}>
-      <pixiGraphics draw={drawCallback} />
+      <pixiGraphics draw={drawStar} />
       {system.system.planets.map((p) => {
         return (
           <OrbitPlanet

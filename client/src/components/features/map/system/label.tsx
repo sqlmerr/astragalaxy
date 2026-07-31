@@ -1,7 +1,7 @@
-import type { AgentWithShip } from "@/api/types"
+import type { AgentExtended } from "@/api/types"
 
 interface SystemLabelProps {
-  agents: AgentWithShip[]
+  agents: AgentExtended[]
   location: "PLANET" | "WAYPOINT"
   locationId: number
   x: number

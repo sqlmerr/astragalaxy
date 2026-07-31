@@ -1,4 +1,4 @@
-import type { AgentWithShip, SchemaSystem, SchemaWaypoint } from "@/api/types"
+import type { AgentExtended, SchemaSystem, SchemaWaypoint } from "@/api/types"
 import type { Container, FederatedPointerEvent, Graphics } from "pixi.js"
 import { useCallback, useEffect, useRef, useState } from "react"
 import { getOrbitRadius, regularPolygon } from "../utils"
@@ -12,7 +12,7 @@ interface WaypointProps {
   system: SchemaSystem
   onClick: (e: FederatedPointerEvent) => void
   isSelected?: boolean
-  agents: AgentWithShip[]
+  agents: AgentExtended[]
 }
 
 export function Waypoint({
