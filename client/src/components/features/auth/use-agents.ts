@@ -1,7 +1,10 @@
-import { activeShipQueryOptions } from "@/api/queries/ships"
+import {
+  activeShipQueryOptions,
+  myShipsQueryOptions,
+} from "@/api/queries/ships"
 import type { AgentExtended, SchemaCooldown } from "@/api/types"
 import { useQueries, useQueryClient } from "@tanstack/react-query"
-import { useMemo } from "react"
+import { act, useMemo } from "react"
 import { useAuth } from "./auth-provider"
 import { agentCooldownQueryOptions } from "@/api/queries/agents"
 import { queryKeys } from "@/api/query-keys"
@@ -20,7 +23,7 @@ export function useAgents() {
 
   const shipQueries = useQueries({
     queries: agents.map((agent) => ({
-      ...activeShipQueryOptions(agent.id),
+      ...myShipsQueryOptions(agent.id),
     })),
   })
 
@@ -38,18 +41,23 @@ export function useAgents() {
 
   const data = useMemo<AgentExtended[]>(() => {
     return agents.flatMap((agent, index) => {
-      const ship = shipQueries[index].data
+      const ships = shipQueries[index].data
 
-      if (!ship) return []
+      if (!ships) return []
 
       const cooldown = cooldownQueries[index].data
       if (!cooldown) return []
 
+      const activeShip = ships.data.find((s) => s.agent_id === agent.id)
+
+      if (!activeShip) return []
+
       return [
         {
           agent,
-          ship,
+          ship: activeShip,
           cooldown,
+          ships: ships.data,
         },
       ]
     })

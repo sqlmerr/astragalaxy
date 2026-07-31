@@ -1,6 +1,6 @@
 import { ChevronLeft, ChevronRight, UsersRound } from "lucide-react"
 import { useState } from "react"
-import type { SchemaAgent } from "@/api/types"
+import type { AgentExtended, SchemaAgent } from "@/api/types"
 
 import { useAuth } from "@/components/features/auth/auth-provider"
 import { AgentCard } from "@/components/features/agents/agent-card"
@@ -24,11 +24,12 @@ import { Spinner } from "@/components/ui/spinner"
 
 import { Json } from "@/components/ui/json"
 import { useAgents } from "../auth/use-agents"
+import { AgentModal } from "./agent-modal"
 
 export function AgentRoster() {
   const { data, isPending, isError } = useAgents()
   const { currentAgentID, setCurrentAgentID } = useAuth()
-  const [selectedAgent, setSelectedAgent] = useState<SchemaAgent | null>(null)
+  const [selectedAgent, setSelectedAgent] = useState<AgentExtended | null>(null)
   const [isCollapsed, setIsCollapsed] = useState(false)
   const agents = data ?? []
 
@@ -99,7 +100,7 @@ export function AgentRoster() {
                       agent={agent}
                       isActive={agent.agent.id === currentAgentID}
                       onClick={() => setCurrentAgentID(agent.agent.id)}
-                      onInfo={() => setSelectedAgent(agent.agent)}
+                      onInfo={() => setSelectedAgent(agent)}
                       expanded={true}
                     />
                   ))}
@@ -109,49 +110,7 @@ export function AgentRoster() {
           )}
         </Card>
       </aside>
-      <Dialog
-        open={selectedAgent !== null}
-        onOpenChange={(open) => {
-          if (!open) setSelectedAgent(null)
-        }}
-      >
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>{selectedAgent?.username}</DialogTitle>
-          </DialogHeader>
-          {selectedAgent && (
-            <div className="space-y-6">
-              <Card className="p-4">
-                <h3 className="mb-3 font-semibold">Information</h3>
-
-                <div className="grid grid-cols-[80px_1fr] gap-x-3 gap-y-2 text-sm">
-                  <span className="text-muted-foreground">ID</span>
-                  <code className="font-mono break-all">
-                    {selectedAgent.id}
-                  </code>
-
-                  <span className="text-muted-foreground">User ID</span>
-
-                  <code className="font-mono break-all">
-                    {selectedAgent.user_id}
-                  </code>
-                </div>
-              </Card>
-              <Separator />
-              <Accordion>
-                <AccordionItem value="json">
-                  <AccordionTrigger>JSON</AccordionTrigger>
-                  <AccordionContent>
-                    <div className="rounded-lg bg-muted p-2 text-xs">
-                      <Json data={selectedAgent} />
-                    </div>
-                  </AccordionContent>
-                </AccordionItem>
-              </Accordion>
-            </div>
-          )}
-        </DialogContent>
-      </Dialog>
+      <AgentModal agent={selectedAgent} setAgent={setSelectedAgent} />
     </>
   )
 }

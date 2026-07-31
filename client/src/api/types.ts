@@ -38,7 +38,8 @@ export type SchemaErrorResponse = components["schemas"]["ErrorResponse"]
 
 export interface AgentExtended {
   agent: SchemaAgent
-  ship: SchemaShip
+  ship: SchemaShip // active ship
+  ships: SchemaShip[]
   cooldown: SchemaCooldown
 }
 

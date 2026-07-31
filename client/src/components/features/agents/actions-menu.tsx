@@ -52,7 +52,7 @@ export function AgentActionsMenu({
                     description: "Sucessfully docked ship",
                   })
                   queryClient.invalidateQueries({
-                    queryKey: queryKeys.ships.active(agent.agent.id),
+                    queryKey: queryKeys.ships.my(agent.agent.id),
                   })
                   setCooldown(agent.agent.id, data)
                 },
@@ -77,7 +77,7 @@ export function AgentActionsMenu({
                     description: "Sucessfully orbitted ship",
                   })
                   queryClient.invalidateQueries({
-                    queryKey: queryKeys.ships.active(agent.agent.id),
+                    queryKey: queryKeys.ships.my(agent.agent.id),
                   })
                   setCooldown(agent.agent.id, data)
                 },

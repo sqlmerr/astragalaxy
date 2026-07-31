@@ -98,7 +98,7 @@ export function StarMapLayout() {
             description: "Successfully warped to another system",
           })
           queryClient.invalidateQueries({
-            queryKey: queryKeys.ships.active(currentAgentID),
+            queryKey: queryKeys.ships.my(currentAgentID),
           })
           setCooldown(currentAgentID, data.cooldown)
         },
@@ -128,7 +128,7 @@ export function StarMapLayout() {
             description: `Successfully navigated to waypoint with id ${w.id}`,
           })
           queryClient.invalidateQueries({
-            queryKey: queryKeys.ships.active(currentAgentID),
+            queryKey: queryKeys.ships.my(currentAgentID),
           })
           setCooldown(currentAgentID, data.cooldown)
         },
@@ -158,7 +158,7 @@ export function StarMapLayout() {
             description: `Successfully navigated to planet with orbit ${p.orbit}`,
           })
           queryClient.invalidateQueries({
-            queryKey: queryKeys.ships.active(currentAgentID),
+            queryKey: queryKeys.ships.my(currentAgentID),
           })
           setCooldown(currentAgentID, data.cooldown)
         },
