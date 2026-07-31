@@ -19,6 +19,8 @@ interface PanelProps {
   onSystemWarp: () => void
   onSelectWaypoint: (w: SchemaWaypoint) => void
   onSelectNone: () => void
+  onPlanetNavigate: (p: SchemaPlanet) => void
+  onWaypointNavigate: (w: SchemaWaypoint) => void
 }
 
 export function Panel({
@@ -33,6 +35,8 @@ export function Panel({
   onSystemWarp,
   onSelectWaypoint,
   onSelectNone,
+  onWaypointNavigate,
+  onPlanetNavigate,
 }: PanelProps) {
   return (
     <aside
@@ -108,6 +112,7 @@ export function Panel({
                 system={system}
                 planet={p}
                 onClose={onClose}
+                onNavigate={onPlanetNavigate}
               />
             </TabsContent>
           ))}
@@ -118,6 +123,7 @@ export function Panel({
                 system={system}
                 waypoint={w}
                 onClose={onClose}
+                onNavigate={onWaypointNavigate}
               />
             </TabsContent>
           ))}

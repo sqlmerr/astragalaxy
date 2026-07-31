@@ -11,6 +11,7 @@ interface PlanetPanelProps {
   system: SystemExtended
   planet: SchemaPlanet
   onClose: () => void
+  onNavigate: (p: SchemaPlanet) => void
 }
 
 export function PlanetPanel({
@@ -18,6 +19,7 @@ export function PlanetPanel({
   system,
   planet,
   onClose,
+  onNavigate,
 }: PlanetPanelProps) {
   return (
     <>
@@ -78,6 +80,7 @@ export function PlanetPanel({
                   ? "default"
                   : "destructive"
               }
+              onClick={() => onNavigate(planet)}
             >
               <ArrowRight className="mr-2 size-4" />
               Navigate

@@ -18,16 +18,26 @@ export function useNavigateWarpMutation() {
   })
 }
 
-export function useNavigatePlanetMutation(agentID: string) {
+export function useNavigatePlanetMutation() {
   return useMutation({
-    mutationFn: (body: SchemaNavigatePlanetRequest) =>
-      navigatePlanet(agentID, body),
+    mutationFn: ({
+      body,
+      agentId,
+    }: {
+      agentId: string
+      body: SchemaNavigatePlanetRequest
+    }) => navigatePlanet(agentId, body),
   })
 }
 
-export function useNavigateWaypointMutation(agentID: string) {
+export function useNavigateWaypointMutation() {
   return useMutation({
-    mutationFn: (body: SchemaNavigateWaypointRequest) =>
-      navigateWaypoint(agentID, body),
+    mutationFn: ({
+      body,
+      agentId,
+    }: {
+      agentId: string
+      body: SchemaNavigateWaypointRequest
+    }) => navigateWaypoint(agentId, body),
   })
 }

@@ -1,16 +1,18 @@
-import type { SchemaSystem, SchemaWaypoint } from "@/api/types"
+import type { AgentWithShip, SchemaSystem, SchemaWaypoint } from "@/api/types"
 import type { Container, FederatedPointerEvent, Graphics } from "pixi.js"
 import { useCallback, useEffect, useRef, useState } from "react"
 import { getOrbitRadius, regularPolygon } from "../utils"
 import { degreesToRadians, randomNumberBetween } from "@/lib/utils"
 import { WAYPOINT_PARAMS } from "../constants"
 import { useTick } from "@pixi/react"
+import { SystemLabel } from "./label"
 
 interface WaypointProps {
   waypoint: SchemaWaypoint
   system: SchemaSystem
   onClick: (e: FederatedPointerEvent) => void
   isSelected?: boolean
+  agents: AgentWithShip[]
 }
 
 export function Waypoint({
@@ -18,6 +20,7 @@ export function Waypoint({
   system,
   onClick,
   isSelected,
+  agents,
 }: WaypointProps) {
   const params = WAYPOINT_PARAMS[waypoint.type]
   const ref = useRef<Container>(null)
@@ -74,16 +77,23 @@ export function Waypoint({
   })
 
   return (
-    <pixiContainer
-      ref={ref}
-      x={coords.x}
-      y={coords.y}
-      rotation={degreesToRadians(initialRotationAngle)}
-      eventMode="static"
-      cursor="pointer"
-      onClick={onClick}
-    >
-      <pixiGraphics draw={draw} />
+    <pixiContainer x={coords.x} y={coords.y}>
+      <pixiContainer
+        ref={ref}
+        rotation={degreesToRadians(initialRotationAngle)}
+        eventMode="static"
+        cursor="pointer"
+        onClick={onClick}
+      >
+        <pixiGraphics draw={draw} />
+      </pixiContainer>
+      <SystemLabel
+        x={0}
+        y={-35}
+        agents={agents}
+        location="WAYPOINT"
+        locationId={waypoint.id}
+      />
     </pixiContainer>
   )
 }

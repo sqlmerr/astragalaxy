@@ -3,7 +3,9 @@ import { LogOut, UserRound } from "lucide-react"
 
 import {
   useActiveShipQuery,
+  useNavigatePlanetMutation,
   useNavigateWarpMutation,
+  useNavigateWaypointMutation,
   useShipRadarQuery,
 } from "@/api/hooks"
 import { Button } from "@/components/ui/button"
@@ -51,6 +53,8 @@ export function StarMapLayout() {
   const systemMapRef = useRef<SystemMapRef>(null)
 
   const warpMutation = useNavigateWarpMutation()
+  const waypointNavigateMutation = useNavigateWaypointMutation()
+  const planetNavigateMutation = useNavigatePlanetMutation()
 
   function handleSignOut() {
     signOut()
@@ -85,6 +89,64 @@ export function StarMapLayout() {
             type: "success",
             title: "Success",
             description: "Successfully warped to another system",
+          })
+          queryClient.invalidateQueries({
+            queryKey: queryKeys.ships.active(currentAgentID),
+          })
+        },
+      }
+    )
+  }
+
+  async function waypointNavigate(w: SchemaWaypoint) {
+    if (!selectedSystem || !currentAgentID || !selectedWaypoint) {
+      return
+    }
+
+    await waypointNavigateMutation.mutateAsync(
+      {
+        agentId: currentAgentID,
+        body: { id: w.id },
+      },
+      {
+        onError(err) {
+          handleError(err, "Failed to navigate to waypoint")
+        },
+        onSuccess(data) {
+          // TODO: cooldown
+          toast.add({
+            type: "success",
+            title: "Success",
+            description: `Successfully navigated to waypoint with id ${w.id}`,
+          })
+          queryClient.invalidateQueries({
+            queryKey: queryKeys.ships.active(currentAgentID),
+          })
+        },
+      }
+    )
+  }
+
+  async function planetNavigate(p: SchemaPlanet) {
+    if (!selectedSystem || !currentAgentID || !selectedPlanet) {
+      return
+    }
+
+    await planetNavigateMutation.mutateAsync(
+      {
+        agentId: currentAgentID,
+        body: { orbit: p.orbit },
+      },
+      {
+        onError(err) {
+          handleError(err, "Failed to navigate to planet")
+        },
+        onSuccess(data) {
+          // TODO: cooldown
+          toast.add({
+            type: "success",
+            title: "Success",
+            description: `Successfully navigated to planet with orbit ${p.orbit}`,
           })
           queryClient.invalidateQueries({
             queryKey: queryKeys.ships.active(currentAgentID),
@@ -232,6 +294,8 @@ export function StarMapLayout() {
             setSelectedWaypoint(null)
             systemMapRef.current?.selectNone()
           }}
+          onWaypointNavigate={waypointNavigate}
+          onPlanetNavigate={planetNavigate}
         />
 
         <div className="fixed top-4 right-4 flex items-center gap-2 lg:top-6 lg:right-6">

@@ -28,7 +28,7 @@ export function Labels({ systems }: { systems: SystemExtended[] }) {
             style={{
               stroke: { color: "black", width: 2 },
               fill: "white",
-              fontFamily: ["Jetbrains Mono Variable", "sans-serif"],
+              fontFamily: ["JetBrains Mono Variable", "sans-serif"],
               fontSize: 1000,
             }}
             anchor={0.5}

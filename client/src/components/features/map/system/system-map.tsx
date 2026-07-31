@@ -83,6 +83,11 @@ export function SystemMap({
     }
   }
 
+  const agentsInThisSystem = agents.filter(
+    (a) =>
+      a.ship.system_x === system.system.x && a.ship.system_y === system.system.y
+  )
+
   return (
     <MapCanvas x={0} y={0} worldRef={worldRef} viewportRef={viewportRef}>
       <pixiGraphics draw={drawCallback} />
@@ -93,6 +98,7 @@ export function SystemMap({
             planet={p}
             onClick={handlePlanetClick(p.orbit)}
             isSelected={selectedPlanet?.orbit === p.orbit}
+            agents={agentsInThisSystem}
           />
         )
       })}
@@ -103,6 +109,7 @@ export function SystemMap({
           system={system.system}
           onClick={handleWaypointClick(w.id)}
           isSelected={selectedWaypoint?.id === w.id}
+          agents={agentsInThisSystem}
         />
       ))}
     </MapCanvas>

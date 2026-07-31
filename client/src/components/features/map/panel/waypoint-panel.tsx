@@ -12,6 +12,7 @@ interface WaypointPanelProps {
   system: SystemExtended
   waypoint: SchemaWaypoint
   onClose: () => void
+  onNavigate: (w: SchemaWaypoint) => void
 }
 
 export function WaypointPanel({
@@ -19,6 +20,7 @@ export function WaypointPanel({
   system,
   waypoint,
   onClose,
+  onNavigate,
 }: WaypointPanelProps) {
   const params = WAYPOINT_PARAMS[waypoint.type]
 
@@ -81,6 +83,7 @@ export function WaypointPanel({
                   ? "default"
                   : "destructive"
               }
+              onClick={() => onNavigate(waypoint)}
             >
               <ArrowRight className="mr-2 size-4" />
               Navigate
