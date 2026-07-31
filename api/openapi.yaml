@@ -64,3 +64,8 @@ components:
       type: http
       description: Agent auth
       scheme: Bearer
+    AgentId:
+      type: apiKey
+      in: header
+      name: X-Agent-ID
+      description: Agent ID. Must be used with UserAuth scheme

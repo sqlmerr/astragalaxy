@@ -91,7 +91,6 @@ export function StarMapLayout() {
           handleError(err, "Failed to warp")
         },
         onSuccess(data) {
-          // TODO: cooldown
           toast.add({
             type: "success",
             title: "Success",
@@ -121,7 +120,6 @@ export function StarMapLayout() {
           handleError(err, "Failed to navigate to waypoint")
         },
         onSuccess(data) {
-          // TODO: cooldown
           toast.add({
             type: "success",
             title: "Success",
@@ -151,7 +149,6 @@ export function StarMapLayout() {
           handleError(err, "Failed to navigate to planet")
         },
         onSuccess(data) {
-          // TODO: cooldown
           toast.add({
             type: "success",
             title: "Success",

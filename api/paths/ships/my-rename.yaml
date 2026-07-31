@@ -31,3 +31,5 @@ patch:
       $ref: "../../components/responses/InvalidAgentToken.yaml"
   security:
     - AgentAuth: []
+    - UserAuth: []
+      AgentId: []

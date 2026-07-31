@@ -22,38 +22,22 @@ export function OrbitPlanet({
 }: OrbitProps) {
   const params = PLANET_PARAMS[planet.type]
   const orbitRadius = getOrbitRadius(planet.orbit)
-  const [coords, setCoords] = useState<{ x: number; y: number }>({
-    x: orbitRadius,
-    y: 0,
-  })
   const ref = useRef<Container>(null)
   const angle = useRef(degreesToRadians(Math.random() * 360))
-
-  useEffect(() => {
-    const x = Math.cos(angle.current) * orbitRadius
-    const y = Math.sin(angle.current) * orbitRadius
-
-    setCoords({ x, y })
-  }, [planet])
 
   useTick((ticker) => {
     if (ref.current) {
       angle.current +=
         params.rotationSpeed * ticker.deltaTime * ((planet.orbit + 1) / 10)
-      setCoords({
-        x: Math.cos(angle.current) * orbitRadius,
-        y: Math.sin(angle.current) * orbitRadius,
-      })
+      ref.current.x = Math.cos(angle.current) * orbitRadius
+      ref.current.y = Math.sin(angle.current) * orbitRadius
     }
   })
 
-  const drawOrbitOutline = useCallback(
-    (g: Graphics) => {
-      g.clear()
-      g.circle(0, 0, orbitRadius).stroke({ alpha: 0.25, color: "white" })
-    },
-    [planet]
-  )
+  const drawOrbitOutline = useCallback((g: Graphics) => {
+    g.clear()
+    g.circle(0, 0, orbitRadius).stroke({ alpha: 0.25, color: "white" })
+  }, [])
 
   const drawPlanet = useCallback(
     (g: Graphics) => {
@@ -64,13 +48,13 @@ export function OrbitPlanet({
         g.circle(0, 0, params.radius * 1.5).stroke({ color: "white" })
       }
     },
-    [planet, isSelected]
+    [isSelected]
   )
 
   return (
-    <pixiContainer ref={ref}>
+    <pixiContainer>
       <pixiGraphics draw={drawOrbitOutline} />
-      <pixiContainer x={coords.x} y={coords.y}>
+      <pixiContainer ref={ref}>
         <pixiContainer cursor="pointer" eventMode="static" onClick={onClick}>
           <pixiGraphics draw={drawPlanet} />
         </pixiContainer>

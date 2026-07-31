@@ -5,6 +5,7 @@ import { Card } from "@/components/ui/card"
 import { ArrowRight, Orbit, X } from "lucide-react"
 import { Separator } from "@/components/ui/separator"
 import type { AgentExtended } from "@/api/types"
+import { AgentCard } from "../../agents/agent-card"
 
 interface PlanetPanelProps {
   currentAgent: AgentExtended
@@ -21,6 +22,10 @@ export function PlanetPanel({
   onClose,
   onNavigate,
 }: PlanetPanelProps) {
+  const thisPlanetAgents = system.agents.filter(
+    (a) => a.ship.location === "PLANET" && a.ship.location_id === planet.orbit
+  )
+
   return (
     <>
       <div className="flex items-center justify-between border-b border-border p-5">
@@ -53,21 +58,21 @@ export function PlanetPanel({
             </div>
           </div>
         </Card>
-
-        {/* <Card className="p-4">
+        <Card className="p-4">
           <h3 className="mb-3 font-semibold">Agents on this planet</h3>
 
           <div className="flex flex-col gap-2">
-            {system.agents.length > 0 ? (
-              system.agents.map((a) => <AgentCard key={a.id} agent={a} />)
+            {thisPlanetAgents.length > 0 ? (
+              thisPlanetAgents.map((a) => (
+                <AgentCard key={a.agent.id} agent={a} />
+              ))
             ) : (
               <div className="flex min-h-20 place-items-center justify-center border border-dashed text-sm text-muted-foreground">
-                No agents in this system
+                No agents on this planet
               </div>
             )}
           </div>
-        </Card> TODO  */}
-
+        </Card>
         <Card className="p-4">
           <h3 className="mb-3 font-semibold">Available Actions</h3>
 
@@ -87,9 +92,7 @@ export function PlanetPanel({
             </Button>
           </div>
         </Card>
-
         <Separator />
-
         {/* <div>
           <h3 className="mb-3 font-semibold">Description</h3>
 

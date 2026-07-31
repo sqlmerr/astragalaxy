@@ -6,6 +6,7 @@ import { ArrowRight, X } from "lucide-react"
 import { Separator } from "@/components/ui/separator"
 import type { AgentExtended } from "@/api/types"
 import { WAYPOINT_PARAMS } from "../constants"
+import { AgentCard } from "../../agents/agent-card"
 
 interface WaypointPanelProps {
   currentAgent: AgentExtended
@@ -22,6 +23,9 @@ export function WaypointPanel({
   onClose,
   onNavigate,
 }: WaypointPanelProps) {
+  const thisWaypointAgents = system.agents.filter(
+    (a) => a.ship.location === "WAYPOINT" && a.ship.location_id === waypoint.id
+  )
   const params = WAYPOINT_PARAMS[waypoint.type]
 
   return (
@@ -57,19 +61,21 @@ export function WaypointPanel({
           </div>
         </Card>
 
-        {/* <Card className="p-4">
-          <h3 className="mb-3 font-semibold">Agents on this planet</h3>
+        <Card className="p-4">
+          <h3 className="mb-3 font-semibold">Agents on this waypoint</h3>
 
           <div className="flex flex-col gap-2">
-            {system.agents.length > 0 ? (
-              system.agents.map((a) => <AgentCard key={a.id} agent={a} />)
+            {thisWaypointAgents.length > 0 ? (
+              thisWaypointAgents.map((a) => (
+                <AgentCard key={a.agent.id} agent={a} />
+              ))
             ) : (
               <div className="flex min-h-20 place-items-center justify-center border border-dashed text-sm text-muted-foreground">
-                No agents in this system
+                No agents on this waypoint
               </div>
             )}
           </div>
-        </Card> TODO  */}
+        </Card>
 
         <Card className="p-4">
           <h3 className="mb-3 font-semibold">Available Actions</h3>
