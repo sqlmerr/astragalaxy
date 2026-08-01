@@ -31,7 +31,7 @@ export function SystemLabel({
   }
   const label = parts.join(", ")
   return (
-    <pixiText
+    <pixiBitmapText
       x={x}
       y={y}
       text={label}

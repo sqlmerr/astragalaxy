@@ -6,6 +6,13 @@ import { ArrowRight, Orbit, SquareArrowOutUpRight, X } from "lucide-react"
 import { AgentCard } from "../../agents/agent-card"
 import { Separator } from "@/components/ui/separator"
 import type { AgentExtended } from "@/api/types"
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion"
+import { Json } from "@/components/ui/json"
 
 interface SystemPanelProps {
   currentAgent: AgentExtended
@@ -131,6 +138,19 @@ export function SystemPanel({
             Additional information about the selected system will appear here
           </p>
         </div>
+
+        <Separator />
+
+        <Accordion>
+          <AccordionItem value="json">
+            <AccordionTrigger>JSON</AccordionTrigger>
+            <AccordionContent>
+              <div className="rounded-lg bg-muted p-2 text-xs">
+                <Json data={system.system} />
+              </div>
+            </AccordionContent>
+          </AccordionItem>
+        </Accordion>
       </div>
     </>
   )

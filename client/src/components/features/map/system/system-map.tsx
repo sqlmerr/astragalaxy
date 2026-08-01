@@ -16,47 +16,21 @@ import { Waypoint } from "./waypoint"
 interface SystemMapProps {
   system: SystemExtended
   agents: AgentExtended[]
-  onPlanetClick: (planet: SchemaPlanet) => void
-  onWaypointClick: (waypoint: SchemaWaypoint) => void
-  ref: RefObject<SystemMapRef | null>
+  selectedPlanet: SchemaPlanet | null
+  setSelectedPlanet: (p: SchemaPlanet | null) => void
+  selectedWaypoint: SchemaWaypoint | null
+  setSelectedWaypoint: (w: SchemaWaypoint | null) => void
 }
-
-export interface SystemMapRef {
-  selectPlanet(planet: SchemaPlanet): void
-  selectWaypoint(waypoint: SchemaWaypoint): void
-  selectNone(): void
-}
-
 export function SystemMap({
   system,
   agents,
-  onPlanetClick,
-  onWaypointClick,
-  ref,
+  selectedPlanet,
+  setSelectedPlanet,
+  selectedWaypoint,
+  setSelectedWaypoint,
 }: SystemMapProps) {
   const viewportRef = useRef<Viewport>(null)
   const worldRef = useRef<Container>(null)
-
-  const [selectedPlanet, setSelectedPlanet] = useState<SchemaPlanet | null>(
-    null
-  )
-  const [selectedWaypoint, setSelectedWaypoint] =
-    useState<SchemaWaypoint | null>(null)
-
-  useImperativeHandle(ref, () => ({
-    selectPlanet(planet: SchemaPlanet) {
-      setSelectedPlanet(planet)
-      setSelectedWaypoint(null)
-    },
-    selectWaypoint(waypoint: SchemaWaypoint) {
-      setSelectedWaypoint(waypoint)
-      setSelectedPlanet(null)
-    },
-    selectNone() {
-      setSelectedWaypoint(null)
-      setSelectedPlanet(null)
-    },
-  }))
 
   const drawStar = useCallback((g: Graphics) => {
     g.clear()
@@ -64,13 +38,12 @@ export function SystemMap({
     g.circle(0, 0, 40).fill({ color: 0xffffff })
   }, [])
 
-  const handlePlanetClick = (orbit: number) => (e: FederatedPointerEvent) => {
-    // e.preventDefault()
+  const handlePlanetClick = (orbit: number) => () => {
     const planet = system.system.planets.find((p) => p.orbit === orbit)
+
     if (planet) {
       setSelectedPlanet(planet)
       setSelectedWaypoint(null)
-      onPlanetClick(planet)
     }
   }
 
@@ -79,7 +52,6 @@ export function SystemMap({
     if (waypoint) {
       setSelectedWaypoint(waypoint)
       setSelectedPlanet(null)
-      onWaypointClick(waypoint)
     }
   }
 

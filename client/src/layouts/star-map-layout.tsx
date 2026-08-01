@@ -22,14 +22,11 @@ import {
   type SchemaSystem,
   type SystemExtended,
 } from "@/api/types"
-import { useCallback, useEffect, useRef, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { Panel } from "@/components/features/map/panel/panel"
 import { useAgents } from "@/components/features/auth/use-agents"
 import { toast } from "@/components/ui/toast"
-import {
-  SystemMap,
-  type SystemMapRef,
-} from "@/components/features/map/system/system-map"
+import { SystemMap } from "@/components/features/map/system/system-map"
 import { useQueryClient } from "@tanstack/react-query"
 import { queryKeys } from "@/api/query-keys"
 import { useErrorHandler } from "@/errors/utils"
@@ -50,7 +47,6 @@ export function StarMapLayout() {
   const [openedSystem, setOpenedSystem] = useState<SystemExtended | null>(null)
 
   const galaxyMapRef = useRef<GalaxyMapRef>(null)
-  const systemMapRef = useRef<SystemMapRef>(null)
 
   const warpMutation = useNavigateWarpMutation()
   const waypointNavigateMutation = useNavigateWaypointMutation()
@@ -244,17 +240,12 @@ export function StarMapLayout() {
             />
           ) : (
             <SystemMap
-              ref={systemMapRef}
               system={openedSystem}
               agents={agentsWithShips}
-              onPlanetClick={(p) => {
-                setSelectedPlanet(p)
-                setSelectedWaypoint(null)
-              }}
-              onWaypointClick={(w) => {
-                setSelectedWaypoint(w)
-                setSelectedPlanet(null)
-              }}
+              selectedPlanet={selectedPlanet}
+              setSelectedPlanet={setSelectedPlanet}
+              selectedWaypoint={selectedWaypoint}
+              setSelectedWaypoint={setSelectedWaypoint}
             />
           ))}
       </ClientOnly>
@@ -282,18 +273,15 @@ export function StarMapLayout() {
           onSelectPlanet={(p) => {
             setSelectedPlanet(p)
             setSelectedWaypoint(null)
-            systemMapRef.current?.selectPlanet(p)
           }}
           onSystemWarp={warp}
           onSelectWaypoint={(w) => {
             setSelectedWaypoint(w)
             setSelectedPlanet(null)
-            systemMapRef.current?.selectWaypoint(w)
           }}
           onSelectNone={() => {
             setSelectedPlanet(null)
             setSelectedWaypoint(null)
-            systemMapRef.current?.selectNone()
           }}
           onWaypointNavigate={waypointNavigate}
           onPlanetNavigate={planetNavigate}

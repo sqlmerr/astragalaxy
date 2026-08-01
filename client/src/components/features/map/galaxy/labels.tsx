@@ -20,7 +20,7 @@ export function Labels({ systems }: { systems: SystemExtended[] }) {
 
         const label = parts.join(", ")
         return (
-          <pixiText
+          <pixiBitmapText
             key={`${s.system.x} ${s.system.y}`}
             x={s.system.x * CELL_SIZE}
             y={s.system.y * CELL_SIZE - 35}
