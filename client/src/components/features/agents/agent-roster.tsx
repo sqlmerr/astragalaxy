@@ -1,37 +1,24 @@
 import { ChevronLeft, ChevronRight, UsersRound } from "lucide-react"
 import { useState } from "react"
-import type { AgentExtended, SchemaAgent } from "@/api/types"
 
 import { useAuth } from "@/components/features/auth/auth-provider"
 import { AgentCard } from "@/components/features/agents/agent-card"
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@/components/ui/accordion"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog"
 import { ScrollArea } from "@/components/ui/scroll-area"
-import { Separator } from "@/components/ui/separator"
 import { Spinner } from "@/components/ui/spinner"
 
-import { Json } from "@/components/ui/json"
 import { useAgents } from "../auth/use-agents"
 import { AgentModal } from "./agent-modal"
 
 export function AgentRoster() {
-  const { data, isPending, isError } = useAgents()
+  const { data: agents = [], isPending, isError } = useAgents()
   const { currentAgentID, setCurrentAgentID } = useAuth()
-  const [selectedAgent, setSelectedAgent] = useState<AgentExtended | null>(null)
+  const [selectedAgentId, setSelectedAgentId] = useState<string | null>(null)
   const [isCollapsed, setIsCollapsed] = useState(false)
-  const agents = data ?? []
+
+  const selectedAgent =
+    agents.find((s) => s.agent.id === selectedAgentId) ?? null
 
   return (
     <>
@@ -100,7 +87,7 @@ export function AgentRoster() {
                       agent={agent}
                       isActive={agent.agent.id === currentAgentID}
                       onClick={() => setCurrentAgentID(agent.agent.id)}
-                      onInfo={() => setSelectedAgent(agent)}
+                      onInfo={() => setSelectedAgentId(agent.agent.id)}
                       expanded={true}
                     />
                   ))}
@@ -110,7 +97,10 @@ export function AgentRoster() {
           )}
         </Card>
       </aside>
-      <AgentModal agent={selectedAgent} setAgent={setSelectedAgent} />
+      <AgentModal
+        agent={selectedAgent}
+        setAgent={(a) => setSelectedAgentId(a?.agent.id || null)}
+      />
     </>
   )
 }

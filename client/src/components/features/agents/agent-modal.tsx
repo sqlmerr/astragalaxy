@@ -44,7 +44,14 @@ export function AgentModal({ agent, setAgent }: AgentModalProps) {
     progress = 100
   }
 
-  const [selectedShip, setSelectedShip] = useState<SchemaShip | null>(null)
+  const [selectedShipId, setSelectedShipId] = useState<string | null>(null)
+
+  const selectedShip = agent?.ships.find((s) => s.id === selectedShipId) ?? null
+  console.log(
+    "AgentModal",
+    selectedShip?.name,
+    agent?.ships.map((s) => s.name)
+  )
 
   return (
     <>
@@ -120,7 +127,7 @@ export function AgentModal({ agent, setAgent }: AgentModalProps) {
                   <ShipCard
                     key={s.id}
                     ship={s}
-                    onOpen={() => setSelectedShip(s)}
+                    onOpen={() => setSelectedShipId(s.id)}
                   />
                 ))}
               </Card>
@@ -141,7 +148,7 @@ export function AgentModal({ agent, setAgent }: AgentModalProps) {
           )}
         </DialogContent>
       </Dialog>
-      <ShipModal ship={selectedShip} onClose={() => setSelectedShip(null)} />
+      <ShipModal ship={selectedShip} onClose={() => setSelectedShipId(null)} />
     </>
   )
 }

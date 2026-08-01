@@ -1,3 +1,5 @@
+import { useRenameShipMutation } from "@/api/hooks"
+import { queryKeys } from "@/api/query-keys"
 import type { SchemaShip } from "@/api/types"
 import {
   Accordion,
@@ -6,6 +8,7 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion"
 import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import {
   Dialog,
@@ -13,8 +16,14 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog"
+import { Input } from "@/components/ui/input"
 import { Json } from "@/components/ui/json"
 import { Separator } from "@/components/ui/separator"
+import { toast } from "@/components/ui/toast"
+import { useErrorHandler } from "@/errors/utils"
+import { useQueryClient } from "@tanstack/react-query"
+import { Check, Pencil, X } from "lucide-react"
+import { useEffect, useState } from "react"
 
 interface ShipModalProps {
   ship: SchemaShip | null
@@ -22,6 +31,69 @@ interface ShipModalProps {
 }
 
 export function ShipModal({ ship, onClose }: ShipModalProps) {
+  const queryClient = useQueryClient()
+  const [isRenaming, setIsRenaming] = useState(false)
+  const [name, setName] = useState("")
+  const renameMutation = useRenameShipMutation()
+  const errorHandler = useErrorHandler()
+
+  useEffect(() => {
+    if (ship) {
+      setName(ship.name)
+      setIsRenaming(false)
+    }
+  }, [ship])
+
+  async function renameShip() {
+    if (!ship) return
+
+    if (name === ship.name) {
+      setIsRenaming(false)
+      return
+    }
+
+    await renameMutation.mutateAsync(
+      {
+        agentId: ship.agent_id,
+        id: ship.id,
+        body: {
+          name,
+        },
+      },
+      {
+        onSuccess: (renamedShip) => {
+          queryClient.invalidateQueries({
+            queryKey: queryKeys.ships.my(ship.agent_id),
+          })
+          // queryClient.setQueryData(
+          //   queryKeys.ships.my(ship.agent_id),
+          //   (old: { data: SchemaShip[] }) => {
+          //     return {
+          //       data: old.data.map((s) => {
+          //         if (s.id === renamedShip.id) {
+          //           return renameShip
+          //         }
+          //         return s
+          //       }),
+          //     }
+          //   }
+          // )
+
+          toast.add({
+            type: "success",
+            title: "Success",
+            description: "Successfully renamed ship",
+          })
+        },
+        onError: (err) => {
+          errorHandler(err, "Failed to rename ship")
+        },
+      }
+    )
+
+    setIsRenaming(false)
+  }
+
   return (
     <Dialog
       open={ship !== null}
@@ -31,8 +103,55 @@ export function ShipModal({ ship, onClose }: ShipModalProps) {
     >
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>
-            {ship?.name} {ship?.active && <Badge>ACTIVE</Badge>}
+          <DialogTitle className="flex items-center gap-2 pr-10">
+            {isRenaming ? (
+              <>
+                <Input
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  className="h-8"
+                />
+
+                <Button
+                  size="icon"
+                  variant="ghost"
+                  disabled={renameMutation.isPending}
+                  onClick={renameShip}
+                >
+                  <Check className="size-4" />
+                </Button>
+
+                <Button
+                  size="icon"
+                  variant="ghost"
+                  onClick={() => {
+                    setName(ship?.name ?? "")
+                    setIsRenaming(false)
+                  }}
+                >
+                  <X className="size-4" />
+                </Button>
+              </>
+            ) : (
+              <>
+                <span>{ship?.name}</span>
+
+                {ship?.active && (
+                  <>
+                    <Badge>ACTIVE</Badge>
+
+                    <Button
+                      size="icon"
+                      variant="ghost"
+                      className="size-7"
+                      onClick={() => setIsRenaming(true)}
+                    >
+                      <Pencil className="size-4" />
+                    </Button>
+                  </>
+                )}
+              </>
+            )}
           </DialogTitle>
         </DialogHeader>
         {ship && (

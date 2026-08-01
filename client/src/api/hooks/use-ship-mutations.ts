@@ -8,21 +8,24 @@ import {
 } from "@/api/mutations/ships"
 import type { SchemaRenameMyShipRequest } from "@/api/types"
 
-export function useRenameShipMutation(agentID: string) {
+export function useRenameShipMutation() {
   return useMutation({
     mutationFn: ({
+      agentId,
       id,
       body,
     }: {
+      agentId: string
       id: string
       body: SchemaRenameMyShipRequest
-    }) => renameShip(agentID, id, body),
+    }) => renameShip(agentId, id, body),
   })
 }
 
-export function useChangeActiveShipMutation(agentID: string) {
+export function useChangeActiveShipMutation() {
   return useMutation({
-    mutationFn: (id: string) => changeActiveShip(agentID, id),
+    mutationFn: ({ agentId, id }: { agentId: string; id: string }) =>
+      changeActiveShip(agentId, id),
   })
 }
 

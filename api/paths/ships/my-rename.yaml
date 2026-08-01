@@ -2,8 +2,8 @@ patch:
   operationId: renameMyShip
   tags:
     - Ships
-  summary: Rename My Active Ship
-  description: Rename current agent's active ship
+  summary: Rename My Ship
+  description: Rename agent's ship
   requestBody:
     required: true
     content:
@@ -20,7 +20,7 @@ patch:
       description: ID of the ship
   responses:
     '200':
-      description: Successfully renamed agent's active ship
+      description: Successfully renamed agent's ship
       content:
         application/json:
           schema:

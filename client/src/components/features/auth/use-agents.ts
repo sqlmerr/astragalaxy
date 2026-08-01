@@ -48,10 +48,9 @@ export function useAgents() {
       const cooldown = cooldownQueries[index].data
       if (!cooldown) return []
 
-      const activeShip = ships.data.find((s) => s.agent_id === agent.id)
+      const activeShip = ships.data.find((s) => s.active)
 
       if (!activeShip) return []
-
       return [
         {
           agent,

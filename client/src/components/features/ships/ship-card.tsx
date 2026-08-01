@@ -22,11 +22,17 @@ export function ShipCard({ ship, onOpen, onSwitch }: ShipCardProps) {
       <div className="flex items-start justify-between gap-4">
         <div className="min-w-0 flex-1">
           <div className="flex items-center gap-2">
-            <Rocket className="size-4 text-primary" />
+            <Rocket className="size-4 shrink-0 text-primary" />
 
-            <h4 className="truncate font-medium">{ship.name}</h4>
+            <div className="min-w-0 flex-1">
+              <span className="block font-medium break-all">{ship.name}</span>
+            </div>
 
-            {ship.active && <Badge variant="default">Active</Badge>}
+            {ship.active && (
+              <Badge variant="default" className="shrink-0 uppercase">
+                Active
+              </Badge>
+            )}
           </div>
 
           <div className="mt-2 space-y-1 text-sm text-muted-foreground">
