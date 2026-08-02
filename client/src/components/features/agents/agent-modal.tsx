@@ -20,6 +20,11 @@ import { Separator } from "@/components/ui/separator"
 import { ShipCard } from "../ships/ship-card"
 import { useState } from "react"
 import { ShipModal } from "../ships/ship-modal"
+import { useChangeActiveShipMutation } from "@/api/hooks"
+import { useQueryClient } from "@tanstack/react-query"
+import { useErrorHandler } from "@/errors/utils"
+import { queryKeys } from "@/api/query-keys"
+import { toast } from "@/components/ui/toast"
 
 interface AgentModalProps {
   agent: AgentExtended | null
@@ -42,6 +47,39 @@ export function AgentModal({ agent, setAgent }: AgentModalProps) {
   } else {
     cooldown = 0
     progress = 100
+  }
+
+  const queryClient = useQueryClient()
+  const errorHandler = useErrorHandler()
+  const changeActiveShipMutation = useChangeActiveShipMutation()
+
+  function changeActiveShip(shipId: string) {
+    return async () => {
+      if (!agent) {
+        return
+      }
+      await changeActiveShipMutation.mutateAsync(
+        {
+          agentId: agent.agent.id,
+          id: shipId,
+        },
+        {
+          onError(err) {
+            errorHandler(err, "Failed to switch ship")
+          },
+          onSuccess() {
+            queryClient.invalidateQueries({
+              queryKey: queryKeys.ships.my(agent.agent.id),
+            })
+            toast.add({
+              type: "success",
+              title: "Success",
+              description: "Successfully changed active ship",
+            })
+          },
+        }
+      )
+    }
   }
 
   const [selectedShipId, setSelectedShipId] = useState<string | null>(null)
@@ -128,6 +166,7 @@ export function AgentModal({ agent, setAgent }: AgentModalProps) {
                     key={s.id}
                     ship={s}
                     onOpen={() => setSelectedShipId(s.id)}
+                    onSwitch={changeActiveShip(s.id)}
                   />
                 ))}
               </Card>
