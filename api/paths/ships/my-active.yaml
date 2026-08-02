@@ -16,3 +16,5 @@ get:
       
   security:
     - AgentAuth: []
+    - UserAuth: []
+      AgentId: []

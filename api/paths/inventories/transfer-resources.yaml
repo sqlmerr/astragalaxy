@@ -25,3 +25,5 @@ post:
             $ref: "../../components/schemas/ErrorResponse.yaml"
   security:
     - AgentAuth: []
+    - UserAuth: []
+      AgentId: []

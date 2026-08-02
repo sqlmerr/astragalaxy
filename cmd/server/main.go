@@ -77,7 +77,7 @@ func main() {
 	authConfig := core_auth.LoadConfigMust()
 	jwtProcessor := core_auth.NewJWTProcessor(*authConfig)
 	userAuthMiddleware := http_middleware.UserAuth(*jwtProcessor)
-	agentAuthMiddleware := http_middleware.AgentAuth(agentRepo)
+	agentAuthMiddleware := http_middleware.AgentAuth(*jwtProcessor, agentRepo)
 
 	gameConfig := service.NewConfigMust()
 	worldGen := worldgen.New(gameConfig.Seed)
@@ -124,6 +124,7 @@ func main() {
 		http_middleware.Logger(log),
 		http_middleware.Panic(),
 		http_middleware.Trace(),
+		http_middleware.CORS([]string{"*"}),
 	)
 	httpServer.RegisterRouters(apiVersionRouter)
 

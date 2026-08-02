@@ -57,3 +57,6 @@ run-server:
 
 test:
     @go test -v ./internal/game/...
+
+run-client:
+    @cd client && bun dev --host

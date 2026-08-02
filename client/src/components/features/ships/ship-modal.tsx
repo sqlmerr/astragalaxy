@@ -1,0 +1,209 @@
+import { useRenameShipMutation } from "@/api/hooks"
+import { queryKeys } from "@/api/query-keys"
+import type { SchemaShip } from "@/api/types"
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion"
+import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
+import { Card } from "@/components/ui/card"
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog"
+import { Input } from "@/components/ui/input"
+import { Json } from "@/components/ui/json"
+import { Separator } from "@/components/ui/separator"
+import { toast } from "@/components/ui/toast"
+import { useErrorHandler } from "@/errors/utils"
+import { useQueryClient } from "@tanstack/react-query"
+import { Check, Pencil, X } from "lucide-react"
+import { useEffect, useState } from "react"
+
+interface ShipModalProps {
+  ship: SchemaShip | null
+  onClose: () => void
+}
+
+export function ShipModal({ ship, onClose }: ShipModalProps) {
+  const queryClient = useQueryClient()
+  const [isRenaming, setIsRenaming] = useState(false)
+  const [name, setName] = useState("")
+  const renameMutation = useRenameShipMutation()
+  const errorHandler = useErrorHandler()
+
+  useEffect(() => {
+    if (ship) {
+      setName(ship.name)
+      setIsRenaming(false)
+    }
+  }, [ship])
+
+  async function renameShip() {
+    if (!ship) return
+
+    if (name === ship.name) {
+      setIsRenaming(false)
+      return
+    }
+
+    await renameMutation.mutateAsync(
+      {
+        agentId: ship.agent_id,
+        id: ship.id,
+        body: {
+          name,
+        },
+      },
+      {
+        onSuccess: (renamedShip) => {
+          queryClient.invalidateQueries({
+            queryKey: queryKeys.ships.my(ship.agent_id),
+          })
+          // queryClient.setQueryData(
+          //   queryKeys.ships.my(ship.agent_id),
+          //   (old: { data: SchemaShip[] }) => {
+          //     return {
+          //       data: old.data.map((s) => {
+          //         if (s.id === renamedShip.id) {
+          //           return renameShip
+          //         }
+          //         return s
+          //       }),
+          //     }
+          //   }
+          // )
+
+          toast.add({
+            type: "success",
+            title: "Success",
+            description: "Successfully renamed ship",
+          })
+        },
+        onError: (err) => {
+          errorHandler(err, "Failed to rename ship")
+        },
+      }
+    )
+
+    setIsRenaming(false)
+  }
+
+  return (
+    <Dialog
+      open={ship !== null}
+      onOpenChange={(open) => {
+        if (!open) onClose()
+      }}
+    >
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle className="flex items-center gap-2 pr-10">
+            {isRenaming ? (
+              <>
+                <Input
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  className="h-8"
+                />
+
+                <Button
+                  size="icon"
+                  variant="ghost"
+                  disabled={renameMutation.isPending}
+                  onClick={renameShip}
+                >
+                  <Check className="size-4" />
+                </Button>
+
+                <Button
+                  size="icon"
+                  variant="ghost"
+                  onClick={() => {
+                    setName(ship?.name ?? "")
+                    setIsRenaming(false)
+                  }}
+                >
+                  <X className="size-4" />
+                </Button>
+              </>
+            ) : (
+              <>
+                <span>{ship?.name}</span>
+
+                {ship?.active && (
+                  <>
+                    <Badge>ACTIVE</Badge>
+
+                    <Button
+                      size="icon"
+                      variant="ghost"
+                      className="size-7"
+                      onClick={() => setIsRenaming(true)}
+                    >
+                      <Pencil className="size-4" />
+                    </Button>
+                  </>
+                )}
+              </>
+            )}
+          </DialogTitle>
+        </DialogHeader>
+        {ship && (
+          <div className="space-y-6">
+            <Card className="p-4">
+              <h3 className="mb-3 font-semibold">Information</h3>
+
+              <div className="grid grid-cols-[80px_1fr] gap-x-3 gap-y-2 text-sm">
+                <span className="text-muted-foreground">ID</span>
+                <code className="font-mono break-all">{ship.id}</code>
+
+                <span className="text-muted-foreground">Agent ID</span>
+                <code className="font-mono break-all">{ship.agent_id}</code>
+
+                <span className="text-muted-foreground">Type</span>
+                <Badge>{ship.type}</Badge>
+
+                <span className="text-muted-foreground">Location</span>
+                <code className="font-mono break-all">
+                  {ship.location === "NONE"
+                    ? ship.location
+                    : `${ship.location} #${ship.location_id}`}
+                </code>
+
+                <span className="text-muted-foreground">System</span>
+                <code className="font-mono break-all">
+                  <span className="text-muted-foreground">x=</span>
+                  {ship.system_x}{" "}
+                  <span className="text-muted-foreground">y=</span>
+                  {ship.system_y}
+                </code>
+
+                <span className="text-muted-foreground">Status</span>
+                <Badge>{ship.status}</Badge>
+              </div>
+            </Card>
+
+            <Separator />
+
+            <Accordion>
+              <AccordionItem value="json">
+                <AccordionTrigger>JSON</AccordionTrigger>
+                <AccordionContent>
+                  <div className="rounded-lg bg-muted p-2 text-xs">
+                    <Json data={ship} />
+                  </div>
+                </AccordionContent>
+              </AccordionItem>
+            </Accordion>
+          </div>
+        )}
+      </DialogContent>
+    </Dialog>
+  )
+}

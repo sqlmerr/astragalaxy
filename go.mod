@@ -10,6 +10,7 @@ require (
 	github.com/jackc/pgx/v5 v5.10.0
 	github.com/kelseyhightower/envconfig v1.4.0
 	github.com/redis/go-redis/v9 v9.21.0
+	github.com/rs/cors v1.11.1
 	github.com/samber/lo v1.53.0
 	github.com/stretchr/testify v1.11.1
 	go.uber.org/zap v1.28.0

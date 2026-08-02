@@ -24,3 +24,5 @@ get:
       $ref: "../../components/responses/AccessDenied.yaml"
   security:
     - AgentAuth: []
+    - UserAuth: []
+      AgentId: []
