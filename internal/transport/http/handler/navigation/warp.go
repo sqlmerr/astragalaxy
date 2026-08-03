@@ -28,7 +28,7 @@ func (h *NavigationHTTPHandler) NavigateWarp(w http.ResponseWriter, r *http.Requ
 
 	agentID := core_auth.GetAgentIDFromContext(ctx)
 
-	cooldown, err := h.service.NavigateWarp(ctx, agentID, req.X, req.Y)
+	cooldown, err := h.navigationService.NavigateWarp(ctx, agentID, req.X, req.Y)
 	if err != nil {
 		responseHandler.ErrorResponse(err, "Failed to warp")
 		return

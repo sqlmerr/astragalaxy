@@ -3,19 +3,22 @@ package http_handler_agents
 import (
 	"net/http"
 
-	"github.com/sqlmerr/astragalaxy/internal/game/service"
+	agents_service "github.com/sqlmerr/astragalaxy/internal/game/agents"
+	cooldowns_service "github.com/sqlmerr/astragalaxy/internal/game/cooldowns"
 	http_middleware "github.com/sqlmerr/astragalaxy/internal/transport/http/middleware"
 	http_server "github.com/sqlmerr/astragalaxy/internal/transport/http/server"
 )
 
 type AgentsHTTPHandler struct {
-	service service.Service
+	agentsService    agents_service.AgentsService
+	cooldownsService cooldowns_service.CooldownsService
 }
 
 func NewAgentsHTTPHandler(
-	service service.Service,
+	agentsService agents_service.AgentsService,
+	cooldownsService cooldowns_service.CooldownsService,
 ) *AgentsHTTPHandler {
-	return &AgentsHTTPHandler{service}
+	return &AgentsHTTPHandler{agentsService, cooldownsService}
 }
 
 func (h *AgentsHTTPHandler) Routes(userAuthMiddleware http_middleware.Middleware, agentAuthMiddleware http_middleware.Middleware) []http_server.Route {

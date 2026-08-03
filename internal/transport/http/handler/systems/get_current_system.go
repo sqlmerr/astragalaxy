@@ -14,7 +14,7 @@ func (h *SystemsHTTPHandler) GetCurrentSystem(w http.ResponseWriter, r *http.Req
 	responseHandler := http_response.NewHTTPResponseHandler(log, w)
 
 	agentID := core_auth.GetAgentIDFromContext(ctx)
-	system, err := h.service.GetCurrentAgentSystem(ctx, agentID)
+	system, err := h.galaxyService.GetCurrentAgentSystem(ctx, agentID)
 	if err != nil {
 		responseHandler.ErrorResponse(err, "Radar failed")
 		return

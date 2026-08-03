@@ -7,7 +7,7 @@ import (
 	"github.com/samber/lo"
 	core_auth "github.com/sqlmerr/astragalaxy/internal/auth"
 	"github.com/sqlmerr/astragalaxy/internal/data/model"
-	"github.com/sqlmerr/astragalaxy/internal/game/service"
+	inventory_service "github.com/sqlmerr/astragalaxy/internal/game/inventory"
 	core_logger "github.com/sqlmerr/astragalaxy/internal/logger"
 	http_request "github.com/sqlmerr/astragalaxy/internal/transport/http/request"
 	http_response "github.com/sqlmerr/astragalaxy/internal/transport/http/response"
@@ -31,7 +31,7 @@ func (h *InventoriesHTTPHandler) TransferResources(w http.ResponseWriter, r *htt
 	}
 
 	agentID := core_auth.GetAgentIDFromContext(ctx)
-	input := service.TransferResourcesInput{
+	input := inventory_service.TransferResourcesInput{
 		AgentID:         agentID,
 		FromInventoryID: request.FromInventoryID,
 		ToInventoryID:   request.ToInventoryID,
@@ -39,7 +39,7 @@ func (h *InventoriesHTTPHandler) TransferResources(w http.ResponseWriter, r *htt
 			return model.ResourceType(key)
 		}),
 	}
-	err := h.service.TransferResources(ctx, input)
+	err := h.inventoryService.TransferResources(ctx, input)
 	if err != nil {
 		responseHandler.ErrorResponse(err, "Failed to transfer resources")
 		return

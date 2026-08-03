@@ -26,7 +26,7 @@ func (h *AgentsHTTPHandler) ResetAgentToken(w http.ResponseWriter, r *http.Reque
 		return
 	}
 
-	newToken, err := h.service.ResetAgentToken(ctx, userID, agentID)
+	newToken, err := h.agentsService.ResetAgentToken(ctx, userID, agentID)
 	if err != nil {
 		responseHandler.ErrorResponse(err, "Failed to reset agent's token")
 		return

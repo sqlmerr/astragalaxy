@@ -1,4 +1,4 @@
-package logic
+package ships_service
 
 import (
 	"testing"

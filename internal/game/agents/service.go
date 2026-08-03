@@ -1,4 +1,4 @@
-package service
+package agents_service
 
 import (
 	"context"
@@ -17,7 +17,27 @@ import (
 	"go.uber.org/zap"
 )
 
-func (s *Service) RegisterAgent(ctx context.Context, userID uuid.UUID, username string) (model.Agent, string, error) {
+type AgentsService struct {
+	store    data.Store
+	worldGen worldgen.WorldGen
+}
+
+func New(store data.Store, worldGen worldgen.WorldGen) *AgentsService {
+	return &AgentsService{
+		store, worldGen,
+	}
+}
+
+func (s *AgentsService) GetUserAgents(ctx context.Context, userID uuid.UUID) ([]model.Agent, error) {
+	agents, err := s.store.Agents().GetAgentsByUser(ctx, userID)
+	if err != nil {
+		return nil, fmt.Errorf("get user agents: %w", err)
+	}
+
+	return agents, err
+}
+
+func (s *AgentsService) RegisterAgent(ctx context.Context, userID uuid.UUID, username string) (model.Agent, string, error) {
 	log := core_logger.TryFromContext(ctx)
 	var rawToken string
 	var agent model.Agent
@@ -138,16 +158,7 @@ func (s *Service) RegisterAgent(ctx context.Context, userID uuid.UUID, username 
 	return agent, rawToken, nil
 }
 
-func (s *Service) GetUserAgents(ctx context.Context, userID uuid.UUID) ([]model.Agent, error) {
-	agents, err := s.store.Agents().GetAgentsByUser(ctx, userID)
-	if err != nil {
-		return nil, fmt.Errorf("get user agents: %w", err)
-	}
-
-	return agents, err
-}
-
-func (s *Service) ResetAgentToken(ctx context.Context, userID uuid.UUID, agentID uuid.UUID) (string, error) {
+func (s *AgentsService) ResetAgentToken(ctx context.Context, userID uuid.UUID, agentID uuid.UUID) (string, error) {
 	agent, err := s.store.Agents().GetAgent(ctx, agentID)
 	if err != nil {
 		return "", fmt.Errorf("get agent: %w", err)
@@ -170,8 +181,4 @@ func (s *Service) ResetAgentToken(ctx context.Context, userID uuid.UUID, agentID
 	}
 
 	return rawToken, nil
-}
-
-func (s *Service) GetAgentCooldown(ctx context.Context, agentID uuid.UUID) (model.Cooldown, error) {
-	return s.store.Cooldowns().GetCooldown(ctx, agentID)
 }

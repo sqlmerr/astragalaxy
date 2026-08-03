@@ -3,18 +3,18 @@ package http_handler_systems
 import (
 	"net/http"
 
-	"github.com/sqlmerr/astragalaxy/internal/game/service"
+	galaxy_service "github.com/sqlmerr/astragalaxy/internal/game/galaxy"
 	http_middleware "github.com/sqlmerr/astragalaxy/internal/transport/http/middleware"
 	http_server "github.com/sqlmerr/astragalaxy/internal/transport/http/server"
 )
 
 type SystemsHTTPHandler struct {
-	service service.Service
+	galaxyService galaxy_service.GalaxyService
 }
 
-func New(service service.Service) *SystemsHTTPHandler {
+func New(galaxyService galaxy_service.GalaxyService) *SystemsHTTPHandler {
 	return &SystemsHTTPHandler{
-		service,
+		galaxyService,
 	}
 }
 

@@ -24,7 +24,7 @@ func (h *UsersHTTPHandler) RegisterUser(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
-	user, err := h.service.RegisterUser(ctx, request.Username, request.Password)
+	user, err := h.authService.RegisterUser(ctx, request.Username, request.Password)
 	if err != nil {
 		responseHandler.ErrorResponse(err, "Failed to register user")
 		return

@@ -3,17 +3,19 @@ package http_handler_users
 import (
 	"net/http"
 
-	"github.com/sqlmerr/astragalaxy/internal/game/service"
+	core_auth "github.com/sqlmerr/astragalaxy/internal/auth"
+	users_service "github.com/sqlmerr/astragalaxy/internal/game/users"
 	http_middleware "github.com/sqlmerr/astragalaxy/internal/transport/http/middleware"
 	http_server "github.com/sqlmerr/astragalaxy/internal/transport/http/server"
 )
 
 type UsersHTTPHandler struct {
-	service service.Service
+	usersService users_service.UsersService
+	authService  core_auth.AuthService
 }
 
-func NewUsersHTTPHandler(service service.Service) *UsersHTTPHandler {
-	return &UsersHTTPHandler{service}
+func NewUsersHTTPHandler(usersService users_service.UsersService, authService core_auth.AuthService) *UsersHTTPHandler {
+	return &UsersHTTPHandler{usersService, authService}
 }
 
 func (h *UsersHTTPHandler) Routes(userAuthMiddleware http_middleware.Middleware) []http_server.Route {

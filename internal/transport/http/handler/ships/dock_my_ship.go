@@ -15,7 +15,7 @@ func (h *ShipsHTTPHandler) DockMyShip(w http.ResponseWriter, r *http.Request) {
 	responseHandler := http_response.NewHTTPResponseHandler(log, w)
 
 	agentID := core_auth.GetAgentIDFromContext(ctx)
-	cooldown, err := h.service.DockShip(ctx, agentID)
+	cooldown, err := h.shipsService.DockShip(ctx, agentID)
 	if err != nil {
 		responseHandler.ErrorResponse(err, "Failed to dock ship")
 		return

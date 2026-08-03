@@ -30,7 +30,7 @@ func (h *AgentsHTTPHandler) RegisterAgent(w http.ResponseWriter, r *http.Request
 	}
 
 	userID := core_auth.GetUserIDFromContext(ctx)
-	agent, token, err := h.service.RegisterAgent(ctx, userID, request.Username)
+	agent, token, err := h.agentsService.RegisterAgent(ctx, userID, request.Username)
 	if err != nil {
 		responseHandler.ErrorResponse(err, "Failed to register new agent")
 		return

@@ -5,7 +5,7 @@ import (
 
 	"github.com/google/uuid"
 	core_auth "github.com/sqlmerr/astragalaxy/internal/auth"
-	"github.com/sqlmerr/astragalaxy/internal/game/service"
+	inventory_service "github.com/sqlmerr/astragalaxy/internal/game/inventory"
 	core_logger "github.com/sqlmerr/astragalaxy/internal/logger"
 	http_request "github.com/sqlmerr/astragalaxy/internal/transport/http/request"
 	http_response "github.com/sqlmerr/astragalaxy/internal/transport/http/response"
@@ -29,13 +29,13 @@ func (h *InventoriesHTTPHandler) TransferItems(w http.ResponseWriter, r *http.Re
 	}
 
 	agentID := core_auth.GetAgentIDFromContext(ctx)
-	input := service.TransferItemsInput{
+	input := inventory_service.TransferItemsInput{
 		AgentID:         agentID,
 		FromInventoryID: request.FromInventoryID,
 		ToInventoryID:   request.ToInventoryID,
 		Items:           request.Items,
 	}
-	err := h.service.TransferItems(ctx, input)
+	err := h.inventoryService.TransferItems(ctx, input)
 	if err != nil {
 		responseHandler.ErrorResponse(err, "Failed to transfer items")
 		return

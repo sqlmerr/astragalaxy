@@ -27,7 +27,7 @@ func (h *NavigationHTTPHandler) NavigatePlanet(w http.ResponseWriter, r *http.Re
 
 	agentID := core_auth.GetAgentIDFromContext(ctx)
 
-	cooldown, err := h.service.NavigatePlanet(ctx, agentID, *req.Orbit)
+	cooldown, err := h.navigationService.NavigatePlanet(ctx, agentID, *req.Orbit)
 	if err != nil {
 		responseHandler.ErrorResponse(err, "Failed to navigate")
 		return

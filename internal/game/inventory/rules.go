@@ -1,4 +1,4 @@
-package logic
+package inventory_service
 
 import (
 	"fmt"

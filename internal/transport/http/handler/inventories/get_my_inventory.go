@@ -14,7 +14,7 @@ func (h *InventoriesHTTPHandler) GetMyInventory(w http.ResponseWriter, r *http.R
 	responseHandler := http_response.NewHTTPResponseHandler(log, w)
 
 	agentID := core_auth.GetAgentIDFromContext(ctx)
-	inv, err := h.service.GetAgentInventory(ctx, agentID)
+	inv, err := h.inventoryService.GetAgentInventory(ctx, agentID)
 	if err != nil {
 		responseHandler.ErrorResponse(err, "Failed to get agent's inventory")
 		return

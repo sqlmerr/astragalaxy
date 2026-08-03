@@ -3,17 +3,17 @@ package http_handler_navigation
 import (
 	"net/http"
 
-	"github.com/sqlmerr/astragalaxy/internal/game/service"
+	navigation_service "github.com/sqlmerr/astragalaxy/internal/game/navigation"
 	http_middleware "github.com/sqlmerr/astragalaxy/internal/transport/http/middleware"
 	http_server "github.com/sqlmerr/astragalaxy/internal/transport/http/server"
 )
 
 type NavigationHTTPHandler struct {
-	service service.Service
+	navigationService navigation_service.NavigationService
 }
 
-func New(service service.Service) *NavigationHTTPHandler {
-	return &NavigationHTTPHandler{service}
+func New(navigationService navigation_service.NavigationService) *NavigationHTTPHandler {
+	return &NavigationHTTPHandler{navigationService}
 }
 
 func (h *NavigationHTTPHandler) Routes(agentAuthMiddleware http_middleware.Middleware) []http_server.Route {

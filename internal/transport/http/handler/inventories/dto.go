@@ -7,7 +7,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/samber/lo"
 	"github.com/sqlmerr/astragalaxy/internal/data/model"
-	"github.com/sqlmerr/astragalaxy/internal/game/service"
+	inventory_service "github.com/sqlmerr/astragalaxy/internal/game/inventory"
 )
 
 type InventoryResponseDTO struct {
@@ -58,7 +58,7 @@ type FullInventoryResponseDTO struct {
 	Items     []ItemResponseDTO     `json:"items"`
 }
 
-func fullInventoryDTOFromModel(m service.FullInventory) FullInventoryResponseDTO {
+func fullInventoryDTOFromModel(m inventory_service.FullInventory) FullInventoryResponseDTO {
 	return FullInventoryResponseDTO{
 		Inventory: inventoryDTOFromModel(m.Inventory),
 		Resources: lo.Map(m.Resources, func(item model.Resource, _ int) ResourceResponseDTO {

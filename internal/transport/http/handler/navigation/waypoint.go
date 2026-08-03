@@ -27,7 +27,7 @@ func (h *NavigationHTTPHandler) NavigateWaypoint(w http.ResponseWriter, r *http.
 
 	agentID := core_auth.GetAgentIDFromContext(ctx)
 
-	cooldown, err := h.service.NavigateWaypoint(ctx, agentID, *req.ID)
+	cooldown, err := h.navigationService.NavigateWaypoint(ctx, agentID, *req.ID)
 	if err != nil {
 		responseHandler.ErrorResponse(err, "Failed to navigate")
 		return

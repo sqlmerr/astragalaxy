@@ -19,7 +19,7 @@ func (h *AgentsHTTPHandler) GetMyAgents(w http.ResponseWriter, r *http.Request) 
 
 	userID := core_auth.GetUserIDFromContext(ctx)
 
-	agents, err := h.service.GetUserAgents(ctx, userID)
+	agents, err := h.agentsService.GetUserAgents(ctx, userID)
 	if err != nil {
 		responseHandler.ErrorResponse(err, "Failed to get user's agents")
 		return

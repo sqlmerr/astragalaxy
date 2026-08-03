@@ -32,7 +32,7 @@ func (h *ShipsHTTPHandler) RenameMyShip(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
-	ship, err := h.service.RenameShip(ctx, agentID, shipID, request.Name)
+	ship, err := h.shipsService.RenameShip(ctx, agentID, shipID, request.Name)
 	if err != nil {
 		responseHandler.ErrorResponse(err, "Failed to rename ship")
 		return

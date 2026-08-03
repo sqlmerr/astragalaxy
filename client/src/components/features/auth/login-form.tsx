@@ -12,6 +12,7 @@ import { Separator } from "@/components/ui/separator"
 import { Textarea } from "@/components/ui/textarea"
 import { useAuth } from "@/components/features/auth/auth-provider"
 import { toast } from "@/components/ui/toast"
+import { useErrorHandler } from "@/errors/utils"
 
 export function LoginForm() {
   const [username, setUsername] = useState("")
@@ -21,6 +22,7 @@ export function LoginForm() {
   const { signIn } = useAuth()
   const navigate = useNavigate()
 
+  const errorHandler = useErrorHandler()
   const passwordLogin = useLoginMutation()
 
   function handlePasswordLogin(event: SyntheticEvent) {
@@ -34,12 +36,8 @@ export function LoginForm() {
             navigate({ to: "/", replace: true })
           }
         },
-        onError: (error) => {
-          toast.add({
-            type: "error",
-            title: "Authentication failed",
-            description: getErrorMessage(error),
-          })
+        onError(error) {
+          errorHandler(error, "Authentication failed")
         },
       }
     )
@@ -83,7 +81,9 @@ export function LoginForm() {
                 id="username"
                 autoComplete="username"
                 value={username}
-                onChange={(event) => setUsername(event.target.value)}
+                onInput={(e) =>
+                  setUsername((e.target as HTMLInputElement).value)
+                }
                 placeholder="SPACE-RANGER-37"
                 required
               />
@@ -98,7 +98,9 @@ export function LoginForm() {
                 type="password"
                 autoComplete="current-password"
                 value={password}
-                onChange={(event) => setPassword(event.target.value)}
+                onInput={(e) =>
+                  setPassword((e.target as HTMLInputElement).value)
+                }
                 placeholder="Enter your password"
                 required
               />

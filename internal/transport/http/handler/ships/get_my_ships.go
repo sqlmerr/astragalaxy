@@ -19,7 +19,7 @@ func (h *ShipsHTTPHandler) GetMyShips(w http.ResponseWriter, r *http.Request) {
 
 	agentID := core_auth.GetAgentIDFromContext(ctx)
 
-	ships, err := h.service.GetAgentShips(ctx, agentID)
+	ships, err := h.shipsService.GetAgentShips(ctx, agentID)
 	if err != nil {
 		responseHandler.ErrorResponse(err, "Failed to get agent ships")
 		return

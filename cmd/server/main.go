@@ -19,7 +19,14 @@ import (
 	inventories_repository "github.com/sqlmerr/astragalaxy/internal/data/repository/inventories"
 	ships_repository "github.com/sqlmerr/astragalaxy/internal/data/repository/ships"
 	users_repository "github.com/sqlmerr/astragalaxy/internal/data/repository/users"
-	"github.com/sqlmerr/astragalaxy/internal/game/service"
+	"github.com/sqlmerr/astragalaxy/internal/game"
+	agents_service "github.com/sqlmerr/astragalaxy/internal/game/agents"
+	cooldowns_service "github.com/sqlmerr/astragalaxy/internal/game/cooldowns"
+	galaxy_service "github.com/sqlmerr/astragalaxy/internal/game/galaxy"
+	inventory_service "github.com/sqlmerr/astragalaxy/internal/game/inventory"
+	navigation_service "github.com/sqlmerr/astragalaxy/internal/game/navigation"
+	ships_service "github.com/sqlmerr/astragalaxy/internal/game/ships"
+	users_service "github.com/sqlmerr/astragalaxy/internal/game/users"
 	"github.com/sqlmerr/astragalaxy/internal/game/worldgen"
 	core_logger "github.com/sqlmerr/astragalaxy/internal/logger"
 	http_handler_agents "github.com/sqlmerr/astragalaxy/internal/transport/http/handler/agents"
@@ -79,26 +86,34 @@ func main() {
 	userAuthMiddleware := http_middleware.UserAuth(*jwtProcessor)
 	agentAuthMiddleware := http_middleware.AgentAuth(*jwtProcessor, agentRepo)
 
-	gameConfig := service.NewConfigMust()
+	gameConfig := game.NewConfigMust()
 	worldGen := worldgen.New(gameConfig.Seed)
-	serviceObj := service.NewService(store, *worldGen, *jwtProcessor)
 
-	usersHandler := http_handler_users.NewUsersHTTPHandler(*serviceObj)
+	usersService := users_service.New(store)
+	authService := core_auth.NewService(store, *jwtProcessor)
+	agentsService := agents_service.New(store, *worldGen)
+	cooldownsService := cooldowns_service.New(store)
+	shipsService := ships_service.New(store, *worldGen)
+	inventoryService := inventory_service.New(store)
+	navigationService := navigation_service.New(store, *worldGen)
+	galaxyService := galaxy_service.New(store, *worldGen)
+
+	usersHandler := http_handler_users.NewUsersHTTPHandler(*usersService, *authService)
 	apiVersionRouter.AddRoutes(usersHandler.Routes(userAuthMiddleware)...)
 
-	agentsHandler := http_handler_agents.NewAgentsHTTPHandler(*serviceObj)
+	agentsHandler := http_handler_agents.NewAgentsHTTPHandler(*agentsService, *cooldownsService)
 	apiVersionRouter.AddRoutes(agentsHandler.Routes(userAuthMiddleware, agentAuthMiddleware)...)
 
-	shipsHandler := http_handler_ships.NewShipsHTTPHandler(*serviceObj)
+	shipsHandler := http_handler_ships.NewShipsHTTPHandler(*shipsService)
 	apiVersionRouter.AddRoutes(shipsHandler.Routes(agentAuthMiddleware)...)
 
-	inventoriesHandler := http_handler_inventories.NewInventoriesHTTPHandler(*serviceObj)
+	inventoriesHandler := http_handler_inventories.NewInventoriesHTTPHandler(*inventoryService)
 	apiVersionRouter.AddRoutes(inventoriesHandler.Routes(agentAuthMiddleware)...)
 
-	navigationHandler := http_handler_navigation.New(*serviceObj)
+	navigationHandler := http_handler_navigation.New(*navigationService)
 	apiVersionRouter.AddRoutes(navigationHandler.Routes(agentAuthMiddleware)...)
 
-	systemsHandler := http_handler_systems.New(*serviceObj)
+	systemsHandler := http_handler_systems.New(*galaxyService)
 	apiVersionRouter.AddRoutes(systemsHandler.Routes(agentAuthMiddleware)...)
 
 	httpConfig := http_server.LoadConfigMust()

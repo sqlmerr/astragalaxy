@@ -14,7 +14,7 @@ func (h *ShipsHTTPHandler) GetMyActiveShip(w http.ResponseWriter, r *http.Reques
 	responseHandler := http_response.NewHTTPResponseHandler(log, w)
 
 	agentID := core_auth.GetAgentIDFromContext(ctx)
-	ship, err := h.service.GetAgentActiveShip(ctx, agentID)
+	ship, err := h.shipsService.GetAgentActiveShip(ctx, agentID)
 	if err != nil {
 		responseHandler.ErrorResponse(err, "Failed to get active ship")
 		return

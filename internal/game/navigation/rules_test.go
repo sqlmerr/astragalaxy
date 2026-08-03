@@ -1,4 +1,4 @@
-package logic
+package navigation_service
 
 import (
 	"testing"

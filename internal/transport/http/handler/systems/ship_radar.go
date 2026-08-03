@@ -18,7 +18,7 @@ func (h *SystemsHTTPHandler) ShipRadar(w http.ResponseWriter, r *http.Request) {
 	responseHandler := http_response.NewHTTPResponseHandler(log, w)
 
 	agentID := core_auth.GetAgentIDFromContext(ctx)
-	systems, err := h.service.ShipRadar(ctx, agentID)
+	systems, err := h.galaxyService.ShipRadar(ctx, agentID)
 	if err != nil {
 		responseHandler.ErrorResponse(err, "Ship radar failed")
 		return

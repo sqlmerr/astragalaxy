@@ -3,17 +3,17 @@ package http_handler_ships
 import (
 	"net/http"
 
-	"github.com/sqlmerr/astragalaxy/internal/game/service"
+	ships_service "github.com/sqlmerr/astragalaxy/internal/game/ships"
 	http_middleware "github.com/sqlmerr/astragalaxy/internal/transport/http/middleware"
 	http_server "github.com/sqlmerr/astragalaxy/internal/transport/http/server"
 )
 
 type ShipsHTTPHandler struct {
-	service service.Service
+	shipsService ships_service.ShipsService
 }
 
-func NewShipsHTTPHandler(service service.Service) *ShipsHTTPHandler {
-	return &ShipsHTTPHandler{service}
+func NewShipsHTTPHandler(shipsService ships_service.ShipsService) *ShipsHTTPHandler {
+	return &ShipsHTTPHandler{shipsService}
 }
 
 func (h *ShipsHTTPHandler) Routes(agentAuthMiddleware http_middleware.Middleware) []http_server.Route {

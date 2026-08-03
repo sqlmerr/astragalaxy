@@ -21,7 +21,7 @@ func (h *ShipsHTTPHandler) ChangeActiveShip(w http.ResponseWriter, r *http.Reque
 		return
 	}
 
-	err = h.service.ChangeActiveShip(ctx, agentID, shipID)
+	err = h.shipsService.ChangeActiveShip(ctx, agentID, shipID)
 	if err != nil {
 		responseHandler.ErrorResponse(err, "Failed to change active ship")
 		return

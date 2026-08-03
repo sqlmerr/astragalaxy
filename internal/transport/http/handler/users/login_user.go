@@ -29,7 +29,7 @@ func (h *UsersHTTPHandler) LoginUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	accessToken, err := h.service.LoginUser(ctx, request.Username, request.Password)
+	accessToken, err := h.authService.LoginUser(ctx, request.Username, request.Password)
 	if err != nil {
 		responseHandler.ErrorResponse(err, "Failed to login")
 		return

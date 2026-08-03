@@ -85,11 +85,6 @@ export function AgentModal({ agent, setAgent }: AgentModalProps) {
   const [selectedShipId, setSelectedShipId] = useState<string | null>(null)
 
   const selectedShip = agent?.ships.find((s) => s.id === selectedShipId) ?? null
-  console.log(
-    "AgentModal",
-    selectedShip?.name,
-    agent?.ships.map((s) => s.name)
-  )
 
   return (
     <>

@@ -21,7 +21,7 @@ func (h *InventoriesHTTPHandler) GetMyShipInventory(w http.ResponseWriter, r *ht
 		return
 	}
 
-	inv, err := h.service.GetShipInventory(ctx, agentID, shipID)
+	inv, err := h.inventoryService.GetShipInventory(ctx, agentID, shipID)
 	if err != nil {
 		responseHandler.ErrorResponse(err, "Failed to get ship's inventory")
 		return

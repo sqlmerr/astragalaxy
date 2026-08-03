@@ -14,7 +14,7 @@ func (h *UsersHTTPHandler) GetMe(w http.ResponseWriter, r *http.Request) {
 	responseHandler := http_response.NewHTTPResponseHandler(log, w)
 
 	userID := core_auth.GetUserIDFromContext(ctx)
-	user, err := h.service.GetUserByID(ctx, userID)
+	user, err := h.usersService.GetUserByID(ctx, userID)
 	if err != nil {
 		responseHandler.ErrorResponse(err, "Failed to get user")
 		return

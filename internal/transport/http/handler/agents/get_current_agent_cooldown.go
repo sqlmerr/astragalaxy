@@ -15,7 +15,7 @@ func (h *AgentsHTTPHandler) GetCurrentAgentCooldown(w http.ResponseWriter, r *ht
 	responseHandler := http_response.NewHTTPResponseHandler(log, w)
 
 	agentID := core_auth.GetAgentIDFromContext(ctx)
-	cooldown, err := h.service.GetAgentCooldown(ctx, agentID)
+	cooldown, err := h.cooldownsService.GetAgentCooldown(ctx, agentID)
 	if err != nil {
 		responseHandler.ErrorResponse(err, "Failed to get agent's cooldown")
 		return
