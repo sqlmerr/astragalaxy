@@ -14,7 +14,7 @@ properties:
     format: uuid
   item_type:
     type: string
-    description: Item type # TODO: link to documentation with item types
+    description: Item type # TODO(docs): link to documentation with item types
   metadata:
     type: string
     format: json

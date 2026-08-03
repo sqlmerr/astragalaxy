@@ -21,7 +21,7 @@ import {
   type SchemaSystem,
   type SystemExtended,
 } from "@/api/types"
-import { CELL_SIZE } from "../constants"
+import { CELL_SIZE, SYSTEM_PARAMS } from "../constants"
 import { Labels } from "./labels"
 import { MapCanvas } from "../map-canvas"
 
@@ -77,11 +77,12 @@ export function GalaxyMap({
 
       g.circle(0, 0, 100)
       for (const system of systems) {
+        const params = SYSTEM_PARAMS[system.system.archetype]
         g.circle(
           system.system.x * CELL_SIZE,
           system.system.y * CELL_SIZE,
           15
-        ).fill()
+        ).fill({ color: params.color })
         if (
           selectedSystem &&
           system.system.x == selectedSystem.x &&

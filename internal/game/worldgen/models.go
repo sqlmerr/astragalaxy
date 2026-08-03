@@ -39,6 +39,7 @@ type System struct {
 	X    int
 	Y    int
 	// StarType StarType
+	Archetype SystemArchetype
 	Planets   []Planet
 	Waypoints []Waypoint
 }
@@ -74,4 +75,106 @@ func (s *System) FindPlanetByOrbit(orbit int) *Planet {
 var (
 	namePrefixes = []string{"Alpha", "Proxima", "Sirius", "Vega", "Rigel", "Arcturus", "Betelgeuse", "Kepler", "Gliese"}
 	nameSuffixes = []string{"Prime", "Major", "Minor", "B", "C", "Nexus", "Void", "Epsilon", "Zeta"}
+)
+
+var (
+	consonants = []string{"b", "c", "d", "f", "g", "k", "l", "m", "n", "p", "r", "s", "t", "v", "x", "z", "kr", "th", "st", "vr", "xl"}
+	vowels     = []string{"a", "e", "i", "o", "u", "y", "ae", "ia", "io", "ou"}
+	suffixes   = []string{" Prime", " Major", " Minor", " Alpha", " Beta", " Gamma", " I", " II", " III", " IV", " V", " X", "-9"}
+)
+
+type SystemArchetype struct {
+	Name       string
+	MinPlanets int
+	MaxPlanets int
+
+	Inner  PlanetWeights
+	Middle PlanetWeights
+	Outer  PlanetWeights
+
+	StationChance float64
+	MaxAsteroids  int
+}
+
+type PlanetWeights struct {
+	Scorched int
+	Terra    int
+	Ocean    int
+	Toxic    int
+	Glacial  int
+}
+
+var (
+	ArchetypeHabitable = SystemArchetype{
+		Name:       "HABITABLE",
+		MinPlanets: 4,
+		MaxPlanets: 7,
+		Inner: PlanetWeights{
+			Scorched: 70, Toxic: 20, Terra: 10,
+		},
+		Middle: PlanetWeights{
+			Terra:    50,
+			Ocean:    30,
+			Toxic:    10,
+			Scorched: 10,
+		},
+		Outer: PlanetWeights{
+			Glacial: 60,
+			Ocean:   30,
+			Toxic:   10,
+		},
+		StationChance: 0.8,
+		MaxAsteroids:  8,
+	}
+	ArchetypeDead = SystemArchetype{
+		Name:       "DEAD",
+		MinPlanets: 2,
+		MaxPlanets: 5,
+		Inner: PlanetWeights{
+			Scorched: 80,
+			Toxic:    15,
+			Ocean:    5,
+		},
+		Middle: PlanetWeights{
+			Scorched: 60,
+			Toxic:    25,
+			Glacial:  15,
+		},
+		Outer: PlanetWeights{
+			Scorched: 30,
+			Glacial:  60,
+			Toxic:    10,
+		},
+		StationChance: 0.1,
+		MaxAsteroids:  15,
+	}
+	ArchetypeFrozen = SystemArchetype{
+		Name:       "FROZEN",
+		MinPlanets: 3,
+		MaxPlanets: 8,
+		Inner: PlanetWeights{
+			Scorched: 40,
+			Glacial:  30,
+			Toxic:    10,
+		},
+		Middle: PlanetWeights{
+			Scorched: 10,
+			Glacial:  60,
+			Toxic:    10,
+			Terra:    5,
+			Ocean:    5,
+		},
+		Outer: PlanetWeights{
+			Glacial: 80,
+			Ocean:   15,
+			Terra:   5,
+		},
+		MaxAsteroids: 6,
+	}
+
+	Archetypes = []SystemArchetype{
+		ArchetypeHabitable,
+		ArchetypeDead,
+		ArchetypeFrozen,
+	}
 )

@@ -19,6 +19,7 @@ services:
     volumes:
       - redis:/var/lib/redis
       - redis-config:/usr/local/etc/redis/redis.conf
+    restart: always
     environment:
       - ALLOW_EMPTY_PASSWORD=yes
 

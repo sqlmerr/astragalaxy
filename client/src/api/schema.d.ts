@@ -4,1341 +4,1346 @@
  */
 
 export interface paths {
-  "/api/v1/auth/login": {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    get?: never
-    put?: never
-    /**
-     * Login user
-     * @description Login into user's account
-     */
-    post: operations["loginUser"]
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/api/v1/auth/register": {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    get?: never
-    put?: never
-    /** Register user */
-    post: operations["registerUser"]
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/api/v1/auth/me": {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    /**
-     * Get me
-     * @description Get current user
-     */
-    get: operations["getMe"]
-    put?: never
-    post?: never
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/api/v1/agents": {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    get?: never
-    put?: never
-    /**
-     * Register Agent
-     * @description Register new agent
-     */
-    post: operations["registerAgent"]
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/api/v1/agents/my": {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    /**
-     * Get My Agents
-     * @description Get current user's agents
-     */
-    get: operations["getMyAgents"]
-    put?: never
-    post?: never
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/api/v1/agents/current": {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    /**
-     * Get Current Agent
-     * @description Get current authorized agent
-     */
-    get: operations["getCurrentAgent"]
-    put?: never
-    post?: never
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/api/v1/agents/current/cooldown": {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    /** Get Current Agent Cooldown */
-    get: operations["getCurrentAgentCooldown"]
-    put?: never
-    post?: never
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/api/v1/agents/{id}/reset-token": {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    get?: never
-    put?: never
-    /**
-     * Reset Agent Token
-     * @description Reset current user's agent's token
-     */
-    post: operations["resetAgentToken"]
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/api/v1/ships/my": {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    /**
-     * Get My Ships
-     * @description Get current agent ships
-     */
-    get: operations["getMyShips"]
-    put?: never
-    post?: never
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/api/v1/ships/my/active": {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    /**
-     * Get My Active Ship
-     * @description Get current agent's active ship
-     */
-    get: operations["getMyActiveShip"]
-    put?: never
-    post?: never
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/api/v1/ships/my/{id}/rename": {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    get?: never
-    put?: never
-    post?: never
-    delete?: never
-    options?: never
-    head?: never
-    /**
-     * Rename My Active Ship
-     * @description Rename current agent's active ship
-     */
-    patch: operations["renameMyShip"]
-    trace?: never
-  }
-  "/api/v1/ships/my/active/radar": {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    /**
-     * Use Ship Radar
-     * @description Use ship radar to get nearest systems
-     */
-    get: operations["shipRadar"]
-    put?: never
-    post?: never
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/api/v1/ships/my/{id}/active": {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    get?: never
-    put?: never
-    /**
-     * Change Active Ship
-     * @description Activate this ship and deactivate current
-     */
-    post: operations["changeActiveShip"]
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/api/v1/ships/my/active/dock": {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    get?: never
-    put?: never
-    /**
-     * Dock Ship
-     * @description Dock active ship
-     */
-    post: operations["dockMyShip"]
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/api/v1/ships/my/active/orbit": {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    get?: never
-    put?: never
-    /**
-     * Orbit Ship
-     * @description Orbit active ship
-     */
-    post: operations["orbitMyShip"]
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/api/v1/inventories/my": {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    /**
-     * Get My Inventory
-     * @description Get current agent's full inventory
-     */
-    get: operations["getMyInventory"]
-    put?: never
-    post?: never
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/api/v1/inventories/my/ships/{id}": {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    /**
-     * Get My Ship Inventory
-     * @description Get current agent's ship full inventory
-     */
-    get: operations["getMyShipInventory"]
-    put?: never
-    post?: never
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/api/v1/inventories/transfer-resources": {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    get?: never
-    put?: never
-    /**
-     * Transfer resources
-     * @description Transfer resources from one inventory to another
-     */
-    post: operations["transferResources"]
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/api/v1/inventories/transfer-items": {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    get?: never
-    put?: never
-    /**
-     * Transfer items
-     * @description Transfer items from one inventory to another
-     */
-    post: operations["transferItems"]
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/api/v1/navigation/warp": {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    get?: never
-    put?: never
-    /**
-     * Navigate Warp
-     * @description Warp to another system
-     */
-    post: operations["navigateWarp"]
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/api/v1/navigation/planet": {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    get?: never
-    put?: never
-    /**
-     * Navigate Planet
-     * @description Navigate to planet in system
-     */
-    post: operations["navigatePlanet"]
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/api/v1/navigation/waypoint": {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    get?: never
-    put?: never
-    /**
-     * Navigate Waypoint
-     * @description Navigate to waypoint in system
-     */
-    post: operations["navigateWaypoint"]
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/api/v1/systems/current": {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    /** Get Current System */
-    get: operations["getCurrentSystem"]
-    put?: never
-    post?: never
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
+    "/api/v1/auth/login": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Login user
+         * @description Login into user's account
+         */
+        post: operations["loginUser"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/auth/register": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Register user */
+        post: operations["registerUser"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/auth/me": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get me
+         * @description Get current user
+         */
+        get: operations["getMe"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/agents": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Register Agent
+         * @description Register new agent
+         */
+        post: operations["registerAgent"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/agents/my": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get My Agents
+         * @description Get current user's agents
+         */
+        get: operations["getMyAgents"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/agents/current": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Current Agent
+         * @description Get current authorized agent
+         */
+        get: operations["getCurrentAgent"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/agents/current/cooldown": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Current Agent Cooldown */
+        get: operations["getCurrentAgentCooldown"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/agents/{id}/reset-token": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Reset Agent Token
+         * @description Reset current user's agent's token
+         */
+        post: operations["resetAgentToken"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/ships/my": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get My Ships
+         * @description Get current agent ships
+         */
+        get: operations["getMyShips"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/ships/my/active": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get My Active Ship
+         * @description Get current agent's active ship
+         */
+        get: operations["getMyActiveShip"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/ships/my/{id}/rename": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /**
+         * Rename My Ship
+         * @description Rename agent's ship
+         */
+        patch: operations["renameMyShip"];
+        trace?: never;
+    };
+    "/api/v1/ships/my/active/radar": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Use Ship Radar
+         * @description Use ship radar to get nearest systems
+         */
+        get: operations["shipRadar"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/ships/my/{id}/active": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Change Active Ship
+         * @description Activate this ship and deactivate current
+         */
+        post: operations["changeActiveShip"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/ships/my/active/dock": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Dock Ship
+         * @description Dock active ship
+         */
+        post: operations["dockMyShip"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/ships/my/active/orbit": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Orbit Ship
+         * @description Orbit active ship
+         */
+        post: operations["orbitMyShip"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/inventories/my": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get My Inventory
+         * @description Get current agent's full inventory
+         */
+        get: operations["getMyInventory"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/inventories/my/ships/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get My Ship Inventory
+         * @description Get current agent's ship full inventory
+         */
+        get: operations["getMyShipInventory"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/inventories/transfer-resources": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Transfer resources
+         * @description Transfer resources from one inventory to another
+         */
+        post: operations["transferResources"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/inventories/transfer-items": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Transfer items
+         * @description Transfer items from one inventory to another
+         */
+        post: operations["transferItems"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/navigation/warp": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Navigate Warp
+         * @description Warp to another system
+         */
+        post: operations["navigateWarp"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/navigation/planet": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Navigate Planet
+         * @description Navigate to planet in system
+         */
+        post: operations["navigatePlanet"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/navigation/waypoint": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Navigate Waypoint
+         * @description Navigate to waypoint in system
+         */
+        post: operations["navigateWaypoint"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/systems/current": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Current System */
+        get: operations["getCurrentSystem"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
-export type webhooks = Record<string, never>
+export type webhooks = Record<string, never>;
 export interface components {
-  schemas: {
-    LoginUserRequest: {
-      username: string
-      /** Format: password */
-      password: string
-    }
-    LoginUserResponse: {
-      /**
-       * @description JWT Token
-       * @example eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c
-       */
-      access_token?: string
-      /** @default Bearer */
-      token_type: string
-    }
-    ErrorResponse: {
-      error: string
-      message: string
-      /**
-       * @description Error code
-       * @example USER_NOT_FOUND
-       */
-      code: string
-    }
-    RegisterUserRequest: {
-      username?: string
-      /** Format: password */
-      password?: string
-    }
-    User: {
-      /** Format: uuid */
-      id: string
-      username: string
-      /** Format: date-time */
-      created_at: string
-    }
-    RegisterAgentRequest: {
-      /** @description Agent's username */
-      username?: string
-    }
-    Agent: {
-      /** Format: uuid */
-      id: string
-      /** Format: uuid */
-      user_id: string
-      username: string
-      /** Format: date-time */
-      created_at: string
-      /** Format: uuid */
-      inventory_id?: string
-    }
-    RegisterAgentResponse: components["schemas"]["Agent"] & {
-      /**
-       * @description Agent token
-       * @example ag_agent_xyzabc123456foobar
-       */
-      token: string
-    }
-    GetMyAgentsResponse: {
-      data: components["schemas"]["Agent"][]
-    }
-    Cooldown: {
-      /** Format: date-time */
-      set_at: string
-      /** Format: duration */
-      duration: number
-      /** @description Duration in seconds */
-      duration_seconds: number
-      /** @description The action for which the cooldown was issued */
-      action: string
-    }
-    ResetAgentTokenResponse: {
-      /** @description Agent's token */
-      token: string
-      /** @default Bearer */
-      token_type: string
-    }
-    Ship: {
-      /** Format: uuid */
-      id: string
-      /** Format: uuid */
-      agent_id: string
-      /** @enum {string} */
-      type: "TRADER" | "SCOUT" | "MINER"
-      active: boolean
-      /** @description X coordinate */
-      system_x: number
-      /** @description Y coordinate */
-      system_y: number
-      /** @enum {string} */
-      status: "ORBIT" | "DOCKED"
-      /** Format: date-time */
-      created_at: string
-      name: string
-      /** Format: uuid */
-      inventory_id?: string
-      /**
-       * @description Location type
-       * @enum {string}
-       */
-      location: "NONE" | "PLANET" | "WAYPOINT"
-      /** @description Location ID */
-      location_id: number
-    }
-    GetMyShipsResponse: {
-      data: components["schemas"]["Ship"][]
-    }
-    RenameMyShipRequest: {
-      /** @description New ship's name */
-      name: string
-    }
-    Planet: {
-      name: string
-      /** @enum {string} */
-      type: "TERRA" | "OCEAN" | "SCORCHED" | "GLACIAL" | "TOXIC"
-      orbit: number
-    }
-    Waypoint: {
-      /** @description Waypoint's ID inside system */
-      id: number
-      /**
-       * @description Waypoint's type
-       * @enum {string}
-       */
-      type: "STATION" | "ASTEROID"
-    }
-    System: {
-      name: string
-      /** @description X coordinate */
-      x: number
-      /** @description Y coordinate */
-      y: number
-      planets: components["schemas"]["Planet"][]
-      waypoints: components["schemas"]["Waypoint"][]
-    }
-    ShipRadarResponse: {
-      data: components["schemas"]["System"][]
-    }
-    Inventory: {
-      /** Format: uuid */
-      inventory_id: string
-      max_item_slots: number
-      max_resource_volume: number
-    }
-    Resource: {
-      /** Format: uuid */
-      inventory_id: string
-      /** @description Resource type */
-      resource_type: string
-      amount: number
-    }
-    Item: {
-      /** Format: uuid */
-      id: string
-      /** Format: uuid */
-      inventory_id: string
-      /** @description Item type */
-      item_type: string
-      /**
-       * Format: json
-       * @example {"durability": 42, "name": "Hello World"}
-       */
-      metadata: string
-      /** Format: date-time */
-      created_at: string
-    }
-    FullInventory: {
-      inventory: components["schemas"]["Inventory"]
-      resources: components["schemas"]["Resource"][]
-      items: components["schemas"]["Item"][]
-    }
-    TransferResourcesRequest: {
-      /** Format: uuid */
-      from_inventory_id: string
-      /** Format: uuid */
-      to_inventory_id: string
-      /** @example "crystal": 42 */
-      resources: {
-        [key: string]: number
-      }
-    }
-    TransferItemsRequest: {
-      /** Format: uuid */
-      from_inventory_id: string
-      /** Format: uuid */
-      to_inventory_id: string
-      /** @description Item IDs */
-      items: string[]
-    }
-    NavigateWarpRequest: {
-      /** @description System X coordinate */
-      x: number
-      /** @description System Y coordinate */
-      y: number
-    }
-    NavigationResponse: {
-      cooldown: components["schemas"]["Cooldown"]
-    }
-    NavigatePlanetRequest: {
-      /** @description Planet's orbit */
-      orbit: number
-    }
-    NavigateWaypointRequest: {
-      /** @description Waypoint ID */
-      id: number
-    }
-  }
-  responses: {
-    /** @description Decode json error */
-    DecodeError: {
-      headers: {
-        [name: string]: unknown
-      }
-      content: {
-        "application/json": components["schemas"]["ErrorResponse"]
-      }
-    }
-    /** @description Invalid JWT token */
-    InvalidJWT: {
-      headers: {
-        [name: string]: unknown
-      }
-      content: {
-        /**
-         * @example {
-         *       "message": "Invalid jwt token",
-         *       "code": "INVALID_JWT_TOKEN",
-         *       "error": "..."
-         *     }
-         */
-        "application/json": components["schemas"]["ErrorResponse"]
-      }
-    }
-    /** @description Invalid Agent token */
-    InvalidAgentToken: {
-      headers: {
-        [name: string]: unknown
-      }
-      content: {
-        /**
-         * @example {
-         *       "message": "Invalid agent token",
-         *       "code": "INVALID_AGENT_TOKEN",
-         *       "error": "..."
-         *     }
-         */
-        "application/json": components["schemas"]["ErrorResponse"]
-      }
-    }
-    /** @description Access Denied */
-    AccessDenied: {
-      headers: {
-        [name: string]: unknown
-      }
-      content: {
-        /**
-         * @example {
-         *       "message": "Access Denied",
-         *       "code": "ACCESS_DENIED",
-         *       "error": "..."
-         *     }
-         */
-        "application/json": components["schemas"]["ErrorResponse"]
-      }
-    }
-  }
-  parameters: never
-  requestBodies: never
-  headers: never
-  pathItems: never
+    schemas: {
+        LoginUserRequest: {
+            username: string;
+            /** Format: password */
+            password: string;
+        };
+        LoginUserResponse: {
+            /**
+             * @description JWT Token
+             * @example eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c
+             */
+            access_token?: string;
+            /** @default Bearer */
+            token_type: string;
+        };
+        ErrorResponse: {
+            error: string;
+            message: string;
+            /**
+             * @description Error code
+             * @example USER_NOT_FOUND
+             */
+            code: string;
+        };
+        RegisterUserRequest: {
+            username?: string;
+            /** Format: password */
+            password?: string;
+        };
+        User: {
+            /** Format: uuid */
+            id: string;
+            username: string;
+            /** Format: date-time */
+            created_at: string;
+        };
+        RegisterAgentRequest: {
+            /** @description Agent's username */
+            username?: string;
+        };
+        Agent: {
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            user_id: string;
+            username: string;
+            /** Format: date-time */
+            created_at: string;
+            /** Format: uuid */
+            inventory_id?: string;
+        };
+        RegisterAgentResponse: components["schemas"]["Agent"] & {
+            /**
+             * @description Agent token
+             * @example ag_agent_xyzabc123456foobar
+             */
+            token: string;
+        };
+        GetMyAgentsResponse: {
+            data: components["schemas"]["Agent"][];
+        };
+        Cooldown: {
+            /** Format: date-time */
+            set_at: string;
+            /** Format: duration */
+            duration: number;
+            /** @description Duration in seconds */
+            duration_seconds: number;
+            /** @description The action for which the cooldown was issued */
+            action: string;
+        };
+        ResetAgentTokenResponse: {
+            /** @description Agent's token */
+            token: string;
+            /** @default Bearer */
+            token_type: string;
+        };
+        Ship: {
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            agent_id: string;
+            /** @enum {string} */
+            type: "TRADER" | "SCOUT" | "MINER";
+            active: boolean;
+            /** @description X coordinate */
+            system_x: number;
+            /** @description Y coordinate */
+            system_y: number;
+            /** @enum {string} */
+            status: "ORBIT" | "DOCKED";
+            /** Format: date-time */
+            created_at: string;
+            name: string;
+            /** Format: uuid */
+            inventory_id?: string;
+            /**
+             * @description Location type
+             * @enum {string}
+             */
+            location: "NONE" | "PLANET" | "WAYPOINT";
+            /** @description Location ID */
+            location_id: number;
+        };
+        GetMyShipsResponse: {
+            data: components["schemas"]["Ship"][];
+        };
+        RenameMyShipRequest: {
+            /** @description New ship's name */
+            name: string;
+        };
+        Planet: {
+            name: string;
+            /** @enum {string} */
+            type: "TERRA" | "OCEAN" | "SCORCHED" | "GLACIAL" | "TOXIC";
+            orbit: number;
+        };
+        Waypoint: {
+            /** @description Waypoint's ID inside system */
+            id: number;
+            /**
+             * @description Waypoint's type
+             * @enum {string}
+             */
+            type: "STATION" | "ASTEROID";
+        };
+        System: {
+            name: string;
+            /** @description X coordinate */
+            x: number;
+            /** @description Y coordinate */
+            y: number;
+            /**
+             * @description System archetype
+             * @enum {string}
+             */
+            archetype: "HABITABLE" | "DEAD" | "FROZEN";
+            planets: components["schemas"]["Planet"][];
+            waypoints: components["schemas"]["Waypoint"][];
+        };
+        ShipRadarResponse: {
+            data: components["schemas"]["System"][];
+        };
+        Inventory: {
+            /** Format: uuid */
+            inventory_id: string;
+            max_item_slots: number;
+            max_resource_volume: number;
+        };
+        Resource: {
+            /** Format: uuid */
+            inventory_id: string;
+            /** @description Resource type */
+            resource_type: string;
+            amount: number;
+        };
+        Item: {
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            inventory_id: string;
+            /** @description Item type */
+            item_type: string;
+            /**
+             * Format: json
+             * @example {"durability": 42, "name": "Hello World"}
+             */
+            metadata: string;
+            /** Format: date-time */
+            created_at: string;
+        };
+        FullInventory: {
+            inventory: components["schemas"]["Inventory"];
+            resources: components["schemas"]["Resource"][];
+            items: components["schemas"]["Item"][];
+        };
+        TransferResourcesRequest: {
+            /** Format: uuid */
+            from_inventory_id: string;
+            /** Format: uuid */
+            to_inventory_id: string;
+            /** @example "crystal": 42 */
+            resources: {
+                [key: string]: number;
+            };
+        };
+        TransferItemsRequest: {
+            /** Format: uuid */
+            from_inventory_id: string;
+            /** Format: uuid */
+            to_inventory_id: string;
+            /** @description Item IDs */
+            items: string[];
+        };
+        NavigateWarpRequest: {
+            /** @description System X coordinate */
+            x: number;
+            /** @description System Y coordinate */
+            y: number;
+        };
+        NavigationResponse: {
+            cooldown: components["schemas"]["Cooldown"];
+        };
+        NavigatePlanetRequest: {
+            /** @description Planet's orbit */
+            orbit: number;
+        };
+        NavigateWaypointRequest: {
+            /** @description Waypoint ID */
+            id: number;
+        };
+    };
+    responses: {
+        /** @description Decode json error */
+        DecodeError: {
+            headers: {
+                [name: string]: unknown;
+            };
+            content: {
+                "application/json": components["schemas"]["ErrorResponse"];
+            };
+        };
+        /** @description Invalid JWT token */
+        InvalidJWT: {
+            headers: {
+                [name: string]: unknown;
+            };
+            content: {
+                /**
+                 * @example {
+                 *       "message": "Invalid jwt token",
+                 *       "code": "INVALID_JWT_TOKEN",
+                 *       "error": "..."
+                 *     }
+                 */
+                "application/json": components["schemas"]["ErrorResponse"];
+            };
+        };
+        /** @description Invalid Agent token */
+        InvalidAgentToken: {
+            headers: {
+                [name: string]: unknown;
+            };
+            content: {
+                /**
+                 * @example {
+                 *       "message": "Invalid agent token",
+                 *       "code": "INVALID_AGENT_TOKEN",
+                 *       "error": "..."
+                 *     }
+                 */
+                "application/json": components["schemas"]["ErrorResponse"];
+            };
+        };
+        /** @description Access Denied */
+        AccessDenied: {
+            headers: {
+                [name: string]: unknown;
+            };
+            content: {
+                /**
+                 * @example {
+                 *       "message": "Access Denied",
+                 *       "code": "ACCESS_DENIED",
+                 *       "error": "..."
+                 *     }
+                 */
+                "application/json": components["schemas"]["ErrorResponse"];
+            };
+        };
+    };
+    parameters: never;
+    requestBodies: never;
+    headers: never;
+    pathItems: never;
 }
-export type $defs = Record<string, never>
+export type $defs = Record<string, never>;
 export interface operations {
-  loginUser: {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["LoginUserRequest"]
-      }
-    }
-    responses: {
-      /** @description Successful login */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["LoginUserResponse"]
-        }
-      }
-      400: components["responses"]["DecodeError"]
-      /** @description Invalid credentials */
-      401: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-    }
-  }
-  registerUser: {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["RegisterUserRequest"]
-      }
-    }
-    responses: {
-      /** @description User successfully registered */
-      201: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["User"]
-        }
-      }
-      400: components["responses"]["DecodeError"]
-      /** @description User's username already occupied */
-      409: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["ErrorResponse"]
-        }
-      }
-    }
-  }
-  getMe: {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      /** @description Successfully got current user */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["User"]
-        }
-      }
-      401: components["responses"]["InvalidJWT"]
-    }
-  }
-  registerAgent: {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["RegisterAgentRequest"]
-      }
-    }
-    responses: {
-      /** @description Agent successfully created */
-      201: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["RegisterAgentResponse"]
-        }
-      }
-      400: components["responses"]["DecodeError"]
-      401: components["responses"]["InvalidJWT"]
-      /** @description Agent's username already occupied */
-      409: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["ErrorResponse"]
-        }
-      }
-    }
-  }
-  getMyAgents: {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      /** @description Successfully got agents */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["GetMyAgentsResponse"]
-        }
-      }
-      401: components["responses"]["InvalidJWT"]
-    }
-  }
-  getCurrentAgent: {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      /** @description Successfully got current agent */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["Agent"]
-        }
-      }
-      401: components["responses"]["InvalidAgentToken"]
-    }
-  }
-  getCurrentAgentCooldown: {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      /** @description Successfully got agent's cooldown */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["Cooldown"]
-        }
-      }
-      401: components["responses"]["InvalidAgentToken"]
-    }
-  }
-  resetAgentToken: {
-    parameters: {
-      query?: never
-      header?: never
-      path: {
-        /** @description ID of the agent */
-        id: string
-      }
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      /** @description Successfully reset agent's token */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["ResetAgentTokenResponse"]
-        }
-      }
-      401: components["responses"]["InvalidJWT"]
-      /** @description Cannot access this agent */
-      403: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["ErrorResponse"]
-        }
-      }
-    }
-  }
-  getMyShips: {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      /** @description Successfully got agent's ships */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["GetMyShipsResponse"]
-        }
-      }
-      401: components["responses"]["InvalidAgentToken"]
-    }
-  }
-  getMyActiveShip: {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      /** @description Successfully got agent's active ship */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["Ship"]
-        }
-      }
-      401: components["responses"]["InvalidAgentToken"]
-    }
-  }
-  renameMyShip: {
-    parameters: {
-      query?: never
-      header?: never
-      path: {
-        /** @description ID of the ship */
-        id: string
-      }
-      cookie?: never
-    }
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["RenameMyShipRequest"]
-      }
-    }
-    responses: {
-      /** @description Successfully renamed agent's active ship */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["Ship"]
-        }
-      }
-      400: components["responses"]["DecodeError"]
-      401: components["responses"]["InvalidAgentToken"]
-    }
-  }
-  shipRadar: {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      /** @description Successfully used ship's radar */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["ShipRadarResponse"]
-        }
-      }
-      401: components["responses"]["InvalidAgentToken"]
-    }
-  }
-  changeActiveShip: {
-    parameters: {
-      query?: never
-      header?: never
-      path: {
-        /** @description ID of the ship */
-        id: string
-      }
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      /** @description Successfully changed active ship */
-      204: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      401: components["responses"]["InvalidAgentToken"]
-      403: components["responses"]["AccessDenied"]
-    }
-  }
-  dockMyShip: {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      /** @description Successfully docked */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["Cooldown"]
-        }
-      }
-      401: components["responses"]["InvalidAgentToken"]
-    }
-  }
-  orbitMyShip: {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      /** @description Successfully orbitted */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["Cooldown"]
-        }
-      }
-      401: components["responses"]["InvalidAgentToken"]
-    }
-  }
-  getMyInventory: {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      /** @description Successfully got agent's inventory */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["FullInventory"]
-        }
-      }
-      401: components["responses"]["InvalidAgentToken"]
-    }
-  }
-  getMyShipInventory: {
-    parameters: {
-      query?: never
-      header?: never
-      path: {
-        /** @description ID of the ship */
-        id: string
-      }
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      /** @description Successfully got ship's inventory */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["FullInventory"]
-        }
-      }
-      401: components["responses"]["InvalidAgentToken"]
-      403: components["responses"]["AccessDenied"]
-    }
-  }
-  transferResources: {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["TransferResourcesRequest"]
-      }
-    }
-    responses: {
-      /** @description Successfully transferred resources */
-      204: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      401: components["responses"]["InvalidAgentToken"]
-      403: components["responses"]["AccessDenied"]
-      /** @description Invalid/unsupported transfer direction */
-      422: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["ErrorResponse"]
-        }
-      }
-    }
-  }
-  transferItems: {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["TransferItemsRequest"]
-      }
-    }
-    responses: {
-      /** @description Successfully transferred items */
-      204: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      401: components["responses"]["InvalidAgentToken"]
-      403: components["responses"]["AccessDenied"]
-      /** @description Invalid/unsupported transfer direction */
-      422: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["ErrorResponse"]
-        }
-      }
-    }
-  }
-  navigateWarp: {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["NavigateWarpRequest"]
-      }
-    }
-    responses: {
-      /** @description Successfully navigated */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["NavigationResponse"]
-        }
-      }
-      401: components["responses"]["InvalidAgentToken"]
-      /** @description Invalid warp path */
-      422: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["ErrorResponse"]
-        }
-      }
-    }
-  }
-  navigatePlanet: {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["NavigatePlanetRequest"]
-      }
-    }
-    responses: {
-      /** @description Successfully navigated */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["NavigationResponse"]
-        }
-      }
-      401: components["responses"]["InvalidAgentToken"]
-      /** @description Invalid coordinates */
-      422: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["ErrorResponse"]
-        }
-      }
-    }
-  }
-  navigateWaypoint: {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["NavigateWaypointRequest"]
-      }
-    }
-    responses: {
-      /** @description Successfully navigated */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["NavigationResponse"]
-        }
-      }
-      401: components["responses"]["InvalidAgentToken"]
-      /** @description Invalid coordinates */
-      422: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["ErrorResponse"]
-        }
-      }
-    }
-  }
-  getCurrentSystem: {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      /** @description Successfully got current system */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["System"]
-        }
-      }
-      401: components["responses"]["InvalidAgentToken"]
-    }
-  }
+    loginUser: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["LoginUserRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful login */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LoginUserResponse"];
+                };
+            };
+            400: components["responses"]["DecodeError"];
+            /** @description Invalid credentials */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    registerUser: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RegisterUserRequest"];
+            };
+        };
+        responses: {
+            /** @description User successfully registered */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["User"];
+                };
+            };
+            400: components["responses"]["DecodeError"];
+            /** @description User's username already occupied */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    getMe: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successfully got current user */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["User"];
+                };
+            };
+            401: components["responses"]["InvalidJWT"];
+        };
+    };
+    registerAgent: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RegisterAgentRequest"];
+            };
+        };
+        responses: {
+            /** @description Agent successfully created */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RegisterAgentResponse"];
+                };
+            };
+            400: components["responses"]["DecodeError"];
+            401: components["responses"]["InvalidJWT"];
+            /** @description Agent's username already occupied */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    getMyAgents: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successfully got agents */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GetMyAgentsResponse"];
+                };
+            };
+            401: components["responses"]["InvalidJWT"];
+        };
+    };
+    getCurrentAgent: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successfully got current agent */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Agent"];
+                };
+            };
+            401: components["responses"]["InvalidAgentToken"];
+        };
+    };
+    getCurrentAgentCooldown: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successfully got agent's cooldown */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Cooldown"];
+                };
+            };
+            401: components["responses"]["InvalidAgentToken"];
+        };
+    };
+    resetAgentToken: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description ID of the agent */
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successfully reset agent's token */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ResetAgentTokenResponse"];
+                };
+            };
+            401: components["responses"]["InvalidJWT"];
+            /** @description Cannot access this agent */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    getMyShips: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successfully got agent's ships */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GetMyShipsResponse"];
+                };
+            };
+            401: components["responses"]["InvalidAgentToken"];
+        };
+    };
+    getMyActiveShip: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successfully got agent's active ship */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Ship"];
+                };
+            };
+            401: components["responses"]["InvalidAgentToken"];
+        };
+    };
+    renameMyShip: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description ID of the ship */
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RenameMyShipRequest"];
+            };
+        };
+        responses: {
+            /** @description Successfully renamed agent's ship */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Ship"];
+                };
+            };
+            400: components["responses"]["DecodeError"];
+            401: components["responses"]["InvalidAgentToken"];
+        };
+    };
+    shipRadar: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successfully used ship's radar */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ShipRadarResponse"];
+                };
+            };
+            401: components["responses"]["InvalidAgentToken"];
+        };
+    };
+    changeActiveShip: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description ID of the ship */
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successfully changed active ship */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            401: components["responses"]["InvalidAgentToken"];
+            403: components["responses"]["AccessDenied"];
+        };
+    };
+    dockMyShip: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successfully docked */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Cooldown"];
+                };
+            };
+            401: components["responses"]["InvalidAgentToken"];
+        };
+    };
+    orbitMyShip: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successfully orbitted */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Cooldown"];
+                };
+            };
+            401: components["responses"]["InvalidAgentToken"];
+        };
+    };
+    getMyInventory: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successfully got agent's inventory */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FullInventory"];
+                };
+            };
+            401: components["responses"]["InvalidAgentToken"];
+        };
+    };
+    getMyShipInventory: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description ID of the ship */
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successfully got ship's inventory */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FullInventory"];
+                };
+            };
+            401: components["responses"]["InvalidAgentToken"];
+            403: components["responses"]["AccessDenied"];
+        };
+    };
+    transferResources: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["TransferResourcesRequest"];
+            };
+        };
+        responses: {
+            /** @description Successfully transferred resources */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            401: components["responses"]["InvalidAgentToken"];
+            403: components["responses"]["AccessDenied"];
+            /** @description Invalid/unsupported transfer direction */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    transferItems: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["TransferItemsRequest"];
+            };
+        };
+        responses: {
+            /** @description Successfully transferred items */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            401: components["responses"]["InvalidAgentToken"];
+            403: components["responses"]["AccessDenied"];
+            /** @description Invalid/unsupported transfer direction */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    navigateWarp: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["NavigateWarpRequest"];
+            };
+        };
+        responses: {
+            /** @description Successfully navigated */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["NavigationResponse"];
+                };
+            };
+            401: components["responses"]["InvalidAgentToken"];
+            /** @description Invalid warp path */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    navigatePlanet: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["NavigatePlanetRequest"];
+            };
+        };
+        responses: {
+            /** @description Successfully navigated */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["NavigationResponse"];
+                };
+            };
+            401: components["responses"]["InvalidAgentToken"];
+            /** @description Invalid coordinates */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    navigateWaypoint: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["NavigateWaypointRequest"];
+            };
+        };
+        responses: {
+            /** @description Successfully navigated */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["NavigationResponse"];
+                };
+            };
+            401: components["responses"]["InvalidAgentToken"];
+            /** @description Invalid coordinates */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    getCurrentSystem: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successfully got current system */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["System"];
+                };
+            };
+            401: components["responses"]["InvalidAgentToken"];
+        };
+    };
 }

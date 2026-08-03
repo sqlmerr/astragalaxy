@@ -1,4 +1,4 @@
-import type { SchemaWaypoint } from "@/api/types"
+import type { SchemaSystem, SchemaWaypoint } from "@/api/types"
 
 export const CELL_SIZE = 100
 
@@ -27,6 +27,21 @@ export const PLANET_PARAMS = {
     color: 0x7cb342,
     radius: 16,
     rotationSpeed: 0.0045,
+  },
+}
+
+export const SYSTEM_PARAMS: Record<
+  SchemaSystem["archetype"],
+  { color: number }
+> = {
+  HABITABLE: {
+    color: 0x87ae73,
+  },
+  DEAD: {
+    color: 0xbb0a1e,
+  },
+  FROZEN: {
+    color: 0x7ec0ee,
   },
 }
 

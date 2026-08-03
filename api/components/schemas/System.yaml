@@ -3,6 +3,7 @@ required:
   - name
   - x
   - y
+  - archetype
   - planets
   - waypoints
 properties:
@@ -14,6 +15,13 @@ properties:
   y:
     type: integer
     description: Y coordinate
+  archetype:
+    type: string
+    enum:
+      - HABITABLE
+      - DEAD 
+      - FROZEN
+    description: System archetype # TODO(docs): add link to archetype docs
   planets:
     type: array
     items:

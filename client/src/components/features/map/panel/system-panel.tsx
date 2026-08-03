@@ -51,9 +51,9 @@ export function SystemPanel({
 
           <div className="space-y-2 text-sm">
             <div className="flex justify-between">
-              <span className="text-muted-foreground">Type</span>
+              <span className="text-muted-foreground">Archetype</span>
 
-              <Badge>system.type</Badge>
+              <Badge>{system.system.archetype}</Badge>
             </div>
 
             <div className="flex justify-between">

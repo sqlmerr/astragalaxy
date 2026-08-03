@@ -38,41 +38,31 @@ func (w *WorldGen) GenerateSystemByCoords(x, y int) (*System, bool) {
 		rng.Intn(900)+100,
 	)
 
+	arch := Archetypes[rng.Intn(len(Archetypes))]
+
 	system := &System{
 		Name:      systemName,
 		X:         x,
 		Y:         y,
+		Archetype: arch,
 		Planets:   make([]Planet, 0),
-		Waypoints: generateWaypoints(rng),
+		Waypoints: generateWaypoints(rng, arch),
 	}
 
-	numPlanets := rng.Intn(5) + 1
+	numPlanets := rng.Intn(
+		arch.MaxPlanets-arch.MinPlanets+1,
+	) + arch.MinPlanets
 	for i := 0; i < numPlanets; i++ {
-		planet := generatePlanet(i, rng)
-		//planet.Name = fmt.Sprintf() // TODO: add names to planets
+		weights := getPlanetWeights(arch, i, numPlanets)
+		planet := generatePlanet(i, rng, weights)
 		system.Planets = append(system.Planets, planet)
 	}
 
 	return system, true
 }
 
-func generatePlanet(orbitIndex int, rng *rand.Rand) Planet {
-	var pType PlanetType
-	roll := rng.Float64()
-
-	if orbitIndex <= 1 {
-		pType = PlanetScorched
-	} else if orbitIndex <= 4 {
-		if roll > 0.7 {
-			pType = PlanetOcean
-		} else if roll > 0.2 {
-			pType = PlanetTerra
-		} else {
-			pType = PlanetToxic
-		}
-	} else {
-		pType = PlanetGlacial
-	}
+func generatePlanet(orbitIndex int, rng *rand.Rand, weights PlanetWeights) Planet {
+	pType := getRandomPlanetType(rng, weights)
 
 	return Planet{
 		Name:  generatePlanetName(rng),
@@ -81,23 +71,23 @@ func generatePlanet(orbitIndex int, rng *rand.Rand) Planet {
 	}
 }
 
-func generateWaypoints(rng *rand.Rand) []Waypoint {
+func generateWaypoints(rng *rand.Rand, archetype SystemArchetype) []Waypoint {
 	waypoints := make([]Waypoint, 0)
 	roll := rng.Float64()
 	lastID := -1
-	if roll < 0.40 {
+	if roll < archetype.StationChance {
 		waypoints = append(waypoints, Waypoint{ID: lastID + 1, Type: WaypointStation, Dockable: true})
+		lastID++
+	}
+
+	asteroidsAmount := rng.Intn(archetype.MaxAsteroids)
+	for range asteroidsAmount {
+		waypoints = append(waypoints, Waypoint{ID: lastID + 1, Type: WaypointAsteroid, Dockable: false}) // TODO: asteroid resources
 		lastID++
 	}
 
 	return waypoints
 }
-
-var (
-	consonants = []string{"b", "c", "d", "f", "g", "k", "l", "m", "n", "p", "r", "s", "t", "v", "x", "z", "kr", "th", "st", "vr", "xl"}
-	vowels     = []string{"a", "e", "i", "o", "u", "y", "ae", "ia", "io", "ou"}
-	suffixes   = []string{" Prime", " Major", " Minor", " Alpha", " Beta", " Gamma", " I", " II", " III", " IV", " V", " X", "-9"}
-)
 
 func generatePlanetName(rng *rand.Rand) string {
 	var nameBuilder strings.Builder
@@ -160,4 +150,37 @@ func getRandomCoordinate(min, max int) int {
 	bg := big.NewInt(int64(max - min + 1))
 	n, _ := cryptorand.Int(cryptorand.Reader, bg)
 	return int(n.Int64()) + min
+}
+
+func getPlanetWeights(archetype SystemArchetype, orbit, numPlanets int) PlanetWeights {
+	w := archetype.Middle
+	ratio := float64(orbit) / float64(numPlanets-1)
+
+	switch {
+	case ratio < 0.3:
+		w = archetype.Inner
+	case ratio > 0.7:
+		w = archetype.Outer
+	}
+
+	return w
+}
+
+func getRandomPlanetType(rng *rand.Rand, w PlanetWeights) PlanetType {
+	total := w.Scorched + w.Terra + w.Ocean + w.Toxic + w.Glacial
+
+	roll := rng.Intn(total)
+
+	switch {
+	case roll < w.Scorched:
+		return PlanetScorched
+	case roll < w.Scorched+w.Terra:
+		return PlanetTerra
+	case roll < w.Scorched+w.Terra+w.Ocean:
+		return PlanetOcean
+	case roll < w.Scorched+w.Terra+w.Ocean+w.Toxic:
+		return PlanetToxic
+	default:
+		return PlanetGlacial
+	}
 }

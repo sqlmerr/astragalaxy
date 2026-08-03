@@ -47,6 +47,7 @@ type SystemResponseDTO struct {
 	Name      string                `json:"name"`
 	X         int                   `json:"x"`
 	Y         int                   `json:"y"`
+	Archetype string                `json:"archetype"`
 	Planets   []PlanetResponseDTO   `json:"planets"`
 	Waypoints []WaypointResponseDTO `json:"waypoints"`
 }
@@ -56,6 +57,7 @@ func systemDTOFromModel(m worldgen.System) SystemResponseDTO {
 		Name:      m.Name,
 		X:         m.X,
 		Y:         m.Y,
+		Archetype: m.Archetype.Name,
 		Planets:   planetDTOsFromModels(m.Planets),
 		Waypoints: waypointDTOsFromModels(m.Waypoints),
 	}
