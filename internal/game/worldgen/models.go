@@ -4,6 +4,7 @@ import (
 	"slices"
 
 	"github.com/samber/lo"
+	"github.com/sqlmerr/astragalaxy/internal/data/model"
 )
 
 type PlanetType string
@@ -28,10 +29,19 @@ type Planet struct {
 	Orbit int
 }
 
+type StationData struct{}
+
+type AsteroidData struct {
+	Deposit ResourceDeposit
+}
+
 type Waypoint struct {
 	ID       int
 	Type     WaypointType
 	Dockable bool
+
+	Station  *StationData
+	Asteroid *AsteroidData
 }
 
 type System struct {
@@ -124,7 +134,7 @@ var (
 			Toxic:   10,
 		},
 		StationChance: 0.8,
-		MaxAsteroids:  8,
+		MaxAsteroids:  3,
 	}
 	ArchetypeDead = SystemArchetype{
 		Name:       "DEAD",
@@ -146,7 +156,7 @@ var (
 			Toxic:    10,
 		},
 		StationChance: 0.1,
-		MaxAsteroids:  15,
+		MaxAsteroids:  9,
 	}
 	ArchetypeFrozen = SystemArchetype{
 		Name:       "FROZEN",
@@ -178,3 +188,18 @@ var (
 		ArchetypeFrozen,
 	}
 )
+
+type ResourceDeposit struct {
+	Resource model.ResourceType
+	Amount   int
+	Richness float64
+}
+
+var asteroidResources = []model.ResourceType{
+	model.ResourceCopper,
+	model.ResourceHelium,
+	model.ResourceIridium,
+	model.ResourceIron,
+	model.ResourceTitanium,
+	model.ResourceUranium,
+}

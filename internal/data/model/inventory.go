@@ -17,14 +17,19 @@ type ResourceType string
 type ItemType string
 
 const (
-	ResourceIron        ResourceType = "IRON"
-	ResourceCrystal     ResourceType = "CRYSTAL"
-	ResourceCarbon      ResourceType = "CARBON"
-	ResourceIce         ResourceType = "ICE"
-	ResourceCopper      ResourceType = "COPPER"
-	ResourceTitanium    ResourceType = "TITANIUM"
-	ResourceSilicon     ResourceType = "SILICON"
-	ResourceHelium      ResourceType = "HELIUM"
+	// basic
+	ResourceIron    ResourceType = "IRON"
+	ResourceCrystal ResourceType = "CRYSTAL"
+	ResourceCarbon  ResourceType = "CARBON"
+	ResourceIce     ResourceType = "ICE"
+
+	// advanced
+	ResourceCopper   ResourceType = "COPPER"
+	ResourceTitanium ResourceType = "TITANIUM"
+	ResourceSilicon  ResourceType = "SILICON"
+	ResourceHelium   ResourceType = "HELIUM"
+
+	// exotic
 	ResourceUranium     ResourceType = "URANIUM"
 	ResourceIridium     ResourceType = "IRIDIUM"
 	ResourceDarkMatter  ResourceType = "DARK_MATTER"
