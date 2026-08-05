@@ -32,6 +32,7 @@ import { toast } from "@/components/ui/toast"
 import { SystemMap } from "@/components/features/map/system/system-map"
 import { useQueryClient } from "@tanstack/react-query"
 import { queryKeys } from "@/api/query-keys"
+import { currentSystemQueryOptions } from "@/api/queries/systems"
 import { useErrorHandler } from "@/errors/utils"
 
 export function StarMapLayout() {
@@ -88,7 +89,7 @@ export function StarMapLayout() {
         onError(err) {
           handleError(err, "Failed to warp")
         },
-        onSuccess(data) {
+        async onSuccess(data) {
           toast.add({
             type: "success",
             title: "Success",
@@ -102,6 +103,13 @@ export function StarMapLayout() {
           })
           queryClient.invalidateQueries({
             queryKey: queryKeys.ships.radar(currentAgentID),
+          })
+          const currentSystem = await queryClient.fetchQuery(
+            currentSystemQueryOptions(currentAgentID)
+          )
+          setSelectedSystem({
+            system: currentSystem,
+            agents: selectedSystem.agents,
           })
           setCooldown(currentAgentID, data.cooldown)
         },
