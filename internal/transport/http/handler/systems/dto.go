@@ -2,6 +2,7 @@ package http_handler_systems
 
 import (
 	"github.com/samber/lo"
+	galaxy_service "github.com/sqlmerr/astragalaxy/internal/game/galaxy"
 	"github.com/sqlmerr/astragalaxy/internal/game/worldgen"
 )
 
@@ -25,15 +26,39 @@ func planetDTOsFromModels(m []worldgen.Planet) []PlanetResponseDTO {
 	})
 }
 
+type ResourceDeposit struct {
+	Resource string  `json:"resource"`
+	Amount   int     `json:"amount"`
+	Richness float64 `json:"richness"`
+}
+
+type AsteroidData struct {
+	Deposit ResourceDeposit `json:"deposit"`
+}
+
 type WaypointResponseDTO struct {
 	ID   int    `json:"id"`
 	Type string `json:"type"`
+
+	Asteroid *AsteroidData `json:"asteroid"`
 }
 
 func waypointDTOFromModel(m worldgen.Waypoint) WaypointResponseDTO {
+	var asteroid *AsteroidData
+	if m.Asteroid != nil {
+		asteroid = &AsteroidData{
+			Deposit: ResourceDeposit{
+				Resource: string(m.Asteroid.Deposit.Resource),
+				Amount:   m.Asteroid.Deposit.Amount,
+				Richness: m.Asteroid.Deposit.Richness,
+			},
+		}
+	}
+
 	return WaypointResponseDTO{
-		ID:   m.ID,
-		Type: string(m.Type),
+		ID:       m.ID,
+		Type:     string(m.Type),
+		Asteroid: asteroid,
 	}
 }
 
@@ -43,7 +68,14 @@ func waypointDTOsFromModels(m []worldgen.Waypoint) []WaypointResponseDTO {
 	})
 }
 
-type SystemResponseDTO struct {
+type ShortSystemResponseDTO struct {
+	Name      string `json:"name"`
+	X         int    `json:"x"`
+	Y         int    `json:"y"`
+	Archetype string `json:"archetype"`
+}
+
+type FullSystemResponseDTO struct {
 	Name      string                `json:"name"`
 	X         int                   `json:"x"`
 	Y         int                   `json:"y"`
@@ -52,8 +84,17 @@ type SystemResponseDTO struct {
 	Waypoints []WaypointResponseDTO `json:"waypoints"`
 }
 
-func systemDTOFromModel(m worldgen.System) SystemResponseDTO {
-	return SystemResponseDTO{
+func shortSystemDTOFromModel(m worldgen.System) ShortSystemResponseDTO {
+	return ShortSystemResponseDTO{
+		Name:      m.Name,
+		X:         m.X,
+		Y:         m.Y,
+		Archetype: m.Archetype.Name,
+	}
+}
+
+func fullSystemDTOFromModel(m galaxy_service.FullSystem) FullSystemResponseDTO {
+	return FullSystemResponseDTO{
 		Name:      m.Name,
 		X:         m.X,
 		Y:         m.Y,
@@ -63,8 +104,8 @@ func systemDTOFromModel(m worldgen.System) SystemResponseDTO {
 	}
 }
 
-func systemDTOsFromModels(m []worldgen.System) []SystemResponseDTO {
-	return lo.Map(m, func(i worldgen.System, _ int) SystemResponseDTO {
-		return systemDTOFromModel(i)
+func systemDTOsFromModels(m []worldgen.System) []ShortSystemResponseDTO {
+	return lo.Map(m, func(i worldgen.System, _ int) ShortSystemResponseDTO {
+		return shortSystemDTOFromModel(i)
 	})
 }

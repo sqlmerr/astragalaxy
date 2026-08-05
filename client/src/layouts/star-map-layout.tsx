@@ -6,6 +6,7 @@ import {
   useNavigatePlanetMutation,
   useNavigateWarpMutation,
   useNavigateWaypointMutation,
+  useCurrentSystemQuery,
   useShipRadarQuery,
 } from "@/api/hooks"
 import { Button } from "@/components/ui/button"
@@ -19,7 +20,9 @@ import {
   type SchemaWaypoint,
   type AgentExtended,
   type SchemaPlanet,
-  type SchemaSystem,
+  isSystemExtended,
+  type AnySystemExtended,
+  type ShortSystemExtended,
   type SystemExtended,
 } from "@/api/types"
 import { useEffect, useRef, useState } from "react"
@@ -36,9 +39,8 @@ export function StarMapLayout() {
   const handleError = useErrorHandler()
   const { signOut, user, currentAgentID, isReady } = useAuth()
   const navigate = useNavigate()
-  const [selectedSystem, setSelectedSystem] = useState<SystemExtended | null>(
-    null
-  )
+  const [selectedSystem, setSelectedSystem] =
+    useState<AnySystemExtended | null>(null)
   const [selectedPlanet, setSelectedPlanet] = useState<SchemaPlanet | null>(
     null
   )
@@ -94,6 +96,12 @@ export function StarMapLayout() {
           })
           queryClient.invalidateQueries({
             queryKey: queryKeys.ships.my(currentAgentID),
+          })
+          queryClient.invalidateQueries({
+            queryKey: queryKeys.systems.current(currentAgentID),
+          })
+          queryClient.invalidateQueries({
+            queryKey: queryKeys.ships.radar(currentAgentID),
           })
           setCooldown(currentAgentID, data.cooldown)
         },
@@ -175,7 +183,13 @@ export function StarMapLayout() {
     isError: isSystemsError,
   } = useShipRadarQuery(currentAgentID || undefined)
 
-  const systems: SchemaSystem[] = systemsData?.data ?? []
+  const {
+    data: currentSystem,
+    isPending: isCurrentSystemPending,
+    isError: isCurrentSystemError,
+  } = useCurrentSystemQuery(currentAgentID || undefined)
+
+  const systems = systemsData?.data ?? []
 
   const agentLocations: Map<string, AgentExtended[]> = new Map()
   for (const a of agentsWithShips) {
@@ -185,7 +199,7 @@ export function StarMapLayout() {
     agentLocations.set(key, l)
   }
 
-  const extendedSystems: SystemExtended[] = []
+  const extendedSystems: ShortSystemExtended[] = []
   systems.forEach((s) => {
     const agentsInSystem = agentLocations.get(`${s.x}:${s.y}`) || []
 
@@ -194,6 +208,27 @@ export function StarMapLayout() {
       agents: agentsInSystem,
     })
   })
+
+  const currentExtendedSystem: SystemExtended | null = currentSystem
+    ? {
+        system: currentSystem,
+        agents:
+          agentLocations.get(`${currentSystem.x}:${currentSystem.y}`) ?? [],
+      }
+    : null
+
+  function selectSystem(system: ShortSystemExtended) {
+    if (
+      currentExtendedSystem &&
+      system.system.x === currentExtendedSystem.system.x &&
+      system.system.y === currentExtendedSystem.system.y
+    ) {
+      setSelectedSystem(currentExtendedSystem)
+      return
+    }
+
+    setSelectedSystem(system)
+  }
 
   useEffect(() => {
     if (isSystemsError) {
@@ -214,14 +249,22 @@ export function StarMapLayout() {
         title: "Error loading agents data",
       })
     }
-  }, [isSystemsError, isShipError, isAgentsError, toast])
+    if (isCurrentSystemError) {
+      toast.add({
+        type: "error",
+        title: "Error loading current system",
+      })
+    }
+  }, [isSystemsError, isShipError, isAgentsError, isCurrentSystemError, toast])
 
   const ready =
     isReady &&
     !isSystemsPending &&
+    !isCurrentSystemPending &&
     !isShipPending &&
     !isSystemsError &&
     !isShipError &&
+    !isCurrentSystemError &&
     currentAgentID &&
     ship &&
     !isAgentsError &&
@@ -234,7 +277,7 @@ export function StarMapLayout() {
           (!openedSystem ? (
             <GalaxyMap
               ref={galaxyMapRef}
-              onSystemClick={setSelectedSystem}
+              onSystemClick={selectSystem}
               ship={ship}
               systems={extendedSystems}
             />
@@ -269,7 +312,11 @@ export function StarMapLayout() {
             selectedSystem &&
             galaxyMapRef.current?.centerOnSystem(selectedSystem.system)
           }
-          onSystemOpen={() => selectedSystem && setOpenedSystem(selectedSystem)}
+          onSystemOpen={() =>
+            selectedSystem &&
+            isSystemExtended(selectedSystem) &&
+            setOpenedSystem(selectedSystem)
+          }
           onSelectPlanet={(p) => {
             setSelectedPlanet(p)
             setSelectedWaypoint(null)

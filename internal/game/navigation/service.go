@@ -51,9 +51,17 @@ func (s *NavigationService) NavigateWarp(ctx context.Context, agentID uuid.UUID,
 		return model.Cooldown{}, fmt.Errorf("process warp: %w", err)
 	}
 
-	_, err = s.store.Ships().SaveShip(ctx, ship)
+	err = s.store.ExecTx(ctx, func(tx data.Store) error {
+		_, err := tx.Ships().SaveShip(ctx, ship)
+		if err != nil {
+			return fmt.Errorf("save ship: %w", err)
+		}
+
+		return nil
+	})
+
 	if err != nil {
-		return model.Cooldown{}, fmt.Errorf("save ship: %w", err)
+		return model.Cooldown{}, err
 	}
 
 	cooldown, err := s.store.Cooldowns().SetCooldown(ctx, cooldowns_repository.SetCooldown{

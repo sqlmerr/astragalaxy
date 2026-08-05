@@ -17,6 +17,7 @@ import (
 	agents_repository "github.com/sqlmerr/astragalaxy/internal/data/repository/agents"
 	cooldowns_repository "github.com/sqlmerr/astragalaxy/internal/data/repository/cooldowns"
 	inventories_repository "github.com/sqlmerr/astragalaxy/internal/data/repository/inventories"
+	resource_deposits_repository "github.com/sqlmerr/astragalaxy/internal/data/repository/resource_deposits"
 	ships_repository "github.com/sqlmerr/astragalaxy/internal/data/repository/ships"
 	users_repository "github.com/sqlmerr/astragalaxy/internal/data/repository/users"
 	"github.com/sqlmerr/astragalaxy/internal/game"
@@ -24,6 +25,7 @@ import (
 	cooldowns_service "github.com/sqlmerr/astragalaxy/internal/game/cooldowns"
 	galaxy_service "github.com/sqlmerr/astragalaxy/internal/game/galaxy"
 	inventory_service "github.com/sqlmerr/astragalaxy/internal/game/inventory"
+	mining_service "github.com/sqlmerr/astragalaxy/internal/game/mining"
 	navigation_service "github.com/sqlmerr/astragalaxy/internal/game/navigation"
 	ships_service "github.com/sqlmerr/astragalaxy/internal/game/ships"
 	users_service "github.com/sqlmerr/astragalaxy/internal/game/users"
@@ -77,8 +79,9 @@ func main() {
 	shipRepo := ships_repository.NewShipRepository(*queries, pool)
 	inventoryRepo := inventories_repository.NewInventoryRepository(*queries, pool)
 	cooldownRepo := cooldowns_repository.NewCooldownRepository(rdb)
+	resourceDepositsRepo := resource_deposits_repository.New(*queries, pool)
 
-	store := data.NewStore(pool, userRepo, agentRepo, shipRepo, inventoryRepo, cooldownRepo)
+	store := data.NewStore(pool, userRepo, agentRepo, shipRepo, inventoryRepo, cooldownRepo, resourceDepositsRepo)
 
 	log.Debug("Initializing game logic")
 	authConfig := core_auth.LoadConfigMust()
@@ -97,11 +100,12 @@ func main() {
 	inventoryService := inventory_service.New(store)
 	navigationService := navigation_service.New(store, *worldGen)
 	galaxyService := galaxy_service.New(store, *worldGen)
+	miningService := mining_service.New(store, *worldGen)
 
 	usersHandler := http_handler_users.NewUsersHTTPHandler(*usersService, *authService)
 	apiVersionRouter.AddRoutes(usersHandler.Routes(userAuthMiddleware)...)
 
-	agentsHandler := http_handler_agents.NewAgentsHTTPHandler(*agentsService, *cooldownsService)
+	agentsHandler := http_handler_agents.NewAgentsHTTPHandler(*agentsService, *cooldownsService, *miningService)
 	apiVersionRouter.AddRoutes(agentsHandler.Routes(userAuthMiddleware, agentAuthMiddleware)...)
 
 	shipsHandler := http_handler_ships.NewShipsHTTPHandler(*shipsService)

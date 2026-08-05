@@ -4,6 +4,7 @@ export type SchemaAgent = components["schemas"]["Agent"]
 export type SchemaUser = components["schemas"]["User"]
 export type SchemaShip = components["schemas"]["Ship"]
 export type SchemaCooldown = components["schemas"]["Cooldown"]
+export type SchemaShortSystem = components["schemas"]["ShortSystem"]
 export type SchemaSystem = components["schemas"]["System"]
 export type SchemaPlanet = components["schemas"]["Planet"]
 export type SchemaWaypoint = components["schemas"]["Waypoint"]
@@ -46,4 +47,17 @@ export interface AgentExtended {
 export interface SystemExtended {
   system: SchemaSystem
   agents: AgentExtended[]
+}
+
+export interface ShortSystemExtended {
+  system: SchemaShortSystem
+  agents: AgentExtended[]
+}
+
+export type AnySystemExtended = SystemExtended | ShortSystemExtended
+
+export function isSystemExtended(
+  system: AnySystemExtended | null
+): system is SystemExtended {
+  return system !== null && "planets" in system.system
 }

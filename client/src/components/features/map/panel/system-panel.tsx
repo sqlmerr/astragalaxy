@@ -1,4 +1,4 @@
-import type { SystemExtended } from "@/api/types"
+import { isSystemExtended, type AnySystemExtended } from "@/api/types"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
@@ -16,7 +16,7 @@ import { Json } from "@/components/ui/json"
 
 interface SystemPanelProps {
   currentAgent: AgentExtended
-  system: SystemExtended
+  system: AnySystemExtended
   onClose: () => void
   onCenterCamera: () => void
   onSystemOpen: () => void
@@ -31,6 +31,8 @@ export function SystemPanel({
   onSystemOpen,
   onWarp,
 }: SystemPanelProps) {
+  const fullSystem = isSystemExtended(system)
+
   return (
     <>
       <div className="flex items-center justify-between border-b border-border p-5">
@@ -64,16 +66,20 @@ export function SystemPanel({
               </span>
             </div>
 
-            <div className="flex justify-between">
-              <span className="text-muted-foreground">Waypoints</span>
+            {fullSystem && (
+              <>
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">Waypoints</span>
 
-              <span>{system.system.waypoints.length}</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-muted-foreground">Planets</span>
+                  <span>{system.system.waypoints.length}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">Planets</span>
 
-              <span>{system.system.planets.length}</span>
-            </div>
+                  <span>{system.system.planets.length}</span>
+                </div>
+              </>
+            )}
           </div>
         </Card>
 
@@ -118,14 +124,16 @@ export function SystemPanel({
               Center Camera
             </Button>
 
-            <Button
-              variant="secondary"
-              className="justify-start"
-              onClick={onSystemOpen}
-            >
-              <SquareArrowOutUpRight className="mr-2 size-4" />
-              Open
-            </Button>
+            {fullSystem && (
+              <Button
+                variant="secondary"
+                className="justify-start"
+                onClick={onSystemOpen}
+              >
+                <SquareArrowOutUpRight className="mr-2 size-4" />
+                Open
+              </Button>
+            )}
           </div>
         </Card>
 

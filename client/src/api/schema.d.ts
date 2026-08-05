@@ -455,6 +455,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/agents/current/actions/mine/asteroid": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Mine Asteroid Action */
+        post: operations["mineAsteroidAction"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -569,22 +586,7 @@ export interface components {
             /** @description New ship's name */
             name: string;
         };
-        Planet: {
-            name: string;
-            /** @enum {string} */
-            type: "TERRA" | "OCEAN" | "SCORCHED" | "GLACIAL" | "TOXIC";
-            orbit: number;
-        };
-        Waypoint: {
-            /** @description Waypoint's ID inside system */
-            id: number;
-            /**
-             * @description Waypoint's type
-             * @enum {string}
-             */
-            type: "STATION" | "ASTEROID";
-        };
-        System: {
+        ShortSystem: {
             name: string;
             /** @description X coordinate */
             x: number;
@@ -595,11 +597,9 @@ export interface components {
              * @enum {string}
              */
             archetype: "HABITABLE" | "DEAD" | "FROZEN";
-            planets: components["schemas"]["Planet"][];
-            waypoints: components["schemas"]["Waypoint"][];
         };
         ShipRadarResponse: {
-            data: components["schemas"]["System"][];
+            data: components["schemas"]["ShortSystem"][];
         };
         Inventory: {
             /** Format: uuid */
@@ -668,6 +668,58 @@ export interface components {
         NavigateWaypointRequest: {
             /** @description Waypoint ID */
             id: number;
+        };
+        Planet: {
+            name: string;
+            /** @enum {string} */
+            type: "TERRA" | "OCEAN" | "SCORCHED" | "GLACIAL" | "TOXIC";
+            orbit: number;
+        };
+        /** @description Resource deposit data */
+        ResourceDeposit: {
+            /** @description Resource type */
+            resource: string;
+            /**
+             * @description resource amount remaining in deposit
+             * @example 1000
+             */
+            amount: number;
+            /**
+             * @description Mining speed
+             * @example 0.75
+             */
+            richness: number;
+        };
+        Waypoint: {
+            /** @description Waypoint's ID inside system */
+            id: number;
+            /**
+             * @description Waypoint's type
+             * @enum {string}
+             */
+            type: "STATION" | "ASTEROID";
+            /** @description Asteroid data. Not null if type == ASTEROID */
+            asteroid?: {
+                deposit?: components["schemas"]["ResourceDeposit"];
+            } | null;
+        };
+        System: {
+            name: string;
+            /** @description X coordinate */
+            x: number;
+            /** @description Y coordinate */
+            y: number;
+            /**
+             * @description System archetype
+             * @enum {string}
+             */
+            archetype: "HABITABLE" | "DEAD" | "FROZEN";
+            planets: components["schemas"]["Planet"][];
+            waypoints: components["schemas"]["Waypoint"][];
+        };
+        MineAsteroidRequest: {
+            /** @description Amount of resource to mine */
+            amount: number;
         };
     };
     responses: {
@@ -1344,6 +1396,40 @@ export interface operations {
                 };
             };
             401: components["responses"]["InvalidAgentToken"];
+        };
+    };
+    mineAsteroidAction: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["MineAsteroidRequest"];
+            };
+        };
+        responses: {
+            /** @description Success */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Cooldown"];
+                };
+            };
+            401: components["responses"]["InvalidAgentToken"];
+            /** @description Not enough items or another internal game error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
         };
     };
 }

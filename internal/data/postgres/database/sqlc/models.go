@@ -12,6 +12,48 @@ import (
 	"github.com/jackc/pgx/v5/pgtype"
 )
 
+type LocationType string
+
+const (
+	LocationTypePLANET   LocationType = "PLANET"
+	LocationTypeWAYPOINT LocationType = "WAYPOINT"
+)
+
+func (e *LocationType) Scan(src interface{}) error {
+	switch s := src.(type) {
+	case []byte:
+		*e = LocationType(s)
+	case string:
+		*e = LocationType(s)
+	default:
+		return fmt.Errorf("unsupported scan type for LocationType: %T", src)
+	}
+	return nil
+}
+
+type NullLocationType struct {
+	LocationType LocationType
+	Valid        bool // Valid is true if LocationType is not NULL
+}
+
+// Scan implements the Scanner interface.
+func (ns *NullLocationType) Scan(value interface{}) error {
+	if value == nil {
+		ns.LocationType, ns.Valid = "", false
+		return nil
+	}
+	ns.Valid = true
+	return ns.LocationType.Scan(value)
+}
+
+// Value implements the driver Valuer interface.
+func (ns NullLocationType) Value() (driver.Value, error) {
+	if !ns.Valid {
+		return nil, nil
+	}
+	return string(ns.LocationType), nil
+}
+
 type ShipLocation string
 
 const (
@@ -167,6 +209,16 @@ type InventoryResource struct {
 	InventoryID  uuid.UUID
 	ResourceType string
 	Amount       int64
+}
+
+type ResourceDepositState struct {
+	SystemX      int32
+	SystemY      int32
+	LocType      LocationType
+	LocID        int32
+	ResourceType string
+	Remaining    int64
+	LastMinedAt  pgtype.Timestamp
 }
 
 type Ship struct {

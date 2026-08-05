@@ -2,6 +2,7 @@ post:
   operationId: navigateWaypoint
   tags:
     - Navigation
+    - Actions
   summary: Navigate Waypoint
   description: Navigate to waypoint in system
   requestBody:

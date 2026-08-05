@@ -2,6 +2,7 @@ post:
   operationId: transferResources
   tags:
     - Inventories
+    - Actions
   summary: Transfer resources
   description: Transfer resources from one inventory to another
   requestBody:

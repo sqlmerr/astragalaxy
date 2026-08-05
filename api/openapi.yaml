@@ -53,6 +53,8 @@ paths:
     $ref: "paths/navigation/waypoint.yaml"
   /api/v1/systems/current:
     $ref: "paths/systems/current.yaml"
+  /api/v1/agents/current/actions/mine/asteroid:
+    $ref: "paths/agents/actions-mine-asteroid.yaml"
 components:
   securitySchemes:
     UserAuth:

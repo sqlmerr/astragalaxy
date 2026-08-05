@@ -1,0 +1,19 @@
+type: object
+description: Resource deposit data
+required:
+  - resource
+  - amount
+  - richness
+properties: 
+  resource:
+    type: string
+    description: Resource type # TODO(docs): resource types
+  amount:
+    type: integer
+    minimum: 0
+    description: resource amount remaining in deposit
+    example: 1000
+  richness:
+    type: number
+    description: Mining speed
+    example: 0.75

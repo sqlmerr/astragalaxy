@@ -9,7 +9,7 @@ import (
 )
 
 type ShipRadarResponse struct {
-	Data []SystemResponseDTO `json:"data"`
+	Data []ShortSystemResponseDTO `json:"data"`
 }
 
 func (h *SystemsHTTPHandler) ShipRadar(w http.ResponseWriter, r *http.Request) {

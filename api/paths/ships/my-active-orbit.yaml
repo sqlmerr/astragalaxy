@@ -4,6 +4,7 @@ post:
   description: Orbit active ship
   tags:
     - Ships
+    - Actions
   responses:
     '200':
       description: Successfully orbitted

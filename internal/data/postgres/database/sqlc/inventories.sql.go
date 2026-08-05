@@ -245,6 +245,18 @@ func (q *Queries) GetInventoryResources(ctx context.Context, inventoryID uuid.UU
 	return items, nil
 }
 
+const getInventoryResourcesTotalAmount = `-- name: GetInventoryResourcesTotalAmount :one
+SELECT COALESCE(SUM(amount), 0)::BIGINT FROM inventory_resources
+WHERE inventory_id = $1
+`
+
+func (q *Queries) GetInventoryResourcesTotalAmount(ctx context.Context, inventoryID uuid.UUID) (int64, error) {
+	row := q.db.QueryRow(ctx, getInventoryResourcesTotalAmount, inventoryID)
+	var column_1 int64
+	err := row.Scan(&column_1)
+	return column_1, err
+}
+
 const updateInventory = `-- name: UpdateInventory :one
 UPDATE inventories
 SET

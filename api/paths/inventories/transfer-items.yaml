@@ -2,6 +2,7 @@ post:
   operationId: transferItems
   tags:
     - Inventories
+    - Actions
   summary: Transfer items
   description: Transfer items from one inventory to another
   requestBody:

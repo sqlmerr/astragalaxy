@@ -2,6 +2,7 @@ post:
   operationId: navigateWarp
   tags:
     - Navigation
+    - Actions
   summary: Navigate Warp
   description: Warp to another system
   requestBody:

@@ -2,6 +2,7 @@ post:
   operationId: navigatePlanet
   tags:
     - Navigation
+    - Actions
   summary: Navigate Planet
   description: Navigate to planet in system
   requestBody:

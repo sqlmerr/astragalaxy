@@ -61,7 +61,8 @@ export const WAYPOINT_PARAMS: Record<
 > = {
   ASTEROID: {
     name: "Asteroid",
-    shape: { type: "custom" }, // TODO: custom waypoint shapes
+    shape: { type: "polygon", sides: 4, radius: 13 }, // TODO: custom waypoint shapes
+    color: 0x4a4f6b,
   },
   STATION: {
     name: "Station",

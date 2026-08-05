@@ -48,6 +48,10 @@ SELECT * FROM inventory_resources
 WHERE inventory_id = $1
 ORDER BY amount;
 
+-- name: GetInventoryResourcesTotalAmount :one
+SELECT COALESCE(SUM(amount), 0)::BIGINT FROM inventory_resources
+WHERE inventory_id = $1;
+
 -- name: GetInventoryResource :one
 SELECT * FROM inventory_resources
 WHERE inventory_id = $1 AND resource_type = $2;

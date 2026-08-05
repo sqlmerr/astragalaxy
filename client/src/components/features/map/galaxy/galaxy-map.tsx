@@ -18,8 +18,8 @@ import {
 import { Viewport } from "pixi-viewport"
 import {
   type SchemaShip,
-  type SchemaSystem,
-  type SystemExtended,
+  type SchemaShortSystem,
+  type ShortSystemExtended,
 } from "@/api/types"
 import { CELL_SIZE, SYSTEM_PARAMS } from "../constants"
 import { Labels } from "./labels"
@@ -34,14 +34,14 @@ extend({
 })
 
 interface GalaxyMapProps {
-  onSystemClick: (system: SystemExtended) => void
+  onSystemClick: (system: ShortSystemExtended) => void
   ref: RefObject<GalaxyMapRef | null>
   ship: SchemaShip
-  systems: SystemExtended[]
+  systems: ShortSystemExtended[]
 }
 
 export interface GalaxyMapRef {
-  centerOnSystem(system: SchemaSystem): void
+  centerOnSystem(system: SchemaShortSystem): void
   closeSystem(): void
 }
 
@@ -51,9 +51,8 @@ export function GalaxyMap({
   ship,
   systems,
 }: GalaxyMapProps) {
-  const [selectedSystem, setSelectedSystem] = useState<SchemaSystem | null>(
-    null
-  )
+  const [selectedSystem, setSelectedSystem] =
+    useState<SchemaShortSystem | null>(null)
   const viewportRef = useRef<Viewport>(null)
 
   useImperativeHandle(ref, () => ({

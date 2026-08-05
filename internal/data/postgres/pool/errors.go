@@ -12,6 +12,7 @@ var (
 	ErrNoRows             = errors.New("no rows")
 	ErrViolatesForeignKey = errors.New("violates foreign key")
 	ErrUnknown            = errors.New("unknown")
+	ErrRowAlreadyExists   = errors.New("row already exists")
 )
 
 func TranslateError(err error) error {
@@ -20,6 +21,7 @@ func TranslateError(err error) error {
 	}
 	const (
 		postgresViolatesForeignKeyCode = "23503"
+		postgresUniqueViolationCode    = "23505"
 	)
 
 	if errors.Is(err, pgx.ErrNoRows) {
@@ -27,8 +29,11 @@ func TranslateError(err error) error {
 	}
 	var pgErr *pgconn.PgError
 	if errors.As(err, &pgErr) {
-		if pgErr.Code == postgresViolatesForeignKeyCode {
+		switch pgErr.Code {
+		case postgresViolatesForeignKeyCode:
 			return ErrViolatesForeignKey
+		case postgresUniqueViolationCode:
+			return ErrRowAlreadyExists
 		}
 	}
 	fmt.Println(err)

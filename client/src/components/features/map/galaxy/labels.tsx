@@ -1,7 +1,7 @@
-import type { SystemExtended } from "@/api/types"
+import type { ShortSystemExtended } from "@/api/types"
 import { CELL_SIZE } from "../constants"
 
-export function Labels({ systems }: { systems: SystemExtended[] }) {
+export function Labels({ systems }: { systems: ShortSystemExtended[] }) {
   return (
     <pixiContainer>
       {systems.map((s) => {

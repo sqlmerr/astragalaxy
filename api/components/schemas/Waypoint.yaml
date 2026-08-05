@@ -12,3 +12,10 @@ properties:
     enum:
       - STATION
       - ASTEROID
+  asteroid:
+    type: object
+    description: Asteroid data. Not null if type == ASTEROID
+    nullable: true
+    properties: 
+      deposit:
+        $ref: ResourceDeposit.yaml

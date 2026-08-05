@@ -20,6 +20,6 @@ func (h *SystemsHTTPHandler) GetCurrentSystem(w http.ResponseWriter, r *http.Req
 		return
 	}
 
-	response := systemDTOFromModel(system)
+	response := fullSystemDTOFromModel(system)
 	responseHandler.JSONResponse(http.StatusOK, response)
 }

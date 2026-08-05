@@ -37,6 +37,8 @@ const (
 	CodeShipAlreadyInThisState       ErrorCode = "SHIP_ALREADY_IN_THIS_STATE"
 	CodeCannotDock                   ErrorCode = "CANNOT_DOCK_HERE"
 	CodeInvalidUUID                  ErrorCode = "INVALID_UUID"
+	CodeInvalidLocation              ErrorCode = "INVALID_LOCATION"
+	CodeWaypointNotFound             ErrorCode = "WAYPOINT_NOT_FOUND"
 )
 
 type WithCode struct {

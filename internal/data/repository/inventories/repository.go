@@ -17,6 +17,7 @@ type InventoryRepository interface {
 
 	CreateResource(ctx context.Context, data CreateResource) (model.Resource, error)
 	GetInventoryResources(ctx context.Context, inventoryID uuid.UUID) ([]model.Resource, error)
+	GetResourcesTotalAmount(ctx context.Context, inventoryID uuid.UUID) (int, error)
 	GetResource(ctx context.Context, inventoryID uuid.UUID, resourceType model.ResourceType) (model.Resource, error)
 	SaveResource(ctx context.Context, data model.Resource) (model.Resource, error)
 	DeleteResource(ctx context.Context, inventoryID uuid.UUID, resourceType model.ResourceType) error

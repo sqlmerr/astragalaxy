@@ -57,7 +57,7 @@ export function Waypoint({
             params.shape.radius,
             params.shape.sides
           )
-          g.poly(points).fill({ color: params.color })
+          g.poly(points).fill({ color: params.color || "white" })
           if (isSelected) {
             g.circle(0, 0, params.shape.radius * 1.5).stroke({ color: "white" })
           }

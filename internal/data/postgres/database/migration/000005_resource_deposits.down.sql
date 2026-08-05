@@ -1,0 +1,1 @@
+DROP TABLE IF EXISTS resource_deposit_states;

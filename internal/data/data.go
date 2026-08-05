@@ -11,6 +11,7 @@ import (
 	agents_repository "github.com/sqlmerr/astragalaxy/internal/data/repository/agents"
 	cooldowns_repository "github.com/sqlmerr/astragalaxy/internal/data/repository/cooldowns"
 	inventories_repository "github.com/sqlmerr/astragalaxy/internal/data/repository/inventories"
+	resource_deposits_repository "github.com/sqlmerr/astragalaxy/internal/data/repository/resource_deposits"
 	ships_repository "github.com/sqlmerr/astragalaxy/internal/data/repository/ships"
 	users_repository "github.com/sqlmerr/astragalaxy/internal/data/repository/users"
 )
@@ -21,6 +22,7 @@ type Store interface {
 	Ships() ships_repository.ShipRepository
 	Inventories() inventories_repository.InventoryRepository
 	Cooldowns() cooldowns_repository.CooldownRepository
+	ResourceDeposits() resource_deposits_repository.ResourceDepositsRepository
 
 	ExecTx(ctx context.Context, fn func(tx Store) error) error
 }
@@ -28,11 +30,12 @@ type Store interface {
 type Storage struct {
 	pool postgres_pool.Pool
 
-	users       users_repository.UserRepository
-	agents      agents_repository.AgentRepository
-	ships       ships_repository.ShipRepository
-	inventories inventories_repository.InventoryRepository
-	cooldowns   cooldowns_repository.CooldownRepository
+	users            users_repository.UserRepository
+	agents           agents_repository.AgentRepository
+	ships            ships_repository.ShipRepository
+	inventories      inventories_repository.InventoryRepository
+	cooldowns        cooldowns_repository.CooldownRepository
+	resourceDeposits resource_deposits_repository.ResourceDepositsRepository
 }
 
 func NewStore(
@@ -42,14 +45,16 @@ func NewStore(
 	ships ships_repository.ShipRepository,
 	inventories inventories_repository.InventoryRepository,
 	cooldowns cooldowns_repository.CooldownRepository,
+	resourceDeposits resource_deposits_repository.ResourceDepositsRepository,
 ) *Storage {
 	return &Storage{
-		pool:        pool,
-		users:       users,
-		agents:      agents,
-		ships:       ships,
-		inventories: inventories,
-		cooldowns:   cooldowns,
+		pool:             pool,
+		users:            users,
+		agents:           agents,
+		ships:            ships,
+		inventories:      inventories,
+		cooldowns:        cooldowns,
+		resourceDeposits: resourceDeposits,
 	}
 }
 
@@ -73,6 +78,10 @@ func (s *Storage) Cooldowns() cooldowns_repository.CooldownRepository {
 	return s.cooldowns
 }
 
+func (s *Storage) ResourceDeposits() resource_deposits_repository.ResourceDepositsRepository {
+	return s.resourceDeposits
+}
+
 func (s *Storage) ExecTx(ctx context.Context, fn func(tx Store) error) error {
 	tx, err := s.pool.Begin(ctx)
 	if err != nil {
@@ -83,12 +92,13 @@ func (s *Storage) ExecTx(ctx context.Context, fn func(tx Store) error) error {
 	q := database.New(sqlcDB)
 
 	txStorage := &Storage{
-		pool:        s.pool,
-		users:       users_repository.NewUserRepository(*q, tx),
-		agents:      agents_repository.NewAgentRepository(*q, tx),
-		ships:       ships_repository.NewShipRepository(*q, tx),
-		inventories: inventories_repository.NewInventoryRepository(*q, tx),
-		cooldowns:   s.cooldowns,
+		pool:             s.pool,
+		users:            users_repository.NewUserRepository(*q, tx),
+		agents:           agents_repository.NewAgentRepository(*q, tx),
+		ships:            ships_repository.NewShipRepository(*q, tx),
+		inventories:      inventories_repository.NewInventoryRepository(*q, tx),
+		cooldowns:        s.cooldowns,
+		resourceDeposits: resource_deposits_repository.New(*q, tx),
 	}
 
 	err = fn(txStorage)
