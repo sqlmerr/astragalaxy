@@ -11,17 +11,19 @@ import (
 	"github.com/sqlmerr/astragalaxy/internal/data/model"
 	cooldowns_repository "github.com/sqlmerr/astragalaxy/internal/data/repository/cooldowns"
 	core_errors "github.com/sqlmerr/astragalaxy/internal/errors"
+	"github.com/sqlmerr/astragalaxy/internal/game"
 	core_logger "github.com/sqlmerr/astragalaxy/internal/logger"
 	"go.uber.org/zap"
 )
 
 type InventoryService struct {
-	store data.Store
+	gameConfig game.Config
+	store      data.Store
 }
 
-func New(store data.Store) *InventoryService {
+func New(gameConfig game.Config, store data.Store) *InventoryService {
 	return &InventoryService{
-		store,
+		gameConfig, store,
 	}
 }
 
@@ -77,8 +79,10 @@ func (s *InventoryService) TransferResources(
 		return nil
 	}
 
-	if err := s.store.Cooldowns().CheckCooldown(ctx, input.AgentID); err != nil {
-		return fmt.Errorf("cooldown: %w", err)
+	if !s.gameConfig.Rules.DisableCooldowns {
+		if err := s.store.Cooldowns().CheckCooldown(ctx, input.AgentID); err != nil {
+			return fmt.Errorf("cooldown: %w", err)
+		}
 	}
 
 	if err := s.checkTransferDirection(ctx, input.AgentID, input.FromInventoryID, input.ToInventoryID); err != nil {
@@ -163,8 +167,10 @@ func (s *InventoryService) TransferItems(ctx context.Context, input TransferItem
 		return nil
 	}
 
-	if err := s.store.Cooldowns().CheckCooldown(ctx, input.AgentID); err != nil {
-		return fmt.Errorf("cooldown: %w", err)
+	if !s.gameConfig.Rules.DisableCooldowns {
+		if err := s.store.Cooldowns().CheckCooldown(ctx, input.AgentID); err != nil {
+			return fmt.Errorf("cooldown: %w", err)
+		}
 	}
 
 	if err := s.checkTransferDirection(ctx, input.AgentID, input.FromInventoryID, input.ToInventoryID); err != nil {
@@ -197,6 +203,7 @@ func (s *InventoryService) TransferItems(ctx context.Context, input TransferItem
 				return err
 			}
 
+			// TODO: check inventory limit
 			_, err = tx.Inventories().SaveItem(ctx, item)
 			if err != nil {
 				return fmt.Errorf("save item: %w", err)

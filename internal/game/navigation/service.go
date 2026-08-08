@@ -9,23 +9,27 @@ import (
 	"github.com/sqlmerr/astragalaxy/internal/data/model"
 	cooldowns_repository "github.com/sqlmerr/astragalaxy/internal/data/repository/cooldowns"
 	core_errors "github.com/sqlmerr/astragalaxy/internal/errors"
+	"github.com/sqlmerr/astragalaxy/internal/game"
 	"github.com/sqlmerr/astragalaxy/internal/game/worldgen"
 )
 
 type NavigationService struct {
-	store    data.Store
-	worldGen worldgen.WorldGen
+	gameConfig game.Config
+	store      data.Store
+	worldGen   worldgen.WorldGen
 }
 
-func New(store data.Store, worldGen worldgen.WorldGen) *NavigationService {
+func New(gameConfig game.Config, store data.Store, worldGen worldgen.WorldGen) *NavigationService {
 	return &NavigationService{
-		store, worldGen,
+		gameConfig, store, worldGen,
 	}
 }
 
 func (s *NavigationService) NavigateWarp(ctx context.Context, agentID uuid.UUID, x, y int) (model.Cooldown, error) {
-	if err := s.store.Cooldowns().CheckCooldown(ctx, agentID); err != nil {
-		return model.Cooldown{}, fmt.Errorf("cooldown: %w", err)
+	if !s.gameConfig.Rules.DisableCooldowns {
+		if err := s.store.Cooldowns().CheckCooldown(ctx, agentID); err != nil {
+			return model.Cooldown{}, fmt.Errorf("cooldown: %w", err)
+		}
 	}
 
 	system, exists := s.worldGen.GenerateSystemByCoords(x, y)
@@ -78,8 +82,10 @@ func (s *NavigationService) NavigateWarp(ctx context.Context, agentID uuid.UUID,
 }
 
 func (s *NavigationService) NavigatePlanet(ctx context.Context, agentID uuid.UUID, orbit int) (model.Cooldown, error) {
-	if err := s.store.Cooldowns().CheckCooldown(ctx, agentID); err != nil {
-		return model.Cooldown{}, fmt.Errorf("cooldown: %w", err)
+	if !s.gameConfig.Rules.DisableCooldowns {
+		if err := s.store.Cooldowns().CheckCooldown(ctx, agentID); err != nil {
+			return model.Cooldown{}, fmt.Errorf("cooldown: %w", err)
+		}
 	}
 
 	ship, err := s.store.Ships().GetActiveShipByAgent(ctx, agentID)
@@ -124,8 +130,10 @@ func (s *NavigationService) NavigatePlanet(ctx context.Context, agentID uuid.UUI
 }
 
 func (s *NavigationService) NavigateWaypoint(ctx context.Context, agentID uuid.UUID, waypointID int) (model.Cooldown, error) {
-	if err := s.store.Cooldowns().CheckCooldown(ctx, agentID); err != nil {
-		return model.Cooldown{}, fmt.Errorf("cooldown: %w", err)
+	if !s.gameConfig.Rules.DisableCooldowns {
+		if err := s.store.Cooldowns().CheckCooldown(ctx, agentID); err != nil {
+			return model.Cooldown{}, fmt.Errorf("cooldown: %w", err)
+		}
 	}
 
 	ship, err := s.store.Ships().GetActiveShipByAgent(ctx, agentID)

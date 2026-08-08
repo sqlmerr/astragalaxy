@@ -1,0 +1,4 @@
+seed: 42 # default: 1
+rules:
+  disableCooldowns: false # default: false
+  disableInventoryLimit: false # default: false

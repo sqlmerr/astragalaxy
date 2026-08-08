@@ -3,25 +3,40 @@ package game
 import (
 	"fmt"
 
-	"github.com/kelseyhightower/envconfig"
+	"github.com/knadh/koanf/parsers/yaml"
+	"github.com/knadh/koanf/providers/file"
+	"github.com/knadh/koanf/v2"
 )
 
-type Config struct {
-	Seed int64 `required:"true"`
+var (
+	k = koanf.New(".")
+)
+
+type RulesConfig struct {
+	DisableCooldowns      bool `koanf:"disableCooldowns"`
+	DisableInventoryLimit bool `koanf:"disableInventoryLimit"`
 }
 
-func NewConfig() (Config, error) {
-	var cfg Config
+type Config struct {
+	Seed  int64       `koanf:"seed"`
+	Rules RulesConfig `koanf:"rules"`
+}
 
-	if err := envconfig.Process("GAME", &cfg); err != nil {
-		return Config{}, fmt.Errorf("load game config: %w", err)
+func LoadConfig() (Config, error) {
+	if err := k.Load(file.Provider("config.yaml"), yaml.Parser()); err != nil {
+		return Config{}, fmt.Errorf("load yaml config: %w", err)
 	}
 
-	return cfg, nil
+	var config Config
+	if err := k.Unmarshal("", &config); err != nil {
+		return Config{}, fmt.Errorf("unmarshal config: %w", err)
+	}
+
+	return config, nil
 }
 
-func NewConfigMust() Config {
-	cfg, err := NewConfig()
+func LoadConfigMust() Config {
+	cfg, err := LoadConfig()
 	if err != nil {
 		panic(err)
 	}

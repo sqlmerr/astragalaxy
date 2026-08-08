@@ -6,12 +6,14 @@ import (
 
 	"github.com/sqlmerr/astragalaxy/internal/data/model"
 	core_errors "github.com/sqlmerr/astragalaxy/internal/errors"
+	"github.com/sqlmerr/astragalaxy/internal/game"
 	"github.com/sqlmerr/astragalaxy/internal/game/worldgen"
 )
 
 const DefaultMiningSpeed = 0.25 // seconds per one resource
 
 func MineAsteroid(
+	gameConfig game.Config,
 	w worldgen.Waypoint,
 	deposit model.ResourceDeposit,
 	amount int,
@@ -26,7 +28,7 @@ func MineAsteroid(
 		)
 	}
 
-	if inventoryVolume+amount > inventory.MaxResourceVolume {
+	if inventoryVolume+amount > inventory.MaxResourceVolume && !gameConfig.Rules.DisableInventoryLimit {
 		return model.ResourceDeposit{}, model.Resource{}, 0, core_errors.NewWithCode(
 			core_errors.CodeInventoryIsFull,
 			fmt.Errorf(
@@ -48,6 +50,7 @@ func MineAsteroid(
 }
 
 func MinePlanet(
+	gameConfig game.Config,
 	d worldgen.ResourceDeposit,
 	deposit model.ResourceDeposit,
 	amount int,
@@ -62,7 +65,7 @@ func MinePlanet(
 		)
 	}
 
-	if inventoryVolume+amount > inventory.MaxResourceVolume {
+	if inventoryVolume+amount > inventory.MaxResourceVolume && !gameConfig.Rules.DisableInventoryLimit {
 		return model.ResourceDeposit{}, model.Resource{}, 0, core_errors.NewWithCode(
 			core_errors.CodeInventoryIsFull,
 			fmt.Errorf(

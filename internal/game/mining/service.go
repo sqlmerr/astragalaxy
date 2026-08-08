@@ -12,21 +12,25 @@ import (
 	inventories_repository "github.com/sqlmerr/astragalaxy/internal/data/repository/inventories"
 	resource_deposits_repository "github.com/sqlmerr/astragalaxy/internal/data/repository/resource_deposits"
 	core_errors "github.com/sqlmerr/astragalaxy/internal/errors"
+	"github.com/sqlmerr/astragalaxy/internal/game"
 	"github.com/sqlmerr/astragalaxy/internal/game/worldgen"
 )
 
 type MiningService struct {
-	store    data.Store
-	worldGen worldgen.WorldGen
+	gameConfig game.Config
+	store      data.Store
+	worldGen   worldgen.WorldGen
 }
 
-func New(store data.Store, worldGen worldgen.WorldGen) *MiningService {
-	return &MiningService{store, worldGen}
+func New(gameConfig game.Config, store data.Store, worldGen worldgen.WorldGen) *MiningService {
+	return &MiningService{gameConfig, store, worldGen}
 }
 
 func (s *MiningService) MineAsteroid(ctx context.Context, agentID uuid.UUID, amount int) (model.Cooldown, error) {
-	if err := s.store.Cooldowns().CheckCooldown(ctx, agentID); err != nil {
-		return model.Cooldown{}, fmt.Errorf("cooldown: %w", err)
+	if !s.gameConfig.Rules.DisableCooldowns {
+		if err := s.store.Cooldowns().CheckCooldown(ctx, agentID); err != nil {
+			return model.Cooldown{}, fmt.Errorf("cooldown: %w", err)
+		}
 	}
 
 	ship, err := s.store.Ships().GetActiveShipByAgent(ctx, agentID)
@@ -109,7 +113,7 @@ func (s *MiningService) MineAsteroid(ctx context.Context, agentID uuid.UUID, amo
 		return model.Cooldown{}, fmt.Errorf("get inventory volume: %w", err)
 	}
 
-	deposit, inventoryResource, cooldownDuration, err := MineAsteroid(*waypoint, deposit, amount, inventory, inventoryResource, inventoryVolume)
+	deposit, inventoryResource, cooldownDuration, err := MineAsteroid(s.gameConfig, *waypoint, deposit, amount, inventory, inventoryResource, inventoryVolume)
 	if err != nil {
 		return model.Cooldown{}, fmt.Errorf("process mining: %w", err)
 	}
@@ -160,8 +164,10 @@ func (s *MiningService) MineAsteroid(ctx context.Context, agentID uuid.UUID, amo
 }
 
 func (s *MiningService) MinePlanet(ctx context.Context, agentID uuid.UUID, resourceType model.ResourceType, amount int) (model.Cooldown, error) {
-	if err := s.store.Cooldowns().CheckCooldown(ctx, agentID); err != nil {
-		return model.Cooldown{}, fmt.Errorf("cooldown: %w", err)
+	if !s.gameConfig.Rules.DisableCooldowns {
+		if err := s.store.Cooldowns().CheckCooldown(ctx, agentID); err != nil {
+			return model.Cooldown{}, fmt.Errorf("cooldown: %w", err)
+		}
 	}
 
 	ship, err := s.store.Ships().GetActiveShipByAgent(ctx, agentID)
@@ -260,7 +266,7 @@ func (s *MiningService) MinePlanet(ctx context.Context, agentID uuid.UUID, resou
 		return model.Cooldown{}, fmt.Errorf("get inventory volume: %w", err)
 	}
 
-	depositData, inventoryResource, cooldownDuration, err := MinePlanet(deposit, depositData, amount, inventory, inventoryResource, inventoryVolume)
+	depositData, inventoryResource, cooldownDuration, err := MinePlanet(s.gameConfig, deposit, depositData, amount, inventory, inventoryResource, inventoryVolume)
 	if err != nil {
 		return model.Cooldown{}, fmt.Errorf("process mining: %w", err)
 	}
