@@ -62,5 +62,11 @@ func (h *AgentsHTTPHandler) Routes(userAuthMiddleware http_middleware.Middleware
 			Handler:    h.MineAsteroid,
 			Middleware: []http_middleware.Middleware{agentAuthMiddleware},
 		},
+		{
+			Method:     http.MethodPost,
+			Path:       "/agents/current/actions/mine/planet",
+			Handler:    h.MinePlanet,
+			Middleware: []http_middleware.Middleware{agentAuthMiddleware},
+		},
 	}
 }

@@ -27,6 +27,8 @@ type Planet struct {
 	Name  string
 	Type  PlanetType
 	Orbit int
+
+	Deposits []ResourceDeposit
 }
 
 type StationData struct{}
@@ -102,8 +104,9 @@ type SystemArchetype struct {
 	Middle PlanetWeights
 	Outer  PlanetWeights
 
-	StationChance float64
-	MaxAsteroids  int
+	StationChance   float64
+	MaxAsteroids    int
+	PlanetResources []model.ResourceType // basic + these
 }
 
 type PlanetWeights struct {
@@ -135,6 +138,10 @@ var (
 		},
 		StationChance: 0.8,
 		MaxAsteroids:  3,
+		PlanetResources: []model.ResourceType{
+			model.ResourceCopper,
+			model.ResourceSilicon,
+		},
 	}
 	ArchetypeDead = SystemArchetype{
 		Name:       "DEAD",
@@ -157,6 +164,11 @@ var (
 		},
 		StationChance: 0.1,
 		MaxAsteroids:  9,
+		PlanetResources: []model.ResourceType{
+			model.ResourceTitanium,
+			model.ResourceIridium,
+			model.ResourceBioDisputes,
+		},
 	}
 	ArchetypeFrozen = SystemArchetype{
 		Name:       "FROZEN",
@@ -180,6 +192,10 @@ var (
 			Terra:   5,
 		},
 		MaxAsteroids: 6,
+		PlanetResources: []model.ResourceType{
+			model.ResourceCopper,
+			model.ResourceTitanium,
+		},
 	}
 
 	Archetypes = []SystemArchetype{
@@ -203,3 +219,5 @@ var asteroidResources = []model.ResourceType{
 	model.ResourceTitanium,
 	model.ResourceUranium,
 }
+
+var basicResources = []model.ResourceType{model.ResourceIron, model.ResourceCrystal, model.ResourceCarbon, model.ResourceIce}

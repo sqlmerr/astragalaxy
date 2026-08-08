@@ -114,7 +114,6 @@ export function AgentModal({ agent, setAgent }: AgentModalProps) {
                   </code>
                 </div>
               </Card>
-              <Separator />
 
               <Card className="p-4">
                 <h3 className="mb-3 font-semibold">Cooldown</h3>
@@ -152,8 +151,6 @@ export function AgentModal({ agent, setAgent }: AgentModalProps) {
                 )}
               </Card>
 
-              <Separator />
-
               <Card className="p-4">
                 <h3 className="mb-3 font-semibold">Ships</h3>
                 {agent.ships.map((s) => (
@@ -166,7 +163,7 @@ export function AgentModal({ agent, setAgent }: AgentModalProps) {
                 ))}
               </Card>
 
-              <Separator />
+              {/* TODO: inventory */}
 
               <Accordion>
                 <AccordionItem value="json">

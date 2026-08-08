@@ -1,0 +1,12 @@
+type: object
+required:
+  - amount
+  - resource
+properties: 
+  amount:
+    type: integer
+    description: Amount of resource to mine
+    minimum: 1
+  resource:
+    type: string
+    description: Resource type to time # TODO(docs): resource type

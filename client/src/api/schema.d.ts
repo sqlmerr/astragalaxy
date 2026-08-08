@@ -472,6 +472,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/agents/current/actions/mine/planet": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Mine Planet Action */
+        post: operations["minePlanetAction"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -603,7 +620,7 @@ export interface components {
         };
         Inventory: {
             /** Format: uuid */
-            inventory_id: string;
+            id: string;
             max_item_slots: number;
             max_resource_volume: number;
         };
@@ -639,7 +656,11 @@ export interface components {
             from_inventory_id: string;
             /** Format: uuid */
             to_inventory_id: string;
-            /** @example "crystal": 42 */
+            /**
+             * @example {
+             *       "crystal": 42
+             *     }
+             */
             resources: {
                 [key: string]: number;
             };
@@ -669,12 +690,6 @@ export interface components {
             /** @description Waypoint ID */
             id: number;
         };
-        Planet: {
-            name: string;
-            /** @enum {string} */
-            type: "TERRA" | "OCEAN" | "SCORCHED" | "GLACIAL" | "TOXIC";
-            orbit: number;
-        };
         /** @description Resource deposit data */
         ResourceDeposit: {
             /** @description Resource type */
@@ -689,6 +704,14 @@ export interface components {
              * @example 0.75
              */
             richness: number;
+        };
+        Planet: {
+            name: string;
+            /** @enum {string} */
+            type: "TERRA" | "OCEAN" | "SCORCHED" | "GLACIAL" | "TOXIC";
+            orbit: number;
+            /** @description Resource deposits on this planet */
+            deposits: components["schemas"]["ResourceDeposit"][];
         };
         Waypoint: {
             /** @description Waypoint's ID inside system */
@@ -720,6 +743,12 @@ export interface components {
         MineAsteroidRequest: {
             /** @description Amount of resource to mine */
             amount: number;
+        };
+        MinePlanetRequest: {
+            /** @description Amount of resource to mine */
+            amount: number;
+            /** @description Resource type to time */
+            resource: string;
         };
     };
     responses: {
@@ -1421,7 +1450,50 @@ export interface operations {
                 };
             };
             401: components["responses"]["InvalidAgentToken"];
-            /** @description Not enough items or another internal game error */
+            /** @description Not enough inventory resource volume or another internal game error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    minePlanetAction: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["MinePlanetRequest"];
+            };
+        };
+        responses: {
+            /** @description Success */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Cooldown"];
+                };
+            };
+            401: components["responses"]["InvalidAgentToken"];
+            /** @description Resource deposit not found on planet */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not enough inventory resource volume or another internal game error */
             422: {
                 headers: {
                     [name: string]: unknown;

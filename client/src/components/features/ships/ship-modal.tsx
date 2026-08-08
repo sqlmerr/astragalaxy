@@ -1,4 +1,4 @@
-import { useRenameShipMutation } from "@/api/hooks"
+import { useRenameShipMutation, useShipInventoryQuery } from "@/api/hooks"
 import { queryKeys } from "@/api/query-keys"
 import type { SchemaShip } from "@/api/types"
 import {
@@ -24,6 +24,7 @@ import { useErrorHandler } from "@/errors/utils"
 import { useQueryClient } from "@tanstack/react-query"
 import { Check, Pencil, X } from "lucide-react"
 import { useEffect, useState } from "react"
+import { InventoryModal } from "../inventory/inventory-modal"
 
 interface ShipModalProps {
   ship: SchemaShip | null
@@ -36,6 +37,16 @@ export function ShipModal({ ship, onClose }: ShipModalProps) {
   const [name, setName] = useState("")
   const renameMutation = useRenameShipMutation()
   const errorHandler = useErrorHandler()
+  const [invModalOpen, setInvModalOpen] = useState(false)
+  const {
+    data: inventory,
+    isPending,
+    isError,
+  } = useShipInventoryQuery(
+    ship ? ship.agent_id : "",
+    ship ? ship.id : "",
+    ship !== null
+  )
 
   useEffect(() => {
     if (ship) {
@@ -65,19 +76,6 @@ export function ShipModal({ ship, onClose }: ShipModalProps) {
           queryClient.invalidateQueries({
             queryKey: queryKeys.ships.my(ship.agent_id),
           })
-          // queryClient.setQueryData(
-          //   queryKeys.ships.my(ship.agent_id),
-          //   (old: { data: SchemaShip[] }) => {
-          //     return {
-          //       data: old.data.map((s) => {
-          //         if (s.id === renamedShip.id) {
-          //           return renameShip
-          //         }
-          //         return s
-          //       }),
-          //     }
-          //   }
-          // )
 
           toast.add({
             type: "success",
@@ -94,116 +92,142 @@ export function ShipModal({ ship, onClose }: ShipModalProps) {
     setIsRenaming(false)
   }
 
+  if (!inventory || isPending || isError) {
+    return null
+  }
+
   return (
-    <Dialog
-      open={ship !== null}
-      onOpenChange={(open) => {
-        if (!open) onClose()
-      }}
-    >
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle className="flex items-center gap-2 pr-10">
-            {isRenaming ? (
-              <>
-                <Input
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  className="h-8"
-                />
+    <>
+      <Dialog
+        open={ship !== null}
+        onOpenChange={(open) => {
+          if (!open) onClose()
+        }}
+      >
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 pr-10">
+              {isRenaming ? (
+                <>
+                  <Input
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    className="h-8"
+                  />
 
-                <Button
-                  size="icon"
-                  variant="ghost"
-                  disabled={renameMutation.isPending}
-                  onClick={renameShip}
-                >
-                  <Check className="size-4" />
-                </Button>
+                  <Button
+                    size="icon"
+                    variant="ghost"
+                    disabled={renameMutation.isPending}
+                    onClick={renameShip}
+                  >
+                    <Check className="size-4" />
+                  </Button>
 
-                <Button
-                  size="icon"
-                  variant="ghost"
-                  onClick={() => {
-                    setName(ship?.name ?? "")
-                    setIsRenaming(false)
-                  }}
-                >
-                  <X className="size-4" />
-                </Button>
-              </>
-            ) : (
-              <>
-                <span>{ship?.name}</span>
+                  <Button
+                    size="icon"
+                    variant="ghost"
+                    onClick={() => {
+                      setName(ship?.name ?? "")
+                      setIsRenaming(false)
+                    }}
+                  >
+                    <X className="size-4" />
+                  </Button>
+                </>
+              ) : (
+                <>
+                  <span>{ship?.name}</span>
 
-                {ship?.active && (
-                  <>
-                    <Badge>ACTIVE</Badge>
+                  {ship?.active && (
+                    <>
+                      <Badge>ACTIVE</Badge>
 
-                    <Button
-                      size="icon"
-                      variant="ghost"
-                      className="size-7"
-                      onClick={() => setIsRenaming(true)}
-                    >
-                      <Pencil className="size-4" />
-                    </Button>
-                  </>
-                )}
-              </>
-            )}
-          </DialogTitle>
-        </DialogHeader>
-        {ship && (
-          <div className="space-y-6">
-            <Card className="p-4">
-              <h3 className="mb-3 font-semibold">Information</h3>
+                      <Button
+                        size="icon"
+                        variant="ghost"
+                        className="size-7"
+                        onClick={() => setIsRenaming(true)}
+                      >
+                        <Pencil className="size-4" />
+                      </Button>
+                    </>
+                  )}
+                </>
+              )}
+            </DialogTitle>
+          </DialogHeader>
+          {ship && (
+            <div className="space-y-6">
+              <Card className="p-4">
+                <h3 className="mb-3 font-semibold">Information</h3>
 
-              <div className="grid grid-cols-[80px_1fr] gap-x-3 gap-y-2 text-sm">
-                <span className="text-muted-foreground">ID</span>
-                <code className="font-mono break-all">{ship.id}</code>
+                <div className="grid grid-cols-[80px_1fr] gap-x-3 gap-y-2 text-sm">
+                  <span className="text-muted-foreground">ID</span>
+                  <code className="font-mono break-all">{ship.id}</code>
 
-                <span className="text-muted-foreground">Agent ID</span>
-                <code className="font-mono break-all">{ship.agent_id}</code>
+                  <span className="text-muted-foreground">Agent ID</span>
+                  <code className="font-mono break-all">{ship.agent_id}</code>
 
-                <span className="text-muted-foreground">Type</span>
-                <Badge>{ship.type}</Badge>
+                  <span className="text-muted-foreground">Type</span>
+                  <Badge>{ship.type}</Badge>
 
-                <span className="text-muted-foreground">Location</span>
-                <code className="font-mono break-all">
-                  {ship.location === "NONE"
-                    ? ship.location
-                    : `${ship.location} #${ship.location_id}`}
-                </code>
+                  <span className="text-muted-foreground">Location</span>
+                  <code className="font-mono break-all">
+                    {ship.location === "NONE"
+                      ? ship.location
+                      : `${ship.location} #${ship.location_id}`}
+                  </code>
 
-                <span className="text-muted-foreground">System</span>
-                <code className="font-mono break-all">
-                  <span className="text-muted-foreground">x=</span>
-                  {ship.system_x}{" "}
-                  <span className="text-muted-foreground">y=</span>
-                  {ship.system_y}
-                </code>
+                  <span className="text-muted-foreground">System</span>
+                  <code className="font-mono break-all">
+                    <span className="text-muted-foreground">x=</span>
+                    {ship.system_x}{" "}
+                    <span className="text-muted-foreground">y=</span>
+                    {ship.system_y}
+                  </code>
 
-                <span className="text-muted-foreground">Status</span>
-                <Badge>{ship.status}</Badge>
-              </div>
-            </Card>
+                  <span className="text-muted-foreground">Status</span>
+                  <Badge>{ship.status}</Badge>
+                </div>
+              </Card>
 
-            <Separator />
+              <Card className="p-4">
+                <h3 className="mb-3 font-semibold">Inventory</h3>
 
-            <Accordion>
-              <AccordionItem value="json">
-                <AccordionTrigger>JSON</AccordionTrigger>
-                <AccordionContent>
-                  <div className="rounded-lg bg-muted p-2 text-xs">
-                    <Json data={ship} />
-                  </div>
-                </AccordionContent>
-              </AccordionItem>
-            </Accordion>
-          </div>
-        )}
-      </DialogContent>
-    </Dialog>
+                <div className="flex items-center justify-between gap-4 text-sm">
+                  <span className="text-muted-foreground">
+                    {inventory.items.length} items, {inventory.resources.length}{" "}
+                    resources
+                  </span>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => setInvModalOpen(true)}
+                  >
+                    Open inventory
+                  </Button>
+                </div>
+              </Card>
+
+              <Accordion>
+                <AccordionItem value="json">
+                  <AccordionTrigger>JSON</AccordionTrigger>
+                  <AccordionContent>
+                    <div className="rounded-lg bg-muted p-2 text-xs">
+                      <Json data={ship} />
+                    </div>
+                  </AccordionContent>
+                </AccordionItem>
+              </Accordion>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
+      <InventoryModal
+        inventory={invModalOpen ? inventory : null}
+        onClose={() => setInvModalOpen(false)}
+      />
+    </>
   )
 }

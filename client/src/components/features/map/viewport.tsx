@@ -32,7 +32,7 @@ export function ViewportScene({
 
     viewport.plugins.removeAll()
 
-    viewport.drag().pinch().wheel().decelerate().clampZoom({
+    viewport.drag().pinch().wheel({ smooth: 2 }).decelerate().clampZoom({
       minScale: 0.2,
       maxScale: 4,
     })

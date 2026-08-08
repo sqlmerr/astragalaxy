@@ -54,20 +54,39 @@ func (w *WorldGen) GenerateSystemByCoords(x, y int) (*System, bool) {
 	) + arch.MinPlanets
 	for i := 0; i < numPlanets; i++ {
 		weights := getPlanetWeights(arch, i, numPlanets)
-		planet := generatePlanet(i, rng, weights)
+		planet := generatePlanet(i, rng, weights, arch)
 		system.Planets = append(system.Planets, planet)
 	}
 
 	return system, true
 }
 
-func generatePlanet(orbitIndex int, rng *rand.Rand, weights PlanetWeights) Planet {
+func generatePlanet(orbitIndex int, rng *rand.Rand, weights PlanetWeights, archetype SystemArchetype) Planet {
 	pType := getRandomPlanetType(rng, weights)
 
+	var deposits []ResourceDeposit
+
+	for _, r := range basicResources {
+		deposits = append(deposits, ResourceDeposit{
+			Resource: r,
+			Amount:   rng.Intn(4600) + 400,
+			Richness: float64(rng.Intn(100)+1) / 100,
+		})
+	}
+
+	for _, r := range archetype.PlanetResources {
+		deposits = append(deposits, ResourceDeposit{
+			Resource: r,
+			Amount:   rng.Intn(1900) + 100,
+			Richness: float64(rng.Intn(100)+1) / 100,
+		})
+	}
+
 	return Planet{
-		Name:  generatePlanetName(rng),
-		Type:  pType,
-		Orbit: orbitIndex,
+		Name:     generatePlanetName(rng),
+		Type:     pType,
+		Orbit:    orbitIndex,
+		Deposits: deposits,
 	}
 }
 

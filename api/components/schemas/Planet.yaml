@@ -3,6 +3,7 @@ required:
   - name
   - type
   - orbit
+  - deposits
 properties:
   name:
     type: string
@@ -16,3 +17,8 @@ properties:
       - TOXIC
   orbit:
     type: integer
+  deposits:
+    type: array
+    items: 
+      $ref: ResourceDeposit.yaml
+    description: Resource deposits on this planet

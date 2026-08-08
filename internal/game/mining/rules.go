@@ -41,7 +41,43 @@ func MineAsteroid(
 	deposit.Remaining -= amount
 	deposit.LastMinedAt = time.Now()
 
-	cooldownSeconds := DefaultMiningSpeed * float64(amount) * w.Asteroid.Deposit.Richness
+	cooldownSeconds := DefaultMiningSpeed * float64(amount) / w.Asteroid.Deposit.Richness
+	cooldownDuration := time.Duration(cooldownSeconds * float64(time.Second))
+
+	return deposit, resource, cooldownDuration, nil
+}
+
+func MinePlanet(
+	d worldgen.ResourceDeposit,
+	deposit model.ResourceDeposit,
+	amount int,
+	inventory model.Inventory,
+	resource model.Resource,
+	inventoryVolume int,
+) (model.ResourceDeposit, model.Resource, time.Duration, error) {
+	if deposit.Remaining < amount {
+		return model.ResourceDeposit{}, model.Resource{}, 0, core_errors.NewWithCode(
+			core_errors.CodeNotEnoughResources,
+			fmt.Errorf("planet resource deposit has %d resources: %w", deposit.Remaining, core_errors.ErrUnprocessableEntity),
+		)
+	}
+
+	if inventoryVolume+amount > inventory.MaxResourceVolume {
+		return model.ResourceDeposit{}, model.Resource{}, 0, core_errors.NewWithCode(
+			core_errors.CodeInventoryIsFull,
+			fmt.Errorf(
+				"cannot mine %d resources due to inventory volume limit = %d: %w",
+				amount, inventory.MaxResourceVolume, core_errors.ErrUnprocessableEntity,
+			),
+		)
+	}
+
+	resource.Amount += amount
+
+	deposit.Remaining -= amount
+	deposit.LastMinedAt = time.Now()
+
+	cooldownSeconds := DefaultMiningSpeed * float64(amount) / d.Richness
 	cooldownDuration := time.Duration(cooldownSeconds * float64(time.Second))
 
 	return deposit, resource, cooldownDuration, nil

@@ -12,6 +12,7 @@ export {
   useTransferItemsMutation,
   useTransferResourcesMutation,
 } from "./use-inventory-mutations"
+export { useMineAsteroidMutation } from "./use-mining-mutations"
 export { useLoginMutation } from "./use-login-mutation"
 export { useMeQuery } from "./use-me-query"
 export {

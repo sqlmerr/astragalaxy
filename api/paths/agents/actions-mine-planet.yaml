@@ -1,6 +1,6 @@
 post:
-  operationId: mineAsteroidAction
-  summary: Mine Asteroid Action
+  operationId: minePlanetAction
+  summary: Mine Planet Action
   tags:
     - Agents
     - Actions
@@ -9,7 +9,7 @@ post:
     content: 
       application/json:
         schema:
-          $ref: ../../components/schemas/MineAsteroidRequest.yaml
+          $ref: ../../components/schemas/MinePlanetRequest.yaml
   responses:
     '200':
       description: Success
@@ -20,6 +20,12 @@ post:
     '422':
       description: Not enough inventory resource volume or another internal game error
       content: 
+        application/json:
+          schema:
+            $ref: ../../components/schemas/ErrorResponse.yaml
+    '404':
+      description: Resource deposit not found on planet
+      content:
         application/json:
           schema:
             $ref: ../../components/schemas/ErrorResponse.yaml

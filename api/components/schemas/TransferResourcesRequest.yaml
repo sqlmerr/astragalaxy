@@ -12,7 +12,7 @@ properties:
     format: uuid
   resources:
     type: object
-    example: '"crystal": 42'
+    example: {"crystal": 42}
     additionalProperties:
       type: integer
       description: item's Amount

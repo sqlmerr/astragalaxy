@@ -31,11 +31,15 @@ export type SchemaTransferResourcesRequest =
   components["schemas"]["TransferResourcesRequest"]
 export type SchemaTransferItemsRequest =
   components["schemas"]["TransferItemsRequest"]
+export type SchemaMineAsteroidRequest =
+  components["schemas"]["MineAsteroidRequest"]
+export type SchemaMinePlanetRequest = components["schemas"]["MinePlanetRequest"]
 export type SchemaNavigationResponse =
   components["schemas"]["NavigationResponse"]
 export type SchemaResetAgentTokenResponse =
   components["schemas"]["ResetAgentTokenResponse"]
 export type SchemaErrorResponse = components["schemas"]["ErrorResponse"]
+export type SchemaResourceDeposit = components["schemas"]["ResourceDeposit"]
 
 export interface AgentExtended {
   agent: SchemaAgent

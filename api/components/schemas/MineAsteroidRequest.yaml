@@ -5,3 +5,4 @@ properties:
   amount:
     type: integer
     description: Amount of resource to mine
+    minimum: 1

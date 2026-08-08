@@ -2,10 +2,12 @@ import type { SchemaPlanet, SystemExtended } from "@/api/types"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
-import { ArrowRight, Orbit, X } from "lucide-react"
+import { ArrowRight, Pickaxe, X } from "lucide-react"
 import { Separator } from "@/components/ui/separator"
 import type { AgentExtended } from "@/api/types"
 import { AgentCard } from "../../agents/agent-card"
+import { ResourceDepositCard } from "../../inventory/resource-deposit-card"
+import { shipLocationIs } from "@/api/utils"
 
 interface PlanetPanelProps {
   currentAgent: AgentExtended
@@ -13,6 +15,7 @@ interface PlanetPanelProps {
   planet: SchemaPlanet
   onClose: () => void
   onNavigate: (p: SchemaPlanet) => void
+  onPlanetMine: () => void
 }
 
 export function PlanetPanel({
@@ -21,6 +24,7 @@ export function PlanetPanel({
   planet,
   onClose,
   onNavigate,
+  onPlanetMine,
 }: PlanetPanelProps) {
   const thisPlanetAgents = system.agents.filter(
     (a) => a.ship.location === "PLANET" && a.ship.location_id === planet.orbit
@@ -77,22 +81,52 @@ export function PlanetPanel({
           <h3 className="mb-3 font-semibold">Available Actions</h3>
 
           <div className="flex flex-col gap-2">
-            <Button
-              className="justify-start"
-              variant={
-                currentAgent.ship.system_x === system.system.x &&
-                currentAgent.ship.system_y === system.system.y
-                  ? "default"
-                  : "destructive"
-              }
-              onClick={() => onNavigate(planet)}
-            >
-              <ArrowRight className="mr-2 size-4" />
-              Navigate
-            </Button>
+            {!shipLocationIs(currentAgent.ship, {
+              locationType: "PLANET",
+              locationId: planet.orbit,
+              systemX: currentAgent.ship.system_x,
+              systemY: currentAgent.ship.system_y,
+            }) ? (
+              <>
+                <Button
+                  className="justify-start"
+                  variant={
+                    currentAgent.ship.system_x === system.system.x &&
+                    currentAgent.ship.system_y === system.system.y
+                      ? "default"
+                      : "destructive"
+                  }
+                  onClick={() => onNavigate(planet)}
+                >
+                  <ArrowRight className="mr-2 size-4" />
+                  Navigate
+                </Button>
+              </>
+            ) : (
+              <>
+                <Button
+                  className="justify-start"
+                  variant="secondary"
+                  onClick={onPlanetMine}
+                >
+                  <Pickaxe className="mr-2 size-4" />
+                  Mine
+                </Button>
+              </>
+            )}
           </div>
         </Card>
         <Separator />
+
+        {planet.deposits.length > 0 ? (
+          <Card className="p-4">
+            <h3 className="mb-3 font-semibold">Resource deposits</h3>
+            {planet.deposits.map((d) => (
+              <ResourceDepositCard deposit={d} />
+            ))}
+          </Card>
+        ) : null}
+
         {/* <div>
           <h3 className="mb-3 font-semibold">Description</h3>
 

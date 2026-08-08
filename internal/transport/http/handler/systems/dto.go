@@ -7,9 +7,10 @@ import (
 )
 
 type PlanetResponseDTO struct {
-	Name  string `json:"name"`
-	Type  string `json:"type"`
-	Orbit int    `json:"orbit"`
+	Name     string                       `json:"name"`
+	Type     string                       `json:"type"`
+	Orbit    int                          `json:"orbit"`
+	Deposits []ResourceDepositResponseDTO `json:"deposits"`
 }
 
 func planetDTOFromModel(m worldgen.Planet) PlanetResponseDTO {
@@ -17,6 +18,9 @@ func planetDTOFromModel(m worldgen.Planet) PlanetResponseDTO {
 		Name:  m.Name,
 		Type:  string(m.Type),
 		Orbit: m.Orbit,
+		Deposits: lo.Map(m.Deposits, func(item worldgen.ResourceDeposit, _ int) ResourceDepositResponseDTO {
+			return depositDTOFromModel(item)
+		}),
 	}
 }
 
@@ -26,14 +30,22 @@ func planetDTOsFromModels(m []worldgen.Planet) []PlanetResponseDTO {
 	})
 }
 
-type ResourceDeposit struct {
+type ResourceDepositResponseDTO struct {
 	Resource string  `json:"resource"`
 	Amount   int     `json:"amount"`
 	Richness float64 `json:"richness"`
 }
 
+func depositDTOFromModel(m worldgen.ResourceDeposit) ResourceDepositResponseDTO {
+	return ResourceDepositResponseDTO{
+		Resource: string(m.Resource),
+		Amount:   m.Amount,
+		Richness: m.Richness,
+	}
+}
+
 type AsteroidData struct {
-	Deposit ResourceDeposit `json:"deposit"`
+	Deposit ResourceDepositResponseDTO `json:"deposit"`
 }
 
 type WaypointResponseDTO struct {
@@ -47,11 +59,7 @@ func waypointDTOFromModel(m worldgen.Waypoint) WaypointResponseDTO {
 	var asteroid *AsteroidData
 	if m.Asteroid != nil {
 		asteroid = &AsteroidData{
-			Deposit: ResourceDeposit{
-				Resource: string(m.Asteroid.Deposit.Resource),
-				Amount:   m.Asteroid.Deposit.Amount,
-				Richness: m.Asteroid.Deposit.Richness,
-			},
+			Deposit: depositDTOFromModel(m.Asteroid.Deposit),
 		}
 	}
 

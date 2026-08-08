@@ -2,11 +2,13 @@ import type { SchemaWaypoint, SystemExtended } from "@/api/types"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
-import { ArrowRight, X } from "lucide-react"
+import { ArrowRight, Pickaxe, X } from "lucide-react"
 import { Separator } from "@/components/ui/separator"
 import type { AgentExtended } from "@/api/types"
 import { WAYPOINT_PARAMS } from "../constants"
 import { AgentCard } from "../../agents/agent-card"
+import { shipLocationIs } from "@/api/utils"
+import { ResourceDepositCard } from "../../inventory/resource-deposit-card"
 
 interface WaypointPanelProps {
   currentAgent: AgentExtended
@@ -14,6 +16,7 @@ interface WaypointPanelProps {
   waypoint: SchemaWaypoint
   onClose: () => void
   onNavigate: (w: SchemaWaypoint) => void
+  onAsteroidMine: () => void
 }
 
 export function WaypointPanel({
@@ -22,6 +25,7 @@ export function WaypointPanel({
   waypoint,
   onClose,
   onNavigate,
+  onAsteroidMine,
 }: WaypointPanelProps) {
   const thisWaypointAgents = system.agents.filter(
     (a) => a.ship.location === "WAYPOINT" && a.ship.location_id === waypoint.id
@@ -81,23 +85,54 @@ export function WaypointPanel({
           <h3 className="mb-3 font-semibold">Available Actions</h3>
 
           <div className="flex flex-col gap-2">
-            <Button
-              className="justify-start"
-              variant={
-                currentAgent.ship.system_x === system.system.x &&
-                currentAgent.ship.system_y === system.system.y
-                  ? "default"
-                  : "destructive"
-              }
-              onClick={() => onNavigate(waypoint)}
-            >
-              <ArrowRight className="mr-2 size-4" />
-              Navigate
-            </Button>
+            {!shipLocationIs(currentAgent.ship, {
+              locationType: "WAYPOINT",
+              locationId: waypoint.id,
+              systemX: currentAgent.ship.system_x,
+              systemY: currentAgent.ship.system_y,
+            }) ? (
+              <>
+                <Button
+                  className="justify-start"
+                  variant={
+                    currentAgent.ship.system_x === system.system.x &&
+                    currentAgent.ship.system_y === system.system.y
+                      ? "default"
+                      : "destructive"
+                  }
+                  onClick={() => onNavigate(waypoint)}
+                >
+                  <ArrowRight className="mr-2 size-4" />
+                  Navigate
+                </Button>
+              </>
+            ) : (
+              <>
+                {waypoint.type === "ASTEROID" ? (
+                  <Button
+                    className="justify-start"
+                    variant="secondary"
+                    onClick={onAsteroidMine}
+                  >
+                    <Pickaxe className="mr-2 size-4" />
+                    Mine
+                  </Button>
+                ) : null}
+              </>
+            )}
           </div>
         </Card>
 
         <Separator />
+
+        {waypoint.type === "ASTEROID" &&
+        !!waypoint.asteroid &&
+        !!waypoint.asteroid.deposit ? (
+          <Card className="p-4">
+            <h3 className="mb-3 font-semibold">Resource deposit</h3>
+            <ResourceDepositCard deposit={waypoint.asteroid.deposit} />
+          </Card>
+        ) : null}
 
         {/* <div>
           <h3 className="mb-3 font-semibold">Description</h3>

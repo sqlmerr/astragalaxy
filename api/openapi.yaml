@@ -55,6 +55,8 @@ paths:
     $ref: "paths/systems/current.yaml"
   /api/v1/agents/current/actions/mine/asteroid:
     $ref: "paths/agents/actions-mine-asteroid.yaml"
+  /api/v1/agents/current/actions/mine/planet:
+    $ref: "paths/agents/actions-mine-planet.yaml"
 components:
   securitySchemes:
     UserAuth:

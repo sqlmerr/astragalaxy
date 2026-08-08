@@ -1,6 +1,5 @@
 import { Info, UserRound } from "lucide-react"
 
-import type { SchemaAgent } from "@/api/types"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import type { AgentExtended } from "@/api/types"

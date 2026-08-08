@@ -39,6 +39,7 @@ const (
 	CodeInvalidUUID                  ErrorCode = "INVALID_UUID"
 	CodeInvalidLocation              ErrorCode = "INVALID_LOCATION"
 	CodeWaypointNotFound             ErrorCode = "WAYPOINT_NOT_FOUND"
+	CodeResourceDepositNotFound      ErrorCode = "RESOURCE_DEPOSIT_NOT_FOUND"
 )
 
 type WithCode struct {

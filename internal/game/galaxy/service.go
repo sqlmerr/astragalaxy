@@ -60,10 +60,17 @@ func (s *GalaxyService) GetCurrentAgentSystem(ctx context.Context, agentID uuid.
 		return FullSystem{}, fmt.Errorf("get deposits: %w", err)
 	}
 
-	deposits := make(map[int]int, len(resourceDeposits))
+	waypointDeposits := make(map[int]int)
+	planetDeposits := make(map[int]map[model.ResourceType]int)
 	for _, deposit := range resourceDeposits {
-		if deposit.LocationType == model.LocationWaypoint {
-			deposits[deposit.LocationID] = deposit.Remaining
+		switch deposit.LocationType {
+		case model.LocationWaypoint:
+			waypointDeposits[deposit.LocationID] = deposit.Remaining
+		case model.LocationPlanet:
+			if planetDeposits[deposit.LocationID] == nil {
+				planetDeposits[deposit.LocationID] = make(map[model.ResourceType]int)
+			}
+			planetDeposits[deposit.LocationID][deposit.ResourceType] = deposit.Remaining
 		}
 	}
 
@@ -72,8 +79,19 @@ func (s *GalaxyService) GetCurrentAgentSystem(ctx context.Context, agentID uuid.
 		if waypoint.Asteroid == nil {
 			continue
 		}
-		if remaining, ok := deposits[waypoint.ID]; ok {
+		if remaining, ok := waypointDeposits[waypoint.ID]; ok {
 			waypoint.Asteroid.Deposit.Amount = remaining
+		}
+	}
+
+	for i := range system.Planets {
+		planet := &system.Planets[i]
+		deposits := planetDeposits[planet.Orbit]
+		for j := range planet.Deposits {
+			deposit := &planet.Deposits[j]
+			if remaining, ok := deposits[deposit.Resource]; ok {
+				deposit.Amount = remaining
+			}
 		}
 	}
 
