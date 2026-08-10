@@ -68,16 +68,16 @@ func generatePlanet(orbitIndex int, rng *rand.Rand, weights PlanetWeights, arche
 
 	for _, r := range basicResources {
 		deposits = append(deposits, ResourceDeposit{
-			Resource: r,
-			Amount:   rng.Intn(4600) + 400,
+			Resource: r.Resource,
+			Amount:   randomIntBetween(rng, r.Min, r.Max),
 			Richness: float64(rng.Intn(100)+1) / 100,
 		})
 	}
 
 	for _, r := range archetype.PlanetResources {
 		deposits = append(deposits, ResourceDeposit{
-			Resource: r,
-			Amount:   rng.Intn(1900) + 100,
+			Resource: r.Resource,
+			Amount:   randomIntBetween(rng, r.Min, r.Max),
 			Richness: float64(rng.Intn(100)+1) / 100,
 		})
 	}

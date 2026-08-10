@@ -95,6 +95,12 @@ var (
 	suffixes   = []string{" Prime", " Major", " Minor", " Alpha", " Beta", " Gamma", " I", " II", " III", " IV", " V", " X", "-9"}
 )
 
+type ResourceGenParams struct {
+	Resource model.ResourceType
+	Min      int
+	Max      int
+}
+
 type SystemArchetype struct {
 	Name       string
 	MinPlanets int
@@ -106,7 +112,7 @@ type SystemArchetype struct {
 
 	StationChance   float64
 	MaxAsteroids    int
-	PlanetResources []model.ResourceType // basic + these
+	PlanetResources []ResourceGenParams // basic + these
 }
 
 type PlanetWeights struct {
@@ -138,9 +144,10 @@ var (
 		},
 		StationChance: 0.8,
 		MaxAsteroids:  3,
-		PlanetResources: []model.ResourceType{
-			model.ResourceCopper,
-			model.ResourceSilicon,
+		PlanetResources: []ResourceGenParams{
+			{Resource: model.ResourceCopper, Min: 600, Max: 1300},
+			{Resource: model.ResourceSilicon, Min: 300, Max: 800},
+			{Resource: model.ResourceHelium, Min: 100, Max: 450},
 		},
 	}
 	ArchetypeDead = SystemArchetype{
@@ -164,10 +171,10 @@ var (
 		},
 		StationChance: 0.1,
 		MaxAsteroids:  9,
-		PlanetResources: []model.ResourceType{
-			model.ResourceTitanium,
-			model.ResourceIridium,
-			model.ResourceBioDisputes,
+		PlanetResources: []ResourceGenParams{
+			{Resource: model.ResourceTitanium, Min: 500, Max: 1200},
+			{Resource: model.ResourceIridium, Min: 50, Max: 500},
+			{Resource: model.ResourceBioDisputes, Min: 1000, Max: 5000},
 		},
 	}
 	ArchetypeFrozen = SystemArchetype{
@@ -192,9 +199,10 @@ var (
 			Terra:   5,
 		},
 		MaxAsteroids: 6,
-		PlanetResources: []model.ResourceType{
-			model.ResourceCopper,
-			model.ResourceTitanium,
+		PlanetResources: []ResourceGenParams{
+			{Resource: model.ResourceCopper, Min: 550, Max: 1000},
+			{Resource: model.ResourceTitanium, Min: 400, Max: 1600},
+			{Resource: model.ResourceHelium, Min: 20, Max: 175},
 		},
 	}
 
@@ -220,4 +228,9 @@ var asteroidResources = []model.ResourceType{
 	model.ResourceUranium,
 }
 
-var basicResources = []model.ResourceType{model.ResourceIron, model.ResourceCrystal, model.ResourceCarbon, model.ResourceIce}
+var basicResources = []ResourceGenParams{
+	{Resource: model.ResourceIron, Min: 4000, Max: 8000},
+	{Resource: model.ResourceCrystal, Min: 500, Max: 2000},
+	{Resource: model.ResourceCarbon, Min: 3500, Max: 10000},
+	{Resource: model.ResourceIce, Min: 1000, Max: 3000},
+}

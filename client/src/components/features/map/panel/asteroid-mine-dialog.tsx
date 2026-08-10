@@ -40,7 +40,7 @@ export function AsteroidMineDialog({
         onSuccess: (data) => {
           toast.add({
             type: "success",
-            title: "Mining started",
+            title: "Mining",
             description: `Requested ${value} resource${value === 1 ? "" : "s"}.`,
           })
           setAmount("")

@@ -122,7 +122,7 @@ export function PlanetPanel({
           <Card className="p-4">
             <h3 className="mb-3 font-semibold">Resource deposits</h3>
             {planet.deposits.map((d) => (
-              <ResourceDepositCard deposit={d} />
+              <ResourceDepositCard key={d.resource} deposit={d} />
             ))}
           </Card>
         ) : null}
