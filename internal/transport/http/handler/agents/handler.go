@@ -5,6 +5,7 @@ import (
 
 	agents_service "github.com/sqlmerr/astragalaxy/internal/game/agents"
 	cooldowns_service "github.com/sqlmerr/astragalaxy/internal/game/cooldowns"
+	crafting_service "github.com/sqlmerr/astragalaxy/internal/game/crafting"
 	mining_service "github.com/sqlmerr/astragalaxy/internal/game/mining"
 	http_middleware "github.com/sqlmerr/astragalaxy/internal/transport/http/middleware"
 	http_server "github.com/sqlmerr/astragalaxy/internal/transport/http/server"
@@ -14,14 +15,16 @@ type AgentsHTTPHandler struct {
 	agentsService    agents_service.AgentsService
 	cooldownsService cooldowns_service.CooldownsService
 	miningService    mining_service.MiningService
+	craftingService  crafting_service.CraftingService
 }
 
 func NewAgentsHTTPHandler(
 	agentsService agents_service.AgentsService,
 	cooldownsService cooldowns_service.CooldownsService,
 	miningService mining_service.MiningService,
+	craftingService crafting_service.CraftingService,
 ) *AgentsHTTPHandler {
-	return &AgentsHTTPHandler{agentsService, cooldownsService, miningService}
+	return &AgentsHTTPHandler{agentsService, cooldownsService, miningService, craftingService}
 }
 
 func (h *AgentsHTTPHandler) Routes(userAuthMiddleware http_middleware.Middleware, agentAuthMiddleware http_middleware.Middleware) []http_server.Route {
@@ -66,6 +69,12 @@ func (h *AgentsHTTPHandler) Routes(userAuthMiddleware http_middleware.Middleware
 			Method:     http.MethodPost,
 			Path:       "/agents/current/actions/mine/planet",
 			Handler:    h.MinePlanet,
+			Middleware: []http_middleware.Middleware{agentAuthMiddleware},
+		},
+		{
+			Method:     http.MethodPost,
+			Path:       "/agents/current/actions/craft",
+			Handler:    h.Craft,
 			Middleware: []http_middleware.Middleware{agentAuthMiddleware},
 		},
 	}

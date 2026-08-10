@@ -1,0 +1,16 @@
+type: object
+required:
+  - recipe_id
+  - target_inventory_id
+properties: 
+  recipe_id:
+    type: string
+    description: Recipe ID # TODO(docs)
+  target_inventory_id:
+    type: string
+    format: uuid
+    description: The ID of the inventory from which crafting will be performed
+  amount:
+    type: integer
+    minimum: 1
+    description: Amount of resources to craft

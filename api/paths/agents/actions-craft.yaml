@@ -1,0 +1,31 @@
+post:
+  operationId: craftAction
+  summary: Craft Action
+  tags:
+    - Agents
+    - Actions
+  requestBody:
+    required: true
+    content: 
+      application/json:
+        schema:
+          $ref: ../../components/schemas/CraftRequest.yaml
+  responses:
+    '200':
+      description: Success
+      content: 
+        application/json:
+          schema:
+            $ref: ../../components/schemas/Cooldown.yaml
+    '422':
+      description: Not enough inventory resources or another internal game error
+      content: 
+        application/json:
+          schema:
+            $ref: ../../components/schemas/ErrorResponse.yaml
+    '401':
+      $ref: ../../components/responses/InvalidAgentToken.yaml
+  security:
+    - AgentAuth: []
+    - UserAuth: []
+      AgentId: []

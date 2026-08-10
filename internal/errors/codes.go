@@ -40,6 +40,9 @@ const (
 	CodeInvalidLocation              ErrorCode = "INVALID_LOCATION"
 	CodeWaypointNotFound             ErrorCode = "WAYPOINT_NOT_FOUND"
 	CodeResourceDepositNotFound      ErrorCode = "RESOURCE_DEPOSIT_NOT_FOUND"
+	CodeRecipeNotFound               ErrorCode = "RECIPE_NOT_FOUND"
+	CodeProductionFacilityNotFound   ErrorCode = "PRODUCTION_FACILITY_NOT_FOUND"
+	CodeShipModuleAlreadyInstalled   ErrorCode = "SHIP_MODULE_ALREADY_INSTALLED"
 )
 
 type WithCode struct {

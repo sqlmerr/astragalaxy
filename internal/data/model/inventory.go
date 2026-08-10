@@ -34,6 +34,9 @@ const (
 	ResourceIridium     ResourceType = "IRIDIUM"
 	ResourceDarkMatter  ResourceType = "DARK_MATTER"
 	ResourceBioDisputes ResourceType = "BIO_DISPUTES"
+
+	// composite
+	ResourceSteel ResourceType = "STEEL"
 )
 
 const (
@@ -64,4 +67,48 @@ const (
 type InventoryOwner struct {
 	OwnerID   uuid.UUID
 	OwnerType InventoryOwnerType
+}
+
+type ProductionFacilityType string
+
+const (
+	FacilityPrinter ProductionFacilityType = "printer"
+	FacilitySmelter ProductionFacilityType = "smelter"
+)
+
+type RecipeResource struct {
+	ResourceType ResourceType
+	Amount       int
+}
+
+type Recipe struct {
+	ID               string
+	RequiredFacility ProductionFacilityType
+	Duration         time.Duration
+	Inputs           []RecipeResource
+	Outputs          []RecipeResource
+}
+
+var Recipes = map[string]Recipe{
+	"steel": {
+		ID:               "steel",
+		RequiredFacility: FacilitySmelter,
+		Duration:         time.Second * 10,
+		Inputs: []RecipeResource{
+			{
+				ResourceType: ResourceIron,
+				Amount:       5,
+			},
+			{
+				ResourceType: ResourceCarbon,
+				Amount:       5,
+			},
+		},
+		Outputs: []RecipeResource{
+			{
+				ResourceType: ResourceSteel,
+				Amount:       1,
+			},
+		},
+	},
 }
