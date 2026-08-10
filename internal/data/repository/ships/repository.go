@@ -15,6 +15,11 @@ type ShipRepository interface {
 	GetShipsByAgent(ctx context.Context, agentID uuid.UUID) ([]model.Ship, error)
 	SaveShip(ctx context.Context, ship model.Ship) (model.Ship, error)
 	GetActiveShipByAgent(ctx context.Context, agentID uuid.UUID) (model.Ship, error)
+
+	CreateShipModule(ctx context.Context, data CreateShipModule) (model.ShipModule, error)
+	GetShipModules(ctx context.Context, shipID uuid.UUID) ([]model.ShipModule, error)
+	GetShipModule(ctx context.Context, shipID uuid.UUID, moduleType model.ShipModuleType) (model.ShipModule, error)
+	DeleteShipModule(ctx context.Context, shipID uuid.UUID, moduleType model.ShipModuleType) error
 }
 
 type ShipRepositoryImpl struct {

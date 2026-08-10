@@ -206,3 +206,24 @@ func (s *ShipsService) DockShip(ctx context.Context, agentID uuid.UUID) (model.C
 
 	return cooldown, nil
 }
+
+func (s *ShipsService) GetShipModules(ctx context.Context, agentID uuid.UUID, shipID uuid.UUID) ([]model.ShipModule, error) {
+	ship, err := s.store.Ships().GetShip(ctx, shipID)
+	if err != nil {
+		return nil, fmt.Errorf("get ship: %w", err)
+	}
+
+	if ship.AgentID != agentID {
+		return nil, core_errors.NewWithCode(
+			core_errors.CodeAccessDenied,
+			fmt.Errorf("cannot access ship with id='%s': %w", shipID, core_errors.ErrAccessDenied),
+		)
+	}
+
+	modules, err := s.store.Ships().GetShipModules(ctx, shipID)
+	if err != nil {
+		return nil, fmt.Errorf("get ship modules: %w", err)
+	}
+
+	return modules, nil
+}

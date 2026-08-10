@@ -19,6 +19,11 @@ type CreateShip struct {
 	LocationID  int
 }
 
+type CreateShipModule struct {
+	Type   model.ShipModuleType
+	ShipID uuid.UUID
+}
+
 func convertModel(m database.Ship) model.Ship {
 	return model.Ship{
 		ID:          m.ID,
@@ -33,5 +38,12 @@ func convertModel(m database.Ship) model.Ship {
 		InventoryID: m.InventoryID,
 		Location:    model.ShipLocation(m.Location),
 		LocationID:  int(m.LocationID),
+	}
+}
+
+func convertModuleModel(m database.ShipModule) model.ShipModule {
+	return model.ShipModule{
+		Type:   model.ShipModuleType(m.ModuleType),
+		ShipID: m.ShipID,
 	}
 }

@@ -1,0 +1,38 @@
+get:
+  operationId: getMyShipModules
+  tags:
+    - Ships
+  summary: Get My Ship Modules
+  description: Get agent's ship modules
+  parameters:
+    - name: id
+      in: path
+      schema:
+        type: string
+        format: uuid
+        description: Ship ID
+      required: true
+  responses:
+    '200':
+      description: Successfully got ship modules
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - data
+            properties: 
+              data:
+                type: array
+                items: 
+                  type: string
+                  description: Ship module type
+    '401':
+      $ref: "../../components/responses/InvalidAgentToken.yaml"
+    '403':
+      $ref: ../../components/responses/AccessDenied.yaml
+      
+  security:
+    - AgentAuth: []
+    - UserAuth: []
+      AgentId: []

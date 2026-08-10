@@ -29,6 +29,18 @@ const (
 	ShipLocationWaypoint ShipLocation = "WAYPOINT"
 )
 
+type ShipModuleType string
+
+const (
+	ShipModulePortableSmelter ShipModuleType = "portable_smelter"
+	ShipModulePortablePrinter ShipModuleType = "portable_printer"
+)
+
+type ShipModule struct {
+	ShipID uuid.UUID
+	Type   ShipModuleType
+}
+
 type Ship struct {
 	ID          uuid.UUID
 	AgentID     uuid.UUID

@@ -54,5 +54,11 @@ func (h *ShipsHTTPHandler) Routes(agentAuthMiddleware http_middleware.Middleware
 			Handler:    h.DockMyShip,
 			Middleware: []http_middleware.Middleware{agentAuthMiddleware},
 		},
+		{
+			Method:     http.MethodGet,
+			Path:       "/ships/my/{id}/modules",
+			Handler:    h.GetMyShipModules,
+			Middleware: []http_middleware.Middleware{agentAuthMiddleware},
+		},
 	}
 }

@@ -236,6 +236,11 @@ type Ship struct {
 	LocationID  int32
 }
 
+type ShipModule struct {
+	ShipID     uuid.UUID
+	ModuleType string
+}
+
 type User struct {
 	ID        uuid.UUID
 	Username  string

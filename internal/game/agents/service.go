@@ -148,6 +148,14 @@ func (s *AgentsService) RegisterAgent(ctx context.Context, userID uuid.UUID, use
 			log.Debug("created ship", zap.String("ship_id", s.ID.String()))
 		}
 
+		_, err = tx.Ships().CreateShipModule(ctx, ships_repository.CreateShipModule{
+			Type:   model.ShipModulePortablePrinter,
+			ShipID: s.ID,
+		})
+		if err != nil {
+			return fmt.Errorf("create ship `portable_printer` module: %w", err)
+		}
+
 		return nil
 	})
 
