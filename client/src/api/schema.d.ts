@@ -489,6 +489,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/inventories/my/items/{id}/use": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Use Item */
+        post: operations["useItem"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -587,7 +604,7 @@ export interface components {
             created_at: string;
             name: string;
             /** Format: uuid */
-            inventory_id?: string;
+            inventory_id: string;
             /**
              * @description Location type
              * @enum {string}
@@ -749,6 +766,11 @@ export interface components {
             amount: number;
             /** @description Resource type to time */
             resource: string;
+        };
+        UseItemResponse: {
+            /** Format: any */
+            data: string;
+            cooldown: components["schemas"]["Cooldown"];
         };
     };
     responses: {
@@ -1502,6 +1524,31 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
+        };
+    };
+    useItem: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Item ID */
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successfully used item */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UseItemResponse"];
+                };
+            };
+            401: components["responses"]["InvalidAgentToken"];
+            403: components["responses"]["AccessDenied"];
         };
     };
 }

@@ -1,5 +1,5 @@
 type: object
-required: [id, agent_id, type, active, system_x, system_y, status, created_at, name, location, location_id]
+required: [id, agent_id, type, active, system_x, system_y, status, created_at, name, location, location_id, inventory_id]
 properties:
   id:
     type: string

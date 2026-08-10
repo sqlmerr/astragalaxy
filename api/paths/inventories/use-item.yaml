@@ -1,0 +1,29 @@
+post:
+  operationId: useItem
+  tags:
+    - Inventories
+    - Actions
+  summary: Use Item
+  parameters:
+    - name: id
+      in: path
+      description: Item ID
+      schema:
+        type: string
+        format: uuid
+      required: true
+  responses:
+    '200':
+      description: Successfully used item
+      content: 
+        application/json:
+          schema:
+            $ref: ../../components/schemas/UseItemResponse.yaml
+    '401':
+      $ref: "../../components/responses/InvalidAgentToken.yaml"
+    '403':
+      $ref: ../../components/responses/AccessDenied.yaml
+  security:
+    - AgentAuth: []
+    - UserAuth: []
+      AgentId: []

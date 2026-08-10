@@ -36,6 +36,10 @@ const (
 	ResourceBioDisputes ResourceType = "BIO_DISPUTES"
 )
 
+const (
+	ItemPortableSmelter ItemType = "portable_smelter"
+)
+
 type Resource struct {
 	InventoryID  uuid.UUID
 	ResourceType ResourceType

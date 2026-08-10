@@ -11,6 +11,7 @@ get:
         format: uuid
       name: id
       description: ID of the ship
+      required: true
   responses:
     '200':
       description: Successfully got ship's inventory

@@ -96,7 +96,7 @@ func AgentAuth(jwtProcessor core_auth.JWTProcessor, agentGetter AgentGetter) Mid
 					responseHandler.ErrorResponse(
 						core_errors.NewWithCode(
 							core_errors.CodeInvalidUUID,
-							fmt.Errorf("parse agent id: %w", err),
+							fmt.Errorf("parse agent id: %w: %w", core_errors.ErrInvalidArgument, err),
 						),
 						fmt.Sprintf("Failed to parse %s agent id header", AGENT_ID_HEADER),
 					)

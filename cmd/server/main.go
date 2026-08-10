@@ -25,6 +25,7 @@ import (
 	cooldowns_service "github.com/sqlmerr/astragalaxy/internal/game/cooldowns"
 	galaxy_service "github.com/sqlmerr/astragalaxy/internal/game/galaxy"
 	inventory_service "github.com/sqlmerr/astragalaxy/internal/game/inventory"
+	items_service "github.com/sqlmerr/astragalaxy/internal/game/items"
 	mining_service "github.com/sqlmerr/astragalaxy/internal/game/mining"
 	navigation_service "github.com/sqlmerr/astragalaxy/internal/game/navigation"
 	ships_service "github.com/sqlmerr/astragalaxy/internal/game/ships"
@@ -101,6 +102,7 @@ func main() {
 	navigationService := navigation_service.New(gameConfig, store, *worldGen)
 	galaxyService := galaxy_service.New(store, *worldGen)
 	miningService := mining_service.New(gameConfig, store, *worldGen)
+	itemsService := items_service.New(store)
 
 	usersHandler := http_handler_users.NewUsersHTTPHandler(*usersService, *authService)
 	apiVersionRouter.AddRoutes(usersHandler.Routes(userAuthMiddleware)...)
@@ -111,7 +113,7 @@ func main() {
 	shipsHandler := http_handler_ships.NewShipsHTTPHandler(*shipsService)
 	apiVersionRouter.AddRoutes(shipsHandler.Routes(agentAuthMiddleware)...)
 
-	inventoriesHandler := http_handler_inventories.NewInventoriesHTTPHandler(*inventoryService)
+	inventoriesHandler := http_handler_inventories.NewInventoriesHTTPHandler(*inventoryService, *itemsService)
 	apiVersionRouter.AddRoutes(inventoriesHandler.Routes(agentAuthMiddleware)...)
 
 	navigationHandler := http_handler_navigation.New(*navigationService)
