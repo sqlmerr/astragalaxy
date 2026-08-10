@@ -1,12 +1,9 @@
 package worldgen
 
 import (
-	cryptorand "crypto/rand"
 	"fmt"
 	"hash/fnv"
-	"math/big"
 	"math/rand"
-	"strings"
 
 	core_errors "github.com/sqlmerr/astragalaxy/internal/errors"
 )
@@ -61,96 +58,6 @@ func (w *WorldGen) GenerateSystemByCoords(x, y int) (*System, bool) {
 	return system, true
 }
 
-func generatePlanet(orbitIndex int, rng *rand.Rand, weights PlanetWeights, archetype SystemArchetype) Planet {
-	pType := getRandomPlanetType(rng, weights)
-
-	var deposits []ResourceDeposit
-
-	for _, r := range basicResources {
-		deposits = append(deposits, ResourceDeposit{
-			Resource: r.Resource,
-			Amount:   randomIntBetween(rng, r.Min, r.Max),
-			Richness: float64(rng.Intn(100)+1) / 100,
-		})
-	}
-
-	for _, r := range archetype.PlanetResources {
-		deposits = append(deposits, ResourceDeposit{
-			Resource: r.Resource,
-			Amount:   randomIntBetween(rng, r.Min, r.Max),
-			Richness: float64(rng.Intn(100)+1) / 100,
-		})
-	}
-
-	return Planet{
-		Name:     generatePlanetName(rng),
-		Type:     pType,
-		Orbit:    orbitIndex,
-		Deposits: deposits,
-	}
-}
-
-func generateWaypoints(rng *rand.Rand, archetype SystemArchetype) []Waypoint {
-	waypoints := make([]Waypoint, 0)
-	roll := rng.Float64()
-	lastID := -1
-	if roll < archetype.StationChance {
-		waypoints = append(waypoints, Waypoint{
-			ID:       lastID + 1,
-			Type:     WaypointStation,
-			Dockable: true,
-			Station:  &StationData{},
-		})
-		lastID++
-	}
-
-	asteroidsAmount := rng.Intn(archetype.MaxAsteroids)
-	for range asteroidsAmount {
-		waypoints = append(waypoints, Waypoint{
-			ID:       lastID + 1,
-			Type:     WaypointAsteroid,
-			Dockable: false,
-			Asteroid: generateAsteroid(rng, archetype),
-		})
-		lastID++
-	}
-
-	return waypoints
-}
-
-func generateAsteroid(rng *rand.Rand, _ SystemArchetype) *AsteroidData {
-	return &AsteroidData{
-		Deposit: ResourceDeposit{
-			Resource: asteroidResources[rng.Intn(len(asteroidResources))],
-			Amount:   rng.Intn(9000) + 1000,
-			Richness: float64(rng.Intn(100)+1) / 100,
-		},
-	}
-}
-
-func generatePlanetName(rng *rand.Rand) string {
-	var nameBuilder strings.Builder
-
-	numSyllables := rng.Intn(3) + 2
-
-	for i := 0; i < numSyllables; i++ {
-		c := consonants[rng.Intn(len(consonants))]
-		v := vowels[rng.Intn(len(vowels))]
-
-		nameBuilder.WriteString(c)
-		nameBuilder.WriteString(v)
-	}
-
-	name := nameBuilder.String()
-	name = strings.ToUpper(string(name[0])) + name[1:]
-
-	if rng.Float32() < 0.25 {
-		name += suffixes[rng.Intn(len(suffixes))]
-	}
-
-	return name
-}
-
 func (w *WorldGen) GetSystemsInBox(minX, minY, maxX, maxY int) ([]System, error) {
 	var foundSystems []System
 
@@ -182,44 +89,5 @@ func (w *WorldGen) FindSpawnSystem() (*System, error) {
 				return sys, nil
 			}
 		}
-	}
-}
-
-func getRandomCoordinate(min, max int) int {
-	bg := big.NewInt(int64(max - min + 1))
-	n, _ := cryptorand.Int(cryptorand.Reader, bg)
-	return int(n.Int64()) + min
-}
-
-func getPlanetWeights(archetype SystemArchetype, orbit, numPlanets int) PlanetWeights {
-	w := archetype.Middle
-	ratio := float64(orbit) / float64(numPlanets-1)
-
-	switch {
-	case ratio < 0.3:
-		w = archetype.Inner
-	case ratio > 0.7:
-		w = archetype.Outer
-	}
-
-	return w
-}
-
-func getRandomPlanetType(rng *rand.Rand, w PlanetWeights) PlanetType {
-	total := w.Scorched + w.Terra + w.Ocean + w.Toxic + w.Glacial
-
-	roll := rng.Intn(total)
-
-	switch {
-	case roll < w.Scorched:
-		return PlanetScorched
-	case roll < w.Scorched+w.Terra:
-		return PlanetTerra
-	case roll < w.Scorched+w.Terra+w.Ocean:
-		return PlanetOcean
-	case roll < w.Scorched+w.Terra+w.Ocean+w.Toxic:
-		return PlanetToxic
-	default:
-		return PlanetGlacial
 	}
 }
