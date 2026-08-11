@@ -1,13 +1,14 @@
 import { extend, Application } from "@pixi/react"
 import { Viewport } from "pixi-viewport"
+import type {
+  FederatedPointerEvent,
+  FederatedWheelEvent,FederatedEventHandler} from "pixi.js";
 import {
   BitmapText,
   Container,
-  FederatedPointerEvent,
-  FederatedWheelEvent,
   Graphics,
-  Rectangle,
-  type FederatedEventHandler,
+  Rectangle
+  
 } from "pixi.js"
 import { CELL_SIZE } from "./constants"
 import { ViewportScene } from "./viewport"

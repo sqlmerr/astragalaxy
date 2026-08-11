@@ -9,24 +9,24 @@ import (
 type ShipType string
 
 const (
-	ShipTypeTrader ShipType = "TRADER"
-	ShipTypeScout  ShipType = "SCOUT"
-	ShipTypeMiner  ShipType = "MINER"
+	ShipTypeTrader ShipType = "trader"
+	ShipTypeScout  ShipType = "scout"
+	ShipTypeMiner  ShipType = "miner"
 )
 
 type ShipStatus string
 
 const (
-	ShipStatusOrbit  ShipStatus = "ORBIT"
-	ShipStatusDocked ShipStatus = "DOCKED"
+	ShipStatusOrbit  ShipStatus = "orbit"
+	ShipStatusDocked ShipStatus = "docked"
 )
 
 type ShipLocation string
 
 const (
-	ShipLocationNone     ShipLocation = "NONE"
-	ShipLocationPlanet   ShipLocation = "PLANET"
-	ShipLocationWaypoint ShipLocation = "WAYPOINT"
+	ShipLocationNone     ShipLocation = "none"
+	ShipLocationPlanet   ShipLocation = "planet"
+	ShipLocationWaypoint ShipLocation = "waypoint"
 )
 
 type ShipModuleType string

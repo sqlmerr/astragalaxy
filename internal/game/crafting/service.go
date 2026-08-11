@@ -9,6 +9,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/sqlmerr/astragalaxy/internal/data"
 	"github.com/sqlmerr/astragalaxy/internal/data/model"
+	"github.com/sqlmerr/astragalaxy/internal/data/registry"
 	cooldowns_repository "github.com/sqlmerr/astragalaxy/internal/data/repository/cooldowns"
 	inventories_repository "github.com/sqlmerr/astragalaxy/internal/data/repository/inventories"
 	core_errors "github.com/sqlmerr/astragalaxy/internal/errors"
@@ -18,10 +19,11 @@ import (
 type CraftingService struct {
 	gameConfig game.Config
 	store      data.Store
+	gameData   registry.GameData
 }
 
-func New(gameConfig game.Config, store data.Store) *CraftingService {
-	return &CraftingService{gameConfig, store}
+func New(gameConfig game.Config, store data.Store, gameData registry.GameData) *CraftingService {
+	return &CraftingService{gameConfig, store, gameData}
 }
 
 func (s *CraftingService) Craft(ctx context.Context, agentID uuid.UUID, recipeID string, targetInventoryID uuid.UUID, amount int) (model.Cooldown, error) {
@@ -31,7 +33,7 @@ func (s *CraftingService) Craft(ctx context.Context, agentID uuid.UUID, recipeID
 		}
 	}
 
-	recipe, ok := model.Recipes[recipeID]
+	recipe, ok := s.gameData.Recipes.GetRecipe(recipeID)
 	if !ok {
 		return model.Cooldown{}, core_errors.NewWithCode(core_errors.CodeRecipeNotFound, fmt.Errorf("recipe `%s`: %w", recipeID, core_errors.ErrNotFound))
 	}
@@ -49,13 +51,13 @@ func (s *CraftingService) Craft(ctx context.Context, agentID uuid.UUID, recipeID
 	}
 
 	// TODO: refactor this using tags
-	var shipFacilities []model.ProductionFacilityType
+	var shipFacilities []registry.ProductionFacilityType
 	for _, m := range shipModules {
 		switch m.Type {
 		case model.ShipModulePortablePrinter:
-			shipFacilities = append(shipFacilities, model.FacilityPrinter)
+			shipFacilities = append(shipFacilities, registry.FacilityPrinter)
 		case model.ShipModulePortableSmelter:
-			shipFacilities = append(shipFacilities, model.FacilitySmelter)
+			shipFacilities = append(shipFacilities, registry.FacilitySmelter)
 		}
 	}
 	if !slices.Contains(shipFacilities, recipe.RequiredFacility) {
@@ -107,7 +109,7 @@ func (s *CraftingService) Craft(ctx context.Context, agentID uuid.UUID, recipeID
 	for _, input := range recipe.Inputs {
 		flag := false
 		for _, resource := range resources {
-			if input.ResourceType == resource.ResourceType && resource.Amount >= (input.Amount*amount) {
+			if model.ResourceType(input.ResourceID) == resource.ResourceType && resource.Amount >= (input.Amount*amount) {
 				resource.Amount -= input.Amount * amount
 				updatedResources = append(updatedResources, resource)
 				flag = true
@@ -118,7 +120,7 @@ func (s *CraftingService) Craft(ctx context.Context, agentID uuid.UUID, recipeID
 		if !flag {
 			return model.Cooldown{}, core_errors.NewWithCode(
 				core_errors.CodeNotEnoughResources,
-				fmt.Errorf("to craft recipe `%s` it is required to have at least %d of `%s` resource", recipeID, input.Amount*amount, input.ResourceType),
+				fmt.Errorf("to craft recipe `%s` it is required to have at least %d of `%s` resource", recipeID, input.Amount*amount, input.ResourceID),
 			)
 		}
 	}
@@ -126,7 +128,7 @@ func (s *CraftingService) Craft(ctx context.Context, agentID uuid.UUID, recipeID
 	for _, output := range recipe.Outputs {
 		flag := false
 		for _, resource := range resources {
-			if output.ResourceType == resource.ResourceType {
+			if model.ResourceType(output.ResourceID) == resource.ResourceType {
 				resource.Amount += output.Amount * amount
 				updatedResources = append(updatedResources, resource)
 				flag = true
@@ -135,7 +137,7 @@ func (s *CraftingService) Craft(ctx context.Context, agentID uuid.UUID, recipeID
 		}
 
 		if !flag {
-			createdResources = append(createdResources, model.Resource{InventoryID: targetInventoryID, ResourceType: output.ResourceType, Amount: output.Amount * amount})
+			createdResources = append(createdResources, model.Resource{InventoryID: targetInventoryID, ResourceType: model.ResourceType(output.ResourceID), Amount: output.Amount * amount})
 		}
 	}
 
@@ -174,7 +176,7 @@ func (s *CraftingService) Craft(ctx context.Context, agentID uuid.UUID, recipeID
 		cooldown, err = tx.Cooldowns().SetCooldown(ctx, cooldowns_repository.SetCooldown{
 			AgentID:  agentID,
 			Action:   "craft",
-			Duration: recipe.Duration * time.Duration(amount),
+			Duration: recipe.GetDuration() * time.Duration(amount),
 		})
 		if err != nil {
 			return fmt.Errorf("set cooldown: %w", err)

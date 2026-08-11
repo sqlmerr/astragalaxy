@@ -18,29 +18,30 @@ type ItemType string
 
 const (
 	// basic
-	ResourceIron    ResourceType = "IRON"
-	ResourceCrystal ResourceType = "CRYSTAL"
-	ResourceCarbon  ResourceType = "CARBON"
-	ResourceIce     ResourceType = "ICE"
+	ResourceIron    ResourceType = "iron"
+	ResourceCrystal ResourceType = "crystal"
+	ResourceCarbon  ResourceType = "carbon"
+	ResourceIce     ResourceType = "ice"
 
 	// advanced
-	ResourceCopper   ResourceType = "COPPER"
-	ResourceTitanium ResourceType = "TITANIUM"
-	ResourceSilicon  ResourceType = "SILICON"
-	ResourceHelium   ResourceType = "HELIUM"
+	ResourceCopper   ResourceType = "copper"
+	ResourceTitanium ResourceType = "titanium"
+	ResourceSilicon  ResourceType = "silicon"
+	ResourceHelium   ResourceType = "helium"
 
 	// exotic
-	ResourceUranium     ResourceType = "URANIUM"
-	ResourceIridium     ResourceType = "IRIDIUM"
-	ResourceDarkMatter  ResourceType = "DARK_MATTER"
-	ResourceBioDisputes ResourceType = "BIO_DISPUTES"
+	ResourceUranium     ResourceType = "uranium"
+	ResourceIridium     ResourceType = "iridium"
+	ResourceDarkMatter  ResourceType = "dark_matter"
+	ResourceBioDisputes ResourceType = "bio_disputes"
 
 	// composite
-	ResourceSteel ResourceType = "STEEL"
+	ResourceSteel ResourceType = "steel"
 )
 
 const (
 	ItemPortableSmelter ItemType = "portable_smelter"
+	ItemPortablePrinter ItemType = "portable_printer"
 )
 
 type Resource struct {
@@ -60,55 +61,11 @@ type Item struct {
 type InventoryOwnerType string
 
 const (
-	InventoryOwnerAgent InventoryOwnerType = "AGENT"
-	InventoryOwnerShip  InventoryOwnerType = "SHIP"
+	InventoryOwnerAgent InventoryOwnerType = "agent"
+	InventoryOwnerShip  InventoryOwnerType = "ship"
 )
 
 type InventoryOwner struct {
 	OwnerID   uuid.UUID
 	OwnerType InventoryOwnerType
-}
-
-type ProductionFacilityType string
-
-const (
-	FacilityPrinter ProductionFacilityType = "printer"
-	FacilitySmelter ProductionFacilityType = "smelter"
-)
-
-type RecipeResource struct {
-	ResourceType ResourceType
-	Amount       int
-}
-
-type Recipe struct {
-	ID               string
-	RequiredFacility ProductionFacilityType
-	Duration         time.Duration
-	Inputs           []RecipeResource
-	Outputs          []RecipeResource
-}
-
-var Recipes = map[string]Recipe{
-	"steel": {
-		ID:               "steel",
-		RequiredFacility: FacilitySmelter,
-		Duration:         time.Second * 10,
-		Inputs: []RecipeResource{
-			{
-				ResourceType: ResourceIron,
-				Amount:       5,
-			},
-			{
-				ResourceType: ResourceCarbon,
-				Amount:       5,
-			},
-		},
-		Outputs: []RecipeResource{
-			{
-				ResourceType: ResourceSteel,
-				Amount:       1,
-			},
-		},
-	},
 }

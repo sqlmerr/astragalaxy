@@ -14,6 +14,7 @@ import (
 	database "github.com/sqlmerr/astragalaxy/internal/data/postgres/database/sqlc"
 	pgx_pool "github.com/sqlmerr/astragalaxy/internal/data/postgres/pool/pgx"
 	redis_goredis "github.com/sqlmerr/astragalaxy/internal/data/redis/goredis"
+	"github.com/sqlmerr/astragalaxy/internal/data/registry"
 	agents_repository "github.com/sqlmerr/astragalaxy/internal/data/repository/agents"
 	cooldowns_repository "github.com/sqlmerr/astragalaxy/internal/data/repository/cooldowns"
 	inventories_repository "github.com/sqlmerr/astragalaxy/internal/data/repository/inventories"
@@ -92,7 +93,14 @@ func main() {
 	agentAuthMiddleware := http_middleware.AgentAuth(*jwtProcessor, agentRepo)
 
 	gameConfig := game.LoadConfigMust()
-	worldGen := worldgen.New(gameConfig.Seed)
+	registryConfig := registry.LoadConfigMust()
+	gameData, err := registry.LoadGameData(registryConfig)
+	if err != nil {
+		log.Error("failed to load game data", zap.Error(err))
+		os.Exit(1)
+	}
+
+	worldGen := worldgen.New(gameData, gameConfig.Seed)
 
 	usersService := users_service.New(store)
 	authService := core_auth.NewService(store, *jwtProcessor)
@@ -104,7 +112,7 @@ func main() {
 	galaxyService := galaxy_service.New(store, *worldGen)
 	miningService := mining_service.New(gameConfig, store, *worldGen)
 	itemsService := items_service.New(store)
-	craftingService := crafting_service.New(gameConfig, store)
+	craftingService := crafting_service.New(gameConfig, store, *gameData)
 
 	usersHandler := http_handler_users.NewUsersHTTPHandler(*usersService, *authService)
 	apiVersionRouter.AddRoutes(usersHandler.Routes(userAuthMiddleware)...)

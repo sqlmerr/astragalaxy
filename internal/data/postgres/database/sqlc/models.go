@@ -15,8 +15,8 @@ import (
 type LocationType string
 
 const (
-	LocationTypePLANET   LocationType = "PLANET"
-	LocationTypeWAYPOINT LocationType = "WAYPOINT"
+	LocationTypePlanet   LocationType = "planet"
+	LocationTypeWaypoint LocationType = "waypoint"
 )
 
 func (e *LocationType) Scan(src interface{}) error {
@@ -57,9 +57,9 @@ func (ns NullLocationType) Value() (driver.Value, error) {
 type ShipLocation string
 
 const (
-	ShipLocationNONE     ShipLocation = "NONE"
-	ShipLocationPLANET   ShipLocation = "PLANET"
-	ShipLocationWAYPOINT ShipLocation = "WAYPOINT"
+	ShipLocationNone     ShipLocation = "none"
+	ShipLocationPlanet   ShipLocation = "planet"
+	ShipLocationWaypoint ShipLocation = "waypoint"
 )
 
 func (e *ShipLocation) Scan(src interface{}) error {
@@ -100,8 +100,8 @@ func (ns NullShipLocation) Value() (driver.Value, error) {
 type ShipStatus string
 
 const (
-	ShipStatusORBIT  ShipStatus = "ORBIT"
-	ShipStatusDOCKED ShipStatus = "DOCKED"
+	ShipStatusOrbit  ShipStatus = "orbit"
+	ShipStatusDocked ShipStatus = "docked"
 )
 
 func (e *ShipStatus) Scan(src interface{}) error {
@@ -142,9 +142,9 @@ func (ns NullShipStatus) Value() (driver.Value, error) {
 type ShipType string
 
 const (
-	ShipTypeTRADER ShipType = "TRADER"
-	ShipTypeSCOUT  ShipType = "SCOUT"
-	ShipTypeMINER  ShipType = "MINER"
+	ShipTypeTrader ShipType = "trader"
+	ShipTypeScout  ShipType = "scout"
+	ShipTypeMiner  ShipType = "miner"
 )
 
 func (e *ShipType) Scan(src interface{}) error {

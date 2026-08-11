@@ -1,4 +1,9 @@
-seed: 42
-rules:
-  disableCooldowns: false
-  disableInventoryLimit: false
+game:
+  seed: 42
+  rules:
+    disableCooldowns: false
+    disableInventoryLimit: false
+registry:
+  itemsPath: data/items.json
+  resourcesPath: data/resources.json
+  recipesPath: data/recipes.json

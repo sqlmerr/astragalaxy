@@ -1,14 +1,14 @@
 import {
-  isSystemExtended,
-  type AnySystemExtended,
-  type SchemaPlanet,
-  type SchemaWaypoint,
+  isSystemExtended
+  
+  
+  
 } from "@/api/types"
+import type {AnySystemExtended, SchemaPlanet, SchemaWaypoint, AgentExtended, SchemaResourceDeposit } from "@/api/types";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area"
 import { SystemPanel } from "./system-panel"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { PlanetPanel } from "./planet-panel"
-import type { AgentExtended, SchemaResourceDeposit } from "@/api/types"
 import { WaypointPanel } from "./waypoint-panel"
 import { WAYPOINT_PARAMS } from "../constants"
 import { AsteroidMineDialog } from "./asteroid-mine-dialog"

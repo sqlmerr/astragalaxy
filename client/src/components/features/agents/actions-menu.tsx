@@ -37,7 +37,7 @@ export function AgentActionsMenu({
       items: [
         {
           label: "Dock",
-          visible: agent.ship.status === "ORBIT",
+          visible: agent.ship.status === "orbit",
           action: async () => {
             await dockMutation.mutateAsync(
               { agentID: agent.agent.id },
@@ -62,7 +62,7 @@ export function AgentActionsMenu({
         },
         {
           label: "Orbit",
-          visible: agent.ship.status === "DOCKED",
+          visible: agent.ship.status === "docked",
           action: async () => {
             await orbitMutation.mutateAsync(
               { agentID: agent.agent.id },

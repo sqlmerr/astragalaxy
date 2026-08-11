@@ -1,10 +1,9 @@
-import type { SchemaPlanet, SystemExtended } from "@/api/types"
+import type { SchemaPlanet, SystemExtended, AgentExtended  } from "@/api/types"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { ArrowRight, Pickaxe, X } from "lucide-react"
 import { Separator } from "@/components/ui/separator"
-import type { AgentExtended } from "@/api/types"
 import { AgentCard } from "../../agents/agent-card"
 import { ResourceDepositCard } from "../../inventory/resource-deposit-card"
 import { shipLocationIs } from "@/api/utils"
@@ -27,7 +26,7 @@ export function PlanetPanel({
   onPlanetMine,
 }: PlanetPanelProps) {
   const thisPlanetAgents = system.agents.filter(
-    (a) => a.ship.location === "PLANET" && a.ship.location_id === planet.orbit
+    (a) => a.ship.location === "planet" && a.ship.location_id === planet.orbit
   )
 
   return (
@@ -82,7 +81,7 @@ export function PlanetPanel({
 
           <div className="flex flex-col gap-2">
             {!shipLocationIs(currentAgent.ship, {
-              locationType: "PLANET",
+              locationType: "planet",
               locationId: planet.orbit,
               systemX: currentAgent.ship.system_x,
               systemY: currentAgent.ship.system_y,

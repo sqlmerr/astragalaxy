@@ -13,14 +13,14 @@ type PlanetType string
 type WaypointType string
 
 const (
-	PlanetTerra    PlanetType = "TERRA"
-	PlanetOcean    PlanetType = "OCEAN"
-	PlanetScorched PlanetType = "SCORCHED"
-	PlanetGlacial  PlanetType = "GLACIAL"
-	PlanetToxic    PlanetType = "TOXIC"
+	PlanetTerra    PlanetType = "terra"
+	PlanetOcean    PlanetType = "ocean"
+	PlanetScorched PlanetType = "scorched"
+	PlanetGlacial  PlanetType = "glacial"
+	PlanetToxic    PlanetType = "toxic"
 
-	WaypointStation  WaypointType = "STATION"
-	WaypointAsteroid WaypointType = "ASTEROID"
+	WaypointStation  WaypointType = "station"
+	WaypointAsteroid WaypointType = "asteroid"
 )
 
 type Planet struct {
@@ -125,7 +125,7 @@ type PlanetWeights struct {
 
 var (
 	ArchetypeHabitable = SystemArchetype{
-		Name:       "HABITABLE",
+		Name:       "habitable",
 		MinPlanets: 4,
 		MaxPlanets: 7,
 		Inner: PlanetWeights{
@@ -151,7 +151,7 @@ var (
 		},
 	}
 	ArchetypeDead = SystemArchetype{
-		Name:       "DEAD",
+		Name:       "dead",
 		MinPlanets: 2,
 		MaxPlanets: 5,
 		Inner: PlanetWeights{
@@ -178,7 +178,7 @@ var (
 		},
 	}
 	ArchetypeFrozen = SystemArchetype{
-		Name:       "FROZEN",
+		Name:       "frozen",
 		MinPlanets: 3,
 		MaxPlanets: 8,
 		Inner: PlanetWeights{
@@ -219,18 +219,18 @@ type ResourceDeposit struct {
 	Richness float64
 }
 
-var asteroidResources = []model.ResourceType{
-	model.ResourceCopper,
-	model.ResourceHelium,
-	model.ResourceIridium,
-	model.ResourceIron,
-	model.ResourceTitanium,
-	model.ResourceUranium,
-}
+// var asteroidResources = []model.ResourceType{
+// 	model.ResourceCopper,
+// 	model.ResourceHelium,
+// 	model.ResourceIridium,
+// 	model.ResourceIron,
+// 	model.ResourceTitanium,
+// 	model.ResourceUranium,
+// }
 
-var basicResources = []ResourceGenParams{
-	{Resource: model.ResourceIron, Min: 4000, Max: 8000},
-	{Resource: model.ResourceCrystal, Min: 500, Max: 2000},
-	{Resource: model.ResourceCarbon, Min: 3500, Max: 10000},
-	{Resource: model.ResourceIce, Min: 1000, Max: 3000},
-}
+// var basicResources = []ResourceGenParams{
+// 	{Resource: model.ResourceIron, Min: 4000, Max: 8000},
+// 	{Resource: model.ResourceCrystal, Min: 500, Max: 2000},
+// 	{Resource: model.ResourceCarbon, Min: 3500, Max: 10000},
+// 	{Resource: model.ResourceIce, Min: 1000, Max: 3000},
+// }

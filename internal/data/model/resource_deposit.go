@@ -5,8 +5,8 @@ import "time"
 type LocationType string
 
 const (
-	LocationWaypoint LocationType = "WAYPOINT"
-	LocationPlanet   LocationType = "PLANET"
+	LocationWaypoint LocationType = "waypoint"
+	LocationPlanet   LocationType = "planet"
 )
 
 type ResourceDeposit struct {

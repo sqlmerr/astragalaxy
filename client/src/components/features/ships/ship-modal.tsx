@@ -18,7 +18,6 @@ import {
 } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { Json } from "@/components/ui/json"
-import { Separator } from "@/components/ui/separator"
 import { toast } from "@/components/ui/toast"
 import { useErrorHandler } from "@/errors/utils"
 import { useQueryClient } from "@tanstack/react-query"
@@ -174,7 +173,7 @@ export function ShipModal({ ship, onClose }: ShipModalProps) {
 
                   <span className="text-muted-foreground">Location</span>
                   <code className="font-mono break-all">
-                    {ship.location === "NONE"
+                    {ship.location === "none"
                       ? ship.location
                       : `${ship.location} #${ship.location_id}`}
                   </code>

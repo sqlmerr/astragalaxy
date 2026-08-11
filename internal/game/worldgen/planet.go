@@ -3,17 +3,25 @@ package worldgen
 import (
 	"math/rand"
 	"strings"
+
+	"github.com/sqlmerr/astragalaxy/internal/data/model"
+	"github.com/sqlmerr/astragalaxy/internal/data/registry"
 )
 
-func generatePlanet(orbitIndex int, rng *rand.Rand, weights PlanetWeights, archetype SystemArchetype) Planet {
+func generatePlanet(gameData *registry.GameData, orbitIndex int, rng *rand.Rand, weights PlanetWeights, archetype SystemArchetype) Planet {
 	pType := getRandomPlanetType(rng, weights)
 
 	var deposits []ResourceDeposit
+	basicResources := gameData.Resources.GetAllResourcesByTag("basic_resource")
 
 	for _, r := range basicResources {
+		if r.WorldGen.Planet.Max == 0 {
+			continue
+		}
+
 		deposits = append(deposits, ResourceDeposit{
-			Resource: r.Resource,
-			Amount:   getRandomIntBetween(rng, r.Min, r.Max),
+			Resource: model.ResourceType(r.ID),
+			Amount:   getRandomIntBetween(rng, r.WorldGen.Planet.Min, r.WorldGen.Planet.Max),
 			Richness: float64(rng.Intn(100)+1) / 100,
 		})
 	}

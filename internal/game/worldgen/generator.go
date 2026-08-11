@@ -5,15 +5,17 @@ import (
 	"hash/fnv"
 	"math/rand"
 
+	"github.com/sqlmerr/astragalaxy/internal/data/registry"
 	core_errors "github.com/sqlmerr/astragalaxy/internal/errors"
 )
 
 type WorldGen struct {
+	gameData *registry.GameData
 	gameSeed int64
 }
 
-func New(gameSeed int64) *WorldGen {
-	return &WorldGen{gameSeed}
+func New(gameData *registry.GameData, gameSeed int64) *WorldGen {
+	return &WorldGen{gameData, gameSeed}
 }
 
 // GenerateSystemByCoords creates system by coordinates
@@ -43,15 +45,15 @@ func (w *WorldGen) GenerateSystemByCoords(x, y int) (*System, bool) {
 		Y:         y,
 		Archetype: arch,
 		Planets:   make([]Planet, 0),
-		Waypoints: generateWaypoints(rng, arch),
+		Waypoints: generateWaypoints(w.gameData, rng, arch),
 	}
 
 	numPlanets := rng.Intn(
 		arch.MaxPlanets-arch.MinPlanets+1,
 	) + arch.MinPlanets
-	for i := 0; i < numPlanets; i++ {
+	for i := range numPlanets {
 		weights := getPlanetWeights(arch, i, numPlanets)
-		planet := generatePlanet(i, rng, weights, arch)
+		planet := generatePlanet(w.gameData, i, rng, weights, arch)
 		system.Planets = append(system.Planets, planet)
 	}
 

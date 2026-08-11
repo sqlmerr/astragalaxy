@@ -3,6 +3,7 @@ package worldgen
 import (
 	"testing"
 
+	"github.com/sqlmerr/astragalaxy/internal/data/registry"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -10,7 +11,7 @@ import (
 func TestGenerateSystemByCoords(t *testing.T) {
 	x, y := 42, -99
 	var seed int64 = 123456789
-	worldGen := New(seed)
+	worldGen := New(&registry.GameData{}, seed)
 
 	sys1, found1 := worldGen.GenerateSystemByCoords(x, y)
 	sys2, found2 := worldGen.GenerateSystemByCoords(x, y)

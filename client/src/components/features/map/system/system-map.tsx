@@ -1,15 +1,13 @@
-import {
-  useCallback,
-  useImperativeHandle,
-  useRef,
-  useState,
-  type RefObject,
-} from "react"
+import { useCallback, useRef } from "react"
 import { MapCanvas } from "../map-canvas"
 import type { Viewport } from "pixi-viewport"
-import { FederatedPointerEvent, Graphics, type Container } from "pixi.js"
-import type { SchemaPlanet, SchemaWaypoint, SystemExtended } from "@/api/types"
-import type { AgentExtended } from "@/api/types"
+import type { FederatedPointerEvent, Graphics, Container } from "pixi.js"
+import type {
+  SchemaPlanet,
+  SchemaWaypoint,
+  SystemExtended,
+  AgentExtended,
+} from "@/api/types"
 import { OrbitPlanet } from "./orbit"
 import { Waypoint } from "./waypoint"
 

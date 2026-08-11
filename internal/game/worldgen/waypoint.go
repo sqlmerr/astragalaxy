@@ -1,8 +1,13 @@
 package worldgen
 
-import "math/rand"
+import (
+	"math/rand"
 
-func generateWaypoints(rng *rand.Rand, archetype SystemArchetype) []Waypoint {
+	"github.com/sqlmerr/astragalaxy/internal/data/model"
+	"github.com/sqlmerr/astragalaxy/internal/data/registry"
+)
+
+func generateWaypoints(gameData *registry.GameData, rng *rand.Rand, archetype SystemArchetype) []Waypoint {
 	waypoints := make([]Waypoint, 0)
 	roll := rng.Float64()
 	lastID := -1
@@ -22,7 +27,7 @@ func generateWaypoints(rng *rand.Rand, archetype SystemArchetype) []Waypoint {
 			ID:       lastID + 1,
 			Type:     WaypointAsteroid,
 			Dockable: false,
-			Asteroid: generateAsteroid(rng, archetype),
+			Asteroid: generateAsteroid(gameData, rng, archetype),
 		})
 		lastID++
 	}
@@ -30,10 +35,12 @@ func generateWaypoints(rng *rand.Rand, archetype SystemArchetype) []Waypoint {
 	return waypoints
 }
 
-func generateAsteroid(rng *rand.Rand, _ SystemArchetype) *AsteroidData {
+func generateAsteroid(gameData *registry.GameData, rng *rand.Rand, _ SystemArchetype) *AsteroidData {
+	asteroidResources := gameData.Resources.GetAllResourcesByTag("asteroid_resource")
+
 	return &AsteroidData{
 		Deposit: ResourceDeposit{
-			Resource: asteroidResources[rng.Intn(len(asteroidResources))],
+			Resource: model.ResourceType(asteroidResources[rng.Intn(len(asteroidResources))].ID),
 			Amount:   rng.Intn(9000) + 1000,
 			Richness: float64(rng.Intn(100)+1) / 100,
 		},

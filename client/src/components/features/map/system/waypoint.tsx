@@ -91,7 +91,7 @@ export function Waypoint({
         x={0}
         y={-35}
         agents={agents}
-        location="WAYPOINT"
+        location="waypoint"
         locationId={waypoint.id}
       />
     </pixiContainer>

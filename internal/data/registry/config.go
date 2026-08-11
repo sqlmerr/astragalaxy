@@ -1,4 +1,4 @@
-package game
+package registry
 
 import (
 	"fmt"
@@ -8,18 +8,12 @@ import (
 	"github.com/knadh/koanf/v2"
 )
 
-var (
-	k = koanf.New(".")
-)
-
-type RulesConfig struct {
-	DisableCooldowns      bool `koanf:"disableCooldowns"`
-	DisableInventoryLimit bool `koanf:"disableInventoryLimit"`
-}
+var k = koanf.New(".")
 
 type Config struct {
-	Seed  int64       `koanf:"seed"`
-	Rules RulesConfig `koanf:"rules"`
+	ItemsPath     string `koanf:"itemsPath"`
+	ResourcesPath string `koanf:"resourcesPath"`
+	RecipesPath   string `koanf:"recipesPath"`
 }
 
 func LoadConfig() (Config, error) {
@@ -28,7 +22,7 @@ func LoadConfig() (Config, error) {
 	}
 
 	var config Config
-	if err := k.Unmarshal("game", &config); err != nil {
+	if err := k.Unmarshal("registry", &config); err != nil {
 		return Config{}, fmt.Errorf("unmarshal config: %w", err)
 	}
 

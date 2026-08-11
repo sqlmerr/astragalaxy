@@ -1,4 +1,4 @@
-import type { AgentExtended, SchemaShip } from "@/api/types"
+import type { AgentExtended } from "@/api/types"
 import { useNow } from "@/components/time-provider"
 import {
   Accordion,
@@ -16,7 +16,6 @@ import {
 } from "@/components/ui/dialog"
 import { Json } from "@/components/ui/json"
 import { Progress } from "@/components/ui/progress"
-import { Separator } from "@/components/ui/separator"
 import { ShipCard } from "../ships/ship-card"
 import { useState } from "react"
 import { ShipModal } from "../ships/ship-modal"

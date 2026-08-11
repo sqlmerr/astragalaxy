@@ -10,11 +10,11 @@ properties:
     type: string
     description: Waypoint's type
     enum:
-      - STATION
-      - ASTEROID
+      - station
+      - asteroid
   asteroid:
     type: object
-    description: Asteroid data. Not null if type == ASTEROID
+    description: Asteroid data. Not null if type == asteroid
     nullable: true
     properties: 
       deposit:

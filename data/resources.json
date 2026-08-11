@@ -1,0 +1,77 @@
+[
+    {
+        "id": "iron",
+        "tags": ["basic_resource", "asteroid_resource"],
+        "worldgen": {
+            "planet": {
+                "min": 4000,
+                "max": 8000
+            }
+        }
+    },
+    {
+        "id": "crystal",
+        "tags": ["basic_resource"],
+        "worldgen": {
+            "planet": {
+                "min": 500,
+                "max": 2000
+            }
+        }
+    },
+    {
+        "id": "carbon",
+        "tags": ["basic_resource"],
+        "worldgen": {
+            "planet": {
+                "min": 3500,
+                "max": 10000
+            }
+        }
+    },
+    {
+        "id": "ice",
+        "tags": ["basic_resource"],
+        "worldgen": {
+            "planet": {
+                "min": 1000,
+                "max": 3000
+            }
+        }
+    },
+    {
+        "id": "copper",
+        "tags": ["advancedResource", "asteroid_resource"]
+    },
+    {
+        "id": "titanium",
+        "tags": ["advancedResource", "asteroid_resource"]
+    },
+    {
+        "id": "silicon",
+        "tags": ["advancedResource"]
+    },
+    {
+        "id": "helium",
+        "tags": ["advancedResource", "asteroid_resource"]
+    },
+    {
+        "id": "uranium",
+        "tags": ["exotic_resource", "asteroid_resource"]
+    },
+    {
+        "id": "iridium",
+        "tags": ["exotic_resource", "asteroid_resource"]
+    },
+        {
+        "id": "dark_matter",
+        "tags": ["exotic_resource"]
+    },
+    {
+        "id": "bio_disputes",
+        "tags": ["exotic_resource"]
+    },
+    {
+        "id": "steel"
+    }
+]

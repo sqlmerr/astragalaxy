@@ -1,8 +1,9 @@
 import { extend } from "@pixi/react"
 
+import type {
+  FederatedPointerEvent} from "pixi.js";
 import {
   Container,
-  FederatedPointerEvent,
   Graphics,
   Point,
   BitmapText,
@@ -12,15 +13,12 @@ import {
   useCallback,
   useImperativeHandle,
   useRef,
-  useState,
-  type RefObject,
+  useState
+  
 } from "react"
+import type {RefObject} from "react";
 import { Viewport } from "pixi-viewport"
-import {
-  type SchemaShip,
-  type SchemaShortSystem,
-  type ShortSystemExtended,
-} from "@/api/types"
+import type {SchemaShip, SchemaShortSystem, ShortSystemExtended} from "@/api/types";
 import { CELL_SIZE, SYSTEM_PARAMS } from "../constants"
 import { Labels } from "./labels"
 import { MapCanvas } from "../map-canvas"
@@ -41,8 +39,8 @@ interface GalaxyMapProps {
 }
 
 export interface GalaxyMapRef {
-  centerOnSystem(system: SchemaShortSystem): void
-  closeSystem(): void
+  centerOnSystem: (system: SchemaShortSystem) => void
+  closeSystem: () => void
 }
 
 export function GalaxyMap({

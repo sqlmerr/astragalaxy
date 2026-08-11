@@ -9,7 +9,8 @@ import {
 import { Input } from "@/components/ui/input"
 import { toast } from "@/components/ui/toast"
 import { useErrorHandler } from "@/errors/utils"
-import { useState, type SyntheticEvent } from "react"
+import { useState  } from "react"
+import type {SyntheticEvent} from "react";
 import { useAgents } from "../../auth/use-agents"
 
 interface AsteroidMineDialogProps {

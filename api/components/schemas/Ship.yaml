@@ -10,9 +10,9 @@ properties:
   type:
     type: string
     enum:
-      - TRADER
-      - SCOUT
-      - MINER
+      - trader
+      - scout
+      - miner
   active:
     type: boolean
   system_x:
@@ -24,8 +24,8 @@ properties:
   status:
     type: string
     enum:
-      - ORBIT
-      - DOCKED
+      - orbit
+      - docked
   created_at:
     type: string
     format: date-time
@@ -39,9 +39,9 @@ properties:
   location:
     type: string
     enum:
-      - NONE
-      - PLANET
-      - WAYPOINT
+      - none
+      - planet
+      - waypoint
     description: Location type
   location_id:
     type: integer

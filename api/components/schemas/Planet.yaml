@@ -10,11 +10,11 @@ properties:
   type:
     type: string
     enum:
-      - TERRA
-      - OCEAN
-      - SCORCHED
-      - GLACIAL
-      - TOXIC
+      - terra
+      - ocean
+      - scorched
+      - glacial
+      - toxic
   orbit:
     type: integer
   deposits:

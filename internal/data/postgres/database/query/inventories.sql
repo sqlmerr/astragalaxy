@@ -18,7 +18,7 @@ RETURNING *;
 -- name: GetInventoryOwner :one
 SELECT
     id AS owner_id,
-    'AGENT' AS owner_type
+    'agent' AS owner_type
 FROM agents
 WHERE agents.inventory_id = $1
 
@@ -26,7 +26,7 @@ UNION ALL
 
 SELECT
     id AS owner_id,
-    'SHIP' AS owner_type
+    'ship' AS owner_type
 FROM ships
 WHERE ships.inventory_id = $1;
 

@@ -45,7 +45,7 @@ export function ShipCard({ ship, onOpen, onSwitch }: ShipCardProps) {
               <MapPin className="size-3.5" />
               <span>
                 [{ship.system_x}; {ship.system_y}] {ship.location}{" "}
-                {ship.location !== "NONE" && ship.location_id}
+                {ship.location !== "none" && ship.location_id}
               </span>
             </div>
           </div>

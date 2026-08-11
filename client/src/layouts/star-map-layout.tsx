@@ -13,18 +13,20 @@ import { Button } from "@/components/ui/button"
 import { AgentRoster } from "@/components/features/agents/agent-roster"
 import { useAuth } from "@/components/features/auth/auth-provider"
 import {
-  GalaxyMap,
-  type GalaxyMapRef,
+  GalaxyMap
+  
 } from "@/components/features/map/galaxy/galaxy-map"
+import type {GalaxyMapRef} from "@/components/features/map/galaxy/galaxy-map";
 import {
-  type SchemaWaypoint,
-  type AgentExtended,
-  type SchemaPlanet,
-  isSystemExtended,
-  type AnySystemExtended,
-  type ShortSystemExtended,
-  type SystemExtended,
+  
+  
+  
+  isSystemExtended
+  
+  
+  
 } from "@/api/types"
+import type {SchemaWaypoint, AgentExtended, SchemaPlanet, AnySystemExtended, ShortSystemExtended, SystemExtended} from "@/api/types";
 import { useEffect, useRef, useState } from "react"
 import { Panel } from "@/components/features/map/panel/panel"
 import { useAgents } from "@/components/features/auth/use-agents"

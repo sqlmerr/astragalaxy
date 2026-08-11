@@ -1,32 +1,15 @@
-type: object
-required:
-  - name
-  - x
-  - y
-  - archetype
-  - planets
-  - waypoints
-properties:
-  name:
-    type: string
-  x:
-    type: integer
-    description: X coordinate
-  y:
-    type: integer
-    description: Y coordinate
-  archetype:
-    type: string
-    enum:
-      - HABITABLE
-      - DEAD 
-      - FROZEN
-    description: System archetype # TODO(docs): add link to archetype docs
-  planets:
-    type: array
-    items:
-      $ref: "./Planet.yaml"
-  waypoints:
-    type: array
-    items:
-      $ref: "./Waypoint.yaml"
+allOf:
+  - $ref: "ShortSystem.yaml"
+  - type: object
+    required:
+      - planets
+      - waypoints
+    properties:
+      planets:
+        type: array
+        items:
+          $ref: "./Planet.yaml"
+      waypoints:
+        type: array
+        items:
+          $ref: "./Waypoint.yaml"

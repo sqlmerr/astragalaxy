@@ -1,10 +1,9 @@
-import type { SchemaWaypoint, SystemExtended } from "@/api/types"
+import type { SchemaWaypoint, SystemExtended, AgentExtended  } from "@/api/types"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { ArrowRight, Pickaxe, X } from "lucide-react"
 import { Separator } from "@/components/ui/separator"
-import type { AgentExtended } from "@/api/types"
 import { WAYPOINT_PARAMS } from "../constants"
 import { AgentCard } from "../../agents/agent-card"
 import { shipLocationIs } from "@/api/utils"
@@ -28,7 +27,7 @@ export function WaypointPanel({
   onAsteroidMine,
 }: WaypointPanelProps) {
   const thisWaypointAgents = system.agents.filter(
-    (a) => a.ship.location === "WAYPOINT" && a.ship.location_id === waypoint.id
+    (a) => a.ship.location === "waypoint" && a.ship.location_id === waypoint.id
   )
   const params = WAYPOINT_PARAMS[waypoint.type]
 
@@ -86,7 +85,7 @@ export function WaypointPanel({
 
           <div className="flex flex-col gap-2">
             {!shipLocationIs(currentAgent.ship, {
-              locationType: "WAYPOINT",
+              locationType: "waypoint",
               locationId: waypoint.id,
               systemX: currentAgent.ship.system_x,
               systemY: currentAgent.ship.system_y,
@@ -108,7 +107,7 @@ export function WaypointPanel({
               </>
             ) : (
               <>
-                {waypoint.type === "ASTEROID" ? (
+                {waypoint.type === "asteroid" ? (
                   <Button
                     className="justify-start"
                     variant="secondary"
@@ -125,7 +124,7 @@ export function WaypointPanel({
 
         <Separator />
 
-        {waypoint.type === "ASTEROID" &&
+        {waypoint.type === "asteroid" &&
         !!waypoint.asteroid &&
         !!waypoint.asteroid.deposit ? (
           <Card className="p-4">

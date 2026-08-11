@@ -2,9 +2,10 @@ import {
   createContext,
   useContext,
   useEffect,
-  useState,
-  type PropsWithChildren,
+  useState
+  
 } from "react"
+import type {PropsWithChildren} from "react";
 
 const TimeContext = createContext(Date.now())
 

@@ -506,6 +506,43 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/ships/my/{id}/modules": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get My Ship Modules
+         * @description Get agent's ship modules
+         */
+        get: operations["getMyShipModules"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/agents/current/actions/craft": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Craft Action */
+        post: operations["craftAction"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -592,14 +629,14 @@ export interface components {
             /** Format: uuid */
             agent_id: string;
             /** @enum {string} */
-            type: "TRADER" | "SCOUT" | "MINER";
+            type: "trader" | "scout" | "miner";
             active: boolean;
             /** @description X coordinate */
             system_x: number;
             /** @description Y coordinate */
             system_y: number;
             /** @enum {string} */
-            status: "ORBIT" | "DOCKED";
+            status: "orbit" | "docked";
             /** Format: date-time */
             created_at: string;
             name: string;
@@ -609,7 +646,7 @@ export interface components {
              * @description Location type
              * @enum {string}
              */
-            location: "NONE" | "PLANET" | "WAYPOINT";
+            location: "none" | "planet" | "waypoint";
             /** @description Location ID */
             location_id: number;
         };
@@ -630,7 +667,7 @@ export interface components {
              * @description System archetype
              * @enum {string}
              */
-            archetype: "HABITABLE" | "DEAD" | "FROZEN";
+            archetype: "habitable" | "dead" | "frozen";
         };
         ShipRadarResponse: {
             data: components["schemas"]["ShortSystem"][];
@@ -725,7 +762,7 @@ export interface components {
         Planet: {
             name: string;
             /** @enum {string} */
-            type: "TERRA" | "OCEAN" | "SCORCHED" | "GLACIAL" | "TOXIC";
+            type: "terra" | "ocean" | "scorched" | "glacial" | "toxic";
             orbit: number;
             /** @description Resource deposits on this planet */
             deposits: components["schemas"]["ResourceDeposit"][];
@@ -737,23 +774,13 @@ export interface components {
              * @description Waypoint's type
              * @enum {string}
              */
-            type: "STATION" | "ASTEROID";
-            /** @description Asteroid data. Not null if type == ASTEROID */
+            type: "station" | "asteroid";
+            /** @description Asteroid data. Not null if type == asteroid */
             asteroid?: {
                 deposit?: components["schemas"]["ResourceDeposit"];
             } | null;
         };
-        System: {
-            name: string;
-            /** @description X coordinate */
-            x: number;
-            /** @description Y coordinate */
-            y: number;
-            /**
-             * @description System archetype
-             * @enum {string}
-             */
-            archetype: "HABITABLE" | "DEAD" | "FROZEN";
+        System: components["schemas"]["ShortSystem"] & {
             planets: components["schemas"]["Planet"][];
             waypoints: components["schemas"]["Waypoint"][];
         };
@@ -771,6 +798,17 @@ export interface components {
             /** Format: any */
             data: string;
             cooldown: components["schemas"]["Cooldown"];
+        };
+        CraftRequest: {
+            /** @description Recipe ID */
+            recipe_id: string;
+            /**
+             * Format: uuid
+             * @description The ID of the inventory from which crafting will be performed
+             */
+            target_inventory_id: string;
+            /** @description Amount of resources to craft */
+            amount?: number;
         };
     };
     responses: {
@@ -1549,6 +1587,66 @@ export interface operations {
             };
             401: components["responses"]["InvalidAgentToken"];
             403: components["responses"]["AccessDenied"];
+        };
+    };
+    getMyShipModules: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successfully got ship modules */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: string[];
+                    };
+                };
+            };
+            401: components["responses"]["InvalidAgentToken"];
+            403: components["responses"]["AccessDenied"];
+        };
+    };
+    craftAction: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CraftRequest"];
+            };
+        };
+        responses: {
+            /** @description Success */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Cooldown"];
+                };
+            };
+            401: components["responses"]["InvalidAgentToken"];
+            /** @description Not enough inventory resources or another internal game error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
         };
     };
 }

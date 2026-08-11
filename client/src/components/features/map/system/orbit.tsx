@@ -1,7 +1,8 @@
 import type { AgentExtended, SchemaPlanet } from "@/api/types"
 import { useTick } from "@pixi/react"
 import type { Container, FederatedPointerEvent, Graphics } from "pixi.js"
-import { useCallback, useEffect, useRef, useState, type ReactNode } from "react"
+import { useCallback, useEffect, useRef, useState  } from "react"
+import type {ReactNode} from "react";
 import { PLANET_PARAMS } from "../constants"
 import { getOrbitRadius } from "../utils"
 import { degreesToRadians } from "@/lib/utils"
@@ -63,7 +64,7 @@ export function OrbitPlanet({
           x={0}
           y={-35}
           agents={agents}
-          location="PLANET"
+          location="planet"
           locationId={planet.orbit}
         />
       </pixiContainer>

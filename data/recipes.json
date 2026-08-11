@@ -1,0 +1,23 @@
+[
+    {
+        "id": "steel",
+        "required_facility": "smelter",
+        "duration": 10,
+        "inputs": [
+            {
+                "resource_id": "iron",
+                "amount": 5
+            },
+            {
+                "resource_id": "carbon",
+                "amount": 5
+            }
+        ],
+        "outputs": [
+            {
+                "resource_id": "steel",
+                "amount": 1
+            }
+        ]
+    }
+]

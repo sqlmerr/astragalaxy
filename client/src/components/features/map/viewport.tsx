@@ -1,6 +1,8 @@
-import { useApplication, extend, type PixiReactElementProps } from "@pixi/react"
+import { useApplication, extend  } from "@pixi/react"
+import type {PixiReactElementProps} from "@pixi/react";
 import { Viewport as PixiViewport } from "pixi-viewport"
-import { useEffect, useRef, type ReactNode, type RefObject } from "react"
+import { useEffect   } from "react"
+import type {ReactNode, RefObject} from "react";
 
 extend({ PixiViewport })
 

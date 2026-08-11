@@ -16,7 +16,7 @@ properties:
   archetype:
     type: string
     enum:
-      - HABITABLE
-      - DEAD 
-      - FROZEN
+      - habitable
+      - dead
+      - frozen
     description: System archetype # TODO(docs): add link to archetype docs

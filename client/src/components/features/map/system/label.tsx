@@ -2,7 +2,7 @@ import type { AgentExtended } from "@/api/types"
 
 interface SystemLabelProps {
   agents: AgentExtended[]
-  location: "PLANET" | "WAYPOINT"
+  location: "planet" | "waypoint"
   locationId: number
   x: number
   y: number

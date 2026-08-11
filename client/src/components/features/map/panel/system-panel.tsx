@@ -1,11 +1,11 @@
-import { isSystemExtended, type AnySystemExtended } from "@/api/types"
+import { isSystemExtended  } from "@/api/types"
+import type {AnySystemExtended, AgentExtended } from "@/api/types";
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { ArrowRight, Orbit, SquareArrowOutUpRight, X } from "lucide-react"
 import { AgentCard } from "../../agents/agent-card"
 import { Separator } from "@/components/ui/separator"
-import type { AgentExtended } from "@/api/types"
 import {
   Accordion,
   AccordionContent,
