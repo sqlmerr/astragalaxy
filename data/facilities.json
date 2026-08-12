@@ -1,0 +1,37 @@
+[
+    {
+        "id": "portable_printer",
+        "type": "printer",
+        "tier": 1,
+        "time_multiplier": 2.0,
+        "cost_multiplier": 1.5
+    },
+    {
+        "id": "standard_printer",
+        "type": "printer",
+        "tier": 2,
+        "time_multiplier": 1.0,
+        "cost_multiplier": 1.0
+    },
+    {
+        "id": "advanced_printer",
+        "type": "printer",
+        "tier": 3,
+        "time_multiplier": 0.8,
+        "cost_multiplier": 0.8
+    },
+    {
+        "id": "portable_smelter",
+        "type": "smelter",
+        "tier": 1,
+        "time_multiplier": 2.0,
+        "cost_multiplier": 1.5
+    },
+    {
+        "id": "standard_smelter",
+        "type": "smelter",
+        "tier": 2,
+        "cost_multiplier": 1.0,
+        "time_multiplier": 1.0
+    }
+]

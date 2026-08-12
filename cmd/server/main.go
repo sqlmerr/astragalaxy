@@ -112,7 +112,7 @@ func main() {
 	galaxyService := galaxy_service.New(store, *worldGen)
 	miningService := mining_service.New(gameConfig, store, *worldGen)
 	itemsService := items_service.New(store)
-	craftingService := crafting_service.New(gameConfig, store, *gameData)
+	craftingService := crafting_service.New(gameConfig, store, *gameData, *worldGen)
 
 	usersHandler := http_handler_users.NewUsersHTTPHandler(*usersService, *authService)
 	apiVersionRouter.AddRoutes(usersHandler.Routes(userAuthMiddleware)...)

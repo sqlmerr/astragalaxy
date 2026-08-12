@@ -1,8 +1,10 @@
 [
     {
-        "id": "portable_smelter"
+        "id": "portable_smelter",
+        "provides_facility": "portable_smelter"
     },
     {
-        "id": "portable_printer"
+        "id": "portable_printer",
+        "provides_facility": "portable_printer"
     }
 ]

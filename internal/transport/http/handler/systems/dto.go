@@ -48,11 +48,16 @@ type AsteroidData struct {
 	Deposit ResourceDepositResponseDTO `json:"deposit"`
 }
 
+type StationData struct {
+	Facilities []string `json:"facilities"`
+}
+
 type WaypointResponseDTO struct {
 	ID   int    `json:"id"`
 	Type string `json:"type"`
 
 	Asteroid *AsteroidData `json:"asteroid"`
+	Station  *StationData  `json:"station"`
 }
 
 func waypointDTOFromModel(m worldgen.Waypoint) WaypointResponseDTO {
@@ -63,10 +68,18 @@ func waypointDTOFromModel(m worldgen.Waypoint) WaypointResponseDTO {
 		}
 	}
 
+	var station *StationData
+	if m.Station != nil {
+		station = &StationData{
+			Facilities: m.Station.Facilities,
+		}
+	}
+
 	return WaypointResponseDTO{
 		ID:       m.ID,
 		Type:     string(m.Type),
 		Asteroid: asteroid,
+		Station:  station,
 	}
 }
 

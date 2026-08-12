@@ -19,3 +19,14 @@ properties:
     properties: 
       deposit:
         $ref: ResourceDeposit.yaml
+  station:
+    type: object
+    description: Station data. Not null if type == station
+    nullable: true
+    properties: 
+      facilities:
+        type: array
+        description: List of available facilities on this station
+        items: 
+          type: string
+          description: Facility ID # TODO(docs)

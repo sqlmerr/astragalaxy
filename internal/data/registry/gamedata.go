@@ -3,9 +3,10 @@ package registry
 import "fmt"
 
 type GameData struct {
-	Resources *ResourceRegistry
-	Items     *ItemRegistry
-	Recipes   *RecipeRegistry
+	Resources  *ResourceRegistry
+	Items      *ItemRegistry
+	Recipes    *RecipeRegistry
+	Facilities *FacilityRegistry
 }
 
 func LoadGameData(cfg Config) (*GameData, error) {
@@ -27,9 +28,16 @@ func LoadGameData(cfg Config) (*GameData, error) {
 		return nil, fmt.Errorf("load recipe registy: %w", err)
 	}
 
+	facilities := NewFacilityRegistry()
+	err = facilities.Load(cfg)
+	if err != nil {
+		return nil, fmt.Errorf("load facility registy: %w", err)
+	}
+
 	return &GameData{
-		Resources: resources,
-		Items:     items,
-		Recipes:   recipes,
+		Resources:  resources,
+		Items:      items,
+		Recipes:    recipes,
+		Facilities: facilities,
 	}, nil
 }

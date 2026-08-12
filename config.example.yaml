@@ -7,3 +7,4 @@ registry:
   itemsPath: data/items.json
   resourcesPath: data/resources.json
   recipesPath: data/recipes.json
+  facilitiesPath: data/facilities.json

@@ -51,7 +51,7 @@ export const ERROR_CODES = {
   WAYPOINT_NOT_FOUND: "Waypoint not found",
   RESOURCE_DEPOSIT_NOT_FOUND: "Resource deposit not found",
   RECIPE_NOT_FOUND: "Recipe not found",
-  PRODUCTION_FACILITY_NOT_FOUND: "Production facility not found",
+  FACILITY_NOT_FOUND: "Facility not found",
   SHIP_MODULE_ALREADY_INSTALLED: "Ship module is already installed",
   CANNOT_USE_ITEM: "Can't use this item",
 }

@@ -2,6 +2,7 @@
     {
         "id": "steel",
         "required_facility": "smelter",
+        "min_tier": 1,
         "duration": 10,
         "inputs": [
             {

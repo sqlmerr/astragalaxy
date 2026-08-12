@@ -9,24 +9,18 @@ import (
 	"github.com/samber/lo"
 )
 
-type ProductionFacilityType string
-
-const (
-	FacilityPrinter ProductionFacilityType = "printer"
-	FacilitySmelter ProductionFacilityType = "smelter"
-)
-
 type RecipeResource struct {
 	ResourceID string `json:"resource_id"`
 	Amount     int    `json:"amount"`
 }
 
 type Recipe struct {
-	ID               string                 `json:"id"`
-	RequiredFacility ProductionFacilityType `json:"required_facility"`
-	Duration         int                    `json:"duration"`
-	Inputs           []RecipeResource       `json:"inputs"`
-	Outputs          []RecipeResource       `json:"outputs"`
+	ID               string           `json:"id"`
+	RequiredFacility FacilityType     `json:"required_facility"`
+	MinTier          int              `json:"min_tier"`
+	Duration         int              `json:"duration"`
+	Inputs           []RecipeResource `json:"inputs"`
+	Outputs          []RecipeResource `json:"outputs"`
 }
 
 func (r *Recipe) GetDuration() time.Duration {
@@ -67,7 +61,7 @@ func (r *RecipeRegistry) GetAllRecipes() []Recipe {
 	return r.recipes
 }
 
-func (r *RecipeRegistry) GetAllRecipesByFacility(facility ProductionFacilityType) []Recipe {
+func (r *RecipeRegistry) GetAllRecipesByFacility(facility FacilityType) []Recipe {
 	var recipes []Recipe
 	for _, recipe := range r.recipes {
 		if recipe.RequiredFacility == facility {

@@ -16,7 +16,7 @@ func generateWaypoints(gameData *registry.GameData, rng *rand.Rand, archetype Sy
 			ID:       lastID + 1,
 			Type:     WaypointStation,
 			Dockable: true,
-			Station:  &StationData{},
+			Station:  generateStation(gameData, archetype),
 		})
 		lastID++
 	}
@@ -44,5 +44,20 @@ func generateAsteroid(gameData *registry.GameData, rng *rand.Rand, _ SystemArche
 			Amount:   rng.Intn(9000) + 1000,
 			Richness: float64(rng.Intn(100)+1) / 100,
 		},
+	}
+}
+
+func generateStation(gameData *registry.GameData, arch SystemArchetype) *StationData {
+	var facilities []string
+	for facility, tier := range arch.StationFacilities {
+		f, ok := gameData.Facilities.GetFacilityByTypeAndTier(facility, tier)
+		if !ok {
+			continue
+		}
+		facilities = append(facilities, f.ID)
+	}
+
+	return &StationData{
+		Facilities: facilities,
 	}
 }

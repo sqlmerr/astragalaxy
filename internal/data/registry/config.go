@@ -11,9 +11,10 @@ import (
 var k = koanf.New(".")
 
 type Config struct {
-	ItemsPath     string `koanf:"itemsPath"`
-	ResourcesPath string `koanf:"resourcesPath"`
-	RecipesPath   string `koanf:"recipesPath"`
+	ItemsPath      string `koanf:"itemsPath"`
+	ResourcesPath  string `koanf:"resourcesPath"`
+	RecipesPath    string `koanf:"recipesPath"`
+	FacilitiesPath string `koanf:"facilitiesPath"`
 }
 
 func LoadConfig() (Config, error) {

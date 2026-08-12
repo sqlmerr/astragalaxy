@@ -779,6 +779,11 @@ export interface components {
             asteroid?: {
                 deposit?: components["schemas"]["ResourceDeposit"];
             } | null;
+            /** @description Station data. Not null if type == station */
+            station?: {
+                /** @description List of available facilities on this station */
+                facilities?: string[];
+            } | null;
         };
         System: components["schemas"]["ShortSystem"] & {
             planets: components["schemas"]["Planet"][];

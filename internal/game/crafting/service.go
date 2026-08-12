@@ -3,7 +3,7 @@ package crafting_service
 import (
 	"context"
 	"fmt"
-	"slices"
+	"math"
 	"time"
 
 	"github.com/google/uuid"
@@ -14,16 +14,18 @@ import (
 	inventories_repository "github.com/sqlmerr/astragalaxy/internal/data/repository/inventories"
 	core_errors "github.com/sqlmerr/astragalaxy/internal/errors"
 	"github.com/sqlmerr/astragalaxy/internal/game"
+	"github.com/sqlmerr/astragalaxy/internal/game/worldgen"
 )
 
 type CraftingService struct {
 	gameConfig game.Config
 	store      data.Store
 	gameData   registry.GameData
+	worldGen   worldgen.WorldGen
 }
 
-func New(gameConfig game.Config, store data.Store, gameData registry.GameData) *CraftingService {
-	return &CraftingService{gameConfig, store, gameData}
+func New(gameConfig game.Config, store data.Store, gameData registry.GameData, worldGen worldgen.WorldGen) *CraftingService {
+	return &CraftingService{gameConfig, store, gameData, worldGen}
 }
 
 func (s *CraftingService) Craft(ctx context.Context, agentID uuid.UUID, recipeID string, targetInventoryID uuid.UUID, amount int) (model.Cooldown, error) {
@@ -38,32 +40,39 @@ func (s *CraftingService) Craft(ctx context.Context, agentID uuid.UUID, recipeID
 		return model.Cooldown{}, core_errors.NewWithCode(core_errors.CodeRecipeNotFound, fmt.Errorf("recipe `%s`: %w", recipeID, core_errors.ErrNotFound))
 	}
 
-	ship, err := s.store.Ships().GetActiveShipByAgent(ctx, agentID)
+	facilities, err := s.gatherAvailableFacilities(ctx, agentID)
 	if err != nil {
-		return model.Cooldown{}, fmt.Errorf("get active agent ship: %w", err)
+		return model.Cooldown{}, err
 	}
 
-	// TODO: waypoint facilities
-
-	shipModules, err := s.store.Ships().GetShipModules(ctx, ship.ID)
-	if err != nil {
-		return model.Cooldown{}, fmt.Errorf("get ship modules: %w", err)
+	if len(facilities[recipe.RequiredFacility]) == 0 {
+		return model.Cooldown{}, core_errors.NewWithCode(
+			core_errors.CodeFacilityNotFound,
+			fmt.Errorf("could not find `%s` facility: %w", recipe.RequiredFacility, core_errors.ErrUnprocessableEntity),
+		)
 	}
 
-	// TODO: refactor this using tags
-	var shipFacilities []registry.ProductionFacilityType
-	for _, m := range shipModules {
-		switch m.Type {
-		case model.ShipModulePortablePrinter:
-			shipFacilities = append(shipFacilities, registry.FacilityPrinter)
-		case model.ShipModulePortableSmelter:
-			shipFacilities = append(shipFacilities, registry.FacilitySmelter)
+	var bestFacility *registry.Facility
+	for _, facility := range facilities[recipe.RequiredFacility] {
+		f, ok := s.gameData.Facilities.GetFacility(facility)
+		if !ok {
+			return model.Cooldown{}, fmt.Errorf("facility not found: %w", core_errors.ErrInternal)
+		}
+
+		if f.Tier < recipe.MinTier {
+			continue
+		}
+
+		if bestFacility == nil || f.Tier > bestFacility.Tier {
+			bestFacility = &f
 		}
 	}
-	if !slices.Contains(shipFacilities, recipe.RequiredFacility) {
+
+	if bestFacility == nil {
+		fmt.Println(len(facilities[recipe.RequiredFacility]))
 		return model.Cooldown{}, core_errors.NewWithCode(
-			core_errors.CodeProductionFacilityNotFound,
-			fmt.Errorf("could not find `%s` facility: %w", recipe.RequiredFacility, core_errors.ErrUnprocessableEntity),
+			core_errors.CodeFacilityNotFound,
+			fmt.Errorf("cannot find facility of type='%s' with tier greater than or equal to %d: %w", recipe.RequiredFacility, recipe.MinTier, core_errors.ErrUnprocessableEntity),
 		)
 	}
 
@@ -107,10 +116,11 @@ func (s *CraftingService) Craft(ctx context.Context, agentID uuid.UUID, recipeID
 	var createdResources []model.Resource
 
 	for _, input := range recipe.Inputs {
+		cost := int(math.Ceil(float64(input.Amount*amount) * bestFacility.CostMultiplier))
 		flag := false
 		for _, resource := range resources {
-			if model.ResourceType(input.ResourceID) == resource.ResourceType && resource.Amount >= (input.Amount*amount) {
-				resource.Amount -= input.Amount * amount
+			if model.ResourceType(input.ResourceID) == resource.ResourceType && resource.Amount >= cost {
+				resource.Amount -= cost
 				updatedResources = append(updatedResources, resource)
 				flag = true
 				break
@@ -176,7 +186,7 @@ func (s *CraftingService) Craft(ctx context.Context, agentID uuid.UUID, recipeID
 		cooldown, err = tx.Cooldowns().SetCooldown(ctx, cooldowns_repository.SetCooldown{
 			AgentID:  agentID,
 			Action:   "craft",
-			Duration: recipe.GetDuration() * time.Duration(amount),
+			Duration: recipe.GetDuration() * time.Duration(amount) * time.Duration(bestFacility.TimeMultiplier),
 		})
 		if err != nil {
 			return fmt.Errorf("set cooldown: %w", err)
@@ -190,4 +200,67 @@ func (s *CraftingService) Craft(ctx context.Context, agentID uuid.UUID, recipeID
 	}
 
 	return cooldown, nil
+}
+
+// TODO: move this method to another service and access it through interface
+func (s *CraftingService) gatherAvailableFacilities(ctx context.Context, agentID uuid.UUID) (map[registry.FacilityType][]string, error) {
+	ship, err := s.store.Ships().GetActiveShipByAgent(ctx, agentID)
+	if err != nil {
+		return nil, fmt.Errorf("get active agent ship: %w", err)
+	}
+
+	shipModules, err := s.store.Ships().GetShipModules(ctx, ship.ID)
+	if err != nil {
+		return nil, fmt.Errorf("get ship modules: %w", err)
+	}
+
+	facilities := make(map[registry.FacilityType][]string)
+	for _, m := range shipModules {
+		item, ok := s.gameData.Items.GetItem(string(m.Type))
+		if !ok {
+			return nil, fmt.Errorf("item does not exist: %w", core_errors.ErrInternal)
+		}
+		if item.ProvidesFacility == "" {
+			continue
+		}
+		f, ok := s.gameData.Facilities.GetFacility(item.ProvidesFacility)
+		if !ok {
+			return nil, fmt.Errorf("facility %s does not exist: %w", item.ProvidesFacility, core_errors.ErrInternal)
+		}
+		facilities[f.Type] = append(facilities[f.Type], f.ID)
+	}
+
+	if ship.Location == model.ShipLocationWaypoint && ship.Status == model.ShipStatusDocked {
+		system, exists := s.worldGen.GenerateSystemByCoords(ship.SystemX, ship.SystemY)
+		if !exists {
+			return nil, core_errors.NewWithCode(
+				core_errors.CodeAnomaly,
+				fmt.Errorf(
+					"system x=%d y=%d does not exists: %w",
+					ship.SystemX, ship.SystemY, core_errors.ErrUnprocessableEntity,
+				),
+			)
+		}
+		waypoint := system.FindWaypointByID(ship.LocationID)
+		if waypoint == nil {
+			return nil, core_errors.NewWithCode(
+				core_errors.CodeAnomaly,
+				fmt.Errorf(
+					"waypoint with id=%d in system x=%d y=%d does not exists: %w",
+					ship.LocationID, ship.SystemX, ship.SystemY, core_errors.ErrUnprocessableEntity,
+				),
+			)
+		}
+		if waypoint.Station != nil {
+			for _, id := range waypoint.Station.Facilities {
+				f, ok := s.gameData.Facilities.GetFacility(id)
+				if !ok {
+					return nil, fmt.Errorf("facility with id='%s' not found: %w", id, core_errors.ErrInternal)
+				}
+				facilities[f.Type] = append(facilities[f.Type], f.ID)
+			}
+		}
+	}
+
+	return facilities, nil
 }

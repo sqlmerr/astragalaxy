@@ -5,6 +5,7 @@ import (
 
 	"github.com/samber/lo"
 	"github.com/sqlmerr/astragalaxy/internal/data/model"
+	"github.com/sqlmerr/astragalaxy/internal/data/registry"
 )
 
 type PlanetType string
@@ -31,7 +32,9 @@ type Planet struct {
 	Deposits []ResourceDeposit
 }
 
-type StationData struct{}
+type StationData struct {
+	Facilities []string
+}
 
 type AsteroidData struct {
 	Deposit ResourceDeposit
@@ -112,7 +115,8 @@ type SystemArchetype struct {
 
 	StationChance                float64
 	MaxAsteroids                 int
-	PlanetResourcesWorldGenParam string // basic + these
+	PlanetResourcesWorldGenParam string                        // basic + these
+	StationFacilities            map[registry.FacilityType]int // key=facility type value=tier
 }
 
 type PlanetWeights struct {
@@ -145,6 +149,7 @@ var (
 		StationChance:                0.8,
 		MaxAsteroids:                 3,
 		PlanetResourcesWorldGenParam: "planet.habitable",
+		StationFacilities:            map[registry.FacilityType]int{registry.FacilityPrinter: 3, registry.FacilitySmelter: 2},
 	}
 	ArchetypeDead = SystemArchetype{
 		Name:       "dead",
@@ -168,6 +173,7 @@ var (
 		StationChance:                0.1,
 		MaxAsteroids:                 9,
 		PlanetResourcesWorldGenParam: "planet.dead",
+		StationFacilities:            map[registry.FacilityType]int{registry.FacilityPrinter: 2, registry.FacilitySmelter: 2},
 	}
 	ArchetypeFrozen = SystemArchetype{
 		Name:       "frozen",
@@ -192,6 +198,7 @@ var (
 		},
 		MaxAsteroids:                 6,
 		PlanetResourcesWorldGenParam: "planet.frozen",
+		StationFacilities:            map[registry.FacilityType]int{registry.FacilityPrinter: 2, registry.FacilitySmelter: 2},
 	}
 
 	Archetypes = []SystemArchetype{

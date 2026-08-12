@@ -9,7 +9,8 @@ import (
 )
 
 type Item struct {
-	ID string `json:"id"`
+	ID               string `json:"id"`
+	ProvidesFacility string `json:"provides_facility,omitempty"`
 }
 
 type ItemRegistry struct {
