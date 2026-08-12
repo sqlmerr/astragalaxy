@@ -43,6 +43,7 @@ const (
 	CodeRecipeNotFound               ErrorCode = "RECIPE_NOT_FOUND"
 	CodeProductionFacilityNotFound   ErrorCode = "PRODUCTION_FACILITY_NOT_FOUND"
 	CodeShipModuleAlreadyInstalled   ErrorCode = "SHIP_MODULE_ALREADY_INSTALLED"
+	CodeCannotUseItem                ErrorCode = "CANNOT_USE_ITEM"
 )
 
 type WithCode struct {

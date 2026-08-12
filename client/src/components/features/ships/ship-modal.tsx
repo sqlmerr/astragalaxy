@@ -24,6 +24,7 @@ import { useQueryClient } from "@tanstack/react-query"
 import { Check, Pencil, X } from "lucide-react"
 import { useEffect, useState } from "react"
 import { InventoryModal } from "../inventory/inventory-modal"
+import { useShipModulesQuery } from "@/api/hooks/use-ships-query"
 
 interface ShipModalProps {
   ship: SchemaShip | null
@@ -39,9 +40,19 @@ export function ShipModal({ ship, onClose }: ShipModalProps) {
   const [invModalOpen, setInvModalOpen] = useState(false)
   const {
     data: inventory,
-    isPending,
-    isError,
+    isPending: isInventoryPending,
+    isError: isInventoryError,
   } = useShipInventoryQuery(
+    ship ? ship.agent_id : "",
+    ship ? ship.id : "",
+    ship !== null
+  )
+
+  const {
+    data: modules,
+    isPending: isModulesPending,
+    isError: isModulesError,
+  } = useShipModulesQuery(
     ship ? ship.agent_id : "",
     ship ? ship.id : "",
     ship !== null
@@ -91,7 +102,14 @@ export function ShipModal({ ship, onClose }: ShipModalProps) {
     setIsRenaming(false)
   }
 
-  if (!inventory || isPending || isError) {
+  if (
+    !inventory ||
+    isInventoryPending ||
+    isInventoryError ||
+    !modules ||
+    isModulesError ||
+    isModulesPending
+  ) {
     return null
   }
 
@@ -209,6 +227,23 @@ export function ShipModal({ ship, onClose }: ShipModalProps) {
                 </div>
               </Card>
 
+              <Card className="p-4">
+                <h3 className="mb-3 font-semibold">Modules</h3>
+                {modules.data.length > 0 ? (
+                  <ul className="space-y-2 text-sm">
+                    {modules.data.map((module) => (
+                      <li key={module}>
+                        <Badge variant="secondary">{module}</Badge>
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  <p className="text-sm text-muted-foreground">
+                    This ship has no modules.
+                  </p>
+                )}
+              </Card>
+
               <Accordion>
                 <AccordionItem value="json">
                   <AccordionTrigger>JSON</AccordionTrigger>
@@ -226,6 +261,7 @@ export function ShipModal({ ship, onClose }: ShipModalProps) {
       <InventoryModal
         inventory={invModalOpen ? inventory : null}
         onClose={() => setInvModalOpen(false)}
+        agentId={ship?.agent_id || ""}
       />
     </>
   )

@@ -3,23 +3,35 @@ import { useQuery } from "@tanstack/react-query"
 import {
   activeShipQueryOptions,
   myShipsQueryOptions,
+  shipModulesQueryOptions,
   shipRadarQueryOptions,
 } from "@/api/queries/ships"
 
-export function useMyShipsQuery(agentID: string) {
-  return useQuery(myShipsQueryOptions(agentID))
+export function useMyShipsQuery(agentId: string) {
+  return useQuery(myShipsQueryOptions(agentId))
 }
 
-export function useActiveShipQuery(agentID?: string) {
+export function useActiveShipQuery(agentId?: string) {
   return useQuery({
-    ...activeShipQueryOptions(agentID ?? ""),
-    enabled: !!agentID,
+    ...activeShipQueryOptions(agentId ?? ""),
+    enabled: !!agentId,
   })
 }
 
-export function useShipRadarQuery(agentID?: string) {
+export function useShipRadarQuery(agentId?: string) {
   return useQuery({
-    ...shipRadarQueryOptions(agentID ?? ""),
-    enabled: !!agentID,
+    ...shipRadarQueryOptions(agentId ?? ""),
+    enabled: !!agentId,
+  })
+}
+
+export function useShipModulesQuery(
+  agentId: string,
+  shipId: string,
+  enabled: boolean
+) {
+  return useQuery({
+    ...shipModulesQueryOptions(agentId, shipId),
+    enabled,
   })
 }

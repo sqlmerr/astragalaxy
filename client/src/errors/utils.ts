@@ -41,7 +41,6 @@ export function handleError(
     actionProps: {
       children: "Details",
       onClick() {
-        console.log("a")
         openError(appError)
       },
     },

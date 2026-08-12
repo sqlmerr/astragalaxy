@@ -3,22 +3,25 @@ export const queryKeys = {
   agents: {
     all: ["agents"] as const,
     my: ["agents", "my"] as const,
-    current: (agentID: string) => ["agents", "current", agentID] as const,
-    cooldown: (agentID: string) =>
-      ["agents", "current", "cooldown", agentID] as const,
+    current: (agentId: string) => ["agents", "current", agentId] as const,
+    cooldown: (agentId: string) =>
+      ["agents", "current", "cooldown", agentId] as const,
   },
   ships: {
-    my: (agentID: string) => ["ships", "my", agentID] as const,
-    active: (agentID: string) => ["ships", "my", "active", agentID] as const,
-    radar: (agentID: string) =>
-      ["ships", "my", "active", "radar", agentID] as const,
+    my: (agentId: string) => ["ships", "my", agentId] as const,
+    active: (agentId: string) => ["ships", "my", "active", agentId] as const,
+    radar: (agentId: string) =>
+      ["ships", "my", "active", "radar", agentId] as const,
+    modules: (agentId: string, shipId: string) =>
+      ["ships", "my", shipId, "modules", agentId] as const,
   },
   inventories: {
-    my: (agentID: string) => ["inventories", "my", agentID] as const,
-    ship: (agentID: string, shipId: string) =>
-      ["inventories", "my", "ships", shipId, agentID] as const,
+    all: ["inventories"] as const,
+    my: (agentId: string) => ["inventories", "my", agentId] as const,
+    ship: (agentId: string, shipId: string) =>
+      ["inventories", "my", "ships", shipId, agentId] as const,
   },
   systems: {
-    current: (agentID: string) => ["systems", "current", agentID] as const,
+    current: (agentId: string) => ["systems", "current", agentId] as const,
   },
 } as const

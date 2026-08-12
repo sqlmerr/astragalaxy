@@ -55,7 +55,7 @@ func (s *ItemsService) UseItem(ctx context.Context, agentID uuid.UUID, itemID uu
 
 	action, ok := item_actions.Actions[item.ItemType]
 	if !ok {
-		return nil, model.Cooldown{}, fmt.Errorf("item action does not exist")
+		return nil, model.Cooldown{}, core_errors.NewWithCode(core_errors.CodeCannotUseItem, fmt.Errorf("item cannot be used: %w", core_errors.ErrInvalidArgument))
 	}
 	var res item_actions.ActionResponse
 	var cooldown model.Cooldown

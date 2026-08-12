@@ -40,6 +40,8 @@ export type SchemaResetAgentTokenResponse =
   components["schemas"]["ResetAgentTokenResponse"]
 export type SchemaErrorResponse = components["schemas"]["ErrorResponse"]
 export type SchemaResourceDeposit = components["schemas"]["ResourceDeposit"]
+export type SchemaUseItemResponse = components["schemas"]["UseItemResponse"]
+export type SchemaInventoryOwner = components["schemas"]["Inventory"]
 
 export interface AgentExtended {
   agent: SchemaAgent

@@ -19,9 +19,14 @@ import { Json } from "@/components/ui/json"
 interface InventoryModalProps {
   inventory: SchemaFullInventory | null
   onClose: () => void
+  agentId: string
 }
 
-export function InventoryModal({ inventory, onClose }: InventoryModalProps) {
+export function InventoryModal({
+  inventory,
+  onClose,
+  agentId,
+}: InventoryModalProps) {
   return (
     <Dialog
       open={inventory !== null}
@@ -74,7 +79,9 @@ export function InventoryModal({ inventory, onClose }: InventoryModalProps) {
 
               <div className="flex flex-col gap-2">
                 {inventory.items.length > 0 ? (
-                  inventory.items.map((i) => <ItemCard key={i.id} item={i} />)
+                  inventory.items.map((i) => (
+                    <ItemCard key={i.id} item={i} inventoryAgentId={agentId} />
+                  ))
                 ) : (
                   <div className="flex min-h-20 place-items-center justify-center border border-dashed text-sm text-muted-foreground">
                     Inventory does not contain any items
