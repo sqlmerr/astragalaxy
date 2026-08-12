@@ -121,7 +121,7 @@ export function ShipModal({ ship, onClose }: ShipModalProps) {
           if (!open) onClose()
         }}
       >
-        <DialogContent>
+        <DialogContent className="max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2 pr-10">
               {isRenaming ? (

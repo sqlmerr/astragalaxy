@@ -93,7 +93,7 @@ export function AgentModal({ agent, setAgent }: AgentModalProps) {
           if (!open) setAgent(null)
         }}
       >
-        <DialogContent>
+        <DialogContent className="max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>{agent?.agent.username}</DialogTitle>
           </DialogHeader>
