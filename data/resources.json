@@ -41,19 +41,55 @@
     },
     {
         "id": "copper",
-        "tags": ["advancedResource", "asteroid_resource"]
+        "tags": ["advancedResource", "asteroid_resource"],
+        "worldgen": {
+            "planet.habitable": {
+                "min": 600,
+                "max": 1300
+            },
+            "planet.frozen": {
+                "min": 550,
+                "max": 1000
+            }
+        }
     },
     {
         "id": "titanium",
-        "tags": ["advancedResource", "asteroid_resource"]
+        "tags": ["advancedResource", "asteroid_resource"],
+        "worldgen": {
+            "planet.dead": {
+                "min": 500,
+                "max": 1200
+            },
+            "planet.frozen": {
+                "min": 400,
+                "max": 1600
+            }
+        }
     },
     {
         "id": "silicon",
-        "tags": ["advancedResource"]
+        "tags": ["advancedResource"],
+        "worldgen": {
+            "planet.habitable": {
+                "min": 300,
+                "max": 800
+            }
+        }
     },
     {
         "id": "helium",
-        "tags": ["advancedResource", "asteroid_resource"]
+        "tags": ["advancedResource", "asteroid_resource"],
+        "worldgen": {
+            "planet.habitable": {
+                "min": 100,
+                "max": 450
+            },
+            "planet.frozen": {
+                "min": 20,
+                "max": 175
+            }
+        }
     },
     {
         "id": "uranium",
@@ -61,7 +97,13 @@
     },
     {
         "id": "iridium",
-        "tags": ["exotic_resource", "asteroid_resource"]
+        "tags": ["exotic_resource", "asteroid_resource"],
+        "worldgen": {
+            "planet.dead": {
+                "min": 50,
+                "max": 500
+            }
+        }
     },
         {
         "id": "dark_matter",
@@ -69,7 +111,13 @@
     },
     {
         "id": "bio_disputes",
-        "tags": ["exotic_resource"]
+        "tags": ["exotic_resource"],
+        "worldgen": {
+            "planet.dead": {
+                "min": 1000,
+                "max": 5000
+            }
+        }
     },
     {
         "id": "steel"

@@ -22,7 +22,7 @@ func New(gameData *registry.GameData, gameSeed int64) *WorldGen {
 // Returns (nil, false) if there is no system.
 func (w *WorldGen) GenerateSystemByCoords(x, y int) (*System, bool) {
 	h := fnv.New64a()
-	_, _ = h.Write([]byte(fmt.Sprintf("%d:%d:%d", x, y, w.gameSeed)))
+	_, _ = fmt.Fprintf(h, "%d:%d:%d", x, y, w.gameSeed)
 	systemSeed := h.Sum64()
 
 	rng := rand.New(rand.NewSource(int64(systemSeed)))

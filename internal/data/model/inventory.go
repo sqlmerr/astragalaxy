@@ -16,28 +16,28 @@ type Inventory struct {
 type ResourceType string
 type ItemType string
 
-const (
-	// basic
-	ResourceIron    ResourceType = "iron"
-	ResourceCrystal ResourceType = "crystal"
-	ResourceCarbon  ResourceType = "carbon"
-	ResourceIce     ResourceType = "ice"
+// const (
+// 	// basic
+// 	ResourceIron    ResourceType = "iron"
+// 	ResourceCrystal ResourceType = "crystal"
+// 	ResourceCarbon  ResourceType = "carbon"
+// 	ResourceIce     ResourceType = "ice"
 
-	// advanced
-	ResourceCopper   ResourceType = "copper"
-	ResourceTitanium ResourceType = "titanium"
-	ResourceSilicon  ResourceType = "silicon"
-	ResourceHelium   ResourceType = "helium"
+// 	// advanced
+// 	ResourceCopper   ResourceType = "copper"
+// 	ResourceTitanium ResourceType = "titanium"
+// 	ResourceSilicon  ResourceType = "silicon"
+// 	ResourceHelium   ResourceType = "helium"
 
-	// exotic
-	ResourceUranium     ResourceType = "uranium"
-	ResourceIridium     ResourceType = "iridium"
-	ResourceDarkMatter  ResourceType = "dark_matter"
-	ResourceBioDisputes ResourceType = "bio_disputes"
+// 	// exotic
+// 	ResourceUranium     ResourceType = "uranium"
+// 	ResourceIridium     ResourceType = "iridium"
+// 	ResourceDarkMatter  ResourceType = "dark_matter"
+// 	ResourceBioDisputes ResourceType = "bio_disputes"
 
-	// composite
-	ResourceSteel ResourceType = "steel"
-)
+// 	// composite
+// 	ResourceSteel ResourceType = "steel"
+// )
 
 const (
 	ItemPortableSmelter ItemType = "portable_smelter"

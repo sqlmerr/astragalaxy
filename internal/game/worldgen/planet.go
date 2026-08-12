@@ -12,24 +12,22 @@ func generatePlanet(gameData *registry.GameData, orbitIndex int, rng *rand.Rand,
 	pType := getRandomPlanetType(rng, weights)
 
 	var deposits []ResourceDeposit
-	basicResources := gameData.Resources.GetAllResourcesByTag("basic_resource")
+	basicResources := gameData.Resources.GetAllResourcesByWorldgenParams("planet")
 
 	for _, r := range basicResources {
-		if r.WorldGen.Planet.Max == 0 {
-			continue
-		}
 
 		deposits = append(deposits, ResourceDeposit{
 			Resource: model.ResourceType(r.ID),
-			Amount:   getRandomIntBetween(rng, r.WorldGen.Planet.Min, r.WorldGen.Planet.Max),
+			Amount:   getRandomIntBetween(rng, r.WorldGen["planet"].Min, r.WorldGen["planet"].Max),
 			Richness: float64(rng.Intn(100)+1) / 100,
 		})
 	}
 
-	for _, r := range archetype.PlanetResources {
+	archetypeResources := gameData.Resources.GetAllResourcesByWorldgenParams(archetype.PlanetResourcesWorldGenParam)
+	for _, r := range archetypeResources {
 		deposits = append(deposits, ResourceDeposit{
-			Resource: r.Resource,
-			Amount:   getRandomIntBetween(rng, r.Min, r.Max),
+			Resource: model.ResourceType(r.ID),
+			Amount:   getRandomIntBetween(rng, r.WorldGen[archetype.PlanetResourcesWorldGenParam].Min, r.WorldGen[archetype.PlanetResourcesWorldGenParam].Max),
 			Richness: float64(rng.Intn(100)+1) / 100,
 		})
 	}

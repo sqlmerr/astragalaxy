@@ -9,17 +9,15 @@ import (
 	"github.com/samber/lo"
 )
 
-type ResourceWorldGen struct {
-	Planet struct {
-		Min int `json:"min"`
-		Max int `json:"max"`
-	} `json:"planet"`
+type ResourceWorldGenParams struct {
+	Min int `json:"min"`
+	Max int `json:"max"`
 }
 
 type Resource struct {
-	ID       string           `json:"id"`
-	Tags     []string         `json:"tags"`
-	WorldGen ResourceWorldGen `json:"worldgen"`
+	ID       string                            `json:"id"`
+	Tags     []string                          `json:"tags"`
+	WorldGen map[string]ResourceWorldGenParams `json:"worldgen"`
 }
 
 type ResourceRegistry struct {
@@ -60,6 +58,17 @@ func (r *ResourceRegistry) GetAllResourcesByTag(tag string) []Resource {
 	var resources []Resource
 	for _, res := range r.resources {
 		if slices.Contains(res.Tags, tag) {
+			resources = append(resources, res)
+		}
+	}
+	return resources
+}
+
+func (r *ResourceRegistry) GetAllResourcesByWorldgenParams(paramName string) []Resource {
+	var resources []Resource
+	for _, res := range r.resources {
+		_, exists := res.WorldGen[paramName]
+		if exists {
 			resources = append(resources, res)
 		}
 	}
