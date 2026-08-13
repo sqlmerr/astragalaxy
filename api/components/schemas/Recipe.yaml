@@ -1,0 +1,27 @@
+type: object
+required:
+  - id
+  - required_facility
+  - min_tier
+  - duration
+  - inputs
+  - outputs
+properties: 
+  id:
+    type: string
+  required_facility:
+    type: string
+    description: facility type
+  min_tier:
+    type: integer
+  duration:
+    type: integer
+    description: In seconds
+  inputs:
+    type: array
+    items: 
+      $ref: RecipeResource.yaml
+  outputs:
+    type: array
+    items: 
+      $ref: RecipeResource.yaml

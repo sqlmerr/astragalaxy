@@ -16,7 +16,7 @@ post:
       content: 
         application/json:
           schema:
-            $ref: ../../components/schemas/Cooldown.yaml
+            $ref: ../../components/schemas/CraftResponse.yaml
     '422':
       description: Not enough inventory resources or another internal game error
       content: 

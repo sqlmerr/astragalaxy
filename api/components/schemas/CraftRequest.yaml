@@ -2,6 +2,7 @@ type: object
 required:
   - recipe_id
   - target_inventory_id
+  - amount
 properties: 
   recipe_id:
     type: string

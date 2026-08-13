@@ -130,7 +130,10 @@ func (s *CraftingService) Craft(ctx context.Context, agentID uuid.UUID, recipeID
 		if !flag {
 			return model.Cooldown{}, core_errors.NewWithCode(
 				core_errors.CodeNotEnoughResources,
-				fmt.Errorf("to craft recipe `%s` it is required to have at least %d of `%s` resource", recipeID, input.Amount*amount, input.ResourceID),
+				fmt.Errorf(
+					"to craft recipe `%s` it is required to have at least %d of `%s` resource: %w",
+					recipeID, cost, input.ResourceID, core_errors.ErrUnprocessableEntity,
+				),
 			)
 		}
 	}

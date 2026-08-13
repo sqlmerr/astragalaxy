@@ -8,8 +8,8 @@ import {
 import { Input } from "@/components/ui/input"
 import { toast } from "@/components/ui/toast"
 import { useErrorHandler } from "@/errors/utils"
-import { useState  } from "react"
-import type {SyntheticEvent} from "react";
+import { useState } from "react"
+import type { SyntheticEvent } from "react"
 import { useAgents } from "../../auth/use-agents"
 import { useMinePlanetMutation } from "@/api/hooks/use-mining-mutations"
 import type { SchemaResourceDeposit } from "@/api/types"
@@ -69,6 +69,7 @@ export function PlanetMineDialog({
             description: `Requested ${value} resource${value === 1 ? "" : "s"}.`,
           })
           setAmount("")
+          setSelectedDeposit(-1)
           onClose()
           setCooldown(agentId, data)
         },
@@ -123,6 +124,7 @@ export function PlanetMineDialog({
             <Select
               items={depositSelectItems}
               onValueChange={(v) => setSelectedDeposit(v as number)}
+              required
             >
               <SelectTrigger className="w-full">
                 <SelectValue placeholder="Deposit" />

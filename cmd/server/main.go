@@ -35,6 +35,7 @@ import (
 	"github.com/sqlmerr/astragalaxy/internal/game/worldgen"
 	core_logger "github.com/sqlmerr/astragalaxy/internal/logger"
 	http_handler_agents "github.com/sqlmerr/astragalaxy/internal/transport/http/handler/agents"
+	http_handler_data "github.com/sqlmerr/astragalaxy/internal/transport/http/handler/data"
 	http_handler_inventories "github.com/sqlmerr/astragalaxy/internal/transport/http/handler/inventories"
 	http_handler_navigation "github.com/sqlmerr/astragalaxy/internal/transport/http/handler/navigation"
 	http_handler_ships "github.com/sqlmerr/astragalaxy/internal/transport/http/handler/ships"
@@ -131,6 +132,9 @@ func main() {
 
 	systemsHandler := http_handler_systems.New(*galaxyService)
 	apiVersionRouter.AddRoutes(systemsHandler.Routes(agentAuthMiddleware)...)
+
+	dataHandler := http_handler_data.New(*gameData)
+	apiVersionRouter.AddRoutes(dataHandler.Routes()...)
 
 	httpConfig := http_server.LoadConfigMust()
 	mux := http.NewServeMux()

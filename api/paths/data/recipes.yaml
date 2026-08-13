@@ -1,0 +1,20 @@
+get:
+  operationId: getRecipes
+  tags:
+    - Data
+  summary: Get Recipes Data
+  responses:
+    200:
+      description: Success
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - data
+            properties:
+              data:
+                type: array
+                items: 
+                  $ref: ../../components/schemas/Recipe.yaml
+  security: []

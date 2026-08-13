@@ -24,4 +24,7 @@ export const queryKeys = {
   systems: {
     current: (agentId: string) => ["systems", "current", agentId] as const,
   },
+  data: {
+    recipes: ["data", "recipes"] as const,
+  },
 } as const
