@@ -22,5 +22,20 @@ func (h *DataHTTPHandler) Routes() []http_server.Route {
 			Method:  http.MethodGet,
 			Handler: h.GetRecipes,
 		},
+		{
+			Path:    "/data/items",
+			Method:  http.MethodGet,
+			Handler: h.GetItems,
+		},
+		{
+			Path:    "/data/resources",
+			Method:  http.MethodGet,
+			Handler: h.GetResources,
+		},
+		{
+			Path:    "/data/facilities",
+			Method:  http.MethodGet,
+			Handler: h.GetFacilities,
+		},
 	}
 }

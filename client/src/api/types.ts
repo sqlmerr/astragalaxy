@@ -44,7 +44,10 @@ export type SchemaUseItemResponse = components["schemas"]["UseItemResponse"]
 export type SchemaInventoryOwner = components["schemas"]["Inventory"]
 export type SchemaCraftRequest = components["schemas"]["CraftRequest"]
 export type SchemaCraftResponse = components["schemas"]["CraftResponse"]
-export type SchemaRecipe = components["schemas"]["Recipe"]
+export type SchemaRecipeData = components["schemas"]["RecipeData"]
+export type SchemaItemData = components["schemas"]["ItemData"]
+export type SchemaResourceData = components["schemas"]["ResourceData"]
+export type SchemaFacilityData = components["schemas"]["FacilityData"]
 
 export interface AgentExtended {
   agent: SchemaAgent

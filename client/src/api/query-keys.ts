@@ -26,5 +26,8 @@ export const queryKeys = {
   },
   data: {
     recipes: ["data", "recipes"] as const,
+    items: ["data", "items"] as const,
+    resources: ["data", "resources"] as const,
+    facilities: ["data", "facilities"] as const,
   },
 } as const

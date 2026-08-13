@@ -1,0 +1,12 @@
+type: object
+required:
+  - id
+  - tags
+properties: 
+  id:
+    type: string
+    description: Resource ID
+  tags:
+    type: array
+    items: 
+      type: string

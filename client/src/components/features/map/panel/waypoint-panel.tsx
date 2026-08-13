@@ -1,4 +1,4 @@
-import type { SchemaWaypoint, SystemExtended, AgentExtended  } from "@/api/types"
+import type { SchemaWaypoint, SystemExtended, AgentExtended } from "@/api/types"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
@@ -124,12 +124,23 @@ export function WaypointPanel({
 
         <Separator />
 
-        {waypoint.type === "asteroid" &&
-        !!waypoint.asteroid &&
-        !!waypoint.asteroid.deposit ? (
+        {waypoint.type === "asteroid" && !!waypoint.asteroid ? (
           <Card className="p-4">
             <h3 className="mb-3 font-semibold">Resource deposit</h3>
             <ResourceDepositCard deposit={waypoint.asteroid.deposit} />
+          </Card>
+        ) : null}
+
+        {waypoint.type === "station" && !!waypoint.station ? (
+          <Card className="p-4">
+            <h3 className="mb-3 font-semibold">Facilities</h3>
+            <ul className="space-y-2 text-sm">
+              {waypoint.station.facilities.map((facility) => (
+                <li key={facility}>
+                  <Badge variant="secondary">{facility}</Badge>
+                </li>
+              ))}
+            </ul>
           </Card>
         ) : null}
 

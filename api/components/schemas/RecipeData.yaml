@@ -12,6 +12,7 @@ properties:
   required_facility:
     type: string
     description: facility type
+    example: smelter
   min_tier:
     type: integer
   duration:

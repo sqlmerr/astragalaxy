@@ -65,6 +65,12 @@ paths:
     $ref: paths/agents/actions-craft.yaml
   /api/v1/data/recipes:
     $ref: paths/data/recipes.yaml
+  /api/v1/data/items:
+    $ref: paths/data/items.yaml
+  /api/v1/data/resources:
+    $ref: paths/data/resources.yaml
+  /api/v1/data/facilities:
+    $ref: paths/data/facilities.yaml
 components:
   securitySchemes:
     UserAuth:

@@ -1,0 +1,11 @@
+type: object
+required:
+  - id
+  - provides_facility
+properties: 
+  id: 
+    type: string
+    description: Item ID
+  provides_facility:
+    type: string
+    description: Facility that item provides

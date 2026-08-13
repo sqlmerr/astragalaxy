@@ -1,8 +1,8 @@
 get:
-  operationId: getRecipes
+  operationId: getFacilities
   tags:
     - Data
-  summary: Get Recipes Data
+  summary: Get Facilities Data
   responses:
     200:
       description: Success
@@ -16,5 +16,5 @@ get:
               data:
                 type: array
                 items: 
-                  $ref: ../../components/schemas/RecipeData.yaml
+                  $ref: ../../components/schemas/FacilityData.yaml
   security: []

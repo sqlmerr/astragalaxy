@@ -16,6 +16,8 @@ properties:
     type: object
     description: Asteroid data. Not null if type == asteroid
     nullable: true
+    required:
+      - deposit
     properties: 
       deposit:
         $ref: ResourceDeposit.yaml
@@ -23,6 +25,8 @@ properties:
     type: object
     description: Station data. Not null if type == station
     nullable: true
+    required:
+      - facilities
     properties: 
       facilities:
         type: array

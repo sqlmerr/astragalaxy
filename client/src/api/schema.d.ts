@@ -560,6 +560,57 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/data/items": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Items Data */
+        get: operations["getItems"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/data/resources": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Resources Data */
+        get: operations["getResources"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/data/facilities": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Facilities Data */
+        get: operations["getFacilities"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -794,12 +845,12 @@ export interface components {
             type: "station" | "asteroid";
             /** @description Asteroid data. Not null if type == asteroid */
             asteroid?: {
-                deposit?: components["schemas"]["ResourceDeposit"];
+                deposit: components["schemas"]["ResourceDeposit"];
             } | null;
             /** @description Station data. Not null if type == station */
             station?: {
                 /** @description List of available facilities on this station */
-                facilities?: string[];
+                facilities: string[];
             } | null;
         };
         System: components["schemas"]["ShortSystem"] & {
@@ -839,15 +890,47 @@ export interface components {
             resource_id: string;
             amount: number;
         };
-        Recipe: {
+        RecipeData: {
             id: string;
-            /** @description facility type */
+            /**
+             * @description facility type
+             * @example smelter
+             */
             required_facility: string;
             min_tier: number;
             /** @description In seconds */
             duration: number;
             inputs: components["schemas"]["RecipeResource"][];
             outputs: components["schemas"]["RecipeResource"][];
+        };
+        ItemData: {
+            /** @description Item ID */
+            id: string;
+            /** @description Facility that item provides */
+            provides_facility: string;
+        };
+        ResourceData: {
+            /** @description Resource ID */
+            id: string;
+            tags: string[];
+        };
+        FacilityData: {
+            /**
+             * @description Facility ID
+             * @example standard_printer
+             */
+            id: string;
+            /**
+             * @description Facility type
+             * @example printer
+             */
+            type: string;
+            /** @description Facility Tier */
+            tier: number;
+            /** Format: float64 */
+            time_multiplier: number;
+            /** Format: float64 */
+            cost_multiplier: number;
         };
     };
     responses: {
@@ -1704,7 +1787,73 @@ export interface operations {
                 };
                 content: {
                     "application/json": {
-                        data: components["schemas"]["Recipe"][];
+                        data: components["schemas"]["RecipeData"][];
+                    };
+                };
+            };
+        };
+    };
+    getItems: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Success */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["ItemData"][];
+                    };
+                };
+            };
+        };
+    };
+    getResources: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Success */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["ResourceData"][];
+                    };
+                };
+            };
+        };
+    };
+    getFacilities: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Success */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["FacilityData"][];
                     };
                 };
             };

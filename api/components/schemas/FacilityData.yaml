@@ -1,0 +1,26 @@
+type: object
+required:
+  - id
+  - type
+  - tier
+  - time_multiplier
+  - cost_multiplier
+properties: 
+  id:
+    type: string
+    description: Facility ID
+    example: standard_printer
+  type:
+    type: string
+    description: Facility type
+    example: printer
+  tier:
+    type: integer
+    description: Facility Tier
+    minimum: 1
+  time_multiplier:
+    type: number
+    format: float64
+  cost_multiplier:
+    type: number
+    format: float64
