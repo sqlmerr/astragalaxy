@@ -19,11 +19,13 @@ import { Progress } from "@/components/ui/progress"
 import { ShipCard } from "../ships/ship-card"
 import { useState } from "react"
 import { ShipModal } from "../ships/ship-modal"
-import { useChangeActiveShipMutation } from "@/api/hooks"
+import { useChangeActiveShipMutation, useMyInventoryQuery } from "@/api/hooks"
 import { useQueryClient } from "@tanstack/react-query"
 import { useErrorHandler } from "@/errors/utils"
 import { queryKeys } from "@/api/query-keys"
 import { toast } from "@/components/ui/toast"
+import { InventoryModal } from "../inventory/inventory-modal"
+import { Button } from "@/components/ui/button"
 
 interface AgentModalProps {
   agent: AgentExtended | null
@@ -82,8 +84,19 @@ export function AgentModal({ agent, setAgent }: AgentModalProps) {
   }
 
   const [selectedShipId, setSelectedShipId] = useState<string | null>(null)
+  const [invModalOpen, setInvModalOpen] = useState(false)
+
+  const {
+    data: inventory,
+    isPending: isInventoryPending,
+    isError: isInventoryError,
+  } = useMyInventoryQuery(agent ? agent.agent.id : "", agent !== null)
 
   const selectedShip = agent?.ships.find((s) => s.id === selectedShipId) ?? null
+
+  if (!inventory || isInventoryPending || isInventoryError) {
+    return null
+  }
 
   return (
     <>
@@ -151,6 +164,24 @@ export function AgentModal({ agent, setAgent }: AgentModalProps) {
               </Card>
 
               <Card className="p-4">
+                <h3 className="mb-3 font-semibold">Inventory</h3>
+
+                <div className="flex items-center justify-between gap-4 text-sm">
+                  <span className="text-muted-foreground">
+                    {inventory.items.length} items, {inventory.resources.length}{" "}
+                    resources
+                  </span>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => setInvModalOpen(true)}
+                  >
+                    Open inventory
+                  </Button>
+                </div>
+              </Card>
+
+              <Card className="p-4">
                 <h3 className="mb-3 font-semibold">Ships</h3>
                 {agent.ships.map((s) => (
                   <ShipCard
@@ -161,8 +192,6 @@ export function AgentModal({ agent, setAgent }: AgentModalProps) {
                   />
                 ))}
               </Card>
-
-              {/* TODO: inventory */}
 
               <Accordion>
                 <AccordionItem value="json">
@@ -179,6 +208,11 @@ export function AgentModal({ agent, setAgent }: AgentModalProps) {
         </DialogContent>
       </Dialog>
       <ShipModal ship={selectedShip} onClose={() => setSelectedShipId(null)} />
+      <InventoryModal
+        inventory={invModalOpen ? inventory : null}
+        onClose={() => setInvModalOpen(false)}
+        agentId={agent?.agent.id || ""}
+      />
     </>
   )
 }

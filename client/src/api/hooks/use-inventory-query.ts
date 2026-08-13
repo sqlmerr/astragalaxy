@@ -5,14 +5,14 @@ import {
   shipInventoryQueryOptions,
 } from "@/api/queries/inventories"
 
-export function useMyInventoryQuery(agentID: string) {
-  return useQuery(myInventoryQueryOptions(agentID))
+export function useMyInventoryQuery(agentId: string, enabled: boolean) {
+  return useQuery({ ...myInventoryQueryOptions(agentId), enabled })
 }
 
 export function useShipInventoryQuery(
-  agentID: string,
+  agentId: string,
   shipId: string,
   enabled: boolean
 ) {
-  return useQuery({ ...shipInventoryQueryOptions(agentID, shipId), enabled })
+  return useQuery({ ...shipInventoryQueryOptions(agentId, shipId), enabled })
 }
