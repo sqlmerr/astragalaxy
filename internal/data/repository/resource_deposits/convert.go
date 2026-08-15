@@ -1,8 +1,8 @@
 package resource_deposits_repository
 
 import (
-	"github.com/sqlmerr/astragalaxy/internal/data/model"
 	database "github.com/sqlmerr/astragalaxy/internal/data/postgres/database/sqlc"
+	"github.com/sqlmerr/astragalaxy/internal/model"
 )
 
 func resourceDepositModel(deposit database.ResourceDepositState) model.ResourceDeposit {

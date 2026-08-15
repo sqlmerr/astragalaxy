@@ -6,9 +6,9 @@ import (
 	"fmt"
 
 	"github.com/google/uuid"
-	"github.com/sqlmerr/astragalaxy/internal/data/model"
 	postgres_pool "github.com/sqlmerr/astragalaxy/internal/data/postgres/pool"
-	core_errors "github.com/sqlmerr/astragalaxy/internal/errors"
+	errs "github.com/sqlmerr/astragalaxy/internal/errors"
+	"github.com/sqlmerr/astragalaxy/internal/model"
 )
 
 func (r *InventoryRepositoryImpl) GetInventoryOwner(ctx context.Context, inventoryID uuid.UUID) (model.InventoryOwner, error) {
@@ -19,9 +19,9 @@ func (r *InventoryRepositoryImpl) GetInventoryOwner(ctx context.Context, invento
 	err = postgres_pool.TranslateError(err)
 	if err != nil {
 		if errors.Is(err, postgres_pool.ErrNoRows) {
-			return model.InventoryOwner{}, core_errors.NewWithCode(
-				core_errors.CodeInventoryNotFound,
-				fmt.Errorf("inventory with id='%s': %w", inventoryID, core_errors.ErrNotFound),
+			return model.InventoryOwner{}, errs.NewWithCode(
+				errs.CodeInventoryNotFound,
+				fmt.Errorf("inventory with id='%s': %w", inventoryID, errs.ErrNotFound),
 			)
 		}
 

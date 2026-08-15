@@ -6,9 +6,9 @@ import (
 	"fmt"
 
 	"github.com/google/uuid"
-	"github.com/sqlmerr/astragalaxy/internal/data/model"
 	postgres_pool "github.com/sqlmerr/astragalaxy/internal/data/postgres/pool"
-	core_errors "github.com/sqlmerr/astragalaxy/internal/errors"
+	errs "github.com/sqlmerr/astragalaxy/internal/errors"
+	"github.com/sqlmerr/astragalaxy/internal/model"
 )
 
 func (r *AgentRepositoryImpl) GetAgent(ctx context.Context, id uuid.UUID) (model.Agent, error) {
@@ -19,12 +19,12 @@ func (r *AgentRepositoryImpl) GetAgent(ctx context.Context, id uuid.UUID) (model
 	err = postgres_pool.TranslateError(err)
 	if err != nil {
 		if errors.Is(err, postgres_pool.ErrNoRows) {
-			return model.Agent{}, core_errors.NewWithCode(
-				core_errors.CodeAgentNotFound,
+			return model.Agent{}, errs.NewWithCode(
+				errs.CodeAgentNotFound,
 				fmt.Errorf(
 					"agent with id='%s': %w",
 					id,
-					core_errors.ErrNotFound,
+					errs.ErrNotFound,
 				),
 			)
 		}

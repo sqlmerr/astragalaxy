@@ -6,11 +6,11 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/sqlmerr/astragalaxy/internal/data"
-	"github.com/sqlmerr/astragalaxy/internal/data/model"
 	cooldowns_repository "github.com/sqlmerr/astragalaxy/internal/data/repository/cooldowns"
-	core_errors "github.com/sqlmerr/astragalaxy/internal/errors"
+	errs "github.com/sqlmerr/astragalaxy/internal/errors"
 	"github.com/sqlmerr/astragalaxy/internal/game"
 	"github.com/sqlmerr/astragalaxy/internal/game/worldgen"
+	"github.com/sqlmerr/astragalaxy/internal/model"
 )
 
 type NavigationService struct {
@@ -34,13 +34,13 @@ func (s *NavigationService) NavigateWarp(ctx context.Context, agentID uuid.UUID,
 
 	system, exists := s.worldGen.GenerateSystemByCoords(x, y)
 	if !exists {
-		return model.Cooldown{}, core_errors.NewWithCode(
-			core_errors.CodeInvalidWarpPath,
+		return model.Cooldown{}, errs.NewWithCode(
+			errs.CodeInvalidWarpPath,
 			fmt.Errorf(
 				"system x=%d y=%d doesn't exist: %w",
 				x,
 				y,
-				core_errors.ErrNotFound,
+				errs.ErrNotFound,
 			),
 		)
 	}
@@ -95,13 +95,13 @@ func (s *NavigationService) NavigatePlanet(ctx context.Context, agentID uuid.UUI
 
 	system, exists := s.worldGen.GenerateSystemByCoords(ship.SystemX, ship.SystemY)
 	if !exists {
-		return model.Cooldown{}, core_errors.NewWithCode(
-			core_errors.CodeAnomaly,
+		return model.Cooldown{}, errs.NewWithCode(
+			errs.CodeAnomaly,
 			fmt.Errorf(
 				"system x=%d y=%d doesn't exist: %w",
 				ship.SystemX,
 				ship.SystemY,
-				core_errors.ErrNotFound,
+				errs.ErrNotFound,
 			),
 		)
 	}
@@ -143,13 +143,13 @@ func (s *NavigationService) NavigateWaypoint(ctx context.Context, agentID uuid.U
 
 	system, exists := s.worldGen.GenerateSystemByCoords(ship.SystemX, ship.SystemY)
 	if !exists {
-		return model.Cooldown{}, core_errors.NewWithCode(
-			core_errors.CodeAnomaly,
+		return model.Cooldown{}, errs.NewWithCode(
+			errs.CodeAnomaly,
 			fmt.Errorf(
 				"system x=%d y=%d doesn't exist: %w",
 				ship.SystemX,
 				ship.SystemY,
-				core_errors.ErrNotFound,
+				errs.ErrNotFound,
 			),
 		)
 	}

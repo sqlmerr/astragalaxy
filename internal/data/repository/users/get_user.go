@@ -6,9 +6,9 @@ import (
 	"fmt"
 
 	"github.com/google/uuid"
-	"github.com/sqlmerr/astragalaxy/internal/data/model"
 	postgres_pool "github.com/sqlmerr/astragalaxy/internal/data/postgres/pool"
-	core_errors "github.com/sqlmerr/astragalaxy/internal/errors"
+	errs "github.com/sqlmerr/astragalaxy/internal/errors"
+	"github.com/sqlmerr/astragalaxy/internal/model"
 )
 
 func (r *UserRepositoryImpl) GetUser(ctx context.Context, userID uuid.UUID) (model.User, error) {
@@ -20,9 +20,9 @@ func (r *UserRepositoryImpl) GetUser(ctx context.Context, userID uuid.UUID) (mod
 
 	if err != nil {
 		if errors.Is(err, postgres_pool.ErrNoRows) {
-			return model.User{}, core_errors.NewWithCode(
-				core_errors.CodeUserNotFound,
-				fmt.Errorf("user with id='%s': %w", userID, core_errors.ErrNotFound),
+			return model.User{}, errs.NewWithCode(
+				errs.CodeUserNotFound,
+				fmt.Errorf("user with id='%s': %w", userID, errs.ErrNotFound),
 			)
 		}
 

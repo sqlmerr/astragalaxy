@@ -8,7 +8,7 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/redis/go-redis/v9"
-	"github.com/sqlmerr/astragalaxy/internal/data/model"
+	"github.com/sqlmerr/astragalaxy/internal/model"
 )
 
 func (r *CooldownRepositoryImpl) GetCooldown(ctx context.Context, agentID uuid.UUID) (model.Cooldown, error) {

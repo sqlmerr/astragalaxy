@@ -4,10 +4,10 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/sqlmerr/astragalaxy/internal/data/model"
-	core_errors "github.com/sqlmerr/astragalaxy/internal/errors"
+	errs "github.com/sqlmerr/astragalaxy/internal/errors"
 	"github.com/sqlmerr/astragalaxy/internal/game"
 	"github.com/sqlmerr/astragalaxy/internal/game/worldgen"
+	"github.com/sqlmerr/astragalaxy/internal/model"
 )
 
 const DefaultMiningSpeed = 0.25 // seconds per one resource
@@ -22,18 +22,18 @@ func MineAsteroid(
 	inventoryVolume int,
 ) (model.ResourceDeposit, model.Resource, time.Duration, error) {
 	if deposit.Remaining < amount {
-		return model.ResourceDeposit{}, model.Resource{}, 0, core_errors.NewWithCode(
-			core_errors.CodeNotEnoughResources,
-			fmt.Errorf("asteroid has %d resources: %w", deposit.Remaining, core_errors.ErrUnprocessableEntity),
+		return model.ResourceDeposit{}, model.Resource{}, 0, errs.NewWithCode(
+			errs.CodeNotEnoughResources,
+			fmt.Errorf("asteroid has %d resources: %w", deposit.Remaining, errs.ErrUnprocessableEntity),
 		)
 	}
 
 	if inventoryVolume+amount > inventory.MaxResourceVolume && !gameConfig.Rules.DisableInventoryLimit {
-		return model.ResourceDeposit{}, model.Resource{}, 0, core_errors.NewWithCode(
-			core_errors.CodeInventoryIsFull,
+		return model.ResourceDeposit{}, model.Resource{}, 0, errs.NewWithCode(
+			errs.CodeInventoryIsFull,
 			fmt.Errorf(
 				"cannot mine %d resources due to inventory volume limit = %d: %w",
-				amount, inventory.MaxResourceVolume, core_errors.ErrUnprocessableEntity,
+				amount, inventory.MaxResourceVolume, errs.ErrUnprocessableEntity,
 			),
 		)
 	}
@@ -59,18 +59,18 @@ func MinePlanet(
 	inventoryVolume int,
 ) (model.ResourceDeposit, model.Resource, time.Duration, error) {
 	if deposit.Remaining < amount {
-		return model.ResourceDeposit{}, model.Resource{}, 0, core_errors.NewWithCode(
-			core_errors.CodeNotEnoughResources,
-			fmt.Errorf("planet resource deposit has %d resources: %w", deposit.Remaining, core_errors.ErrUnprocessableEntity),
+		return model.ResourceDeposit{}, model.Resource{}, 0, errs.NewWithCode(
+			errs.CodeNotEnoughResources,
+			fmt.Errorf("planet resource deposit has %d resources: %w", deposit.Remaining, errs.ErrUnprocessableEntity),
 		)
 	}
 
 	if inventoryVolume+amount > inventory.MaxResourceVolume && !gameConfig.Rules.DisableInventoryLimit {
-		return model.ResourceDeposit{}, model.Resource{}, 0, core_errors.NewWithCode(
-			core_errors.CodeInventoryIsFull,
+		return model.ResourceDeposit{}, model.Resource{}, 0, errs.NewWithCode(
+			errs.CodeInventoryIsFull,
 			fmt.Errorf(
 				"cannot mine %d resources due to inventory volume limit = %d: %w",
-				amount, inventory.MaxResourceVolume, core_errors.ErrUnprocessableEntity,
+				amount, inventory.MaxResourceVolume, errs.ErrUnprocessableEntity,
 			),
 		)
 	}

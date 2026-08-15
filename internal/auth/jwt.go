@@ -7,7 +7,7 @@ import (
 
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/google/uuid"
-	core_errors "github.com/sqlmerr/astragalaxy/internal/errors"
+	errs "github.com/sqlmerr/astragalaxy/internal/errors"
 )
 
 const ClaimsContextKey = "claims"
@@ -42,10 +42,10 @@ func (m JWTProcessorImpl) ValidateToken(tokenString string) (uuid.UUID, error) {
 		return []byte(m.config.JWTSecret), nil
 	})
 	if err != nil {
-		return uuid.Nil, fmt.Errorf("validate jwt token: %w: %w", core_errors.ErrUnauthorized, err)
+		return uuid.Nil, fmt.Errorf("validate jwt token: %w: %w", errs.ErrUnauthorized, err)
 	}
 
-	errInvalidJwtToken := fmt.Errorf("invalid jwt token: %w", core_errors.ErrUnauthorized)
+	errInvalidJwtToken := fmt.Errorf("invalid jwt token: %w", errs.ErrUnauthorized)
 
 	if !token.Valid {
 		return uuid.Nil, errInvalidJwtToken

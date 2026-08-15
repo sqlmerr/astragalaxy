@@ -7,10 +7,10 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/sqlmerr/astragalaxy/internal/data"
-	"github.com/sqlmerr/astragalaxy/internal/data/model"
 	cooldowns_repository "github.com/sqlmerr/astragalaxy/internal/data/repository/cooldowns"
-	core_errors "github.com/sqlmerr/astragalaxy/internal/errors"
+	errs "github.com/sqlmerr/astragalaxy/internal/errors"
 	item_actions "github.com/sqlmerr/astragalaxy/internal/game/items/actions"
+	"github.com/sqlmerr/astragalaxy/internal/model"
 )
 
 type ItemsService struct {
@@ -32,9 +32,9 @@ func (s *ItemsService) UseItem(ctx context.Context, agentID uuid.UUID, itemID uu
 		return nil, model.Cooldown{}, fmt.Errorf("get inventory owner: %w", err)
 	}
 
-	accessDeniedErr := core_errors.NewWithCode(
-		core_errors.CodeAccessDenied,
-		fmt.Errorf("cannot access this inventory: %w", core_errors.ErrAccessDenied),
+	accessDeniedErr := errs.NewWithCode(
+		errs.CodeAccessDenied,
+		fmt.Errorf("cannot access this inventory: %w", errs.ErrAccessDenied),
 	)
 	switch owner.OwnerType {
 	case model.InventoryOwnerAgent:
@@ -55,7 +55,7 @@ func (s *ItemsService) UseItem(ctx context.Context, agentID uuid.UUID, itemID uu
 
 	action, ok := item_actions.Actions[item.ItemType]
 	if !ok {
-		return nil, model.Cooldown{}, core_errors.NewWithCode(core_errors.CodeCannotUseItem, fmt.Errorf("item cannot be used: %w", core_errors.ErrInvalidArgument))
+		return nil, model.Cooldown{}, errs.NewWithCode(errs.CodeCannotUseItem, fmt.Errorf("item cannot be used: %w", errs.ErrInvalidArgument))
 	}
 	var res item_actions.ActionResponse
 	var cooldown model.Cooldown

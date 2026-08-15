@@ -4,9 +4,9 @@ import (
 	"testing"
 
 	"github.com/google/uuid"
-	"github.com/sqlmerr/astragalaxy/internal/data/model"
-	core_errors "github.com/sqlmerr/astragalaxy/internal/errors"
+	errs "github.com/sqlmerr/astragalaxy/internal/errors"
 	"github.com/sqlmerr/astragalaxy/internal/game/worldgen"
+	"github.com/sqlmerr/astragalaxy/internal/model"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -48,9 +48,9 @@ func TestOrbitShip(t *testing.T) {
 	}
 	_, _, err = OrbitShip(ship2)
 	assert.Error(t, err)
-	var withCode core_errors.WithCode
+	var withCode errs.WithCode
 	if assert.ErrorAs(t, err, &withCode) {
-		assert.Equal(t, withCode.Code, core_errors.CodeShipAlreadyInThisState)
+		assert.Equal(t, withCode.Code, errs.CodeShipAlreadyInThisState)
 	}
 }
 
@@ -61,7 +61,7 @@ func TestDockShip(t *testing.T) {
 		system      worldgen.System
 		expectedErr bool
 		err         error
-		errCode     core_errors.ErrorCode
+		errCode     errs.ErrorCode
 	}
 
 	tests := []testCase{
@@ -110,8 +110,8 @@ func TestDockShip(t *testing.T) {
 			},
 			system:      worldgen.System{},
 			expectedErr: true,
-			err:         core_errors.ErrUnprocessableEntity,
-			errCode:     core_errors.CodeShipAlreadyInThisState,
+			err:         errs.ErrUnprocessableEntity,
+			errCode:     errs.CodeShipAlreadyInThisState,
 		},
 		{
 			name: "Cant Dock",
@@ -131,8 +131,8 @@ func TestDockShip(t *testing.T) {
 				},
 			},
 			expectedErr: true,
-			err:         core_errors.ErrUnprocessableEntity,
-			errCode:     core_errors.CodeCannotDock,
+			err:         errs.ErrUnprocessableEntity,
+			errCode:     errs.CodeCannotDock,
 		},
 	}
 
@@ -142,7 +142,7 @@ func TestDockShip(t *testing.T) {
 			if test.expectedErr {
 				assert.Error(t, err)
 				assert.ErrorIs(t, err, test.err)
-				var withCode core_errors.WithCode
+				var withCode errs.WithCode
 				if assert.ErrorAs(t, err, &withCode) {
 					assert.Equal(t, test.errCode, withCode.Code)
 				}

@@ -7,7 +7,7 @@ import (
 	"github.com/google/uuid"
 	database "github.com/sqlmerr/astragalaxy/internal/data/postgres/database/sqlc"
 	postgres_pool "github.com/sqlmerr/astragalaxy/internal/data/postgres/pool"
-	core_errors "github.com/sqlmerr/astragalaxy/internal/errors"
+	errs "github.com/sqlmerr/astragalaxy/internal/errors"
 )
 
 func (r *AgentRepositoryImpl) ChangeAgentToken(ctx context.Context, agentID uuid.UUID, tokenHash string) error {
@@ -22,9 +22,9 @@ func (r *AgentRepositoryImpl) ChangeAgentToken(ctx context.Context, agentID uuid
 	}
 
 	if rowsAffected == 0 {
-		return core_errors.NewWithCode(
-			core_errors.CodeAgentNotFound,
-			fmt.Errorf("agent with id='%s': %w", agentID, core_errors.ErrNotFound),
+		return errs.NewWithCode(
+			errs.CodeAgentNotFound,
+			fmt.Errorf("agent with id='%s': %w", agentID, errs.ErrNotFound),
 		)
 	}
 

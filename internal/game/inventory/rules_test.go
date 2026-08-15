@@ -4,8 +4,8 @@ import (
 	"testing"
 
 	"github.com/google/uuid"
-	"github.com/sqlmerr/astragalaxy/internal/data/model"
-	core_errors "github.com/sqlmerr/astragalaxy/internal/errors"
+	errs "github.com/sqlmerr/astragalaxy/internal/errors"
+	"github.com/sqlmerr/astragalaxy/internal/model"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -16,10 +16,10 @@ func TestTransferResource(t *testing.T) {
 	assert.Equal(t, 9, to.Amount)
 
 	_, _, err = TransferResource(model.Resource{Amount: 3}, model.Resource{}, 4)
-	assert.ErrorIs(t, err, core_errors.ErrUnprocessableEntity)
-	var withCode core_errors.WithCode
+	assert.ErrorIs(t, err, errs.ErrUnprocessableEntity)
+	var withCode errs.WithCode
 	if assert.ErrorAs(t, err, &withCode) {
-		assert.Equal(t, core_errors.CodeNotEnoughResources, withCode.Code)
+		assert.Equal(t, errs.CodeNotEnoughResources, withCode.Code)
 	}
 }
 
@@ -27,10 +27,10 @@ func TestCheckItemCapacity(t *testing.T) {
 	assert.NoError(t, CheckItemCapacity(model.Inventory{MaxItemSlots: 3}, 1, 2))
 
 	err := CheckItemCapacity(model.Inventory{MaxItemSlots: 3}, 2, 2)
-	assert.ErrorIs(t, err, core_errors.ErrUnprocessableEntity)
-	var withCode core_errors.WithCode
+	assert.ErrorIs(t, err, errs.ErrUnprocessableEntity)
+	var withCode errs.WithCode
 	if assert.ErrorAs(t, err, &withCode) {
-		assert.Equal(t, core_errors.CodeInventoryIsFull, withCode.Code)
+		assert.Equal(t, errs.CodeInventoryIsFull, withCode.Code)
 	}
 }
 
@@ -44,9 +44,9 @@ func TestTransferItem(t *testing.T) {
 	assert.Equal(t, toInventoryID, transferredItem.InventoryID)
 
 	_, err = TransferItem(item, uuid.New(), toInventoryID)
-	assert.ErrorIs(t, err, core_errors.ErrUnprocessableEntity)
-	var withCode core_errors.WithCode
+	assert.ErrorIs(t, err, errs.ErrUnprocessableEntity)
+	var withCode errs.WithCode
 	if assert.ErrorAs(t, err, &withCode) {
-		assert.Equal(t, core_errors.CodeItemNotInInventory, withCode.Code)
+		assert.Equal(t, errs.CodeItemNotInInventory, withCode.Code)
 	}
 }

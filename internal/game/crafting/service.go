@@ -8,13 +8,13 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/sqlmerr/astragalaxy/internal/data"
-	"github.com/sqlmerr/astragalaxy/internal/data/model"
 	"github.com/sqlmerr/astragalaxy/internal/data/registry"
 	cooldowns_repository "github.com/sqlmerr/astragalaxy/internal/data/repository/cooldowns"
 	inventories_repository "github.com/sqlmerr/astragalaxy/internal/data/repository/inventories"
-	core_errors "github.com/sqlmerr/astragalaxy/internal/errors"
+	errs "github.com/sqlmerr/astragalaxy/internal/errors"
 	"github.com/sqlmerr/astragalaxy/internal/game"
 	"github.com/sqlmerr/astragalaxy/internal/game/worldgen"
+	"github.com/sqlmerr/astragalaxy/internal/model"
 )
 
 type CraftingService struct {
@@ -37,7 +37,7 @@ func (s *CraftingService) Craft(ctx context.Context, agentID uuid.UUID, recipeID
 
 	recipe, ok := s.gameData.Recipes.GetRecipe(recipeID)
 	if !ok {
-		return model.Cooldown{}, core_errors.NewWithCode(core_errors.CodeRecipeNotFound, fmt.Errorf("recipe `%s`: %w", recipeID, core_errors.ErrNotFound))
+		return model.Cooldown{}, errs.NewWithCode(errs.CodeRecipeNotFound, fmt.Errorf("recipe `%s`: %w", recipeID, errs.ErrNotFound))
 	}
 
 	facilities, err := s.gatherAvailableFacilities(ctx, agentID)
@@ -46,9 +46,9 @@ func (s *CraftingService) Craft(ctx context.Context, agentID uuid.UUID, recipeID
 	}
 
 	if len(facilities[recipe.RequiredFacility]) == 0 {
-		return model.Cooldown{}, core_errors.NewWithCode(
-			core_errors.CodeFacilityNotFound,
-			fmt.Errorf("could not find `%s` facility: %w", recipe.RequiredFacility, core_errors.ErrUnprocessableEntity),
+		return model.Cooldown{}, errs.NewWithCode(
+			errs.CodeFacilityNotFound,
+			fmt.Errorf("could not find `%s` facility: %w", recipe.RequiredFacility, errs.ErrUnprocessableEntity),
 		)
 	}
 
@@ -56,7 +56,7 @@ func (s *CraftingService) Craft(ctx context.Context, agentID uuid.UUID, recipeID
 	for _, facility := range facilities[recipe.RequiredFacility] {
 		f, ok := s.gameData.Facilities.GetFacility(facility)
 		if !ok {
-			return model.Cooldown{}, fmt.Errorf("facility not found: %w", core_errors.ErrInternal)
+			return model.Cooldown{}, fmt.Errorf("facility not found: %w", errs.ErrInternal)
 		}
 
 		if f.Tier < recipe.MinTier {
@@ -70,9 +70,9 @@ func (s *CraftingService) Craft(ctx context.Context, agentID uuid.UUID, recipeID
 
 	if bestFacility == nil {
 		fmt.Println(len(facilities[recipe.RequiredFacility]))
-		return model.Cooldown{}, core_errors.NewWithCode(
-			core_errors.CodeFacilityNotFound,
-			fmt.Errorf("cannot find facility of type='%s' with tier greater than or equal to %d: %w", recipe.RequiredFacility, recipe.MinTier, core_errors.ErrUnprocessableEntity),
+		return model.Cooldown{}, errs.NewWithCode(
+			errs.CodeFacilityNotFound,
+			fmt.Errorf("cannot find facility of type='%s' with tier greater than or equal to %d: %w", recipe.RequiredFacility, recipe.MinTier, errs.ErrUnprocessableEntity),
 		)
 	}
 
@@ -86,9 +86,9 @@ func (s *CraftingService) Craft(ctx context.Context, agentID uuid.UUID, recipeID
 		return model.Cooldown{}, fmt.Errorf("get inventory owner: %w", err)
 	}
 
-	accessDeniedErr := core_errors.NewWithCode(
-		core_errors.CodeAccessDenied,
-		fmt.Errorf("cannot access this inventory: %w", core_errors.ErrAccessDenied),
+	accessDeniedErr := errs.NewWithCode(
+		errs.CodeAccessDenied,
+		fmt.Errorf("cannot access this inventory: %w", errs.ErrAccessDenied),
 	)
 	switch owner.OwnerType {
 	case model.InventoryOwnerAgent:
@@ -128,11 +128,11 @@ func (s *CraftingService) Craft(ctx context.Context, agentID uuid.UUID, recipeID
 		}
 
 		if !flag {
-			return model.Cooldown{}, core_errors.NewWithCode(
-				core_errors.CodeNotEnoughResources,
+			return model.Cooldown{}, errs.NewWithCode(
+				errs.CodeNotEnoughResources,
 				fmt.Errorf(
 					"to craft recipe `%s` it is required to have at least %d of `%s` resource: %w",
-					recipeID, cost, input.ResourceID, core_errors.ErrUnprocessableEntity,
+					recipeID, cost, input.ResourceID, errs.ErrUnprocessableEntity,
 				),
 			)
 		}
@@ -156,11 +156,11 @@ func (s *CraftingService) Craft(ctx context.Context, agentID uuid.UUID, recipeID
 
 	volume := CountTotalResourceVolume(append(updatedResources, createdResources...))
 	if !s.gameConfig.Rules.DisableInventoryLimit && volume > inventory.MaxResourceVolume {
-		return model.Cooldown{}, core_errors.NewWithCode(
-			core_errors.CodeInventoryIsFull,
+		return model.Cooldown{}, errs.NewWithCode(
+			errs.CodeInventoryIsFull,
 			fmt.Errorf(
 				"cannot craft this recipe due to inventory resource limit (%d > %d): %w",
-				volume, inventory.MaxResourceVolume, core_errors.ErrUnprocessableEntity,
+				volume, inventory.MaxResourceVolume, errs.ErrUnprocessableEntity,
 			),
 		)
 	}
@@ -217,18 +217,19 @@ func (s *CraftingService) gatherAvailableFacilities(ctx context.Context, agentID
 		return nil, fmt.Errorf("get ship modules: %w", err)
 	}
 
+	// TODO: maybe extend item.ProvidesFacility field so it can specify in which item's state it provides facility. For example, portable_smelter will only provide facility when installed as a ship module.
 	facilities := make(map[registry.FacilityType][]string)
 	for _, m := range shipModules {
 		item, ok := s.gameData.Items.GetItem(string(m.Type))
 		if !ok {
-			return nil, fmt.Errorf("item does not exist: %w", core_errors.ErrInternal)
+			return nil, fmt.Errorf("item does not exist: %w", errs.ErrInternal)
 		}
 		if item.ProvidesFacility == "" {
 			continue
 		}
 		f, ok := s.gameData.Facilities.GetFacility(item.ProvidesFacility)
 		if !ok {
-			return nil, fmt.Errorf("facility %s does not exist: %w", item.ProvidesFacility, core_errors.ErrInternal)
+			return nil, fmt.Errorf("facility %s does not exist: %w", item.ProvidesFacility, errs.ErrInternal)
 		}
 		facilities[f.Type] = append(facilities[f.Type], f.ID)
 	}
@@ -236,21 +237,21 @@ func (s *CraftingService) gatherAvailableFacilities(ctx context.Context, agentID
 	if ship.Location == model.ShipLocationWaypoint && ship.Status == model.ShipStatusDocked {
 		system, exists := s.worldGen.GenerateSystemByCoords(ship.SystemX, ship.SystemY)
 		if !exists {
-			return nil, core_errors.NewWithCode(
-				core_errors.CodeAnomaly,
+			return nil, errs.NewWithCode(
+				errs.CodeAnomaly,
 				fmt.Errorf(
 					"system x=%d y=%d does not exists: %w",
-					ship.SystemX, ship.SystemY, core_errors.ErrUnprocessableEntity,
+					ship.SystemX, ship.SystemY, errs.ErrUnprocessableEntity,
 				),
 			)
 		}
 		waypoint := system.FindWaypointByID(ship.LocationID)
 		if waypoint == nil {
-			return nil, core_errors.NewWithCode(
-				core_errors.CodeAnomaly,
+			return nil, errs.NewWithCode(
+				errs.CodeAnomaly,
 				fmt.Errorf(
 					"waypoint with id=%d in system x=%d y=%d does not exists: %w",
-					ship.LocationID, ship.SystemX, ship.SystemY, core_errors.ErrUnprocessableEntity,
+					ship.LocationID, ship.SystemX, ship.SystemY, errs.ErrUnprocessableEntity,
 				),
 			)
 		}
@@ -258,7 +259,7 @@ func (s *CraftingService) gatherAvailableFacilities(ctx context.Context, agentID
 			for _, id := range waypoint.Station.Facilities {
 				f, ok := s.gameData.Facilities.GetFacility(id)
 				if !ok {
-					return nil, fmt.Errorf("facility with id='%s' not found: %w", id, core_errors.ErrInternal)
+					return nil, fmt.Errorf("facility with id='%s' not found: %w", id, errs.ErrInternal)
 				}
 				facilities[f.Type] = append(facilities[f.Type], f.ID)
 			}

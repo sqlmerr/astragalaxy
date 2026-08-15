@@ -6,8 +6,8 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/samber/lo"
-	"github.com/sqlmerr/astragalaxy/internal/data/model"
 	inventory_service "github.com/sqlmerr/astragalaxy/internal/game/inventory"
+	"github.com/sqlmerr/astragalaxy/internal/model"
 )
 
 type InventoryResponseDTO struct {

@@ -5,10 +5,10 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/sqlmerr/astragalaxy/internal/data/model"
 	database "github.com/sqlmerr/astragalaxy/internal/data/postgres/database/sqlc"
 	postgres_pool "github.com/sqlmerr/astragalaxy/internal/data/postgres/pool"
-	core_errors "github.com/sqlmerr/astragalaxy/internal/errors"
+	errs "github.com/sqlmerr/astragalaxy/internal/errors"
+	"github.com/sqlmerr/astragalaxy/internal/model"
 )
 
 func (r *ShipRepositoryImpl) CreateShip(ctx context.Context, data CreateShip) (model.Ship, error) {
@@ -31,9 +31,9 @@ func (r *ShipRepositoryImpl) CreateShip(ctx context.Context, data CreateShip) (m
 
 	if err != nil {
 		if errors.Is(err, postgres_pool.ErrViolatesForeignKey) {
-			return model.Ship{}, core_errors.NewWithCode(
-				core_errors.CodeAgentNotFound,
-				fmt.Errorf("agent with id='%s': %w", data.AgentID, core_errors.ErrNotFound),
+			return model.Ship{}, errs.NewWithCode(
+				errs.CodeAgentNotFound,
+				fmt.Errorf("agent with id='%s': %w", data.AgentID, errs.ErrNotFound),
 			)
 		}
 

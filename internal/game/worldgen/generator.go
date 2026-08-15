@@ -6,7 +6,7 @@ import (
 	"math/rand"
 
 	"github.com/sqlmerr/astragalaxy/internal/data/registry"
-	core_errors "github.com/sqlmerr/astragalaxy/internal/errors"
+	errs "github.com/sqlmerr/astragalaxy/internal/errors"
 )
 
 type WorldGen struct {
@@ -64,9 +64,9 @@ func (w *WorldGen) GetSystemsInBox(minX, minY, maxX, maxY int) ([]System, error)
 	var foundSystems []System
 
 	if (maxX-minX) > 50 || (maxY-minY) > 50 {
-		return nil, core_errors.NewWithCode(
-			core_errors.CodeRadarAreaTooLarge,
-			fmt.Errorf("the radar area is too large: %w", core_errors.ErrInvalidArgument),
+		return nil, errs.NewWithCode(
+			errs.CodeRadarAreaTooLarge,
+			fmt.Errorf("the radar area is too large: %w", errs.ErrInvalidArgument),
 		)
 	}
 

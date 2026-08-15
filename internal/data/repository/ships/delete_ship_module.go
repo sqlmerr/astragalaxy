@@ -5,9 +5,9 @@ import (
 	"fmt"
 
 	"github.com/google/uuid"
-	"github.com/sqlmerr/astragalaxy/internal/data/model"
 	database "github.com/sqlmerr/astragalaxy/internal/data/postgres/database/sqlc"
 	postgres_pool "github.com/sqlmerr/astragalaxy/internal/data/postgres/pool"
+	"github.com/sqlmerr/astragalaxy/internal/model"
 )
 
 func (r *ShipRepositoryImpl) DeleteShipModule(ctx context.Context, shipID uuid.UUID, moduleType model.ShipModuleType) error {

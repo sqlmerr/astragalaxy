@@ -4,9 +4,9 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/sqlmerr/astragalaxy/internal/data/model"
 	database "github.com/sqlmerr/astragalaxy/internal/data/postgres/database/sqlc"
 	postgres_pool "github.com/sqlmerr/astragalaxy/internal/data/postgres/pool"
+	"github.com/sqlmerr/astragalaxy/internal/model"
 )
 
 func (r *UserRepositoryImpl) CreateUser(ctx context.Context, data CreateUser) (model.User, error) {

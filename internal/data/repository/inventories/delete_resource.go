@@ -5,10 +5,10 @@ import (
 	"fmt"
 
 	"github.com/google/uuid"
-	"github.com/sqlmerr/astragalaxy/internal/data/model"
 	database "github.com/sqlmerr/astragalaxy/internal/data/postgres/database/sqlc"
 	postgres_pool "github.com/sqlmerr/astragalaxy/internal/data/postgres/pool"
-	core_errors "github.com/sqlmerr/astragalaxy/internal/errors"
+	errs "github.com/sqlmerr/astragalaxy/internal/errors"
+	"github.com/sqlmerr/astragalaxy/internal/model"
 )
 
 func (r *InventoryRepositoryImpl) DeleteResource(ctx context.Context, inventoryID uuid.UUID, resourceType model.ResourceType) error {
@@ -22,11 +22,11 @@ func (r *InventoryRepositoryImpl) DeleteResource(ctx context.Context, inventoryI
 	}
 
 	if rowsAffected == 0 {
-		return core_errors.NewWithCode(
-			core_errors.CodeResourceNotFound,
+		return errs.NewWithCode(
+			errs.CodeResourceNotFound,
 			fmt.Errorf(
 				"resource with type='%s' in inventory with id='%s': %w",
-				resourceType, inventoryID, core_errors.ErrNotFound,
+				resourceType, inventoryID, errs.ErrNotFound,
 			),
 		)
 	}

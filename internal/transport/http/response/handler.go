@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"net/http"
 
-	core_errors "github.com/sqlmerr/astragalaxy/internal/errors"
+	errs "github.com/sqlmerr/astragalaxy/internal/errors"
 	core_logger "github.com/sqlmerr/astragalaxy/internal/logger"
 	"go.uber.org/zap"
 )
@@ -25,7 +25,7 @@ func NewHTTPResponseHandler(
 }
 
 func (h *HTTPResponseHandler) PanicResponse(p any, msg string) {
-	err := fmt.Errorf("unexpected panic: %v: %w", p, core_errors.ErrInternal)
+	err := fmt.Errorf("unexpected panic: %v: %w", p, errs.ErrInternal)
 
 	h.ErrorResponse(err, msg)
 }
@@ -40,29 +40,29 @@ func (h *HTTPResponseHandler) ErrorResponse(err error, msg string) {
 		logFunc    func(string, ...zap.Field)
 	)
 	switch {
-	case errors.Is(err, core_errors.ErrInternal):
+	case errors.Is(err, errs.ErrInternal):
 		statusCode = http.StatusInternalServerError
-		err = core_errors.NewWithCode(core_errors.CodeInternalServerError, err)
+		err = errs.NewWithCode(errs.CodeInternalServerError, err)
 		logFunc = h.log.Error
-	case errors.Is(err, core_errors.ErrInvalidArgument):
+	case errors.Is(err, errs.ErrInvalidArgument):
 		statusCode = http.StatusBadRequest
 		logFunc = h.log.Warn
-	case errors.Is(err, core_errors.ErrNotFound):
+	case errors.Is(err, errs.ErrNotFound):
 		statusCode = http.StatusNotFound
 		logFunc = h.log.Debug
-	case errors.Is(err, core_errors.ErrConflict):
+	case errors.Is(err, errs.ErrConflict):
 		statusCode = http.StatusConflict
 		logFunc = h.log.Warn
-	case errors.Is(err, core_errors.ErrUnauthorized):
+	case errors.Is(err, errs.ErrUnauthorized):
 		statusCode = http.StatusUnauthorized
 		logFunc = h.log.Warn
-	case errors.Is(err, core_errors.ErrAccessDenied):
+	case errors.Is(err, errs.ErrAccessDenied):
 		statusCode = http.StatusForbidden
 		logFunc = h.log.Warn
-	case errors.Is(err, core_errors.ErrUnprocessableEntity):
+	case errors.Is(err, errs.ErrUnprocessableEntity):
 		statusCode = http.StatusUnprocessableEntity
 		logFunc = h.log.Warn
-	case errors.Is(err, core_errors.ErrNotModified):
+	case errors.Is(err, errs.ErrNotModified):
 		statusCode = http.StatusNotModified
 		logFunc = h.log.Debug
 	default:
@@ -72,13 +72,13 @@ func (h *HTTPResponseHandler) ErrorResponse(err error, msg string) {
 
 	logFunc(msg, zap.Error(err))
 	if statusCode == http.StatusInternalServerError {
-		err = core_errors.NewWithCode(core_errors.CodeInternalServerError, core_errors.ErrInternal)
+		err = errs.NewWithCode(errs.CodeInternalServerError, errs.ErrInternal)
 	}
-	var errorCode core_errors.ErrorCode
-	if errorWithCode, ok := errors.AsType[core_errors.WithCode](err); ok {
+	var errorCode errs.ErrorCode
+	if errorWithCode, ok := errors.AsType[errs.WithCode](err); ok {
 		errorCode = errorWithCode.Code
 	} else {
-		errorCode = core_errors.CodeUnknown
+		errorCode = errs.CodeUnknown
 	}
 	response := map[string]string{
 		"message": msg,

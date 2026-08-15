@@ -5,9 +5,9 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/sqlmerr/astragalaxy/internal/data/model"
 	postgres_pool "github.com/sqlmerr/astragalaxy/internal/data/postgres/pool"
-	core_errors "github.com/sqlmerr/astragalaxy/internal/errors"
+	errs "github.com/sqlmerr/astragalaxy/internal/errors"
+	"github.com/sqlmerr/astragalaxy/internal/model"
 )
 
 func (r *AgentRepositoryImpl) GetAgentByToken(ctx context.Context, tokenHash string) (model.Agent, error) {
@@ -18,11 +18,11 @@ func (r *AgentRepositoryImpl) GetAgentByToken(ctx context.Context, tokenHash str
 	err = postgres_pool.TranslateError(err)
 	if err != nil {
 		if errors.Is(err, postgres_pool.ErrNoRows) {
-			return model.Agent{}, core_errors.NewWithCode(
-				core_errors.CodeAgentNotFound,
+			return model.Agent{}, errs.NewWithCode(
+				errs.CodeAgentNotFound,
 				fmt.Errorf(
 					"get agent: %w",
-					core_errors.ErrNotFound,
+					errs.ErrNotFound,
 				),
 			)
 		}

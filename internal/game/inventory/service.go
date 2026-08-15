@@ -8,11 +8,11 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/sqlmerr/astragalaxy/internal/data"
-	"github.com/sqlmerr/astragalaxy/internal/data/model"
 	cooldowns_repository "github.com/sqlmerr/astragalaxy/internal/data/repository/cooldowns"
-	core_errors "github.com/sqlmerr/astragalaxy/internal/errors"
+	errs "github.com/sqlmerr/astragalaxy/internal/errors"
 	"github.com/sqlmerr/astragalaxy/internal/game"
 	core_logger "github.com/sqlmerr/astragalaxy/internal/logger"
+	"github.com/sqlmerr/astragalaxy/internal/model"
 	"go.uber.org/zap"
 )
 
@@ -43,9 +43,9 @@ func (s *InventoryService) GetShipInventory(ctx context.Context, agentID, shipID
 	}
 
 	if ship.AgentID != agentID {
-		return FullInventory{}, core_errors.NewWithCode(
-			core_errors.CodeAccessDenied,
-			fmt.Errorf("can't get ship's inventory: %w", core_errors.ErrAccessDenied),
+		return FullInventory{}, errs.NewWithCode(
+			errs.CodeAccessDenied,
+			fmt.Errorf("can't get ship's inventory: %w", errs.ErrAccessDenied),
 		)
 	}
 
@@ -98,10 +98,10 @@ func (s *InventoryService) TransferResources(
 		for resourceType, amount := range input.Resources {
 			resourceFrom, err := tx.Inventories().GetResource(ctx, input.FromInventoryID, resourceType)
 			if err != nil {
-				if errors.Is(err, core_errors.ErrNotFound) {
-					return core_errors.NewWithCode(
-						core_errors.CodeNotEnoughResources,
-						fmt.Errorf("resource amount must be at least %d: %w", amount, core_errors.ErrUnprocessableEntity),
+				if errors.Is(err, errs.ErrNotFound) {
+					return errs.NewWithCode(
+						errs.CodeNotEnoughResources,
+						fmt.Errorf("resource amount must be at least %d: %w", amount, errs.ErrUnprocessableEntity),
 					)
 				}
 				return fmt.Errorf("get resource: %w", err)
@@ -255,11 +255,11 @@ func (s *InventoryService) checkTransferDirection(ctx context.Context, agentID u
 	if ownerFrom.OwnerType == model.InventoryOwnerAgent || ownerTo.OwnerType == model.InventoryOwnerAgent {
 		if !((ownerFrom.OwnerType == model.InventoryOwnerAgent && ownerFrom.OwnerID == agentID) ||
 			(ownerTo.OwnerType == model.InventoryOwnerAgent && ownerTo.OwnerID == agentID)) {
-			return core_errors.NewWithCode(
-				core_errors.CodeAccessDenied, fmt.Errorf(
+			return errs.NewWithCode(
+				errs.CodeAccessDenied, fmt.Errorf(
 					"can't access this agent's inventory with id='%s': %w",
 					toInventoryID,
-					core_errors.ErrAccessDenied,
+					errs.ErrAccessDenied,
 				),
 			)
 		}
@@ -277,20 +277,20 @@ func (s *InventoryService) checkTransferDirection(ctx context.Context, agentID u
 			}
 
 			if ship.AgentID != agentID {
-				return core_errors.NewWithCode(
-					core_errors.CodeAccessDenied, fmt.Errorf(
-						"can't access this ship's inventory: %w", core_errors.ErrAccessDenied,
+				return errs.NewWithCode(
+					errs.CodeAccessDenied, fmt.Errorf(
+						"can't access this ship's inventory: %w", errs.ErrAccessDenied,
 					),
 				)
 			}
 
 			if !ship.Active { // TODO: check ship's location to match agent's. Not be active
-				return core_errors.NewWithCode(
-					core_errors.CodeShipMustBeActive,
+				return errs.NewWithCode(
+					errs.CodeShipMustBeActive,
 					fmt.Errorf(
 						"ship with id='%s' must be active: %w",
 						ship.ID,
-						core_errors.ErrInvalidArgument,
+						errs.ErrInvalidArgument,
 					),
 				)
 			}
@@ -298,15 +298,15 @@ func (s *InventoryService) checkTransferDirection(ctx context.Context, agentID u
 			return nil
 		}
 	}
-	return core_errors.NewWithCode(
-		core_errors.CodeInvalidTransferDirection,
+	return errs.NewWithCode(
+		errs.CodeInvalidTransferDirection,
 		fmt.Errorf(
 			"invalid transfer direction: %s -> %s (%s -> %s): %w",
 			fromInventoryID,
 			toInventoryID,
 			ownerFrom.OwnerType,
 			ownerTo.OwnerType,
-			core_errors.ErrInvalidArgument,
+			errs.ErrInvalidArgument,
 		),
 	)
 

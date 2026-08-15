@@ -2,8 +2,8 @@ package ships_repository
 
 import (
 	"github.com/google/uuid"
-	"github.com/sqlmerr/astragalaxy/internal/data/model"
 	database "github.com/sqlmerr/astragalaxy/internal/data/postgres/database/sqlc"
+	"github.com/sqlmerr/astragalaxy/internal/model"
 )
 
 type CreateShip struct {

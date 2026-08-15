@@ -5,9 +5,9 @@ import (
 	"fmt"
 
 	"github.com/samber/lo"
-	"github.com/sqlmerr/astragalaxy/internal/data/model"
 	database "github.com/sqlmerr/astragalaxy/internal/data/postgres/database/sqlc"
 	postgres_pool "github.com/sqlmerr/astragalaxy/internal/data/postgres/pool"
+	"github.com/sqlmerr/astragalaxy/internal/model"
 )
 
 func (r *ResourceDepositsRepositoryImpl) GetSystemResourceDeposits(ctx context.Context, x, y int) ([]model.ResourceDeposit, error) {

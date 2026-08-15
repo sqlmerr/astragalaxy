@@ -5,7 +5,7 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/samber/lo"
-	"github.com/sqlmerr/astragalaxy/internal/data/model"
+	"github.com/sqlmerr/astragalaxy/internal/model"
 )
 
 type AgentResponseDTO struct {

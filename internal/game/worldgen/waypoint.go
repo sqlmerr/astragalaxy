@@ -3,8 +3,8 @@ package worldgen
 import (
 	"math/rand"
 
-	"github.com/sqlmerr/astragalaxy/internal/data/model"
 	"github.com/sqlmerr/astragalaxy/internal/data/registry"
+	"github.com/sqlmerr/astragalaxy/internal/model"
 )
 
 func generateWaypoints(gameData *registry.GameData, rng *rand.Rand, archetype SystemArchetype) []Waypoint {

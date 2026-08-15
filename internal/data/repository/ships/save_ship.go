@@ -5,10 +5,10 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/sqlmerr/astragalaxy/internal/data/model"
 	database "github.com/sqlmerr/astragalaxy/internal/data/postgres/database/sqlc"
 	postgres_pool "github.com/sqlmerr/astragalaxy/internal/data/postgres/pool"
-	core_errors "github.com/sqlmerr/astragalaxy/internal/errors"
+	errs "github.com/sqlmerr/astragalaxy/internal/errors"
+	"github.com/sqlmerr/astragalaxy/internal/model"
 )
 
 func (r *ShipRepositoryImpl) SaveShip(ctx context.Context, ship model.Ship) (model.Ship, error) {
@@ -29,9 +29,9 @@ func (r *ShipRepositoryImpl) SaveShip(ctx context.Context, ship model.Ship) (mod
 	err = postgres_pool.TranslateError(err)
 	if err != nil {
 		if errors.Is(err, postgres_pool.ErrNoRows) {
-			return model.Ship{}, core_errors.NewWithCode(
-				core_errors.CodeShipNotFound,
-				fmt.Errorf("ship with id='%s': %w", ship.ID, core_errors.ErrNotFound),
+			return model.Ship{}, errs.NewWithCode(
+				errs.CodeShipNotFound,
+				fmt.Errorf("ship with id='%s': %w", ship.ID, errs.ErrNotFound),
 			)
 		}
 

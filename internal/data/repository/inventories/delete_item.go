@@ -6,7 +6,7 @@ import (
 
 	"github.com/google/uuid"
 	postgres_pool "github.com/sqlmerr/astragalaxy/internal/data/postgres/pool"
-	core_errors "github.com/sqlmerr/astragalaxy/internal/errors"
+	errs "github.com/sqlmerr/astragalaxy/internal/errors"
 )
 
 func (r *InventoryRepositoryImpl) DeleteItem(ctx context.Context, id uuid.UUID) error {
@@ -20,9 +20,9 @@ func (r *InventoryRepositoryImpl) DeleteItem(ctx context.Context, id uuid.UUID) 
 	}
 
 	if rowsAffected == 0 {
-		return core_errors.NewWithCode(
-			core_errors.CodeItemNotFound,
-			fmt.Errorf("item with id='%s': %w", id, core_errors.ErrNotFound),
+		return errs.NewWithCode(
+			errs.CodeItemNotFound,
+			fmt.Errorf("item with id='%s': %w", id, errs.ErrNotFound),
 		)
 	}
 

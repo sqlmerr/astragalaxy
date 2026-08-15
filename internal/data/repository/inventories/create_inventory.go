@@ -4,9 +4,9 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/sqlmerr/astragalaxy/internal/data/model"
 	database "github.com/sqlmerr/astragalaxy/internal/data/postgres/database/sqlc"
 	postgres_pool "github.com/sqlmerr/astragalaxy/internal/data/postgres/pool"
+	"github.com/sqlmerr/astragalaxy/internal/model"
 )
 
 func (r *InventoryRepositoryImpl) CreateInventory(ctx context.Context, data CreateInventory) (model.Inventory, error) {

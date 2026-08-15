@@ -5,10 +5,10 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/sqlmerr/astragalaxy/internal/data/model"
 	database "github.com/sqlmerr/astragalaxy/internal/data/postgres/database/sqlc"
 	postgres_pool "github.com/sqlmerr/astragalaxy/internal/data/postgres/pool"
-	core_errors "github.com/sqlmerr/astragalaxy/internal/errors"
+	errs "github.com/sqlmerr/astragalaxy/internal/errors"
+	"github.com/sqlmerr/astragalaxy/internal/model"
 )
 
 func (r *InventoryRepositoryImpl) SaveInventory(ctx context.Context, data model.Inventory) (model.Inventory, error) {
@@ -26,9 +26,9 @@ func (r *InventoryRepositoryImpl) SaveInventory(ctx context.Context, data model.
 	err = postgres_pool.TranslateError(err)
 	if err != nil {
 		if errors.Is(err, postgres_pool.ErrNoRows) {
-			return model.Inventory{}, core_errors.NewWithCode(
-				core_errors.CodeInventoryNotFound,
-				fmt.Errorf("inventory with id='%s': %w", data.ID, core_errors.ErrNotFound),
+			return model.Inventory{}, errs.NewWithCode(
+				errs.CodeInventoryNotFound,
+				fmt.Errorf("inventory with id='%s': %w", data.ID, errs.ErrNotFound),
 			)
 		}
 		return model.Inventory{}, fmt.Errorf("update inventory: %w", err)

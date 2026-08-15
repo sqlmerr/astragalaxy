@@ -3,7 +3,7 @@ package resource_deposits_repository
 import (
 	"time"
 
-	"github.com/sqlmerr/astragalaxy/internal/data/model"
+	"github.com/sqlmerr/astragalaxy/internal/model"
 )
 
 type CreateResourceDeposit struct {

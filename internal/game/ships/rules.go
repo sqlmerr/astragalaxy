@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/sqlmerr/astragalaxy/internal/data/model"
-	core_errors "github.com/sqlmerr/astragalaxy/internal/errors"
+	errs "github.com/sqlmerr/astragalaxy/internal/errors"
 	"github.com/sqlmerr/astragalaxy/internal/game/worldgen"
+	"github.com/sqlmerr/astragalaxy/internal/model"
 )
 
 func RenameShip(ship model.Ship, name string) model.Ship {
@@ -25,9 +25,9 @@ func ChangeActiveShip(oldActiveShip *model.Ship, newActiveShip model.Ship) (mode
 
 func OrbitShip(ship model.Ship) (model.Ship, time.Duration, error) {
 	if ship.Status == model.ShipStatusOrbit {
-		return model.Ship{}, 0, core_errors.NewWithCode(
-			core_errors.CodeShipAlreadyInThisState,
-			fmt.Errorf("ship already orbitted: %w", core_errors.ErrUnprocessableEntity),
+		return model.Ship{}, 0, errs.NewWithCode(
+			errs.CodeShipAlreadyInThisState,
+			fmt.Errorf("ship already orbitted: %w", errs.ErrUnprocessableEntity),
 		)
 	}
 
@@ -39,9 +39,9 @@ func OrbitShip(ship model.Ship) (model.Ship, time.Duration, error) {
 
 func DockShip(ship model.Ship, system worldgen.System) (model.Ship, time.Duration, error) {
 	if ship.Status == model.ShipStatusDocked {
-		return model.Ship{}, 0, core_errors.NewWithCode(
-			core_errors.CodeShipAlreadyInThisState,
-			fmt.Errorf("ship already docked: %w", core_errors.ErrUnprocessableEntity),
+		return model.Ship{}, 0, errs.NewWithCode(
+			errs.CodeShipAlreadyInThisState,
+			fmt.Errorf("ship already docked: %w", errs.ErrUnprocessableEntity),
 		)
 	}
 
@@ -52,23 +52,23 @@ func DockShip(ship model.Ship, system worldgen.System) (model.Ship, time.Duratio
 			ship.Status = model.ShipStatusOrbit
 			ship.Location = model.ShipLocationNone
 			ship.LocationID = 0
-			return ship, 0, core_errors.NewWithCode(
-				core_errors.CodeAnomaly,
-				fmt.Errorf("something happenned to your location: %w", core_errors.ErrUnprocessableEntity),
+			return ship, 0, errs.NewWithCode(
+				errs.CodeAnomaly,
+				fmt.Errorf("something happenned to your location: %w", errs.ErrUnprocessableEntity),
 			)
 		}
 		if !waypoint.Dockable {
-			return model.Ship{}, 0, core_errors.NewWithCode(
-				core_errors.CodeCannotDock,
-				fmt.Errorf("can't dock ship here: %w", core_errors.ErrUnprocessableEntity),
+			return model.Ship{}, 0, errs.NewWithCode(
+				errs.CodeCannotDock,
+				fmt.Errorf("can't dock ship here: %w", errs.ErrUnprocessableEntity),
 			)
 		}
 	case model.ShipLocationPlanet:
 
 	default:
-		return model.Ship{}, 0, core_errors.NewWithCode(
-			core_errors.CodeCannotDock,
-			fmt.Errorf("can't dock ship here: %w", core_errors.ErrUnprocessableEntity),
+		return model.Ship{}, 0, errs.NewWithCode(
+			errs.CodeCannotDock,
+			fmt.Errorf("can't dock ship here: %w", errs.ErrUnprocessableEntity),
 		)
 	}
 	ship.Status = model.ShipStatusDocked

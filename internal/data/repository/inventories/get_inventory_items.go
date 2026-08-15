@@ -6,9 +6,9 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/samber/lo"
-	"github.com/sqlmerr/astragalaxy/internal/data/model"
 	database "github.com/sqlmerr/astragalaxy/internal/data/postgres/database/sqlc"
 	postgres_pool "github.com/sqlmerr/astragalaxy/internal/data/postgres/pool"
+	"github.com/sqlmerr/astragalaxy/internal/model"
 )
 
 func (r *InventoryRepositoryImpl) GetInventoryItems(ctx context.Context, inventoryID uuid.UUID) ([]model.Item, error) {

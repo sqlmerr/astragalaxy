@@ -3,9 +3,9 @@ package navigation_service
 import (
 	"testing"
 
-	"github.com/sqlmerr/astragalaxy/internal/data/model"
-	core_errors "github.com/sqlmerr/astragalaxy/internal/errors"
+	errs "github.com/sqlmerr/astragalaxy/internal/errors"
 	"github.com/sqlmerr/astragalaxy/internal/game/worldgen"
+	"github.com/sqlmerr/astragalaxy/internal/model"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -16,7 +16,7 @@ func TestNavigateWarp(t *testing.T) {
 		newSystem   worldgen.System
 		expectedErr bool
 		err         error
-		errCode     core_errors.ErrorCode
+		errCode     errs.ErrorCode
 	}
 
 	tests := []testCase{
@@ -40,8 +40,8 @@ func TestNavigateWarp(t *testing.T) {
 			},
 			newSystem:   worldgen.System{},
 			expectedErr: true,
-			err:         core_errors.ErrUnprocessableEntity,
-			errCode:     core_errors.CodeInvalidShipState,
+			err:         errs.ErrUnprocessableEntity,
+			errCode:     errs.CodeInvalidShipState,
 		},
 		{
 			name: "Invalid warp path",
@@ -55,8 +55,8 @@ func TestNavigateWarp(t *testing.T) {
 				Y: 10,
 			},
 			expectedErr: true,
-			err:         core_errors.ErrInvalidArgument,
-			errCode:     core_errors.CodeInvalidWarpPath,
+			err:         errs.ErrInvalidArgument,
+			errCode:     errs.CodeInvalidWarpPath,
 		},
 		{
 			name: "Already at destination",
@@ -70,8 +70,8 @@ func TestNavigateWarp(t *testing.T) {
 				Y: 10,
 			},
 			expectedErr: true,
-			err:         core_errors.ErrNotModified,
-			errCode:     core_errors.CodeAlreadyAtDestination,
+			err:         errs.ErrNotModified,
+			errCode:     errs.CodeAlreadyAtDestination,
 		},
 	}
 
@@ -81,7 +81,7 @@ func TestNavigateWarp(t *testing.T) {
 			if test.expectedErr {
 				assert.Error(t, err)
 				assert.ErrorIs(t, err, test.err)
-				var withCode core_errors.WithCode
+				var withCode errs.WithCode
 				if assert.ErrorAs(t, err, &withCode) {
 					assert.Equal(t, test.errCode, withCode.Code)
 				}
@@ -103,7 +103,7 @@ func TestNavigatePlanet(t *testing.T) {
 		orbitIndex  int
 		expectedErr bool
 		err         error
-		errCode     core_errors.ErrorCode
+		errCode     errs.ErrorCode
 	}
 
 	tests := []testCase{
@@ -135,8 +135,8 @@ func TestNavigatePlanet(t *testing.T) {
 			system:      worldgen.System{},
 			orbitIndex:  1,
 			expectedErr: true,
-			err:         core_errors.ErrUnprocessableEntity,
-			errCode:     core_errors.CodeInvalidShipState,
+			err:         errs.ErrUnprocessableEntity,
+			errCode:     errs.CodeInvalidShipState,
 		},
 		{
 			name: "Invalid coordinates",
@@ -146,8 +146,8 @@ func TestNavigatePlanet(t *testing.T) {
 			system:      worldgen.System{},
 			orbitIndex:  1,
 			expectedErr: true,
-			err:         core_errors.ErrNotFound,
-			errCode:     core_errors.CodeInvalidCoordinates,
+			err:         errs.ErrNotFound,
+			errCode:     errs.CodeInvalidCoordinates,
 		},
 		{
 			name: "Already at destination",
@@ -159,8 +159,8 @@ func TestNavigatePlanet(t *testing.T) {
 			system:      worldgen.System{},
 			orbitIndex:  1,
 			expectedErr: true,
-			err:         core_errors.ErrNotModified,
-			errCode:     core_errors.CodeAlreadyAtDestination,
+			err:         errs.ErrNotModified,
+			errCode:     errs.CodeAlreadyAtDestination,
 		},
 	}
 
@@ -170,7 +170,7 @@ func TestNavigatePlanet(t *testing.T) {
 			if test.expectedErr {
 				assert.Error(t, err)
 				assert.ErrorIs(t, err, test.err)
-				var withCode core_errors.WithCode
+				var withCode errs.WithCode
 				if assert.ErrorAs(t, err, &withCode) {
 					assert.Equal(t, test.errCode, withCode.Code)
 				}
@@ -192,7 +192,7 @@ func TestNavigateWaypoint(t *testing.T) {
 		waypointID  int
 		expectedErr bool
 		err         error
-		errCode     core_errors.ErrorCode
+		errCode     errs.ErrorCode
 	}
 
 	tests := []testCase{
@@ -220,8 +220,8 @@ func TestNavigateWaypoint(t *testing.T) {
 			system:      worldgen.System{},
 			waypointID:  0,
 			expectedErr: true,
-			err:         core_errors.ErrUnprocessableEntity,
-			errCode:     core_errors.CodeInvalidShipState,
+			err:         errs.ErrUnprocessableEntity,
+			errCode:     errs.CodeInvalidShipState,
 		},
 		{
 			name: "Invalid coordinates",
@@ -231,8 +231,8 @@ func TestNavigateWaypoint(t *testing.T) {
 			system:      worldgen.System{},
 			waypointID:  0,
 			expectedErr: true,
-			err:         core_errors.ErrNotFound,
-			errCode:     core_errors.CodeInvalidCoordinates,
+			err:         errs.ErrNotFound,
+			errCode:     errs.CodeInvalidCoordinates,
 		},
 		{
 			name: "Already at destination",
@@ -244,8 +244,8 @@ func TestNavigateWaypoint(t *testing.T) {
 			system:      worldgen.System{},
 			waypointID:  0,
 			expectedErr: true,
-			err:         core_errors.ErrNotModified,
-			errCode:     core_errors.CodeAlreadyAtDestination,
+			err:         errs.ErrNotModified,
+			errCode:     errs.CodeAlreadyAtDestination,
 		},
 	}
 
@@ -255,7 +255,7 @@ func TestNavigateWaypoint(t *testing.T) {
 			if test.expectedErr {
 				assert.Error(t, err)
 				assert.ErrorIs(t, err, test.err)
-				var withCode core_errors.WithCode
+				var withCode errs.WithCode
 				if assert.ErrorAs(t, err, &withCode) {
 					assert.Equal(t, test.errCode, withCode.Code)
 				}

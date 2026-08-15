@@ -6,9 +6,9 @@ import (
 	"fmt"
 
 	"github.com/google/uuid"
-	"github.com/sqlmerr/astragalaxy/internal/data/model"
 	postgres_pool "github.com/sqlmerr/astragalaxy/internal/data/postgres/pool"
-	core_errors "github.com/sqlmerr/astragalaxy/internal/errors"
+	errs "github.com/sqlmerr/astragalaxy/internal/errors"
+	"github.com/sqlmerr/astragalaxy/internal/model"
 )
 
 func (r *InventoryRepositoryImpl) GetItem(ctx context.Context, id uuid.UUID) (model.Item, error) {
@@ -19,8 +19,8 @@ func (r *InventoryRepositoryImpl) GetItem(ctx context.Context, id uuid.UUID) (mo
 	err = postgres_pool.TranslateError(err)
 	if err != nil {
 		if errors.Is(err, postgres_pool.ErrNoRows) {
-			return model.Item{}, core_errors.NewWithCode(core_errors.CodeItemNotFound, fmt.Errorf(
-				"item with id='%s: %w'", id, core_errors.ErrNotFound,
+			return model.Item{}, errs.NewWithCode(errs.CodeItemNotFound, fmt.Errorf(
+				"item with id='%s: %w'", id, errs.ErrNotFound,
 			))
 		}
 

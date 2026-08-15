@@ -4,8 +4,8 @@ import (
 	"math/rand"
 	"strings"
 
-	"github.com/sqlmerr/astragalaxy/internal/data/model"
 	"github.com/sqlmerr/astragalaxy/internal/data/registry"
+	"github.com/sqlmerr/astragalaxy/internal/model"
 )
 
 func generatePlanet(gameData *registry.GameData, orbitIndex int, rng *rand.Rand, weights PlanetWeights, archetype SystemArchetype) Planet {

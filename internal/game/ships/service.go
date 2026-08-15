@@ -7,12 +7,14 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/sqlmerr/astragalaxy/internal/data"
-	"github.com/sqlmerr/astragalaxy/internal/data/model"
 	cooldowns_repository "github.com/sqlmerr/astragalaxy/internal/data/repository/cooldowns"
-	core_errors "github.com/sqlmerr/astragalaxy/internal/errors"
+	inventories_repository "github.com/sqlmerr/astragalaxy/internal/data/repository/inventories"
+	ships_repository "github.com/sqlmerr/astragalaxy/internal/data/repository/ships"
+	errs "github.com/sqlmerr/astragalaxy/internal/errors"
 	"github.com/sqlmerr/astragalaxy/internal/game"
 	"github.com/sqlmerr/astragalaxy/internal/game/worldgen"
 	core_logger "github.com/sqlmerr/astragalaxy/internal/logger"
+	"github.com/sqlmerr/astragalaxy/internal/model"
 	"go.uber.org/zap"
 )
 
@@ -53,9 +55,9 @@ func (s *ShipsService) RenameShip(ctx context.Context, agentID uuid.UUID, shipID
 	}
 
 	if ship.AgentID != agentID {
-		return model.Ship{}, core_errors.NewWithCode(
-			core_errors.CodeAccessDenied,
-			fmt.Errorf("this ship does not belong to agent: %w", core_errors.ErrAccessDenied),
+		return model.Ship{}, errs.NewWithCode(
+			errs.CodeAccessDenied,
+			fmt.Errorf("this ship does not belong to agent: %w", errs.ErrAccessDenied),
 		)
 	}
 	ship = RenameShip(ship, newShipName)
@@ -73,7 +75,7 @@ func (s *ShipsService) ChangeActiveShip(ctx context.Context, agentID uuid.UUID, 
 		oldActiveShip, oldActiveErr := tx.Ships().GetActiveShipByAgent(ctx, agentID)
 		var oldActiveShipToSave *model.Ship
 		if oldActiveErr != nil {
-			if !errors.Is(oldActiveErr, core_errors.ErrNotFound) {
+			if !errors.Is(oldActiveErr, errs.ErrNotFound) {
 				return fmt.Errorf("get active ship: %w", oldActiveErr)
 			}
 			log := core_logger.TryFromContext(ctx)
@@ -89,9 +91,9 @@ func (s *ShipsService) ChangeActiveShip(ctx context.Context, agentID uuid.UUID, 
 		}
 
 		if newActiveShip.AgentID != agentID {
-			return core_errors.NewWithCode(
-				core_errors.CodeAccessDenied,
-				fmt.Errorf("new active ship does not belong to agent: %w", core_errors.ErrAccessDenied),
+			return errs.NewWithCode(
+				errs.CodeAccessDenied,
+				fmt.Errorf("new active ship does not belong to agent: %w", errs.ErrAccessDenied),
 			)
 		}
 		newActiveShip, oldActiveShipToSave = ChangeActiveShip(oldActiveShipToSave, newActiveShip)
@@ -165,20 +167,20 @@ func (s *ShipsService) DockShip(ctx context.Context, agentID uuid.UUID) (model.C
 
 	system, exists := s.worldGen.GenerateSystemByCoords(ship.SystemX, ship.SystemY)
 	if !exists {
-		return model.Cooldown{}, core_errors.NewWithCode(
-			core_errors.CodeAnomaly,
+		return model.Cooldown{}, errs.NewWithCode(
+			errs.CodeAnomaly,
 			fmt.Errorf(
 				"system x=%d y=%d doesn't exist: %w",
 				ship.SystemX,
 				ship.SystemY,
-				core_errors.ErrNotFound,
+				errs.ErrNotFound,
 			),
 		)
 	}
 
 	ship, cooldownDuration, err := DockShip(ship, *system)
 	if err != nil {
-		if core_errors.IsCode(err, core_errors.CodeAnomaly) {
+		if errs.IsCode(err, errs.CodeAnomaly) {
 			_, err = s.store.Ships().SaveShip(ctx, ship)
 			if err != nil {
 				return model.Cooldown{}, fmt.Errorf("save ship: %w", err)
@@ -214,9 +216,9 @@ func (s *ShipsService) GetShipModules(ctx context.Context, agentID uuid.UUID, sh
 	}
 
 	if ship.AgentID != agentID {
-		return nil, core_errors.NewWithCode(
-			core_errors.CodeAccessDenied,
-			fmt.Errorf("cannot access ship with id='%s': %w", shipID, core_errors.ErrAccessDenied),
+		return nil, errs.NewWithCode(
+			errs.CodeAccessDenied,
+			fmt.Errorf("cannot access ship with id='%s': %w", shipID, errs.ErrAccessDenied),
 		)
 	}
 
@@ -226,4 +228,54 @@ func (s *ShipsService) GetShipModules(ctx context.Context, agentID uuid.UUID, sh
 	}
 
 	return modules, nil
+}
+
+func (s *ShipsService) CreateShip(ctx context.Context, agentID uuid.UUID, shipType model.ShipType) (model.Ship, error) {
+	spawnSystem, err := s.worldGen.FindSpawnSystem()
+	if err != nil {
+		return model.Ship{}, fmt.Errorf("find spawn system: %w", err)
+	}
+	spawnWaypoint := spawnSystem.FindWaypointsByType(worldgen.WaypointStation)[0]
+
+	var ship model.Ship
+	err = s.store.ExecTx(ctx, func(tx data.Store) error {
+		shipInventory, err := tx.Inventories().CreateInventory(ctx, inventories_repository.CreateInventory{
+			MaxItemSlots:      15,
+			MaxResourceVolume: 3000,
+		})
+		if err != nil {
+			return fmt.Errorf("create ship inventory: %w", err)
+		}
+		ship, err = tx.Ships().CreateShip(ctx, ships_repository.CreateShip{
+			AgentID:     agentID,
+			Type:        shipType,
+			Active:      true,
+			SystemX:     spawnSystem.X,
+			SystemY:     spawnSystem.Y,
+			Status:      model.ShipStatusDocked,
+			Name:        "ship",
+			InventoryID: shipInventory.ID,
+			Location:    model.ShipLocationWaypoint,
+			LocationID:  spawnWaypoint.ID,
+		})
+		if err != nil {
+			return fmt.Errorf("create ship: %w", err)
+		}
+
+		_, err = tx.Ships().CreateShipModule(ctx, ships_repository.CreateShipModule{
+			Type:   model.ShipModulePortablePrinter,
+			ShipID: ship.ID,
+		})
+		if err != nil {
+			return fmt.Errorf("create ship `portable_printer` module: %w", err)
+		}
+
+		return nil
+	})
+
+	if err != nil {
+		return model.Ship{}, err
+	}
+
+	return ship, nil
 }

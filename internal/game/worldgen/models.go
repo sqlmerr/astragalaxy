@@ -4,8 +4,8 @@ import (
 	"slices"
 
 	"github.com/samber/lo"
-	"github.com/sqlmerr/astragalaxy/internal/data/model"
 	"github.com/sqlmerr/astragalaxy/internal/data/registry"
+	"github.com/sqlmerr/astragalaxy/internal/model"
 )
 
 type PlanetType string

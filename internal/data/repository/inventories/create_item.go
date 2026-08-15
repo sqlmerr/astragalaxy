@@ -5,10 +5,10 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/sqlmerr/astragalaxy/internal/data/model"
 	database "github.com/sqlmerr/astragalaxy/internal/data/postgres/database/sqlc"
 	postgres_pool "github.com/sqlmerr/astragalaxy/internal/data/postgres/pool"
-	core_errors "github.com/sqlmerr/astragalaxy/internal/errors"
+	errs "github.com/sqlmerr/astragalaxy/internal/errors"
+	"github.com/sqlmerr/astragalaxy/internal/model"
 )
 
 func (r *InventoryRepositoryImpl) CreateItem(ctx context.Context, data CreateItem) (model.Item, error) {
@@ -23,11 +23,11 @@ func (r *InventoryRepositoryImpl) CreateItem(ctx context.Context, data CreateIte
 	err = postgres_pool.TranslateError(err)
 	if err != nil {
 		if errors.Is(err, postgres_pool.ErrViolatesForeignKey) {
-			return model.Item{}, core_errors.NewWithCode(
-				core_errors.CodeInventoryNotFound, fmt.Errorf(
+			return model.Item{}, errs.NewWithCode(
+				errs.CodeInventoryNotFound, fmt.Errorf(
 					"inventory with id='%s': %w",
 					data.InventoryID,
-					core_errors.ErrNotFound,
+					errs.ErrNotFound,
 				),
 			)
 		}

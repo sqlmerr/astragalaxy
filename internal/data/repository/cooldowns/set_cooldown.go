@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/sqlmerr/astragalaxy/internal/data/model"
+	"github.com/sqlmerr/astragalaxy/internal/model"
 )
 
 func (r *CooldownRepositoryImpl) SetCooldown(ctx context.Context, data SetCooldown) (model.Cooldown, error) {

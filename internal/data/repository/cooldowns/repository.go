@@ -5,8 +5,8 @@ import (
 	"fmt"
 
 	"github.com/google/uuid"
-	"github.com/sqlmerr/astragalaxy/internal/data/model"
 	"github.com/sqlmerr/astragalaxy/internal/data/redis"
+	"github.com/sqlmerr/astragalaxy/internal/model"
 )
 
 type CooldownRepository interface {

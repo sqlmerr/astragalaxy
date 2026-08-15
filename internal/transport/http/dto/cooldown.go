@@ -3,7 +3,7 @@ package http_dto
 import (
 	"time"
 
-	"github.com/sqlmerr/astragalaxy/internal/data/model"
+	"github.com/sqlmerr/astragalaxy/internal/model"
 )
 
 type CooldownDTO struct {

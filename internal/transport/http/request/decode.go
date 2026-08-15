@@ -6,7 +6,7 @@ import (
 	"net/http"
 
 	"github.com/go-playground/validator/v10"
-	core_errors "github.com/sqlmerr/astragalaxy/internal/errors"
+	errs "github.com/sqlmerr/astragalaxy/internal/errors"
 )
 
 var requestValidator = validator.New()
@@ -17,7 +17,7 @@ type validatable interface {
 
 func DecodeAndValidateRequest(r *http.Request, dest any) error {
 	if err := json.NewDecoder(r.Body).Decode(dest); err != nil {
-		return core_errors.NewWithCode(core_errors.CodeDecodeError, fmt.Errorf("decode json: %w: %w", core_errors.ErrInvalidArgument, err))
+		return errs.NewWithCode(errs.CodeDecodeError, fmt.Errorf("decode json: %w: %w", errs.ErrInvalidArgument, err))
 	}
 
 	var err error
@@ -29,7 +29,7 @@ func DecodeAndValidateRequest(r *http.Request, dest any) error {
 	}
 
 	if err != nil {
-		return core_errors.NewWithCode(core_errors.CodeValidationError, fmt.Errorf("request validation: %w: %w", core_errors.ErrInvalidArgument, err))
+		return errs.NewWithCode(errs.CodeValidationError, fmt.Errorf("request validation: %w: %w", errs.ErrInvalidArgument, err))
 	}
 
 	return nil

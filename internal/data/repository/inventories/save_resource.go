@@ -5,10 +5,10 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/sqlmerr/astragalaxy/internal/data/model"
 	database "github.com/sqlmerr/astragalaxy/internal/data/postgres/database/sqlc"
 	postgres_pool "github.com/sqlmerr/astragalaxy/internal/data/postgres/pool"
-	core_errors "github.com/sqlmerr/astragalaxy/internal/errors"
+	errs "github.com/sqlmerr/astragalaxy/internal/errors"
+	"github.com/sqlmerr/astragalaxy/internal/model"
 )
 
 func (r *InventoryRepositoryImpl) SaveResource(ctx context.Context, data model.Resource) (model.Resource, error) {
@@ -23,7 +23,7 @@ func (r *InventoryRepositoryImpl) SaveResource(ctx context.Context, data model.R
 	err = postgres_pool.TranslateError(err)
 	if err != nil {
 		if errors.Is(err, postgres_pool.ErrNoRows) {
-			return model.Resource{}, core_errors.NewWithCode(core_errors.CodeResourceNotFound, fmt.Errorf(
+			return model.Resource{}, errs.NewWithCode(errs.CodeResourceNotFound, fmt.Errorf(
 				"resource with type='%s' in inventory with id='%s': %w",
 				data.ResourceType, data.InventoryID, err,
 			))

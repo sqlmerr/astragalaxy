@@ -5,10 +5,10 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/sqlmerr/astragalaxy/internal/data/model"
 	database "github.com/sqlmerr/astragalaxy/internal/data/postgres/database/sqlc"
 	postgres_pool "github.com/sqlmerr/astragalaxy/internal/data/postgres/pool"
-	core_errors "github.com/sqlmerr/astragalaxy/internal/errors"
+	errs "github.com/sqlmerr/astragalaxy/internal/errors"
+	"github.com/sqlmerr/astragalaxy/internal/model"
 )
 
 func (r *AgentRepositoryImpl) CreateAgent(ctx context.Context, data CreateAgent) (model.Agent, error) {
@@ -26,12 +26,12 @@ func (r *AgentRepositoryImpl) CreateAgent(ctx context.Context, data CreateAgent)
 
 	if err != nil {
 		if errors.Is(err, postgres_pool.ErrViolatesForeignKey) {
-			return model.Agent{}, core_errors.NewWithCode(
-				core_errors.CodeUserNotFound,
+			return model.Agent{}, errs.NewWithCode(
+				errs.CodeUserNotFound,
 				fmt.Errorf(
 					"user with id='%s': %w",
 					data.UserID,
-					core_errors.ErrNotFound,
+					errs.ErrNotFound,
 				),
 			)
 		}

@@ -105,9 +105,9 @@ func main() {
 
 	usersService := users_service.New(store)
 	authService := core_auth.NewService(store, *jwtProcessor)
-	agentsService := agents_service.New(store, *worldGen)
-	cooldownsService := cooldowns_service.New(gameConfig, store)
 	shipsService := ships_service.New(gameConfig, store, *worldGen)
+	agentsService := agents_service.New(store, *worldGen, shipsService)
+	cooldownsService := cooldowns_service.New(gameConfig, store)
 	inventoryService := inventory_service.New(gameConfig, store)
 	navigationService := navigation_service.New(gameConfig, store, *worldGen)
 	galaxyService := galaxy_service.New(store, *worldGen)

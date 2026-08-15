@@ -1,8 +1,8 @@
 package users_repository
 
 import (
-	"github.com/sqlmerr/astragalaxy/internal/data/model"
 	database "github.com/sqlmerr/astragalaxy/internal/data/postgres/database/sqlc"
+	"github.com/sqlmerr/astragalaxy/internal/model"
 )
 
 type CreateUser struct {

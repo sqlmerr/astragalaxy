@@ -6,9 +6,9 @@ import (
 	"time"
 
 	"github.com/google/uuid"
-	"github.com/sqlmerr/astragalaxy/internal/data/model"
 	ships_repository "github.com/sqlmerr/astragalaxy/internal/data/repository/ships"
-	core_errors "github.com/sqlmerr/astragalaxy/internal/errors"
+	errs "github.com/sqlmerr/astragalaxy/internal/errors"
+	"github.com/sqlmerr/astragalaxy/internal/model"
 )
 
 // UsePortableSmelter equips portable smelter module to agents active ship
@@ -27,9 +27,9 @@ func UsePortableSmelter(ctx ActionContext, agentID uuid.UUID, item model.Item) (
 	if slices.ContainsFunc(modules, func(e model.ShipModule) bool {
 		return e.Type == model.ShipModulePortableSmelter
 	}) {
-		return nil, core_errors.NewWithCode(
-			core_errors.CodeShipModuleAlreadyInstalled,
-			fmt.Errorf("this ship module is already installed: %w", core_errors.ErrUnprocessableEntity),
+		return nil, errs.NewWithCode(
+			errs.CodeShipModuleAlreadyInstalled,
+			fmt.Errorf("this ship module is already installed: %w", errs.ErrUnprocessableEntity),
 		)
 	}
 

@@ -6,9 +6,9 @@ import (
 	"fmt"
 
 	"github.com/sqlmerr/astragalaxy/internal/data"
-	"github.com/sqlmerr/astragalaxy/internal/data/model"
 	users_repository "github.com/sqlmerr/astragalaxy/internal/data/repository/users"
-	core_errors "github.com/sqlmerr/astragalaxy/internal/errors"
+	errs "github.com/sqlmerr/astragalaxy/internal/errors"
+	"github.com/sqlmerr/astragalaxy/internal/model"
 )
 
 type AuthService struct {
@@ -25,15 +25,15 @@ func NewService(store data.Store, jwtProcessor JWTProcessor) *AuthService {
 func (s *AuthService) RegisterUser(ctx context.Context, username, password string) (model.User, error) {
 	userExists, err := s.store.Users().UserExistsByUsername(ctx, username)
 	if err != nil {
-		return model.User{}, core_errors.ErrInternal
+		return model.User{}, errs.ErrInternal
 	}
 
 	// TODO: username format check
 
 	if userExists {
-		return model.User{}, core_errors.NewWithCode(
-			core_errors.CodeUserUsernameAlreadyOccupied,
-			fmt.Errorf("username='%s' already occupied: %w", username, core_errors.ErrConflict),
+		return model.User{}, errs.NewWithCode(
+			errs.CodeUserUsernameAlreadyOccupied,
+			fmt.Errorf("username='%s' already occupied: %w", username, errs.ErrConflict),
 		)
 	}
 
@@ -57,19 +57,19 @@ func (s *AuthService) RegisterUser(ctx context.Context, username, password strin
 func (s *AuthService) LoginUser(ctx context.Context, username, password string) (string, error) {
 	user, err := s.store.Users().GetUserByUsername(ctx, username)
 	if err != nil {
-		if errors.Is(err, core_errors.ErrNotFound) {
-			return "", core_errors.NewWithCode(
-				core_errors.CodeInvalidCredentials,
-				fmt.Errorf("invalid credentials: %w", core_errors.ErrUnauthorized),
+		if errors.Is(err, errs.ErrNotFound) {
+			return "", errs.NewWithCode(
+				errs.CodeInvalidCredentials,
+				fmt.Errorf("invalid credentials: %w", errs.ErrUnauthorized),
 			)
 		}
 		return "", fmt.Errorf("get user: %w", err)
 	}
 
 	if err := ComparePassword(user.Password, password); err != nil { // TODO: add interface PasswordHasher
-		return "", core_errors.NewWithCode(
-			core_errors.CodeInvalidCredentials,
-			fmt.Errorf("invalid credentials: %w", core_errors.ErrUnauthorized),
+		return "", errs.NewWithCode(
+			errs.CodeInvalidCredentials,
+			fmt.Errorf("invalid credentials: %w", errs.ErrUnauthorized),
 		)
 	}
 

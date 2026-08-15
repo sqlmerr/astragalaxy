@@ -6,9 +6,9 @@ import (
 	"fmt"
 
 	"github.com/google/uuid"
-	"github.com/sqlmerr/astragalaxy/internal/data/model"
 	postgres_pool "github.com/sqlmerr/astragalaxy/internal/data/postgres/pool"
-	core_errors "github.com/sqlmerr/astragalaxy/internal/errors"
+	errs "github.com/sqlmerr/astragalaxy/internal/errors"
+	"github.com/sqlmerr/astragalaxy/internal/model"
 )
 
 func (r *ShipRepositoryImpl) GetActiveShipByAgent(ctx context.Context, agentID uuid.UUID) (model.Ship, error) {
@@ -20,7 +20,7 @@ func (r *ShipRepositoryImpl) GetActiveShipByAgent(ctx context.Context, agentID u
 
 	if err != nil {
 		if errors.Is(err, postgres_pool.ErrNoRows) {
-			return model.Ship{}, core_errors.NewWithCode(core_errors.CodeShipNotFound, fmt.Errorf("ship: %w", core_errors.ErrNotFound))
+			return model.Ship{}, errs.NewWithCode(errs.CodeShipNotFound, fmt.Errorf("ship: %w", errs.ErrNotFound))
 		}
 
 		return model.Ship{}, fmt.Errorf("scan: %w", err)

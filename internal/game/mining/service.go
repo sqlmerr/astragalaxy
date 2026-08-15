@@ -7,13 +7,13 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/sqlmerr/astragalaxy/internal/data"
-	"github.com/sqlmerr/astragalaxy/internal/data/model"
 	cooldowns_repository "github.com/sqlmerr/astragalaxy/internal/data/repository/cooldowns"
 	inventories_repository "github.com/sqlmerr/astragalaxy/internal/data/repository/inventories"
 	resource_deposits_repository "github.com/sqlmerr/astragalaxy/internal/data/repository/resource_deposits"
-	core_errors "github.com/sqlmerr/astragalaxy/internal/errors"
+	errs "github.com/sqlmerr/astragalaxy/internal/errors"
 	"github.com/sqlmerr/astragalaxy/internal/game"
 	"github.com/sqlmerr/astragalaxy/internal/game/worldgen"
+	"github.com/sqlmerr/astragalaxy/internal/model"
 )
 
 type MiningService struct {
@@ -40,31 +40,31 @@ func (s *MiningService) MineAsteroid(ctx context.Context, agentID uuid.UUID, amo
 
 	system, exists := s.worldGen.GenerateSystemByCoords(ship.SystemX, ship.SystemY)
 	if !exists {
-		return model.Cooldown{}, core_errors.NewWithCode(
-			core_errors.CodeAnomaly,
-			fmt.Errorf("your system doesn't exist: %w", core_errors.ErrUnprocessableEntity),
+		return model.Cooldown{}, errs.NewWithCode(
+			errs.CodeAnomaly,
+			fmt.Errorf("your system doesn't exist: %w", errs.ErrUnprocessableEntity),
 		)
 	}
 
 	if ship.Location != model.ShipLocationWaypoint {
-		return model.Cooldown{}, core_errors.NewWithCode(
-			core_errors.CodeInvalidLocation,
-			fmt.Errorf("`Location` must be 'WAYPOINT': %w", core_errors.ErrUnprocessableEntity),
+		return model.Cooldown{}, errs.NewWithCode(
+			errs.CodeInvalidLocation,
+			fmt.Errorf("`Location` must be 'WAYPOINT': %w", errs.ErrUnprocessableEntity),
 		)
 	}
 
 	waypoint := system.FindWaypointByID(ship.LocationID)
 	if waypoint == nil {
-		return model.Cooldown{}, core_errors.NewWithCode(
-			core_errors.CodeAnomaly,
-			fmt.Errorf("waypoint with id='%d': %w", ship.LocationID, core_errors.ErrNotFound),
+		return model.Cooldown{}, errs.NewWithCode(
+			errs.CodeAnomaly,
+			fmt.Errorf("waypoint with id='%d': %w", ship.LocationID, errs.ErrNotFound),
 		)
 	}
 
 	if waypoint.Type != worldgen.WaypointAsteroid {
-		return model.Cooldown{}, core_errors.NewWithCode(
-			core_errors.CodeInvalidLocation,
-			fmt.Errorf("waypoint type must be 'ASTEROID': %w", core_errors.ErrUnprocessableEntity),
+		return model.Cooldown{}, errs.NewWithCode(
+			errs.CodeInvalidLocation,
+			fmt.Errorf("waypoint type must be 'ASTEROID': %w", errs.ErrUnprocessableEntity),
 		)
 	}
 
@@ -76,7 +76,7 @@ func (s *MiningService) MineAsteroid(ctx context.Context, agentID uuid.UUID, amo
 		ResourceType: waypoint.Asteroid.Deposit.Resource,
 	})
 	if err != nil {
-		if !errors.Is(err, core_errors.ErrNotFound) {
+		if !errors.Is(err, errs.ErrNotFound) {
 			return model.Cooldown{}, fmt.Errorf("get deposit: %w", err)
 		}
 		deposit = model.ResourceDeposit{
@@ -97,7 +97,7 @@ func (s *MiningService) MineAsteroid(ctx context.Context, agentID uuid.UUID, amo
 	inventoryResource, err := s.store.Inventories().GetResource(ctx, ship.InventoryID, waypoint.Asteroid.Deposit.Resource)
 	resourceExists := true
 	if err != nil {
-		if !errors.Is(err, core_errors.ErrNotFound) {
+		if !errors.Is(err, errs.ErrNotFound) {
 			return model.Cooldown{}, fmt.Errorf("get inventory resource: %w", err)
 		}
 		resourceExists = false
@@ -177,31 +177,31 @@ func (s *MiningService) MinePlanet(ctx context.Context, agentID uuid.UUID, resou
 
 	system, exists := s.worldGen.GenerateSystemByCoords(ship.SystemX, ship.SystemY)
 	if !exists {
-		return model.Cooldown{}, core_errors.NewWithCode(
-			core_errors.CodeAnomaly,
-			fmt.Errorf("your system doesn't exist: %w", core_errors.ErrUnprocessableEntity),
+		return model.Cooldown{}, errs.NewWithCode(
+			errs.CodeAnomaly,
+			fmt.Errorf("your system doesn't exist: %w", errs.ErrUnprocessableEntity),
 		)
 	}
 
 	if ship.Location != model.ShipLocationPlanet {
-		return model.Cooldown{}, core_errors.NewWithCode(
-			core_errors.CodeInvalidLocation,
-			fmt.Errorf("`Location` must be 'PLANET': %w", core_errors.ErrUnprocessableEntity),
+		return model.Cooldown{}, errs.NewWithCode(
+			errs.CodeInvalidLocation,
+			fmt.Errorf("`Location` must be 'PLANET': %w", errs.ErrUnprocessableEntity),
 		)
 	}
 
 	if ship.Status != model.ShipStatusDocked {
-		return model.Cooldown{}, core_errors.NewWithCode(
-			core_errors.CodeInvalidShipState,
-			fmt.Errorf("ship must be docked: %w", core_errors.ErrUnprocessableEntity),
+		return model.Cooldown{}, errs.NewWithCode(
+			errs.CodeInvalidShipState,
+			fmt.Errorf("ship must be docked: %w", errs.ErrUnprocessableEntity),
 		)
 	}
 
 	planet := system.FindPlanetByOrbit(ship.LocationID)
 	if planet == nil {
-		return model.Cooldown{}, core_errors.NewWithCode(
-			core_errors.CodeAnomaly,
-			fmt.Errorf("planet with id='%d': %w", ship.LocationID, core_errors.ErrNotFound),
+		return model.Cooldown{}, errs.NewWithCode(
+			errs.CodeAnomaly,
+			fmt.Errorf("planet with id='%d': %w", ship.LocationID, errs.ErrNotFound),
 		)
 	}
 
@@ -215,9 +215,9 @@ func (s *MiningService) MinePlanet(ctx context.Context, agentID uuid.UUID, resou
 		}
 	}
 	if !flag {
-		return model.Cooldown{}, core_errors.NewWithCode(
-			core_errors.CodeResourceDepositNotFound,
-			fmt.Errorf("resource type=%s deposit: %w", resourceType, core_errors.ErrNotFound),
+		return model.Cooldown{}, errs.NewWithCode(
+			errs.CodeResourceDepositNotFound,
+			fmt.Errorf("resource type=%s deposit: %w", resourceType, errs.ErrNotFound),
 		)
 	}
 
@@ -229,7 +229,7 @@ func (s *MiningService) MinePlanet(ctx context.Context, agentID uuid.UUID, resou
 		ResourceType: deposit.Resource,
 	})
 	if err != nil {
-		if !errors.Is(err, core_errors.ErrNotFound) {
+		if !errors.Is(err, errs.ErrNotFound) {
 			return model.Cooldown{}, fmt.Errorf("get deposit: %w", err)
 		}
 		depositData = model.ResourceDeposit{
@@ -250,7 +250,7 @@ func (s *MiningService) MinePlanet(ctx context.Context, agentID uuid.UUID, resou
 	inventoryResource, err := s.store.Inventories().GetResource(ctx, ship.InventoryID, deposit.Resource)
 	resourceExists := true
 	if err != nil {
-		if !errors.Is(err, core_errors.ErrNotFound) {
+		if !errors.Is(err, errs.ErrNotFound) {
 			return model.Cooldown{}, fmt.Errorf("get inventory resource: %w", err)
 		}
 		resourceExists = false

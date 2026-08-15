@@ -6,9 +6,9 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/sqlmerr/astragalaxy/internal/data"
-	"github.com/sqlmerr/astragalaxy/internal/data/model"
-	core_errors "github.com/sqlmerr/astragalaxy/internal/errors"
+	errs "github.com/sqlmerr/astragalaxy/internal/errors"
 	"github.com/sqlmerr/astragalaxy/internal/game/worldgen"
+	"github.com/sqlmerr/astragalaxy/internal/model"
 )
 
 type GalaxyService struct {
@@ -44,13 +44,13 @@ func (s *GalaxyService) GetCurrentAgentSystem(ctx context.Context, agentID uuid.
 
 	system, exists := s.worldGen.GenerateSystemByCoords(ship.SystemX, ship.SystemY)
 	if !exists {
-		return FullSystem{}, core_errors.NewWithCode(
-			core_errors.CodeAnomaly,
+		return FullSystem{}, errs.NewWithCode(
+			errs.CodeAnomaly,
 			fmt.Errorf(
 				"something happened to system with x=%d y=%d: %w",
 				ship.SystemX,
 				ship.SystemY,
-				core_errors.ErrUnprocessableEntity,
+				errs.ErrUnprocessableEntity,
 			),
 		)
 	}

@@ -9,7 +9,7 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/redis/go-redis/v9"
-	core_errors "github.com/sqlmerr/astragalaxy/internal/errors"
+	errs "github.com/sqlmerr/astragalaxy/internal/errors"
 )
 
 func (r *CooldownRepositoryImpl) CheckCooldown(ctx context.Context, agentID uuid.UUID) error {
@@ -29,12 +29,12 @@ func (r *CooldownRepositoryImpl) CheckCooldown(ctx context.Context, agentID uuid
 
 	timeLeft := time.Until(c.SetAt.Add(c.Duration))
 	if timeLeft > 0 {
-		return core_errors.NewWithCode(
-			core_errors.CodeAgentInCooldown,
+		return errs.NewWithCode(
+			errs.CodeAgentInCooldown,
 			fmt.Errorf(
 				"cooldown %.0fs left: %w",
 				timeLeft.Seconds(),
-				core_errors.ErrUnprocessableEntity,
+				errs.ErrUnprocessableEntity,
 			),
 		)
 	}

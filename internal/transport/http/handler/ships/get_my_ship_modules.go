@@ -5,8 +5,8 @@ import (
 
 	"github.com/samber/lo"
 	core_auth "github.com/sqlmerr/astragalaxy/internal/auth"
-	"github.com/sqlmerr/astragalaxy/internal/data/model"
 	core_logger "github.com/sqlmerr/astragalaxy/internal/logger"
+	"github.com/sqlmerr/astragalaxy/internal/model"
 	http_response "github.com/sqlmerr/astragalaxy/internal/transport/http/response"
 	http_utils "github.com/sqlmerr/astragalaxy/internal/transport/http/utils"
 )
