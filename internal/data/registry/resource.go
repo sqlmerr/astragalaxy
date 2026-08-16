@@ -20,6 +20,12 @@ type Resource struct {
 	WorldGen map[string]ResourceWorldGenParams `json:"worldgen"`
 }
 
+func (r *Resource) Normalize() {
+	if r.Tags == nil {
+		r.Tags = []string{}
+	}
+}
+
 type ResourceRegistry struct {
 	resources []Resource
 }
@@ -39,8 +45,13 @@ func (r *ResourceRegistry) Load(cfg Config) error {
 	if err != nil {
 		return fmt.Errorf("unmarshal data: %w", err)
 	}
+	var normalizedResources []Resource
+	for _, r := range resources {
+		r.Normalize()
+		normalizedResources = append(normalizedResources, r)
+	}
 
-	r.resources = resources
+	r.resources = normalizedResources
 	return nil
 }
 

@@ -17,7 +17,7 @@ import (
 )
 
 type shipProvider interface {
-	CreateShip(ctx context.Context, agentID uuid.UUID, shipType model.ShipType) (model.Ship, error)
+	CreateStarterShip(ctx context.Context, tx data.Store, agentID uuid.UUID) (model.Ship, error)
 }
 
 type AgentsService struct {
@@ -115,7 +115,7 @@ func (s *AgentsService) RegisterAgent(ctx context.Context, userID uuid.UUID, use
 			log.Debug("created agent", zap.String("agent_id", agent.ID.String()))
 		}
 
-		_, err = s.shipProvider.CreateShip(ctx, agent.ID, model.ShipTypeScout)
+		_, err = s.shipProvider.CreateStarterShip(ctx, tx, agent.ID)
 		if err != nil {
 			return err
 		}

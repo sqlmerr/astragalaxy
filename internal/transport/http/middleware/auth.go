@@ -120,6 +120,7 @@ func AgentAuth(jwtProcessor core_auth.JWTProcessor, agentGetter AgentGetter) Mid
 						),
 						"Failed to access agent control",
 					)
+					return
 				}
 			}
 

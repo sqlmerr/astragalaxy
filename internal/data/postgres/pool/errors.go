@@ -2,7 +2,6 @@ package postgres_pool
 
 import (
 	"errors"
-	"fmt"
 
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgconn"
@@ -27,8 +26,7 @@ func TranslateError(err error) error {
 	if errors.Is(err, pgx.ErrNoRows) {
 		return ErrNoRows
 	}
-	var pgErr *pgconn.PgError
-	if errors.As(err, &pgErr) {
+	if pgErr, ok := errors.AsType[*pgconn.PgError](err); ok {
 		switch pgErr.Code {
 		case postgresViolatesForeignKeyCode:
 			return ErrViolatesForeignKey
@@ -36,6 +34,5 @@ func TranslateError(err error) error {
 			return ErrRowAlreadyExists
 		}
 	}
-	fmt.Println(err)
 	return ErrUnknown
 }

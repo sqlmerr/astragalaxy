@@ -1,5 +1,5 @@
 import { ClientOnly, useNavigate } from "@tanstack/react-router"
-import { LogOut, UserRound } from "lucide-react"
+import { BookOpen, LogOut, UserRound } from "lucide-react"
 
 import {
   useActiveShipQuery,
@@ -12,21 +12,17 @@ import {
 import { Button } from "@/components/ui/button"
 import { AgentRoster } from "@/components/features/agents/agent-roster"
 import { useAuth } from "@/components/features/auth/auth-provider"
-import {
-  GalaxyMap
-  
-} from "@/components/features/map/galaxy/galaxy-map"
-import type {GalaxyMapRef} from "@/components/features/map/galaxy/galaxy-map";
-import {
-  
-  
-  
-  isSystemExtended
-  
-  
-  
+import { GalaxyMap } from "@/components/features/map/galaxy/galaxy-map"
+import type { GalaxyMapRef } from "@/components/features/map/galaxy/galaxy-map"
+import { isSystemExtended } from "@/api/types"
+import type {
+  SchemaWaypoint,
+  AgentExtended,
+  SchemaPlanet,
+  AnySystemExtended,
+  ShortSystemExtended,
+  SystemExtended,
 } from "@/api/types"
-import type {SchemaWaypoint, AgentExtended, SchemaPlanet, AnySystemExtended, ShortSystemExtended, SystemExtended} from "@/api/types";
 import { useEffect, useRef, useState } from "react"
 import { Panel } from "@/components/features/map/panel/panel"
 import { useAgents } from "@/components/features/auth/use-agents"
@@ -36,6 +32,7 @@ import { useQueryClient } from "@tanstack/react-query"
 import { queryKeys } from "@/api/query-keys"
 import { currentSystemQueryOptions } from "@/api/queries/systems"
 import { useErrorHandler } from "@/errors/utils"
+import { CatalogueDialog } from "@/components/catalogue/catalogue-dialog"
 
 export function StarMapLayout() {
   const queryClient = useQueryClient()
@@ -50,6 +47,7 @@ export function StarMapLayout() {
   const [selectedWaypoint, setSelectedWaypoint] =
     useState<SchemaWaypoint | null>(null)
   const [openedSystem, setOpenedSystem] = useState<SystemExtended | null>(null)
+  const [isCatalogueOpen, setCatalogueOpen] = useState(false)
 
   const galaxyMapRef = useRef<GalaxyMapRef>(null)
 
@@ -352,11 +350,30 @@ export function StarMapLayout() {
             </span>
           </div>
 
-          <Button variant="outline" size="sm" onClick={handleSignOut}>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setCatalogueOpen(true)}
+            className="rounded-none"
+          >
+            <BookOpen />
+            <span className="hidden sm:inline">Catalogue</span>
+          </Button>
+
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={handleSignOut}
+            className="rounded-none"
+          >
             <LogOut />
             <span className="hidden sm:inline">Log out</span>
           </Button>
         </div>
+        <CatalogueDialog
+          open={isCatalogueOpen}
+          onClose={() => setCatalogueOpen(false)}
+        />
       </div>
     </div>
   )

@@ -230,51 +230,64 @@ func (s *ShipsService) GetShipModules(ctx context.Context, agentID uuid.UUID, sh
 	return modules, nil
 }
 
-func (s *ShipsService) CreateShip(ctx context.Context, agentID uuid.UUID, shipType model.ShipType) (model.Ship, error) {
+func (s *ShipsService) CreateStarterShip(ctx context.Context, tx data.Store, agentID uuid.UUID) (model.Ship, error) {
 	spawnSystem, err := s.worldGen.FindSpawnSystem()
 	if err != nil {
 		return model.Ship{}, fmt.Errorf("find spawn system: %w", err)
 	}
 	spawnWaypoint := spawnSystem.FindWaypointsByType(worldgen.WaypointStation)[0]
 
-	var ship model.Ship
-	err = s.store.ExecTx(ctx, func(tx data.Store) error {
-		shipInventory, err := tx.Inventories().CreateInventory(ctx, inventories_repository.CreateInventory{
+	coords, err := model.NewShipCoords(model.ShipLocationWaypoint, spawnWaypoint.ID, spawnSystem.X, spawnSystem.Y)
+	if err != nil {
+		return model.Ship{}, err
+	}
+
+	return s.createShip(ctx, tx, CreateShipSpec{
+		AgentID: agentID,
+		Type:    model.ShipTypeScout,
+		Name:    "ship",
+		Active:  true,
+		Coords:  coords,
+		Modules: []model.ShipModuleType{model.ShipModulePortablePrinter},
+		Inventory: model.Inventory{
 			MaxItemSlots:      15,
 			MaxResourceVolume: 3000,
-		})
-		if err != nil {
-			return fmt.Errorf("create ship inventory: %w", err)
-		}
-		ship, err = tx.Ships().CreateShip(ctx, ships_repository.CreateShip{
-			AgentID:     agentID,
-			Type:        shipType,
-			Active:      true,
-			SystemX:     spawnSystem.X,
-			SystemY:     spawnSystem.Y,
-			Status:      model.ShipStatusDocked,
-			Name:        "ship",
-			InventoryID: shipInventory.ID,
-			Location:    model.ShipLocationWaypoint,
-			LocationID:  spawnWaypoint.ID,
-		})
-		if err != nil {
-			return fmt.Errorf("create ship: %w", err)
-		}
+		},
+	})
+}
 
+func (s *ShipsService) createShip(ctx context.Context, tx data.Store, spec CreateShipSpec) (model.Ship, error) {
+	shipInventory, err := tx.Inventories().CreateInventory(ctx, inventories_repository.CreateInventory{
+		MaxItemSlots:      spec.Inventory.MaxItemSlots,
+		MaxResourceVolume: spec.Inventory.MaxResourceVolume,
+	})
+	if err != nil {
+		return model.Ship{}, fmt.Errorf("create ship inventory: %w", err)
+	}
+	ship, err := tx.Ships().CreateShip(ctx, ships_repository.CreateShip{
+		AgentID:     spec.AgentID,
+		Type:        spec.Type,
+		Active:      spec.Active,
+		SystemX:     spec.Coords.SystemX,
+		SystemY:     spec.Coords.SystemY,
+		Status:      model.ShipStatusDocked,
+		Name:        spec.Name,
+		InventoryID: shipInventory.ID,
+		Location:    spec.Coords.Location,
+		LocationID:  spec.Coords.LocationID,
+	})
+	if err != nil {
+		return model.Ship{}, fmt.Errorf("create ship: %w", err)
+	}
+
+	for _, m := range spec.Modules {
 		_, err = tx.Ships().CreateShipModule(ctx, ships_repository.CreateShipModule{
-			Type:   model.ShipModulePortablePrinter,
+			Type:   m,
 			ShipID: ship.ID,
 		})
 		if err != nil {
-			return fmt.Errorf("create ship `portable_printer` module: %w", err)
+			return model.Ship{}, fmt.Errorf("create ship `%s` module: %w", m, err)
 		}
-
-		return nil
-	})
-
-	if err != nil {
-		return model.Ship{}, err
 	}
 
 	return ship, nil
