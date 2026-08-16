@@ -44,13 +44,13 @@ func shipDTOFromModel(m model.Ship) ShipResponseDTO {
 		AgentID:     m.AgentID,
 		Type:        string(m.Type),
 		Active:      m.Active,
-		SystemX:     m.SystemX,
-		SystemY:     m.SystemY,
+		SystemX:     m.Coords.SystemX,
+		SystemY:     m.Coords.SystemY,
 		Status:      string(m.Status),
 		CreatedAt:   m.CreatedAt,
 		Name:        m.Name,
-		Location:    string(m.Location),
-		LocationID:  m.LocationID,
+		Location:    string(m.Coords.Location),
+		LocationID:  m.Coords.LocationID,
 		InventoryID: m.InventoryID,
 	}
 }

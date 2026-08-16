@@ -68,9 +68,11 @@ func TestDockShip(t *testing.T) {
 		{
 			name: "Success: waypoint",
 			ship: model.Ship{
-				Status:     model.ShipStatusOrbit,
-				Location:   model.ShipLocationWaypoint,
-				LocationID: 0,
+				Status: model.ShipStatusOrbit,
+				Coords: model.ShipCoords{
+					Location:   model.ShipLocationWaypoint,
+					LocationID: 0,
+				},
 			},
 			system: worldgen.System{
 				Name: "System-1",
@@ -87,9 +89,11 @@ func TestDockShip(t *testing.T) {
 		{
 			name: "Success: planet",
 			ship: model.Ship{
-				Status:     model.ShipStatusOrbit,
-				Location:   model.ShipLocationPlanet,
-				LocationID: 0,
+				Status: model.ShipStatusOrbit,
+				Coords: model.ShipCoords{
+					Location:   model.ShipLocationPlanet,
+					LocationID: 0,
+				},
 			},
 			system: worldgen.System{
 				Name: "System-2",
@@ -116,9 +120,11 @@ func TestDockShip(t *testing.T) {
 		{
 			name: "Cant Dock",
 			ship: model.Ship{
-				Status:     model.ShipStatusOrbit,
-				Location:   model.ShipLocationWaypoint,
-				LocationID: 0,
+				Status: model.ShipStatusOrbit,
+				Coords: model.ShipCoords{
+					Location:   model.ShipLocationWaypoint,
+					LocationID: 0,
+				},
 			},
 			system: worldgen.System{
 				Name: "System-3",

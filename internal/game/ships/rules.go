@@ -45,13 +45,13 @@ func DockShip(ship model.Ship, system worldgen.System) (model.Ship, time.Duratio
 		)
 	}
 
-	switch ship.Location {
+	switch ship.Coords.Location {
 	case model.ShipLocationWaypoint:
-		waypoint := system.FindWaypointByID(ship.LocationID)
+		waypoint := system.FindWaypointByID(ship.Coords.LocationID)
 		if waypoint == nil {
 			ship.Status = model.ShipStatusOrbit
-			ship.Location = model.ShipLocationNone
-			ship.LocationID = 0
+			ship.Coords.Location = model.ShipLocationNone
+			ship.Coords.LocationID = 0
 			return ship, 0, errs.NewWithCode(
 				errs.CodeAnomaly,
 				fmt.Errorf("something happenned to your location: %w", errs.ErrUnprocessableEntity),

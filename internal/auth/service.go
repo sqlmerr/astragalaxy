@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"regexp"
 
 	"github.com/sqlmerr/astragalaxy/internal/data"
 	users_repository "github.com/sqlmerr/astragalaxy/internal/data/repository/users"
@@ -22,13 +23,33 @@ func NewService(store data.Store, jwtProcessor JWTProcessor) *AuthService {
 	}
 }
 
+var usernameRegex = regexp.MustCompile(`^[a-zA-Z0-9_]+$`)
+
+func checkUsername(username string) error {
+	usernameLen := len([]rune(username))
+	if usernameLen < 3 || usernameLen > 32 {
+		return errs.NewWithCode(
+			errs.CodeInvalidUsername,
+			fmt.Errorf("invalid username length: must be between 3 and 27 characters: %w", errs.ErrInvalidArgument),
+		)
+	}
+
+	if !usernameRegex.MatchString(username) {
+		return errs.NewWithCode(errs.CodeInvalidUsername, fmt.Errorf("invalid username format: must contain only latin letters, digits, and underscores: %w", errs.ErrInvalidArgument))
+	}
+
+	return nil
+}
+
 func (s *AuthService) RegisterUser(ctx context.Context, username, password string) (model.User, error) {
 	userExists, err := s.store.Users().UserExistsByUsername(ctx, username)
 	if err != nil {
 		return model.User{}, errs.ErrInternal
 	}
 
-	// TODO: username format check
+	if err := checkUsername(username); err != nil {
+		return model.User{}, err
+	}
 
 	if userExists {
 		return model.User{}, errs.NewWithCode(

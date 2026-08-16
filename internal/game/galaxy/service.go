@@ -28,7 +28,7 @@ func (s *GalaxyService) ShipRadar(ctx context.Context, agentID uuid.UUID) ([]wor
 		return nil, fmt.Errorf("get active ship: %w", err)
 	}
 
-	systems, err := s.worldGen.GetSystemsInBox(ship.SystemX-10, ship.SystemY-10, ship.SystemX+10, ship.SystemY+10)
+	systems, err := s.worldGen.GetSystemsInBox(ship.Coords.SystemX-10, ship.Coords.SystemY-10, ship.Coords.SystemX+10, ship.Coords.SystemY+10)
 	if err != nil {
 		return nil, fmt.Errorf("use radar: %w", err)
 	}
@@ -42,20 +42,20 @@ func (s *GalaxyService) GetCurrentAgentSystem(ctx context.Context, agentID uuid.
 		return FullSystem{}, fmt.Errorf("get active ship: %w", err)
 	}
 
-	system, exists := s.worldGen.GenerateSystemByCoords(ship.SystemX, ship.SystemY)
+	system, exists := s.worldGen.GenerateSystemByCoords(ship.Coords.SystemX, ship.Coords.SystemY)
 	if !exists {
 		return FullSystem{}, errs.NewWithCode(
 			errs.CodeAnomaly,
 			fmt.Errorf(
 				"something happened to system with x=%d y=%d: %w",
-				ship.SystemX,
-				ship.SystemY,
+				ship.Coords.SystemX,
+				ship.Coords.SystemY,
 				errs.ErrUnprocessableEntity,
 			),
 		)
 	}
 
-	resourceDeposits, err := s.store.ResourceDeposits().GetSystemResourceDeposits(ctx, ship.SystemX, ship.SystemY)
+	resourceDeposits, err := s.store.ResourceDeposits().GetSystemResourceDeposits(ctx, ship.Coords.SystemX, ship.Coords.SystemY)
 	if err != nil {
 		return FullSystem{}, fmt.Errorf("get deposits: %w", err)
 	}

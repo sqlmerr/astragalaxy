@@ -21,7 +21,9 @@ func (r *ShipRepositoryImpl) GetShipsByAgent(ctx context.Context, agentID uuid.U
 		return nil, fmt.Errorf("scan: %w", err)
 	}
 
-	return lo.Map(ships, func(item database.Ship, _ int) model.Ship {
+	shipsMapped := lo.Map(ships, func(item database.Ship, _ int) model.Ship {
 		return convertModel(item)
-	}), nil
+	})
+
+	return shipsMapped, nil
 }

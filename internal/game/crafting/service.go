@@ -234,24 +234,24 @@ func (s *CraftingService) gatherAvailableFacilities(ctx context.Context, agentID
 		facilities[f.Type] = append(facilities[f.Type], f.ID)
 	}
 
-	if ship.Location == model.ShipLocationWaypoint && ship.Status == model.ShipStatusDocked {
-		system, exists := s.worldGen.GenerateSystemByCoords(ship.SystemX, ship.SystemY)
+	if ship.Coords.Location == model.ShipLocationWaypoint && ship.Status == model.ShipStatusDocked {
+		system, exists := s.worldGen.GenerateSystemByCoords(ship.Coords.SystemX, ship.Coords.SystemY)
 		if !exists {
 			return nil, errs.NewWithCode(
 				errs.CodeAnomaly,
 				fmt.Errorf(
 					"system x=%d y=%d does not exists: %w",
-					ship.SystemX, ship.SystemY, errs.ErrUnprocessableEntity,
+					ship.Coords.SystemX, ship.Coords.SystemY, errs.ErrUnprocessableEntity,
 				),
 			)
 		}
-		waypoint := system.FindWaypointByID(ship.LocationID)
+		waypoint := system.FindWaypointByID(ship.Coords.LocationID)
 		if waypoint == nil {
 			return nil, errs.NewWithCode(
 				errs.CodeAnomaly,
 				fmt.Errorf(
 					"waypoint with id=%d in system x=%d y=%d does not exists: %w",
-					ship.LocationID, ship.SystemX, ship.SystemY, errs.ErrUnprocessableEntity,
+					ship.Coords.LocationID, ship.Coords.SystemX, ship.Coords.SystemY, errs.ErrUnprocessableEntity,
 				),
 			)
 		}

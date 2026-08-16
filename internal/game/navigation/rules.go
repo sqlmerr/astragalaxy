@@ -19,7 +19,7 @@ func NavigateWarp(ship model.Ship, newSystem worldgen.System) (model.Ship, time.
 	}
 
 	// TODO: fuel
-	x1, y1 := ship.SystemX, ship.SystemY
+	x1, y1 := ship.Coords.SystemX, ship.Coords.SystemY
 	x2, y2 := newSystem.X, newSystem.Y
 
 	if x1 == x2 && y1 == y2 {
@@ -44,10 +44,11 @@ func NavigateWarp(ship model.Ship, newSystem worldgen.System) (model.Ship, time.
 
 	cooldownDuration := 30 * time.Second * time.Duration(distance) // TODO: ship engines
 
-	ship.SystemX = x2
-	ship.SystemY = y2
-	ship.Location = model.ShipLocationNone
-	ship.LocationID = 0
+	shipCoords, err := model.NewShipCoords(model.ShipLocationNone, 0, x2, y2)
+	if err != nil {
+		return model.Ship{}, 0, fmt.Errorf("set coords: %w", err)
+	}
+	ship.Coords = shipCoords
 
 	return ship, cooldownDuration, nil
 }
@@ -60,7 +61,7 @@ func NavigatePlanet(ship model.Ship, system worldgen.System, orbitIndex int) (mo
 		)
 	}
 
-	if ship.Location == model.ShipLocationPlanet && ship.LocationID == orbitIndex {
+	if ship.Coords.Location == model.ShipLocationPlanet && ship.Coords.LocationID == orbitIndex {
 		return model.Ship{}, 0, errs.NewWithCode(
 			errs.CodeAlreadyAtDestination,
 			fmt.Errorf("already at destination: %w", errs.ErrNotModified),
@@ -83,8 +84,16 @@ func NavigatePlanet(ship model.Ship, system worldgen.System, orbitIndex int) (mo
 	// TODO: fuel
 
 	cooldownDuration := time.Second * 30
-	ship.Location = model.ShipLocationPlanet
-	ship.LocationID = planet.Orbit
+	shipCoords, err := model.NewShipCoords(
+		model.ShipLocationPlanet,
+		planet.Orbit,
+		ship.Coords.SystemX,
+		ship.Coords.SystemY,
+	)
+	if err != nil {
+		return model.Ship{}, 0, fmt.Errorf("set coords: %w", err)
+	}
+	ship.Coords = shipCoords
 
 	return ship, cooldownDuration, nil
 }
@@ -97,7 +106,7 @@ func NavigateWaypoint(ship model.Ship, system worldgen.System, waypointID int) (
 		)
 	}
 
-	if ship.Location == model.ShipLocationWaypoint && ship.LocationID == waypointID {
+	if ship.Coords.Location == model.ShipLocationWaypoint && ship.Coords.LocationID == waypointID {
 		return model.Ship{}, 0, errs.NewWithCode(
 			errs.CodeAlreadyAtDestination,
 			fmt.Errorf("already at destination: %w", errs.ErrNotModified),
@@ -116,8 +125,11 @@ func NavigateWaypoint(ship model.Ship, system worldgen.System, waypointID int) (
 
 	cooldownDuration := time.Second * 30
 
-	ship.Location = model.ShipLocationWaypoint
-	ship.LocationID = waypointID
+	shipCoords, err := model.NewShipCoords(model.ShipLocationWaypoint, waypointID, ship.Coords.SystemX, ship.Coords.SystemY)
+	if err != nil {
+		return model.Ship{}, 0, fmt.Errorf("set coords: %w", err)
+	}
+	ship.Coords = shipCoords
 
 	return ship, cooldownDuration, nil
 }

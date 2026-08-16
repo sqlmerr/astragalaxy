@@ -25,19 +25,23 @@ type CreateShipModule struct {
 }
 
 func convertModel(m database.Ship) model.Ship {
+	coords := model.ShipCoords{
+		Location:   model.ShipLocation(m.Location),
+		LocationID: int(m.LocationID),
+		SystemX:    int(m.SystemX),
+		SystemY:    int(m.SystemY),
+	}
+
 	return model.Ship{
 		ID:          m.ID,
 		AgentID:     m.AgentID,
 		Type:        model.ShipType(m.Type),
 		Active:      m.Active,
-		SystemX:     int(m.SystemX),
-		SystemY:     int(m.SystemY),
 		Status:      model.ShipStatus(m.Status),
 		CreatedAt:   m.CreatedAt.Time,
 		Name:        m.Name,
 		InventoryID: m.InventoryID,
-		Location:    model.ShipLocation(m.Location),
-		LocationID:  int(m.LocationID),
+		Coords:      coords,
 	}
 }
 

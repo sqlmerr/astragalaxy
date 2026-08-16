@@ -69,3 +69,7 @@ type InventoryOwner struct {
 	OwnerID   uuid.UUID
 	OwnerType InventoryOwnerType
 }
+
+func NewInventoryOwner(ownerID uuid.UUID, ownerType InventoryOwnerType) InventoryOwner {
+	return InventoryOwner{OwnerID: ownerID, OwnerType: ownerType}
+}

@@ -44,6 +44,8 @@ const (
 	CodeFacilityNotFound             ErrorCode = "FACILITY_NOT_FOUND"
 	CodeShipModuleAlreadyInstalled   ErrorCode = "SHIP_MODULE_ALREADY_INSTALLED"
 	CodeCannotUseItem                ErrorCode = "CANNOT_USE_ITEM"
+	CodeInvalidUsername              ErrorCode = "INVALID_USERNAME"
+	CodeInvalidPassword              ErrorCode = "INVALID_PASSWORD"
 )
 
 type WithCode struct {

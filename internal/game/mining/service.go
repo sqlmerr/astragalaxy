@@ -38,7 +38,7 @@ func (s *MiningService) MineAsteroid(ctx context.Context, agentID uuid.UUID, amo
 		return model.Cooldown{}, fmt.Errorf("get active ship: %w", err)
 	}
 
-	system, exists := s.worldGen.GenerateSystemByCoords(ship.SystemX, ship.SystemY)
+	system, exists := s.worldGen.GenerateSystemByCoords(ship.Coords.SystemX, ship.Coords.SystemY)
 	if !exists {
 		return model.Cooldown{}, errs.NewWithCode(
 			errs.CodeAnomaly,
@@ -46,18 +46,18 @@ func (s *MiningService) MineAsteroid(ctx context.Context, agentID uuid.UUID, amo
 		)
 	}
 
-	if ship.Location != model.ShipLocationWaypoint {
+	if ship.Coords.Location != model.ShipLocationWaypoint {
 		return model.Cooldown{}, errs.NewWithCode(
 			errs.CodeInvalidLocation,
 			fmt.Errorf("`Location` must be 'WAYPOINT': %w", errs.ErrUnprocessableEntity),
 		)
 	}
 
-	waypoint := system.FindWaypointByID(ship.LocationID)
+	waypoint := system.FindWaypointByID(ship.Coords.LocationID)
 	if waypoint == nil {
 		return model.Cooldown{}, errs.NewWithCode(
 			errs.CodeAnomaly,
-			fmt.Errorf("waypoint with id='%d': %w", ship.LocationID, errs.ErrNotFound),
+			fmt.Errorf("waypoint with id='%d': %w", ship.Coords.LocationID, errs.ErrNotFound),
 		)
 	}
 
@@ -175,7 +175,7 @@ func (s *MiningService) MinePlanet(ctx context.Context, agentID uuid.UUID, resou
 		return model.Cooldown{}, fmt.Errorf("get active ship: %w", err)
 	}
 
-	system, exists := s.worldGen.GenerateSystemByCoords(ship.SystemX, ship.SystemY)
+	system, exists := s.worldGen.GenerateSystemByCoords(ship.Coords.SystemX, ship.Coords.SystemY)
 	if !exists {
 		return model.Cooldown{}, errs.NewWithCode(
 			errs.CodeAnomaly,
@@ -183,7 +183,7 @@ func (s *MiningService) MinePlanet(ctx context.Context, agentID uuid.UUID, resou
 		)
 	}
 
-	if ship.Location != model.ShipLocationPlanet {
+	if ship.Coords.Location != model.ShipLocationPlanet {
 		return model.Cooldown{}, errs.NewWithCode(
 			errs.CodeInvalidLocation,
 			fmt.Errorf("`Location` must be 'PLANET': %w", errs.ErrUnprocessableEntity),
@@ -197,11 +197,11 @@ func (s *MiningService) MinePlanet(ctx context.Context, agentID uuid.UUID, resou
 		)
 	}
 
-	planet := system.FindPlanetByOrbit(ship.LocationID)
+	planet := system.FindPlanetByOrbit(ship.Coords.LocationID)
 	if planet == nil {
 		return model.Cooldown{}, errs.NewWithCode(
 			errs.CodeAnomaly,
-			fmt.Errorf("planet with id='%d': %w", ship.LocationID, errs.ErrNotFound),
+			fmt.Errorf("planet with id='%d': %w", ship.Coords.LocationID, errs.ErrNotFound),
 		)
 	}
 

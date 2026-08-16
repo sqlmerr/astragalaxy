@@ -23,9 +23,11 @@ func TestNavigateWarp(t *testing.T) {
 		{
 			name: "Success",
 			ship: model.Ship{
-				SystemX: 10,
-				SystemY: 10,
-				Status:  model.ShipStatusOrbit,
+				Coords: model.ShipCoords{
+					SystemX: 10,
+					SystemY: 10,
+				},
+				Status: model.ShipStatusOrbit,
 			},
 			newSystem: worldgen.System{
 				X: 10,
@@ -46,9 +48,11 @@ func TestNavigateWarp(t *testing.T) {
 		{
 			name: "Invalid warp path",
 			ship: model.Ship{
-				Status:  model.ShipStatusOrbit,
-				SystemX: -10,
-				SystemY: -10,
+				Status: model.ShipStatusOrbit,
+				Coords: model.ShipCoords{
+					SystemX: -10,
+					SystemY: -10,
+				},
 			},
 			newSystem: worldgen.System{
 				X: 10,
@@ -61,9 +65,11 @@ func TestNavigateWarp(t *testing.T) {
 		{
 			name: "Already at destination",
 			ship: model.Ship{
-				Status:  model.ShipStatusOrbit,
-				SystemX: 10,
-				SystemY: 10,
+				Status: model.ShipStatusOrbit,
+				Coords: model.ShipCoords{
+					SystemX: 10,
+					SystemY: 10,
+				},
 			},
 			newSystem: worldgen.System{
 				X: 10,
@@ -87,8 +93,8 @@ func TestNavigateWarp(t *testing.T) {
 				}
 			} else {
 				assert.NoError(t, err)
-				assert.Equal(t, test.newSystem.X, ship.SystemX)
-				assert.Equal(t, test.newSystem.Y, ship.SystemY)
+				assert.Equal(t, test.newSystem.X, ship.Coords.SystemX)
+				assert.Equal(t, test.newSystem.Y, ship.Coords.SystemY)
 				assert.True(t, cd > 0)
 			}
 		})
@@ -152,9 +158,11 @@ func TestNavigatePlanet(t *testing.T) {
 		{
 			name: "Already at destination",
 			ship: model.Ship{
-				Status:     model.ShipStatusOrbit,
-				Location:   model.ShipLocationPlanet,
-				LocationID: 1,
+				Status: model.ShipStatusOrbit,
+				Coords: model.ShipCoords{
+					Location:   model.ShipLocationPlanet,
+					LocationID: 1,
+				},
 			},
 			system:      worldgen.System{},
 			orbitIndex:  1,
@@ -176,8 +184,8 @@ func TestNavigatePlanet(t *testing.T) {
 				}
 			} else {
 				assert.NoError(t, err)
-				assert.Equal(t, model.ShipLocationPlanet, ship.Location)
-				assert.Equal(t, test.orbitIndex, ship.LocationID)
+				assert.Equal(t, model.ShipLocationPlanet, ship.Coords.Location)
+				assert.Equal(t, test.orbitIndex, ship.Coords.LocationID)
 				assert.True(t, cd > 0)
 			}
 		})
@@ -237,9 +245,11 @@ func TestNavigateWaypoint(t *testing.T) {
 		{
 			name: "Already at destination",
 			ship: model.Ship{
-				Status:     model.ShipStatusOrbit,
-				Location:   model.ShipLocationWaypoint,
-				LocationID: 0,
+				Status: model.ShipStatusOrbit,
+				Coords: model.ShipCoords{
+					Location:   model.ShipLocationWaypoint,
+					LocationID: 0,
+				},
 			},
 			system:      worldgen.System{},
 			waypointID:  0,
@@ -261,8 +271,8 @@ func TestNavigateWaypoint(t *testing.T) {
 				}
 			} else {
 				assert.NoError(t, err)
-				assert.Equal(t, model.ShipLocationWaypoint, ship.Location)
-				assert.Equal(t, test.waypointID, ship.LocationID)
+				assert.Equal(t, model.ShipLocationWaypoint, ship.Coords.Location)
+				assert.Equal(t, test.waypointID, ship.Coords.LocationID)
 				assert.True(t, cd > 0)
 			}
 		})

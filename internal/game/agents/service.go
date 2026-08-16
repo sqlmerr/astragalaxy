@@ -52,7 +52,9 @@ func (s *AgentsService) RegisterAgent(ctx context.Context, userID uuid.UUID, use
 		return model.Agent{}, "", fmt.Errorf("check agent's existence: %w", err)
 	}
 
-	// TODO: username format check
+	if err := checkUsername(username); err != nil {
+		return model.Agent{}, "", err
+	}
 
 	if exists {
 		return model.Agent{}, "", errs.NewWithCode(

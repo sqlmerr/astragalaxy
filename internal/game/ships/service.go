@@ -165,14 +165,14 @@ func (s *ShipsService) DockShip(ctx context.Context, agentID uuid.UUID) (model.C
 		return model.Cooldown{}, fmt.Errorf("get active agent ship: %w", err)
 	}
 
-	system, exists := s.worldGen.GenerateSystemByCoords(ship.SystemX, ship.SystemY)
+	system, exists := s.worldGen.GenerateSystemByCoords(ship.Coords.SystemX, ship.Coords.SystemY)
 	if !exists {
 		return model.Cooldown{}, errs.NewWithCode(
 			errs.CodeAnomaly,
 			fmt.Errorf(
 				"system x=%d y=%d doesn't exist: %w",
-				ship.SystemX,
-				ship.SystemY,
+				ship.Coords.SystemX,
+				ship.Coords.SystemY,
 				errs.ErrNotFound,
 			),
 		)
