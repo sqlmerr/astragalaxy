@@ -71,6 +71,8 @@ paths:
     $ref: paths/data/resources.yaml
   /api/v1/data/facilities:
     $ref: paths/data/facilities.yaml
+  /api/v1/agents/current/facilities:
+    $ref: paths/agents/facilities.yaml
 components:
   securitySchemes:
     UserAuth:

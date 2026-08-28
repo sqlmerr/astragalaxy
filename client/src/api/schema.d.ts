@@ -611,6 +611,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/agents/current/facilities": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Agent Available Facilities */
+        get: operations["getAgentFacilities"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -931,6 +948,23 @@ export interface components {
             time_multiplier: number;
             /** Format: float64 */
             cost_multiplier: number;
+        };
+        GetAgentFacilitiesResponse: {
+            /**
+             * @example {
+             *       "printer": [
+             *         "portable_printer",
+             *         "standard_printer",
+             *         "advanced_printer"
+             *       ],
+             *       "smelter": [
+             *         "portable_smelter"
+             *       ]
+             *     }
+             */
+            data?: {
+                [key: string]: string[];
+            };
         };
     };
     responses: {
@@ -1857,6 +1891,27 @@ export interface operations {
                     };
                 };
             };
+        };
+    };
+    getAgentFacilities: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successfully got agent's available facilties */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GetAgentFacilitiesResponse"];
+                };
+            };
+            401: components["responses"]["InvalidAgentToken"];
         };
     };
 }

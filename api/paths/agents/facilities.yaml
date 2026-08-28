@@ -1,0 +1,18 @@
+get:
+  operationId: getAgentFacilities
+  summary: Get Agent Available Facilities
+  tags:
+    - Agents
+  responses:
+    '200':
+      description: Successfully got agent's available facilties
+      content: 
+        application/json:
+          schema:
+            $ref: ../../components/schemas/GetAgentFacilitiesResponse.yaml
+    '401':
+      $ref: ../../components/responses/InvalidAgentToken.yaml
+  security:
+    - AgentAuth: []
+    - UserAuth: []
+      AgentId: []

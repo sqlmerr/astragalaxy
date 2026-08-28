@@ -63,7 +63,7 @@ export function Waypoint({
           }
           break
         }
-        case "custom": // TODO: custom waypoint locations
+        case "custom": // TODO: custom waypoint shapes
           break
       }
     },

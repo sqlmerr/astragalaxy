@@ -1,0 +1,17 @@
+type: object
+properties: 
+  data:
+    type: object
+    additionalProperties: 
+      type: array
+      items: 
+        type: string
+        description: Facility ID
+        example: portable_smelter
+    example: 
+      printer:
+        - portable_printer
+        - standard_printer
+        - advanced_printer
+      smelter:
+        - portable_smelter
