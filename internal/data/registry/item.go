@@ -8,9 +8,25 @@ import (
 	"github.com/samber/lo"
 )
 
+// As describes how/where an item provides a facility capability.
+// - empty list: the capability is not provided anywhere
+// - "none": the capability is active but not tied to any module type
+//   (e.g. the item is not a ship module)
+type ItemProvidesFacilityAsType string
+
+var (
+	ItemProvidesFacilityAsShipModule ItemProvidesFacilityAsType = "ship_module"
+	ItemProvidesFacilityAsNone       ItemProvidesFacilityAsType = "none"
+)
+
+type ItemProvidesFacility struct {
+	ID string                       `json:"id"`
+	As []ItemProvidesFacilityAsType `json:"as"`
+}
+
 type Item struct {
-	ID               string `json:"id"`
-	ProvidesFacility string `json:"provides_facility,omitempty"`
+	ID               string                `json:"id"`
+	ProvidesFacility *ItemProvidesFacility `json:"provides_facility,omitempty"`
 }
 
 type ItemRegistry struct {

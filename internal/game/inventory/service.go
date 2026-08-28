@@ -203,7 +203,6 @@ func (s *Service) TransferItems(ctx context.Context, input TransferItemsInput) e
 				return err
 			}
 
-			// TODO: check inventory limit
 			_, err = tx.Inventories().SaveItem(ctx, item)
 			if err != nil {
 				return fmt.Errorf("save item: %w", err)

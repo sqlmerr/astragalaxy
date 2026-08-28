@@ -102,3 +102,4 @@ bun check           # prettier --check
 - Match surrounding code style; do not add code comments unless they add real value.
 - Run relevant tests before finishing: `just test` for backend, and
   `bun test` / `bun typecheck` for client changes.
+- Write everything in English

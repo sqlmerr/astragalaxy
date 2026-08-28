@@ -76,10 +76,31 @@ function ItemCatalogueCard({ item }: { item: SchemaItemData }) {
           {item.id}
         </CardTitle>
       </CardHeader>
-      <CardContent className="text-muted-foreground">
-        Provides facility:{" "}
-        <span className="text-foreground">{item.provides_facility}</span>
-      </CardContent>
+      {item.provides_facility ? (
+        <CardContent className="space-y-4 text-sm">
+          <div className="flex flex-col gap-1">
+            <span className="text-xs tracking-wider text-muted-foreground">
+              Facility
+            </span>
+            <span className="text-base font-medium text-foreground">
+              {item.provides_facility?.id}
+            </span>
+          </div>
+
+          <div className="flex flex-col gap-2">
+            <span className="text-xs tracking-wider text-muted-foreground">
+              Provides facility as
+            </span>
+            <div className="flex flex-wrap gap-1.5">
+              {item.provides_facility?.as?.map((role) => (
+                <Badge key={role} variant="secondary">
+                  {role}
+                </Badge>
+              ))}
+            </div>
+          </div>
+        </CardContent>
+      ) : null}
     </Card>
   )
 }

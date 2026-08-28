@@ -924,7 +924,12 @@ export interface components {
             /** @description Item ID */
             id: string;
             /** @description Facility that item provides */
-            provides_facility: string;
+            provides_facility: {
+                /** @description Facility ID */
+                id: string;
+                /** @description In which item states it provides this facility */
+                as: string[];
+            } | null;
         };
         ResourceData: {
             /** @description Resource ID */
@@ -962,7 +967,7 @@ export interface components {
              *       ]
              *     }
              */
-            data?: {
+            data: {
                 [key: string]: string[];
             };
         };

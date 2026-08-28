@@ -14,9 +14,14 @@ type RecipeDTO struct {
 	Outputs          []RecipeResourceDTO `json:"outputs"`
 }
 
+type ItemProvidesFacilityDTO struct {
+	ID string   `json:"id"`
+	As []string `json:"as"`
+}
+
 type ItemDTO struct {
-	ID               string `json:"id"`
-	ProvidesFacility string `json:"provides_facility,omitempty"`
+	ID               string                   `json:"id"`
+	ProvidesFacility *ItemProvidesFacilityDTO `json:"provides_facility,omitempty"`
 }
 
 type ResourceDTO struct {

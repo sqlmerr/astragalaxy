@@ -22,9 +22,18 @@ func (h *DataHTTPHandler) GetItems(w http.ResponseWriter, r *http.Request) {
 
 	response := GetItemsResponse{
 		Data: lo.Map(items, func(i registry.Item, _ int) ItemDTO {
+			var providesFacility *ItemProvidesFacilityDTO
+			if i.ProvidesFacility != nil {
+				providesFacility = &ItemProvidesFacilityDTO{
+					ID: i.ProvidesFacility.ID,
+					As: lo.Map(i.ProvidesFacility.As, func(item registry.ItemProvidesFacilityAsType, _ int) string {
+						return string(item)
+					}),
+				}
+			}
 			return ItemDTO{
 				ID:               i.ID,
-				ProvidesFacility: i.ProvidesFacility,
+				ProvidesFacility: providesFacility,
 			}
 		}),
 	}

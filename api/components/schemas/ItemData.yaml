@@ -7,5 +7,19 @@ properties:
     type: string
     description: Item ID
   provides_facility:
-    type: string
+    type: object
     description: Facility that item provides
+    nullable: true
+    required:
+      - id
+      - as
+    properties: 
+      id:
+        type: string
+        description: Facility ID
+      as:
+        type: array
+        items: 
+          type: string
+          example: ship_module
+        description: In which item states it provides this facility
