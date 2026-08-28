@@ -3,7 +3,6 @@ package crafting_service
 import (
 	"context"
 	"fmt"
-	"math"
 	"time"
 
 	"github.com/google/uuid"
@@ -112,46 +111,9 @@ func (s *CraftingService) Craft(ctx context.Context, agentID uuid.UUID, recipeID
 		return model.Cooldown{}, fmt.Errorf("get inventory resources: %w", err)
 	}
 
-	var updatedResources []model.Resource
-	var createdResources []model.Resource
-
-	for _, input := range recipe.Inputs {
-		cost := int(math.Ceil(float64(input.Amount*amount) * bestFacility.CostMultiplier))
-		flag := false
-		for _, resource := range resources {
-			if model.ResourceType(input.ResourceID) == resource.ResourceType && resource.Amount >= cost {
-				resource.Amount -= cost
-				updatedResources = append(updatedResources, resource)
-				flag = true
-				break
-			}
-		}
-
-		if !flag {
-			return model.Cooldown{}, errs.NewWithCode(
-				errs.CodeNotEnoughResources,
-				fmt.Errorf(
-					"to craft recipe `%s` it is required to have at least %d of `%s` resource: %w",
-					recipeID, cost, input.ResourceID, errs.ErrUnprocessableEntity,
-				),
-			)
-		}
-	}
-
-	for _, output := range recipe.Outputs {
-		flag := false
-		for _, resource := range resources {
-			if model.ResourceType(output.ResourceID) == resource.ResourceType {
-				resource.Amount += output.Amount * amount
-				updatedResources = append(updatedResources, resource)
-				flag = true
-				break
-			}
-		}
-
-		if !flag {
-			createdResources = append(createdResources, model.Resource{InventoryID: targetInventoryID, ResourceType: model.ResourceType(output.ResourceID), Amount: output.Amount * amount})
-		}
+	updatedResources, createdResources, err := ProcessCraft(&recipe, bestFacility, resources, targetInventoryID, amount)
+	if err != nil {
+		return model.Cooldown{}, err
 	}
 
 	volume := CountTotalResourceVolume(append(updatedResources, createdResources...))
