@@ -3,7 +3,7 @@ package http_handler_ships
 import (
 	"net/http"
 
-	core_auth "github.com/sqlmerr/astragalaxy/internal/auth"
+	"github.com/sqlmerr/astragalaxy/internal/auth"
 	core_logger "github.com/sqlmerr/astragalaxy/internal/logger"
 	http_response "github.com/sqlmerr/astragalaxy/internal/transport/http/response"
 )
@@ -17,7 +17,7 @@ func (h *ShipsHTTPHandler) GetMyShips(w http.ResponseWriter, r *http.Request) {
 	log := core_logger.FromContext(ctx)
 	responseHandler := http_response.NewHTTPResponseHandler(log, w)
 
-	agentID := core_auth.GetAgentIDFromContext(ctx)
+	agentID := auth.GetAgentIDFromContext(ctx)
 
 	ships, err := h.shipsService.GetAgentShips(ctx, agentID)
 	if err != nil {

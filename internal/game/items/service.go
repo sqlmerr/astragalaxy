@@ -1,4 +1,4 @@
-package items_service
+package items
 
 import (
 	"context"
@@ -13,15 +13,15 @@ import (
 	"github.com/sqlmerr/astragalaxy/internal/model"
 )
 
-type ItemsService struct {
+type Service struct {
 	store data.Store
 }
 
-func New(store data.Store) *ItemsService {
-	return &ItemsService{store}
+func NewService(store data.Store) *Service {
+	return &Service{store}
 }
 
-func (s *ItemsService) UseItem(ctx context.Context, agentID uuid.UUID, itemID uuid.UUID) (json.RawMessage, model.Cooldown, error) {
+func (s *Service) UseItem(ctx context.Context, agentID uuid.UUID, itemID uuid.UUID) (json.RawMessage, model.Cooldown, error) {
 	item, err := s.store.Inventories().GetItem(ctx, itemID)
 	if err != nil {
 		return nil, model.Cooldown{}, fmt.Errorf("get item: %w", err)

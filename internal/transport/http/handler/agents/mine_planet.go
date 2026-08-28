@@ -3,7 +3,7 @@ package http_handler_agents
 import (
 	"net/http"
 
-	core_auth "github.com/sqlmerr/astragalaxy/internal/auth"
+	"github.com/sqlmerr/astragalaxy/internal/auth"
 	core_logger "github.com/sqlmerr/astragalaxy/internal/logger"
 	"github.com/sqlmerr/astragalaxy/internal/model"
 	http_dto "github.com/sqlmerr/astragalaxy/internal/transport/http/dto"
@@ -27,7 +27,7 @@ func (h *AgentsHTTPHandler) MinePlanet(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	agentID := core_auth.GetAgentIDFromContext(ctx)
+	agentID := auth.GetAgentIDFromContext(ctx)
 	cooldown, err := h.miningService.MinePlanet(ctx, agentID, model.ResourceType(request.Resource), request.Amount)
 	if err != nil {
 		responseHandler.ErrorResponse(err, "Failed to process action")

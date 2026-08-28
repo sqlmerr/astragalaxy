@@ -1,4 +1,4 @@
-package crafting_service
+package crafting
 
 import (
 	"context"
@@ -20,7 +20,7 @@ type FacilityProvider interface {
 	GatherAvailableFacilities(ctx context.Context, agentID uuid.UUID) (map[registry.FacilityType][]string, error)
 }
 
-type CraftingService struct {
+type Service struct {
 	gameConfig game.Config
 	store      data.Store
 	gameData   registry.GameData
@@ -29,11 +29,11 @@ type CraftingService struct {
 	facilityProvider FacilityProvider
 }
 
-func New(gameConfig game.Config, store data.Store, gameData registry.GameData, worldGen worldgen.WorldGen, facilityProvider FacilityProvider) *CraftingService {
-	return &CraftingService{gameConfig, store, gameData, worldGen, facilityProvider}
+func NewService(gameConfig game.Config, store data.Store, gameData registry.GameData, worldGen worldgen.WorldGen, facilityProvider FacilityProvider) *Service {
+	return &Service{gameConfig, store, gameData, worldGen, facilityProvider}
 }
 
-func (s *CraftingService) Craft(ctx context.Context, agentID uuid.UUID, recipeID string, targetInventoryID uuid.UUID, amount int) (model.Cooldown, error) {
+func (s *Service) Craft(ctx context.Context, agentID uuid.UUID, recipeID string, targetInventoryID uuid.UUID, amount int) (model.Cooldown, error) {
 	if !s.gameConfig.Rules.DisableCooldowns {
 		if err := s.store.Cooldowns().CheckCooldown(ctx, agentID); err != nil {
 			return model.Cooldown{}, fmt.Errorf("cooldown: %w", err)

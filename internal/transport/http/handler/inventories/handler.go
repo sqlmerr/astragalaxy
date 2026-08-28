@@ -3,18 +3,18 @@ package http_handler_inventories
 import (
 	"net/http"
 
-	inventory_service "github.com/sqlmerr/astragalaxy/internal/game/inventory"
-	items_service "github.com/sqlmerr/astragalaxy/internal/game/items"
+	"github.com/sqlmerr/astragalaxy/internal/game/inventory"
+	"github.com/sqlmerr/astragalaxy/internal/game/items"
 	http_middleware "github.com/sqlmerr/astragalaxy/internal/transport/http/middleware"
 	http_server "github.com/sqlmerr/astragalaxy/internal/transport/http/server"
 )
 
 type InventoriesHTTPHandler struct {
-	inventoryService inventory_service.InventoryService
-	itemsService     items_service.ItemsService
+	inventoryService inventory.Service
+	itemsService     items.Service
 }
 
-func NewInventoriesHTTPHandler(inventoryService inventory_service.InventoryService, itemsService items_service.ItemsService) *InventoriesHTTPHandler {
+func NewInventoriesHTTPHandler(inventoryService inventory.Service, itemsService items.Service) *InventoriesHTTPHandler {
 	return &InventoriesHTTPHandler{inventoryService, itemsService}
 }
 

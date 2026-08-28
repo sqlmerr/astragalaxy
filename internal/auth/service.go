@@ -1,4 +1,4 @@
-package core_auth
+package auth
 
 import (
 	"context"
@@ -12,13 +12,13 @@ import (
 	"github.com/sqlmerr/astragalaxy/internal/model"
 )
 
-type AuthService struct {
+type Service struct {
 	store        data.Store
 	jwtProcessor JWTProcessor
 }
 
-func NewService(store data.Store, jwtProcessor JWTProcessor) *AuthService {
-	return &AuthService{
+func NewService(store data.Store, jwtProcessor JWTProcessor) *Service {
+	return &Service{
 		store, jwtProcessor,
 	}
 }
@@ -41,7 +41,7 @@ func checkUsername(username string) error {
 	return nil
 }
 
-func (s *AuthService) RegisterUser(ctx context.Context, username, password string) (model.User, error) {
+func (s *Service) RegisterUser(ctx context.Context, username, password string) (model.User, error) {
 	userExists, err := s.store.Users().UserExistsByUsername(ctx, username)
 	if err != nil {
 		return model.User{}, errs.ErrInternal
@@ -75,7 +75,7 @@ func (s *AuthService) RegisterUser(ctx context.Context, username, password strin
 	return user, nil
 }
 
-func (s *AuthService) LoginUser(ctx context.Context, username, password string) (string, error) {
+func (s *Service) LoginUser(ctx context.Context, username, password string) (string, error) {
 	user, err := s.store.Users().GetUserByUsername(ctx, username)
 	if err != nil {
 		if errors.Is(err, errs.ErrNotFound) {

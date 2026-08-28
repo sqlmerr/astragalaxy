@@ -1,4 +1,4 @@
-package ships_service
+package ships
 
 import (
 	"fmt"

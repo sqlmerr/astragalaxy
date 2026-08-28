@@ -1,4 +1,4 @@
-package navigation_service
+package navigation
 
 import (
 	"context"
@@ -13,19 +13,19 @@ import (
 	"github.com/sqlmerr/astragalaxy/internal/model"
 )
 
-type NavigationService struct {
+type Service struct {
 	gameConfig game.Config
 	store      data.Store
 	worldGen   worldgen.WorldGen
 }
 
-func New(gameConfig game.Config, store data.Store, worldGen worldgen.WorldGen) *NavigationService {
-	return &NavigationService{
+func NewService(gameConfig game.Config, store data.Store, worldGen worldgen.WorldGen) *Service {
+	return &Service{
 		gameConfig, store, worldGen,
 	}
 }
 
-func (s *NavigationService) NavigateWarp(ctx context.Context, agentID uuid.UUID, x, y int) (model.Cooldown, error) {
+func (s *Service) NavigateWarp(ctx context.Context, agentID uuid.UUID, x, y int) (model.Cooldown, error) {
 	if !s.gameConfig.Rules.DisableCooldowns {
 		if err := s.store.Cooldowns().CheckCooldown(ctx, agentID); err != nil {
 			return model.Cooldown{}, fmt.Errorf("cooldown: %w", err)
@@ -81,7 +81,7 @@ func (s *NavigationService) NavigateWarp(ctx context.Context, agentID uuid.UUID,
 	return cooldown, nil
 }
 
-func (s *NavigationService) NavigatePlanet(ctx context.Context, agentID uuid.UUID, orbit int) (model.Cooldown, error) {
+func (s *Service) NavigatePlanet(ctx context.Context, agentID uuid.UUID, orbit int) (model.Cooldown, error) {
 	if !s.gameConfig.Rules.DisableCooldowns {
 		if err := s.store.Cooldowns().CheckCooldown(ctx, agentID); err != nil {
 			return model.Cooldown{}, fmt.Errorf("cooldown: %w", err)
@@ -129,7 +129,7 @@ func (s *NavigationService) NavigatePlanet(ctx context.Context, agentID uuid.UUI
 	return cooldown, nil
 }
 
-func (s *NavigationService) NavigateWaypoint(ctx context.Context, agentID uuid.UUID, waypointID int) (model.Cooldown, error) {
+func (s *Service) NavigateWaypoint(ctx context.Context, agentID uuid.UUID, waypointID int) (model.Cooldown, error) {
 	if !s.gameConfig.Rules.DisableCooldowns {
 		if err := s.store.Cooldowns().CheckCooldown(ctx, agentID); err != nil {
 			return model.Cooldown{}, fmt.Errorf("cooldown: %w", err)

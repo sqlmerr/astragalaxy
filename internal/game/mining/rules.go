@@ -1,4 +1,4 @@
-package mining_service
+package mining
 
 import (
 	"fmt"

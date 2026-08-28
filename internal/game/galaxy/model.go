@@ -1,4 +1,4 @@
-package galaxy_service
+package galaxy
 
 import (
 	"github.com/sqlmerr/astragalaxy/internal/game/worldgen"

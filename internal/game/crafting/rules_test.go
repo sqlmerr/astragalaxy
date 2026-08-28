@@ -1,4 +1,4 @@
-package crafting_service
+package crafting
 
 import (
 	"testing"

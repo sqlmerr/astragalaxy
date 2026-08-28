@@ -1,4 +1,4 @@
-package inventory_service
+package inventory
 
 import (
 	"github.com/google/uuid"

@@ -1,4 +1,4 @@
-package navigation_service
+package navigation
 
 import (
 	"fmt"

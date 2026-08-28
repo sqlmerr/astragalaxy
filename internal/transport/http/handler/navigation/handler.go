@@ -3,16 +3,16 @@ package http_handler_navigation
 import (
 	"net/http"
 
-	navigation_service "github.com/sqlmerr/astragalaxy/internal/game/navigation"
+	"github.com/sqlmerr/astragalaxy/internal/game/navigation"
 	http_middleware "github.com/sqlmerr/astragalaxy/internal/transport/http/middleware"
 	http_server "github.com/sqlmerr/astragalaxy/internal/transport/http/server"
 )
 
 type NavigationHTTPHandler struct {
-	navigationService navigation_service.NavigationService
+	navigationService navigation.Service
 }
 
-func New(navigationService navigation_service.NavigationService) *NavigationHTTPHandler {
+func New(navigationService navigation.Service) *NavigationHTTPHandler {
 	return &NavigationHTTPHandler{navigationService}
 }
 

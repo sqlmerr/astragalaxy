@@ -9,7 +9,7 @@ import (
 	"syscall"
 
 	scalargo "github.com/bdpiprava/scalar-go"
-	core_auth "github.com/sqlmerr/astragalaxy/internal/auth"
+	"github.com/sqlmerr/astragalaxy/internal/auth"
 	"github.com/sqlmerr/astragalaxy/internal/data"
 	database "github.com/sqlmerr/astragalaxy/internal/data/postgres/database/sqlc"
 	pgx_pool "github.com/sqlmerr/astragalaxy/internal/data/postgres/pool/pgx"
@@ -22,17 +22,17 @@ import (
 	ships_repository "github.com/sqlmerr/astragalaxy/internal/data/repository/ships"
 	users_repository "github.com/sqlmerr/astragalaxy/internal/data/repository/users"
 	"github.com/sqlmerr/astragalaxy/internal/game"
-	agents_service "github.com/sqlmerr/astragalaxy/internal/game/agents"
-	cooldowns_service "github.com/sqlmerr/astragalaxy/internal/game/cooldowns"
-	crafting_service "github.com/sqlmerr/astragalaxy/internal/game/crafting"
+	"github.com/sqlmerr/astragalaxy/internal/game/agents"
+	"github.com/sqlmerr/astragalaxy/internal/game/cooldowns"
+	"github.com/sqlmerr/astragalaxy/internal/game/crafting"
 	"github.com/sqlmerr/astragalaxy/internal/game/facilities"
-	galaxy_service "github.com/sqlmerr/astragalaxy/internal/game/galaxy"
-	inventory_service "github.com/sqlmerr/astragalaxy/internal/game/inventory"
-	items_service "github.com/sqlmerr/astragalaxy/internal/game/items"
-	mining_service "github.com/sqlmerr/astragalaxy/internal/game/mining"
-	navigation_service "github.com/sqlmerr/astragalaxy/internal/game/navigation"
-	ships_service "github.com/sqlmerr/astragalaxy/internal/game/ships"
-	users_service "github.com/sqlmerr/astragalaxy/internal/game/users"
+	"github.com/sqlmerr/astragalaxy/internal/game/galaxy"
+	"github.com/sqlmerr/astragalaxy/internal/game/inventory"
+	"github.com/sqlmerr/astragalaxy/internal/game/items"
+	"github.com/sqlmerr/astragalaxy/internal/game/mining"
+	"github.com/sqlmerr/astragalaxy/internal/game/navigation"
+	"github.com/sqlmerr/astragalaxy/internal/game/ships"
+	"github.com/sqlmerr/astragalaxy/internal/game/users"
 	"github.com/sqlmerr/astragalaxy/internal/game/worldgen"
 	core_logger "github.com/sqlmerr/astragalaxy/internal/logger"
 	http_handler_agents "github.com/sqlmerr/astragalaxy/internal/transport/http/handler/agents"
@@ -89,8 +89,8 @@ func main() {
 	store := data.NewStore(pool, userRepo, agentRepo, shipRepo, inventoryRepo, cooldownRepo, resourceDepositsRepo)
 
 	log.Debug("Initializing game logic")
-	authConfig := core_auth.LoadConfigMust()
-	jwtProcessor := core_auth.NewJWTProcessor(*authConfig)
+	authConfig := auth.LoadConfigMust()
+	jwtProcessor := auth.NewJWTProcessor(*authConfig)
 	userAuthMiddleware := http_middleware.UserAuth(*jwtProcessor)
 	agentAuthMiddleware := http_middleware.AgentAuth(*jwtProcessor, agentRepo)
 
@@ -104,18 +104,18 @@ func main() {
 
 	worldGen := worldgen.New(gameData, gameConfig.Seed)
 
-	usersService := users_service.New(store)
-	authService := core_auth.NewService(store, *jwtProcessor)
-	shipsService := ships_service.New(gameConfig, store, *worldGen)
-	agentsService := agents_service.New(store, *worldGen, shipsService)
-	cooldownsService := cooldowns_service.New(gameConfig, store)
-	inventoryService := inventory_service.New(gameConfig, store)
-	navigationService := navigation_service.New(gameConfig, store, *worldGen)
-	galaxyService := galaxy_service.New(store, *worldGen)
-	miningService := mining_service.New(gameConfig, store, *worldGen)
-	itemsService := items_service.New(store)
+	usersService := users.NewService(store)
+	authService := auth.NewService(store, *jwtProcessor)
+	shipsService := ships.NewService(gameConfig, store, *worldGen)
+	agentsService := agents.NewService(store, *worldGen, shipsService)
+	cooldownsService := cooldowns.NewService(gameConfig, store)
+	inventoryService := inventory.NewService(gameConfig, store)
+	navigationService := navigation.NewService(gameConfig, store, *worldGen)
+	galaxyService := galaxy.NewService(store, *worldGen)
+	miningService := mining.NewService(gameConfig, store, *worldGen)
+	itemsService := items.NewService(store)
 	faciltiesService := facilities.NewService(store, *gameData, *worldGen)
-	craftingService := crafting_service.New(gameConfig, store, *gameData, *worldGen, faciltiesService)
+	craftingService := crafting.NewService(gameConfig, store, *gameData, *worldGen, faciltiesService)
 
 	usersHandler := http_handler_users.NewUsersHTTPHandler(*usersService, *authService)
 	apiVersionRouter.AddRoutes(usersHandler.Routes(userAuthMiddleware)...)

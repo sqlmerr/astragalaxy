@@ -3,18 +3,18 @@ package http_handler_users
 import (
 	"net/http"
 
-	core_auth "github.com/sqlmerr/astragalaxy/internal/auth"
-	users_service "github.com/sqlmerr/astragalaxy/internal/game/users"
+	"github.com/sqlmerr/astragalaxy/internal/auth"
+	"github.com/sqlmerr/astragalaxy/internal/game/users"
 	http_middleware "github.com/sqlmerr/astragalaxy/internal/transport/http/middleware"
 	http_server "github.com/sqlmerr/astragalaxy/internal/transport/http/server"
 )
 
 type UsersHTTPHandler struct {
-	usersService users_service.UsersService
-	authService  core_auth.AuthService
+	usersService users.Service
+	authService  auth.Service
 }
 
-func NewUsersHTTPHandler(usersService users_service.UsersService, authService core_auth.AuthService) *UsersHTTPHandler {
+func NewUsersHTTPHandler(usersService users.Service, authService auth.Service) *UsersHTTPHandler {
 	return &UsersHTTPHandler{usersService, authService}
 }
 

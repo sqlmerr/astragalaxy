@@ -1,4 +1,4 @@
-package galaxy_service
+package galaxy
 
 import (
 	"context"
@@ -11,18 +11,18 @@ import (
 	"github.com/sqlmerr/astragalaxy/internal/model"
 )
 
-type GalaxyService struct {
+type Service struct {
 	store    data.Store
 	worldGen worldgen.WorldGen
 }
 
-func New(store data.Store, worldGen worldgen.WorldGen) *GalaxyService {
-	return &GalaxyService{
+func NewService(store data.Store, worldGen worldgen.WorldGen) *Service {
+	return &Service{
 		store, worldGen,
 	}
 }
 
-func (s *GalaxyService) ShipRadar(ctx context.Context, agentID uuid.UUID) ([]worldgen.System, error) {
+func (s *Service) ShipRadar(ctx context.Context, agentID uuid.UUID) ([]worldgen.System, error) {
 	ship, err := s.store.Ships().GetActiveShipByAgent(ctx, agentID)
 	if err != nil {
 		return nil, fmt.Errorf("get active ship: %w", err)
@@ -36,7 +36,7 @@ func (s *GalaxyService) ShipRadar(ctx context.Context, agentID uuid.UUID) ([]wor
 	return systems, nil
 }
 
-func (s *GalaxyService) GetCurrentAgentSystem(ctx context.Context, agentID uuid.UUID) (FullSystem, error) {
+func (s *Service) GetCurrentAgentSystem(ctx context.Context, agentID uuid.UUID) (FullSystem, error) {
 	ship, err := s.store.Ships().GetActiveShipByAgent(ctx, agentID)
 	if err != nil {
 		return FullSystem{}, fmt.Errorf("get active ship: %w", err)

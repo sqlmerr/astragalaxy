@@ -3,7 +3,7 @@ package http_handler_navigation
 import (
 	"net/http"
 
-	core_auth "github.com/sqlmerr/astragalaxy/internal/auth"
+	"github.com/sqlmerr/astragalaxy/internal/auth"
 	core_logger "github.com/sqlmerr/astragalaxy/internal/logger"
 	http_dto "github.com/sqlmerr/astragalaxy/internal/transport/http/dto"
 	http_request "github.com/sqlmerr/astragalaxy/internal/transport/http/request"
@@ -25,7 +25,7 @@ func (h *NavigationHTTPHandler) NavigateWaypoint(w http.ResponseWriter, r *http.
 		return
 	}
 
-	agentID := core_auth.GetAgentIDFromContext(ctx)
+	agentID := auth.GetAgentIDFromContext(ctx)
 
 	cooldown, err := h.navigationService.NavigateWaypoint(ctx, agentID, *req.ID)
 	if err != nil {

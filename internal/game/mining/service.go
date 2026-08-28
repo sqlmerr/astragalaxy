@@ -1,4 +1,4 @@
-package mining_service
+package mining
 
 import (
 	"context"
@@ -16,17 +16,17 @@ import (
 	"github.com/sqlmerr/astragalaxy/internal/model"
 )
 
-type MiningService struct {
+type Service struct {
 	gameConfig game.Config
 	store      data.Store
 	worldGen   worldgen.WorldGen
 }
 
-func New(gameConfig game.Config, store data.Store, worldGen worldgen.WorldGen) *MiningService {
-	return &MiningService{gameConfig, store, worldGen}
+func NewService(gameConfig game.Config, store data.Store, worldGen worldgen.WorldGen) *Service {
+	return &Service{gameConfig, store, worldGen}
 }
 
-func (s *MiningService) MineAsteroid(ctx context.Context, agentID uuid.UUID, amount int) (model.Cooldown, error) {
+func (s *Service) MineAsteroid(ctx context.Context, agentID uuid.UUID, amount int) (model.Cooldown, error) {
 	if !s.gameConfig.Rules.DisableCooldowns {
 		if err := s.store.Cooldowns().CheckCooldown(ctx, agentID); err != nil {
 			return model.Cooldown{}, fmt.Errorf("cooldown: %w", err)
@@ -163,7 +163,7 @@ func (s *MiningService) MineAsteroid(ctx context.Context, agentID uuid.UUID, amo
 	return cooldown, err
 }
 
-func (s *MiningService) MinePlanet(ctx context.Context, agentID uuid.UUID, resourceType model.ResourceType, amount int) (model.Cooldown, error) {
+func (s *Service) MinePlanet(ctx context.Context, agentID uuid.UUID, resourceType model.ResourceType, amount int) (model.Cooldown, error) {
 	if !s.gameConfig.Rules.DisableCooldowns {
 		if err := s.store.Cooldowns().CheckCooldown(ctx, agentID); err != nil {
 			return model.Cooldown{}, fmt.Errorf("cooldown: %w", err)

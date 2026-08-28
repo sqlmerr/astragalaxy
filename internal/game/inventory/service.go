@@ -1,4 +1,4 @@
-package inventory_service
+package inventory
 
 import (
 	"context"
@@ -16,18 +16,18 @@ import (
 	"go.uber.org/zap"
 )
 
-type InventoryService struct {
+type Service struct {
 	gameConfig game.Config
 	store      data.Store
 }
 
-func New(gameConfig game.Config, store data.Store) *InventoryService {
-	return &InventoryService{
+func NewService(gameConfig game.Config, store data.Store) *Service {
+	return &Service{
 		gameConfig, store,
 	}
 }
 
-func (s *InventoryService) GetAgentInventory(ctx context.Context, agentID uuid.UUID) (FullInventory, error) {
+func (s *Service) GetAgentInventory(ctx context.Context, agentID uuid.UUID) (FullInventory, error) {
 	agent, err := s.store.Agents().GetAgent(ctx, agentID)
 	if err != nil {
 		return FullInventory{}, fmt.Errorf("get agent: %w", err)
@@ -36,7 +36,7 @@ func (s *InventoryService) GetAgentInventory(ctx context.Context, agentID uuid.U
 	return s.getFullInventory(ctx, agent.InventoryID)
 }
 
-func (s *InventoryService) GetShipInventory(ctx context.Context, agentID, shipID uuid.UUID) (FullInventory, error) {
+func (s *Service) GetShipInventory(ctx context.Context, agentID, shipID uuid.UUID) (FullInventory, error) {
 	ship, err := s.store.Ships().GetShip(ctx, shipID)
 	if err != nil {
 		return FullInventory{}, fmt.Errorf("get ship: %w", err)
@@ -52,7 +52,7 @@ func (s *InventoryService) GetShipInventory(ctx context.Context, agentID, shipID
 	return s.getFullInventory(ctx, ship.InventoryID)
 }
 
-func (s *InventoryService) getFullInventory(ctx context.Context, inventoryID uuid.UUID) (FullInventory, error) {
+func (s *Service) getFullInventory(ctx context.Context, inventoryID uuid.UUID) (FullInventory, error) {
 	inv, err := s.store.Inventories().GetInventory(ctx, inventoryID)
 	if err != nil {
 		return FullInventory{}, fmt.Errorf("get inventory: %w", err)
@@ -71,7 +71,7 @@ func (s *InventoryService) getFullInventory(ctx context.Context, inventoryID uui
 	return FullInventory{Inventory: inv, Resources: resources, Items: items}, nil
 }
 
-func (s *InventoryService) TransferResources(
+func (s *Service) TransferResources(
 	ctx context.Context,
 	input TransferResourcesInput,
 ) error {
@@ -162,7 +162,7 @@ func (s *InventoryService) TransferResources(
 	return nil
 }
 
-func (s *InventoryService) TransferItems(ctx context.Context, input TransferItemsInput) error {
+func (s *Service) TransferItems(ctx context.Context, input TransferItemsInput) error {
 	if input.FromInventoryID == input.ToInventoryID || input.Items == nil || len(input.Items) == 0 {
 		return nil
 	}
@@ -238,7 +238,7 @@ func (s *InventoryService) TransferItems(ctx context.Context, input TransferItem
 	return nil
 }
 
-func (s *InventoryService) checkTransferDirection(ctx context.Context, agentID uuid.UUID, fromInventoryID, toInventoryID uuid.UUID) error {
+func (s *Service) checkTransferDirection(ctx context.Context, agentID uuid.UUID, fromInventoryID, toInventoryID uuid.UUID) error {
 	ownerFrom, err := s.store.Inventories().GetInventoryOwner(ctx, fromInventoryID)
 	if err != nil {
 		return fmt.Errorf("get inventory owner: %w", err)

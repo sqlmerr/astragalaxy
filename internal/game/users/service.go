@@ -1,4 +1,4 @@
-package users_service
+package users
 
 import (
 	"context"
@@ -9,17 +9,17 @@ import (
 	"github.com/sqlmerr/astragalaxy/internal/model"
 )
 
-type UsersService struct {
+type Service struct {
 	store data.Store
 }
 
-func New(store data.Store) *UsersService {
-	return &UsersService{
+func NewService(store data.Store) *Service {
+	return &Service{
 		store,
 	}
 }
 
-func (s *UsersService) GetUserByUsername(ctx context.Context, username string) (model.User, error) {
+func (s *Service) GetUserByUsername(ctx context.Context, username string) (model.User, error) {
 	user, err := s.store.Users().GetUserByUsername(ctx, username)
 	if err != nil {
 		return model.User{}, fmt.Errorf("get user: %w", err)
@@ -28,7 +28,7 @@ func (s *UsersService) GetUserByUsername(ctx context.Context, username string) (
 	return user, nil
 }
 
-func (s *UsersService) GetUserByID(ctx context.Context, userID uuid.UUID) (model.User, error) {
+func (s *Service) GetUserByID(ctx context.Context, userID uuid.UUID) (model.User, error) {
 	user, err := s.store.Users().GetUser(ctx, userID)
 	if err != nil {
 		return model.User{}, fmt.Errorf("get user: %w", err)

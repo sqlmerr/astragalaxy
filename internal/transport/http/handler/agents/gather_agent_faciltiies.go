@@ -4,7 +4,7 @@ import (
 	"net/http"
 
 	"github.com/samber/lo"
-	core_auth "github.com/sqlmerr/astragalaxy/internal/auth"
+	"github.com/sqlmerr/astragalaxy/internal/auth"
 	"github.com/sqlmerr/astragalaxy/internal/data/registry"
 	core_logger "github.com/sqlmerr/astragalaxy/internal/logger"
 	http_response "github.com/sqlmerr/astragalaxy/internal/transport/http/response"
@@ -19,8 +19,8 @@ func (h *AgentsHTTPHandler) GetAgentFacilities(w http.ResponseWriter, r *http.Re
 	log := core_logger.FromContext(ctx)
 	responseHandler := http_response.NewHTTPResponseHandler(log, w)
 
-	agentID := core_auth.GetAgentIDFromContext(ctx)
-	facilities, err := h.faciltiesService.GatherAvailableFacilities(ctx, agentID)
+	agentID := auth.GetAgentIDFromContext(ctx)
+	facilities, err := h.facilitiesService.GatherAvailableFacilities(ctx, agentID)
 	if err != nil {
 		responseHandler.ErrorResponse(err, "Failed to get available facilities")
 		return

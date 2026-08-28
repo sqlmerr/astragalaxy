@@ -1,11 +1,11 @@
-package agents_service
+package agents
 
 import (
 	"context"
 	"fmt"
 
 	"github.com/google/uuid"
-	core_auth "github.com/sqlmerr/astragalaxy/internal/auth"
+	"github.com/sqlmerr/astragalaxy/internal/auth"
 	"github.com/sqlmerr/astragalaxy/internal/data"
 	agents_repository "github.com/sqlmerr/astragalaxy/internal/data/repository/agents"
 	inventories_repository "github.com/sqlmerr/astragalaxy/internal/data/repository/inventories"
@@ -20,20 +20,20 @@ type shipProvider interface {
 	CreateStarterShip(ctx context.Context, tx data.Store, agentID uuid.UUID) (model.Ship, error)
 }
 
-type AgentsService struct {
+type Service struct {
 	store    data.Store
 	worldGen worldgen.WorldGen
 
 	shipProvider shipProvider
 }
 
-func New(store data.Store, worldGen worldgen.WorldGen, shipProvider shipProvider) *AgentsService {
-	return &AgentsService{
+func NewService(store data.Store, worldGen worldgen.WorldGen, shipProvider shipProvider) *Service {
+	return &Service{
 		store, worldGen, shipProvider,
 	}
 }
 
-func (s *AgentsService) GetUserAgents(ctx context.Context, userID uuid.UUID) ([]model.Agent, error) {
+func (s *Service) GetUserAgents(ctx context.Context, userID uuid.UUID) ([]model.Agent, error) {
 	agents, err := s.store.Agents().GetAgentsByUser(ctx, userID)
 	if err != nil {
 		return nil, fmt.Errorf("get user agents: %w", err)
@@ -42,7 +42,7 @@ func (s *AgentsService) GetUserAgents(ctx context.Context, userID uuid.UUID) ([]
 	return agents, err
 }
 
-func (s *AgentsService) RegisterAgent(ctx context.Context, userID uuid.UUID, username string) (model.Agent, string, error) {
+func (s *Service) RegisterAgent(ctx context.Context, userID uuid.UUID, username string) (model.Agent, string, error) {
 	log := core_logger.TryFromContext(ctx)
 	var rawToken string
 	var agent model.Agent
@@ -64,7 +64,7 @@ func (s *AgentsService) RegisterAgent(ctx context.Context, userID uuid.UUID, use
 	}
 
 	var tokenHash string
-	rawToken, tokenHash, err = core_auth.GenerateAgentToken()
+	rawToken, tokenHash, err = auth.GenerateAgentToken()
 	if err != nil {
 		return model.Agent{}, "", fmt.Errorf("failed to generate token")
 	}
@@ -129,7 +129,7 @@ func (s *AgentsService) RegisterAgent(ctx context.Context, userID uuid.UUID, use
 	return agent, rawToken, nil
 }
 
-func (s *AgentsService) ResetAgentToken(ctx context.Context, userID uuid.UUID, agentID uuid.UUID) (string, error) {
+func (s *Service) ResetAgentToken(ctx context.Context, userID uuid.UUID, agentID uuid.UUID) (string, error) {
 	agent, err := s.store.Agents().GetAgent(ctx, agentID)
 	if err != nil {
 		return "", fmt.Errorf("get agent: %w", err)
@@ -141,7 +141,7 @@ func (s *AgentsService) ResetAgentToken(ctx context.Context, userID uuid.UUID, a
 		)
 	}
 
-	rawToken, tokenHash, err := core_auth.GenerateAgentToken()
+	rawToken, tokenHash, err := auth.GenerateAgentToken()
 	if err != nil {
 		return "", fmt.Errorf("generate token: %w", err)
 	}

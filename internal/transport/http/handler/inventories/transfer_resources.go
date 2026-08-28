@@ -5,8 +5,8 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/samber/lo"
-	core_auth "github.com/sqlmerr/astragalaxy/internal/auth"
-	inventory_service "github.com/sqlmerr/astragalaxy/internal/game/inventory"
+	"github.com/sqlmerr/astragalaxy/internal/auth"
+	"github.com/sqlmerr/astragalaxy/internal/game/inventory"
 	core_logger "github.com/sqlmerr/astragalaxy/internal/logger"
 	"github.com/sqlmerr/astragalaxy/internal/model"
 	http_request "github.com/sqlmerr/astragalaxy/internal/transport/http/request"
@@ -30,8 +30,8 @@ func (h *InventoriesHTTPHandler) TransferResources(w http.ResponseWriter, r *htt
 		return
 	}
 
-	agentID := core_auth.GetAgentIDFromContext(ctx)
-	input := inventory_service.TransferResourcesInput{
+	agentID := auth.GetAgentIDFromContext(ctx)
+	input := inventory.TransferResourcesInput{
 		AgentID:         agentID,
 		FromInventoryID: request.FromInventoryID,
 		ToInventoryID:   request.ToInventoryID,

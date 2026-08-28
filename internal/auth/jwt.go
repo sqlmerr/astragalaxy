@@ -1,4 +1,4 @@
-package core_auth
+package auth
 
 import (
 	"context"

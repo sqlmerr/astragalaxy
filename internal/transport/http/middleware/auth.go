@@ -8,7 +8,7 @@ import (
 	"strings"
 
 	"github.com/google/uuid"
-	core_auth "github.com/sqlmerr/astragalaxy/internal/auth"
+	"github.com/sqlmerr/astragalaxy/internal/auth"
 	errs "github.com/sqlmerr/astragalaxy/internal/errors"
 	core_logger "github.com/sqlmerr/astragalaxy/internal/logger"
 	"github.com/sqlmerr/astragalaxy/internal/model"
@@ -17,7 +17,7 @@ import (
 
 const AGENT_ID_HEADER = "X-Agent-ID"
 
-func UserAuth(jwtProcessor core_auth.JWTProcessor) Middleware {
+func UserAuth(jwtProcessor auth.JWTProcessor) Middleware {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			ctx := r.Context()
@@ -40,7 +40,7 @@ func UserAuth(jwtProcessor core_auth.JWTProcessor) Middleware {
 				responseHandler.ErrorResponse(errs.NewWithCode(errs.CodeInvalidJWTToken, err), "Invalid jwt token")
 				return
 			}
-			ctx = context.WithValue(ctx, core_auth.UserIDContextKey, userID)
+			ctx = context.WithValue(ctx, auth.UserIDContextKey, userID)
 
 			next.ServeHTTP(w, r.WithContext(ctx))
 		})
@@ -52,7 +52,7 @@ type AgentGetter interface {
 	GetAgent(ctx context.Context, id uuid.UUID) (model.Agent, error)
 }
 
-func AgentAuth(jwtProcessor core_auth.JWTProcessor, agentGetter AgentGetter) Middleware {
+func AgentAuth(jwtProcessor auth.JWTProcessor, agentGetter AgentGetter) Middleware {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			ctx := r.Context()
@@ -71,7 +71,7 @@ func AgentAuth(jwtProcessor core_auth.JWTProcessor, agentGetter AgentGetter) Mid
 
 			var agent model.Agent
 			if strings.HasPrefix(headerParts[1], "ag_agent_") {
-				hashedToken := core_auth.HashRawAgentToken(headerParts[1])
+				hashedToken := auth.HashRawAgentToken(headerParts[1])
 				var err error
 				agent, err = agentGetter.GetAgentByToken(ctx, hashedToken)
 				if err != nil {
@@ -124,8 +124,8 @@ func AgentAuth(jwtProcessor core_auth.JWTProcessor, agentGetter AgentGetter) Mid
 				}
 			}
 
-			ctx = context.WithValue(ctx, core_auth.AgentIDContextKey, agent.ID)
-			ctx = context.WithValue(ctx, core_auth.AgentContextKey, agent)
+			ctx = context.WithValue(ctx, auth.AgentIDContextKey, agent.ID)
+			ctx = context.WithValue(ctx, auth.AgentContextKey, agent)
 
 			next.ServeHTTP(w, r.WithContext(ctx))
 		})

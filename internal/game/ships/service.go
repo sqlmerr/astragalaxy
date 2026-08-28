@@ -1,4 +1,4 @@
-package ships_service
+package ships
 
 import (
 	"context"
@@ -18,19 +18,19 @@ import (
 	"go.uber.org/zap"
 )
 
-type ShipsService struct {
+type Service struct {
 	gameConfig game.Config
 	store      data.Store
 	worldGen   worldgen.WorldGen
 }
 
-func New(gameConfig game.Config, store data.Store, worldGen worldgen.WorldGen) *ShipsService {
-	return &ShipsService{
+func NewService(gameConfig game.Config, store data.Store, worldGen worldgen.WorldGen) *Service {
+	return &Service{
 		gameConfig, store, worldGen,
 	}
 }
 
-func (s *ShipsService) GetAgentShips(ctx context.Context, agentID uuid.UUID) ([]model.Ship, error) {
+func (s *Service) GetAgentShips(ctx context.Context, agentID uuid.UUID) ([]model.Ship, error) {
 	ships, err := s.store.Ships().GetShipsByAgent(ctx, agentID)
 	if err != nil {
 		return nil, fmt.Errorf("get ships: %w", err)
@@ -39,7 +39,7 @@ func (s *ShipsService) GetAgentShips(ctx context.Context, agentID uuid.UUID) ([]
 	return ships, nil
 }
 
-func (s *ShipsService) GetAgentActiveShip(ctx context.Context, agentID uuid.UUID) (model.Ship, error) {
+func (s *Service) GetAgentActiveShip(ctx context.Context, agentID uuid.UUID) (model.Ship, error) {
 	ship, err := s.store.Ships().GetActiveShipByAgent(ctx, agentID)
 	if err != nil {
 		return model.Ship{}, fmt.Errorf("get active ship: %w", err)
@@ -48,7 +48,7 @@ func (s *ShipsService) GetAgentActiveShip(ctx context.Context, agentID uuid.UUID
 	return ship, nil
 }
 
-func (s *ShipsService) RenameShip(ctx context.Context, agentID uuid.UUID, shipID uuid.UUID, newShipName string) (model.Ship, error) {
+func (s *Service) RenameShip(ctx context.Context, agentID uuid.UUID, shipID uuid.UUID, newShipName string) (model.Ship, error) {
 	ship, err := s.store.Ships().GetShip(ctx, shipID)
 	if err != nil {
 		return model.Ship{}, fmt.Errorf("get ship: %w", err)
@@ -70,7 +70,7 @@ func (s *ShipsService) RenameShip(ctx context.Context, agentID uuid.UUID, shipID
 	return newShip, nil
 }
 
-func (s *ShipsService) ChangeActiveShip(ctx context.Context, agentID uuid.UUID, newActiveShipID uuid.UUID) error {
+func (s *Service) ChangeActiveShip(ctx context.Context, agentID uuid.UUID, newActiveShipID uuid.UUID) error {
 	err := s.store.ExecTx(ctx, func(tx data.Store) error {
 		oldActiveShip, oldActiveErr := tx.Ships().GetActiveShipByAgent(ctx, agentID)
 		var oldActiveShipToSave *model.Ship
@@ -120,7 +120,7 @@ func (s *ShipsService) ChangeActiveShip(ctx context.Context, agentID uuid.UUID, 
 	return nil
 }
 
-func (s *ShipsService) OrbitShip(ctx context.Context, agentID uuid.UUID) (model.Cooldown, error) {
+func (s *Service) OrbitShip(ctx context.Context, agentID uuid.UUID) (model.Cooldown, error) {
 	if !s.gameConfig.Rules.DisableCooldowns {
 		if err := s.store.Cooldowns().CheckCooldown(ctx, agentID); err != nil {
 			return model.Cooldown{}, fmt.Errorf("cooldown: %w", err)
@@ -153,7 +153,7 @@ func (s *ShipsService) OrbitShip(ctx context.Context, agentID uuid.UUID) (model.
 	return cooldown, nil
 }
 
-func (s *ShipsService) DockShip(ctx context.Context, agentID uuid.UUID) (model.Cooldown, error) {
+func (s *Service) DockShip(ctx context.Context, agentID uuid.UUID) (model.Cooldown, error) {
 	if !s.gameConfig.Rules.DisableCooldowns {
 		if err := s.store.Cooldowns().CheckCooldown(ctx, agentID); err != nil {
 			return model.Cooldown{}, fmt.Errorf("cooldown: %w", err)
@@ -209,7 +209,7 @@ func (s *ShipsService) DockShip(ctx context.Context, agentID uuid.UUID) (model.C
 	return cooldown, nil
 }
 
-func (s *ShipsService) GetShipModules(ctx context.Context, agentID uuid.UUID, shipID uuid.UUID) ([]model.ShipModule, error) {
+func (s *Service) GetShipModules(ctx context.Context, agentID uuid.UUID, shipID uuid.UUID) ([]model.ShipModule, error) {
 	ship, err := s.store.Ships().GetShip(ctx, shipID)
 	if err != nil {
 		return nil, fmt.Errorf("get ship: %w", err)
@@ -230,7 +230,7 @@ func (s *ShipsService) GetShipModules(ctx context.Context, agentID uuid.UUID, sh
 	return modules, nil
 }
 
-func (s *ShipsService) CreateStarterShip(ctx context.Context, tx data.Store, agentID uuid.UUID) (model.Ship, error) {
+func (s *Service) CreateStarterShip(ctx context.Context, tx data.Store, agentID uuid.UUID) (model.Ship, error) {
 	spawnSystem, err := s.worldGen.FindSpawnSystem()
 	if err != nil {
 		return model.Ship{}, fmt.Errorf("find spawn system: %w", err)
@@ -256,7 +256,7 @@ func (s *ShipsService) CreateStarterShip(ctx context.Context, tx data.Store, age
 	})
 }
 
-func (s *ShipsService) createShip(ctx context.Context, tx data.Store, spec CreateShipSpec) (model.Ship, error) {
+func (s *Service) createShip(ctx context.Context, tx data.Store, spec CreateShipSpec) (model.Ship, error) {
 	shipInventory, err := tx.Inventories().CreateInventory(ctx, inventories_repository.CreateInventory{
 		MaxItemSlots:      spec.Inventory.MaxItemSlots,
 		MaxResourceVolume: spec.Inventory.MaxResourceVolume,

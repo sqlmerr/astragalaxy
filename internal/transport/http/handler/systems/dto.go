@@ -2,7 +2,7 @@ package http_handler_systems
 
 import (
 	"github.com/samber/lo"
-	galaxy_service "github.com/sqlmerr/astragalaxy/internal/game/galaxy"
+	"github.com/sqlmerr/astragalaxy/internal/game/galaxy"
 	"github.com/sqlmerr/astragalaxy/internal/game/worldgen"
 )
 
@@ -114,7 +114,7 @@ func shortSystemDTOFromModel(m worldgen.System) ShortSystemResponseDTO {
 	}
 }
 
-func fullSystemDTOFromModel(m galaxy_service.FullSystem) FullSystemResponseDTO {
+func fullSystemDTOFromModel(m galaxy.FullSystem) FullSystemResponseDTO {
 	return FullSystemResponseDTO{
 		Name:      m.Name,
 		X:         m.X,

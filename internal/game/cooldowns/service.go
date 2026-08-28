@@ -1,4 +1,4 @@
-package cooldowns_service
+package cooldowns
 
 import (
 	"context"
@@ -9,19 +9,19 @@ import (
 	"github.com/sqlmerr/astragalaxy/internal/model"
 )
 
-type CooldownsService struct {
+type Service struct {
 	gameConfig game.Config
 	store      data.Store
 }
 
-func New(gameConfig game.Config, store data.Store) *CooldownsService {
-	return &CooldownsService{
+func NewService(gameConfig game.Config, store data.Store) *Service {
+	return &Service{
 		gameConfig,
 		store,
 	}
 }
 
-func (s *CooldownsService) GetAgentCooldown(ctx context.Context, agentID uuid.UUID) (model.Cooldown, error) {
+func (s *Service) GetAgentCooldown(ctx context.Context, agentID uuid.UUID) (model.Cooldown, error) {
 	if s.gameConfig.Rules.DisableCooldowns {
 		return model.Cooldown{}, nil
 	}

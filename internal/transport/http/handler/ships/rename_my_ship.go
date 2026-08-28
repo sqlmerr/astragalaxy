@@ -3,7 +3,7 @@ package http_handler_ships
 import (
 	"net/http"
 
-	core_auth "github.com/sqlmerr/astragalaxy/internal/auth"
+	"github.com/sqlmerr/astragalaxy/internal/auth"
 	core_logger "github.com/sqlmerr/astragalaxy/internal/logger"
 	http_request "github.com/sqlmerr/astragalaxy/internal/transport/http/request"
 	http_response "github.com/sqlmerr/astragalaxy/internal/transport/http/response"
@@ -25,7 +25,7 @@ func (h *ShipsHTTPHandler) RenameMyShip(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
-	agentID := core_auth.GetAgentIDFromContext(ctx)
+	agentID := auth.GetAgentIDFromContext(ctx)
 	shipID, err := http_utils.GetUUIDPathValue(r, "id")
 	if err != nil {
 		responseHandler.ErrorResponse(err, "Failed to get `id` path value")

@@ -1,4 +1,4 @@
-package agents_service
+package agents
 
 import (
 	"fmt"

@@ -1,4 +1,4 @@
-package inventory_service
+package inventory
 
 import (
 	"fmt"
