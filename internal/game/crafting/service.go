@@ -17,7 +17,7 @@ import (
 )
 
 type FacilityProvider interface {
-	GatherAvailableFacilities(ctx context.Context, agentID uuid.UUID) (map[registry.FacilityType][]string, error)
+	GatherAvailableFacilities(ctx context.Context, agentID uuid.UUID) (map[model.FacilityType][]string, error)
 }
 
 type Service struct {
@@ -57,7 +57,7 @@ func (s *Service) Craft(ctx context.Context, agentID uuid.UUID, recipeID string,
 		)
 	}
 
-	var bestFacility *registry.Facility
+	var bestFacility *model.Facility
 	for _, facility := range facilities[recipe.RequiredFacility] {
 		f, ok := s.gameData.Facilities.GetFacility(facility)
 		if !ok {

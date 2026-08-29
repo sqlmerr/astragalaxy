@@ -51,7 +51,7 @@ just migrate-create NAME
 just migrate-up        # Apply migrations
 just migrate-down N    # Rollback N migrations
 just migrate-force V   # Force migration version
-just gen-docs          # redocly bundle api/openapi.yaml -> out/openapi.json
+just gen-docs          # Bundle openapi.yaml -> out/openapi.json + regenerate client types
 just gen-db            # sqlc generate
 just run-server        # go mod tidy && go run cmd/server/main.go
 just test              # go test -v ./internal/game/...
@@ -75,9 +75,9 @@ bun check           # prettier --check
 - `api/openapi.yaml` is the single source of truth. Endpoint definitions are split into
   `api/paths/**`. The auth security schemes (`UserAuth`, `AgentAuth`, `AgentId`) live in the
   `components/securitySchemes` block.
-- Regenerate the bundled JSON with `just gen-docs` after changing the spec.
-- The client generates TypeScript types from the spec: `cd client && bun run doc`
-  (writes `src/api/schema.d.ts`, used with `openapi-fetch` / `openapi-react-query`).
+- Regenerate the bundled JSON and client types with `just gen-docs` after changing the spec.
+  Client types are written to `src/api/schema.d.ts` (used with `openapi-fetch` /
+  `openapi-react-query`).
 
 ### Domain Logic (Backend)
 

@@ -6,27 +6,31 @@ import (
 	"os"
 
 	"github.com/samber/lo"
-)
-
-// As describes how/where an item provides a facility capability.
-// - empty list: the capability is not provided anywhere
-// - "none": the capability is active but not tied to any module type
-//   (e.g. the item is not a ship module)
-type ItemProvidesFacilityAsType string
-
-var (
-	ItemProvidesFacilityAsShipModule ItemProvidesFacilityAsType = "ship_module"
-	ItemProvidesFacilityAsNone       ItemProvidesFacilityAsType = "none"
+	"github.com/sqlmerr/astragalaxy/internal/model"
 )
 
 type ItemProvidesFacility struct {
-	ID string                       `json:"id"`
-	As []ItemProvidesFacilityAsType `json:"as"`
+	ID string                                 `json:"id"`
+	As []model.ItemDataProvidesFacilityAsType `json:"as"`
 }
 
 type Item struct {
 	ID               string                `json:"id"`
 	ProvidesFacility *ItemProvidesFacility `json:"provides_facility,omitempty"`
+}
+
+func itemToModel(i Item) model.ItemData {
+	var providesFacility *model.ItemDataProvidesFacility
+	if i.ProvidesFacility != nil {
+		providesFacility = &model.ItemDataProvidesFacility{
+			ID: i.ProvidesFacility.ID,
+			As: i.ProvidesFacility.As,
+		}
+	}
+	return model.ItemData{
+		ID:               i.ID,
+		ProvidesFacility: providesFacility,
+	}
 }
 
 type ItemRegistry struct {
@@ -53,12 +57,15 @@ func (r *ItemRegistry) Load(cfg Config) error {
 	return nil
 }
 
-func (r *ItemRegistry) GetItem(id string) (Item, bool) {
-	return lo.Find(r.items, func(i Item) bool {
+func (r *ItemRegistry) GetItem(id string) (model.ItemData, bool) {
+	item, found := lo.Find(r.items, func(i Item) bool {
 		return i.ID == id
 	})
+	return itemToModel(item), found
 }
 
-func (r *ItemRegistry) GetAllItems() []Item {
-	return r.items
+func (r *ItemRegistry) GetAllItems() []model.ItemData {
+	return lo.Map(r.items, func(item Item, _ int) model.ItemData {
+		return itemToModel(item)
+	})
 }

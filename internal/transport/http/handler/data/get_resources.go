@@ -4,8 +4,8 @@ import (
 	"net/http"
 
 	"github.com/samber/lo"
-	"github.com/sqlmerr/astragalaxy/internal/data/registry"
 	core_logger "github.com/sqlmerr/astragalaxy/internal/logger"
+	"github.com/sqlmerr/astragalaxy/internal/model"
 	http_response "github.com/sqlmerr/astragalaxy/internal/transport/http/response"
 )
 
@@ -21,7 +21,7 @@ func (h *DataHTTPHandler) GetResources(w http.ResponseWriter, r *http.Request) {
 	resources := h.gameData.Resources.GetAllResources()
 
 	response := GetResourcesResponse{
-		Data: lo.Map(resources, func(i registry.Resource, _ int) ResourceDTO {
+		Data: lo.Map(resources, func(i model.ResourceData, _ int) ResourceDTO {
 			return ResourceDTO{
 				ID:   i.ID,
 				Tags: i.Tags,

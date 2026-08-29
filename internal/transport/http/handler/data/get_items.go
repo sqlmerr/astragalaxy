@@ -4,8 +4,8 @@ import (
 	"net/http"
 
 	"github.com/samber/lo"
-	"github.com/sqlmerr/astragalaxy/internal/data/registry"
 	core_logger "github.com/sqlmerr/astragalaxy/internal/logger"
+	"github.com/sqlmerr/astragalaxy/internal/model"
 	http_response "github.com/sqlmerr/astragalaxy/internal/transport/http/response"
 )
 
@@ -21,12 +21,12 @@ func (h *DataHTTPHandler) GetItems(w http.ResponseWriter, r *http.Request) {
 	items := h.gameData.Items.GetAllItems()
 
 	response := GetItemsResponse{
-		Data: lo.Map(items, func(i registry.Item, _ int) ItemDTO {
+		Data: lo.Map(items, func(i model.ItemData, _ int) ItemDTO {
 			var providesFacility *ItemProvidesFacilityDTO
 			if i.ProvidesFacility != nil {
 				providesFacility = &ItemProvidesFacilityDTO{
 					ID: i.ProvidesFacility.ID,
-					As: lo.Map(i.ProvidesFacility.As, func(item registry.ItemProvidesFacilityAsType, _ int) string {
+					As: lo.Map(i.ProvidesFacility.As, func(item model.ItemDataProvidesFacilityAsType, _ int) string {
 						return string(item)
 					}),
 				}

@@ -4,8 +4,8 @@ import (
 	"net/http"
 
 	"github.com/samber/lo"
-	"github.com/sqlmerr/astragalaxy/internal/data/registry"
 	core_logger "github.com/sqlmerr/astragalaxy/internal/logger"
+	"github.com/sqlmerr/astragalaxy/internal/model"
 	http_response "github.com/sqlmerr/astragalaxy/internal/transport/http/response"
 )
 
@@ -21,7 +21,7 @@ func (h *DataHTTPHandler) GetFacilities(w http.ResponseWriter, r *http.Request) 
 	facilities := h.gameData.Facilities.GetAllFacilities()
 
 	response := GetFacilitiesResponse{
-		Data: lo.Map(facilities, func(i registry.Facility, _ int) FacilityDTO {
+		Data: lo.Map(facilities, func(i model.Facility, _ int) FacilityDTO {
 			return FacilityDTO{
 				ID:             i.ID,
 				Type:           string(i.Type),

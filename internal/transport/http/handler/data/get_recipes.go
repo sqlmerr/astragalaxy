@@ -4,8 +4,8 @@ import (
 	"net/http"
 
 	"github.com/samber/lo"
-	"github.com/sqlmerr/astragalaxy/internal/data/registry"
 	core_logger "github.com/sqlmerr/astragalaxy/internal/logger"
+	"github.com/sqlmerr/astragalaxy/internal/model"
 	http_response "github.com/sqlmerr/astragalaxy/internal/transport/http/response"
 )
 
@@ -21,19 +21,19 @@ func (h *DataHTTPHandler) GetRecipes(w http.ResponseWriter, r *http.Request) {
 	recipes := h.gameData.Recipes.GetAllRecipes()
 
 	response := GetRecipesResponse{
-		Data: lo.Map(recipes, func(i registry.Recipe, _ int) RecipeDTO {
+		Data: lo.Map(recipes, func(i model.Recipe, _ int) RecipeDTO {
 			return RecipeDTO{
 				ID:               i.ID,
 				RequiredFacility: string(i.RequiredFacility),
 				MinTier:          i.MinTier,
 				Duration:         i.Duration,
-				Inputs: lo.Map(i.Inputs, func(in registry.RecipeResource, _ int) RecipeResourceDTO {
+				Inputs: lo.Map(i.Inputs, func(in model.RecipeResource, _ int) RecipeResourceDTO {
 					return RecipeResourceDTO{
 						ResourceID: in.ResourceID,
 						Amount:     in.Amount,
 					}
 				}),
-				Outputs: lo.Map(i.Outputs, func(out registry.RecipeResource, _ int) RecipeResourceDTO {
+				Outputs: lo.Map(i.Outputs, func(out model.RecipeResource, _ int) RecipeResourceDTO {
 					return RecipeResourceDTO{
 						ResourceID: out.ResourceID,
 						Amount:     out.Amount,

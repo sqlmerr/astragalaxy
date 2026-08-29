@@ -4,7 +4,6 @@ import (
 	"testing"
 
 	"github.com/google/uuid"
-	"github.com/sqlmerr/astragalaxy/internal/data/registry"
 	"github.com/sqlmerr/astragalaxy/internal/model"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -24,22 +23,22 @@ func TestCountResourceVolume(t *testing.T) {
 func TestProcessCraft(t *testing.T) {
 	invID := uuid.New()
 
-	recipe := &registry.Recipe{
+	recipe := &model.Recipe{
 		ID:               "smelt_iron",
-		RequiredFacility: registry.FacilitySmelter,
+		RequiredFacility: model.FacilitySmelter,
 		MinTier:          1,
 		Duration:         10,
-		Inputs: []registry.RecipeResource{
+		Inputs: []model.RecipeResource{
 			{ResourceID: "iron_ore", Amount: 2},
 		},
-		Outputs: []registry.RecipeResource{
+		Outputs: []model.RecipeResource{
 			{ResourceID: "iron_bar", Amount: 1},
 		},
 	}
 
-	facility := &registry.Facility{
+	facility := &model.Facility{
 		ID:             "smelter_1",
-		Type:           registry.FacilitySmelter,
+		Type:           model.FacilitySmelter,
 		Tier:           1,
 		TimeMultiplier: 1.0,
 		CostMultiplier: 1.0,
@@ -114,9 +113,9 @@ func TestProcessCraft(t *testing.T) {
 	})
 
 	t.Run("cost multiplier increases cost", func(t *testing.T) {
-		facility2 := &registry.Facility{
+		facility2 := &model.Facility{
 			ID:             "smelter_2",
-			Type:           registry.FacilitySmelter,
+			Type:           model.FacilitySmelter,
 			Tier:           1,
 			TimeMultiplier: 0.8,
 			CostMultiplier: 1.5,
@@ -144,16 +143,16 @@ func TestProcessCraft(t *testing.T) {
 	})
 
 	t.Run("multiple inputs recipe", func(t *testing.T) {
-		recipeMulti := &registry.Recipe{
+		recipeMulti := &model.Recipe{
 			ID:               "alloy_steel",
-			RequiredFacility: registry.FacilitySmelter,
+			RequiredFacility: model.FacilitySmelter,
 			MinTier:          1,
 			Duration:         20,
-			Inputs: []registry.RecipeResource{
+			Inputs: []model.RecipeResource{
 				{ResourceID: "iron_ore", Amount: 3},
 				{ResourceID: "carbon", Amount: 1},
 			},
-			Outputs: []registry.RecipeResource{
+			Outputs: []model.RecipeResource{
 				{ResourceID: "steel", Amount: 1},
 			},
 		}
@@ -180,16 +179,16 @@ func TestProcessCraft(t *testing.T) {
 	})
 
 	t.Run("multiple inputs fail if one missing", func(t *testing.T) {
-		recipeMulti := &registry.Recipe{
+		recipeMulti := &model.Recipe{
 			ID:               "alloy_steel",
-			RequiredFacility: registry.FacilitySmelter,
+			RequiredFacility: model.FacilitySmelter,
 			MinTier:          1,
 			Duration:         20,
-			Inputs: []registry.RecipeResource{
+			Inputs: []model.RecipeResource{
 				{ResourceID: "iron_ore", Amount: 3},
 				{ResourceID: "carbon", Amount: 1},
 			},
-			Outputs: []registry.RecipeResource{
+			Outputs: []model.RecipeResource{
 				{ResourceID: "steel", Amount: 1},
 			},
 		}
@@ -203,15 +202,15 @@ func TestProcessCraft(t *testing.T) {
 	})
 
 	t.Run("multiple outputs", func(t *testing.T) {
-		recipeMultiOut := &registry.Recipe{
+		recipeMultiOut := &model.Recipe{
 			ID:               "refine_crystal",
-			RequiredFacility: registry.FacilitySmelter,
+			RequiredFacility: model.FacilitySmelter,
 			MinTier:          1,
 			Duration:         15,
-			Inputs: []registry.RecipeResource{
+			Inputs: []model.RecipeResource{
 				{ResourceID: "raw_crystal", Amount: 1},
 			},
-			Outputs: []registry.RecipeResource{
+			Outputs: []model.RecipeResource{
 				{ResourceID: "crystal_shard", Amount: 2},
 				{ResourceID: "crystal_dust", Amount: 1},
 			},

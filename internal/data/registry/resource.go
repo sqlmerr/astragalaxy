@@ -7,6 +7,7 @@ import (
 	"slices"
 
 	"github.com/samber/lo"
+	"github.com/sqlmerr/astragalaxy/internal/model"
 )
 
 type ResourceWorldGenParams struct {
@@ -18,6 +19,19 @@ type Resource struct {
 	ID       string                            `json:"id"`
 	Tags     []string                          `json:"tags"`
 	WorldGen map[string]ResourceWorldGenParams `json:"worldgen"`
+}
+
+func resourceToModel(r Resource) model.ResourceData {
+	return model.ResourceData{
+		ID:   r.ID,
+		Tags: r.Tags,
+		WorldGen: lo.MapValues(r.WorldGen, func(v ResourceWorldGenParams, k string) model.ResourceDataWorldGenParams {
+			return model.ResourceDataWorldGenParams{
+				Min: v.Min,
+				Max: v.Max,
+			}
+		}),
+	}
 }
 
 func (r *Resource) Normalize() {
@@ -55,32 +69,35 @@ func (r *ResourceRegistry) Load(cfg Config) error {
 	return nil
 }
 
-func (r *ResourceRegistry) GetResource(id string) (Resource, bool) {
-	return lo.Find(r.resources, func(i Resource) bool {
+func (r *ResourceRegistry) GetResource(id string) (model.ResourceData, bool) {
+	resource, found := lo.Find(r.resources, func(i Resource) bool {
 		return i.ID == id
+	})
+	return resourceToModel(resource), found
+}
+
+func (r *ResourceRegistry) GetAllResources() []model.ResourceData {
+	return lo.Map(r.resources, func(resource Resource, _ int) model.ResourceData {
+		return resourceToModel(resource)
 	})
 }
 
-func (r *ResourceRegistry) GetAllResources() []Resource {
-	return r.resources
-}
-
-func (r *ResourceRegistry) GetAllResourcesByTag(tag string) []Resource {
-	var resources []Resource
+func (r *ResourceRegistry) GetAllResourcesByTag(tag string) []model.ResourceData {
+	var resources []model.ResourceData
 	for _, res := range r.resources {
 		if slices.Contains(res.Tags, tag) {
-			resources = append(resources, res)
+			resources = append(resources, resourceToModel(res))
 		}
 	}
 	return resources
 }
 
-func (r *ResourceRegistry) GetAllResourcesByWorldgenParams(paramName string) []Resource {
-	var resources []Resource
+func (r *ResourceRegistry) GetAllResourcesByWorldgenParams(paramName string) []model.ResourceData {
+	var resources []model.ResourceData
 	for _, res := range r.resources {
 		_, exists := res.WorldGen[paramName]
 		if exists {
-			resources = append(resources, res)
+			resources = append(resources, resourceToModel(res))
 		}
 	}
 	return resources

@@ -5,7 +5,6 @@ import (
 	"math"
 
 	"github.com/google/uuid"
-	"github.com/sqlmerr/astragalaxy/internal/data/registry"
 	errs "github.com/sqlmerr/astragalaxy/internal/errors"
 	"github.com/sqlmerr/astragalaxy/internal/model"
 )
@@ -19,7 +18,7 @@ func CountTotalResourceVolume(resources []model.Resource) int {
 	return amount
 }
 
-func ProcessCraft(recipe *registry.Recipe, facility *registry.Facility, resources []model.Resource, targetInventoryID uuid.UUID, amount int) (updatedResources []model.Resource, createdResources []model.Resource, err error) {
+func ProcessCraft(recipe *model.Recipe, facility *model.Facility, resources []model.Resource, targetInventoryID uuid.UUID, amount int) (updatedResources []model.Resource, createdResources []model.Resource, err error) {
 	for _, input := range recipe.Inputs {
 		cost := int(math.Ceil(float64(input.Amount*amount) * facility.CostMultiplier))
 		flag := false

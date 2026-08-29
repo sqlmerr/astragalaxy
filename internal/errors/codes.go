@@ -46,6 +46,7 @@ const (
 	CodeCannotUseItem                ErrorCode = "CANNOT_USE_ITEM"
 	CodeInvalidUsername              ErrorCode = "INVALID_USERNAME"
 	CodeInvalidPassword              ErrorCode = "INVALID_PASSWORD"
+	CodeInvalidFacilityType          ErrorCode = "INVALID_FACILITY_TYPE"
 )
 
 type WithCode struct {

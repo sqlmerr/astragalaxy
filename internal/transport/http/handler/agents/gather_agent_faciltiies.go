@@ -5,8 +5,8 @@ import (
 
 	"github.com/samber/lo"
 	"github.com/sqlmerr/astragalaxy/internal/auth"
-	"github.com/sqlmerr/astragalaxy/internal/data/registry"
 	core_logger "github.com/sqlmerr/astragalaxy/internal/logger"
+	"github.com/sqlmerr/astragalaxy/internal/model"
 	http_response "github.com/sqlmerr/astragalaxy/internal/transport/http/response"
 )
 
@@ -27,7 +27,7 @@ func (h *AgentsHTTPHandler) GetAgentFacilities(w http.ResponseWriter, r *http.Re
 	}
 
 	response := GatherAgentFacilitiesResponse{
-		Data: lo.MapKeys(facilities, func(value []string, key registry.FacilityType) string {
+		Data: lo.MapKeys(facilities, func(value []string, key model.FacilityType) string {
 			return string(key)
 		}),
 	}

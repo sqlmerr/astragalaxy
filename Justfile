@@ -48,6 +48,7 @@ migrate-force VERSION:
 
 gen-docs:
     redocly bundle api/openapi.yaml -o out/openapi.json
+    @cd client && bun run doc
 
 gen-db:
     sqlc generate

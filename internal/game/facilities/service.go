@@ -26,7 +26,7 @@ func NewService(store data.Store, gameData registry.GameData, worldGen worldgen.
 	}
 }
 
-func (s *FacilitiesService) GatherAvailableFacilities(ctx context.Context, agentID uuid.UUID) (map[registry.FacilityType][]string, error) {
+func (s *FacilitiesService) GatherAvailableFacilities(ctx context.Context, agentID uuid.UUID) (map[model.FacilityType][]string, error) {
 	ship, err := s.store.Ships().GetActiveShipByAgent(ctx, agentID)
 	if err != nil {
 		return nil, fmt.Errorf("get active agent ship: %w", err)
@@ -37,8 +37,7 @@ func (s *FacilitiesService) GatherAvailableFacilities(ctx context.Context, agent
 		return nil, fmt.Errorf("get ship modules: %w", err)
 	}
 
-	// TODO: maybe extend item.ProvidesFacility field so it can specify in which item's state it provides facility. For example, portable_smelter will only provide facility when installed as a ship module.
-	facilities := make(map[registry.FacilityType][]string)
+	facilities := make(map[model.FacilityType][]string)
 	for _, m := range shipModules {
 		item, ok := s.gameData.Items.GetItem(string(m.Type))
 		if !ok {
@@ -48,7 +47,7 @@ func (s *FacilitiesService) GatherAvailableFacilities(ctx context.Context, agent
 			continue
 		}
 
-		if !slices.Contains(item.ProvidesFacility.As, registry.ItemProvidesFacilityAsShipModule) {
+		if !slices.Contains(item.ProvidesFacility.As, model.ItemProvidesFacilityAsShipModule) {
 			continue
 		}
 
