@@ -22,6 +22,11 @@ type CreateResource struct {
 type CreateItem struct {
 	InventoryID uuid.UUID
 	ItemType    model.ItemType
+}
+
+type CreateItemWithMetadata struct {
+	InventoryID uuid.UUID
+	ItemType    model.ItemType
 	Metadata    json.RawMessage
 }
 

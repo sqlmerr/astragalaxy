@@ -2,9 +2,11 @@ package postgres_pool
 
 import (
 	"errors"
+	"fmt"
 
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgconn"
+	errs "github.com/sqlmerr/astragalaxy/internal/errors"
 )
 
 var (
@@ -34,5 +36,5 @@ func TranslateError(err error) error {
 			return ErrRowAlreadyExists
 		}
 	}
-	return ErrUnknown
+	return fmt.Errorf("%w: %w: %w", ErrUnknown, err, errs.ErrInternal)
 }

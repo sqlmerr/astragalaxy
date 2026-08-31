@@ -103,22 +103,6 @@ export function CraftActionDialog({
         </DialogHeader>
         <form className="space-y-4" onSubmit={craft}>
           <Label className="grid gap-2 text-sm font-medium" htmlFor="amount">
-            Amount to craft
-            <Input
-              id="amount"
-              type="number"
-              min="1"
-              step="1"
-              inputMode="numeric"
-              value={amount}
-              onChange={(e) => setAmount(e.target.value)}
-              placeholder="Enter amount"
-              required
-              autoFocus
-            />
-          </Label>
-
-          <Label className="grid gap-2 text-sm font-medium" htmlFor="amount">
             Recipe
             <Select
               items={recipeSelectItems}
@@ -138,6 +122,22 @@ export function CraftActionDialog({
                 </SelectGroup>
               </SelectContent>
             </Select>
+          </Label>
+
+          <Label className="grid gap-2 text-sm font-medium" htmlFor="amount">
+            Amount to craft
+            <Input
+              id="amount"
+              type="number"
+              min="1"
+              step="1"
+              inputMode="numeric"
+              value={amount}
+              onChange={(e) => setAmount(e.target.value)}
+              placeholder="Enter amount"
+              required
+              autoFocus
+            />
           </Label>
 
           <Button

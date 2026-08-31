@@ -11,13 +11,14 @@ import (
 	"github.com/sqlmerr/astragalaxy/internal/model"
 )
 
-func (r *InventoryRepositoryImpl) CreateItem(ctx context.Context, data CreateItem) (model.Item, error) {
+func (r *InventoryRepositoryImpl) CreateItemWithMetadata(ctx context.Context, data CreateItemWithMetadata) (model.Item, error) {
 	ctx, cancel := context.WithTimeout(ctx, r.db.OpTimeout())
 	defer cancel()
 
-	item, err := r.q.CreateInventoryItem(ctx, database.CreateInventoryItemParams{
+	item, err := r.q.CreateInventoryItemWithMetadata(ctx, database.CreateInventoryItemWithMetadataParams{
 		InventoryID: data.InventoryID,
 		ItemType:    string(data.ItemType),
+		Metadata:    data.Metadata,
 	})
 	err = postgres_pool.TranslateError(err)
 	if err != nil {
@@ -31,7 +32,7 @@ func (r *InventoryRepositoryImpl) CreateItem(ctx context.Context, data CreateIte
 			)
 		}
 
-		return model.Item{}, fmt.Errorf("create item: %w", err)
+		return model.Item{}, fmt.Errorf("create item with metadata: %w", err)
 	}
 
 	return convertItemModel(item), nil

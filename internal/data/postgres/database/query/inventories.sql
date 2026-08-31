@@ -68,6 +68,11 @@ RETURNING *;
 DELETE FROM inventory_resources WHERE inventory_id = $1 AND resource_type = $2;
 
 -- name: CreateInventoryItem :one
+INSERT INTO inventory_items (inventory_id, item_type)
+VALUES ($1, $2)
+RETURNING *;
+
+-- name: CreateInventoryItemWithMetadata :one
 INSERT INTO inventory_items (inventory_id, item_type, metadata)
 VALUES ($1, $2, $3)
 RETURNING *;

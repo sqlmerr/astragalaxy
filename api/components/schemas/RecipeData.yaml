@@ -21,8 +21,8 @@ properties:
   inputs:
     type: array
     items: 
-      $ref: RecipeResource.yaml
+      $ref: RecipeInput.yaml
   outputs:
     type: array
     items: 
-      $ref: RecipeResource.yaml
+      $ref: RecipeOutput.yaml

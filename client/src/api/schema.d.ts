@@ -914,8 +914,21 @@ export interface components {
         CraftResponse: {
             cooldown: components["schemas"]["Cooldown"];
         };
-        RecipeResource: {
+        RecipeInput: {
             resource_id: string;
+            amount: number;
+        };
+        RecipeOutput: {
+            /**
+             * @description The kind of product; resource or item
+             * @example resource
+             */
+            type: string;
+            /**
+             * @description Resource id (type=resource) or item id (type=item)
+             * @example steel
+             */
+            id: string;
             amount: number;
         };
         RecipeData: {
@@ -928,8 +941,8 @@ export interface components {
             min_tier: number;
             /** @description In seconds */
             duration: number;
-            inputs: components["schemas"]["RecipeResource"][];
-            outputs: components["schemas"]["RecipeResource"][];
+            inputs: components["schemas"]["RecipeInput"][];
+            outputs: components["schemas"]["RecipeOutput"][];
         };
         ItemData: {
             /** @description Item ID */

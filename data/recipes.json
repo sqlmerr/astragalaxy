@@ -16,7 +16,8 @@
         ],
         "outputs": [
             {
-                "resource_id": "steel",
+                "type": "resource",
+                "id": "steel",
                 "amount": 1
             }
         ]
@@ -38,7 +39,8 @@
         ],
         "outputs": [
             {
-                "resource_id": "warp_cell_t1",
+                "type": "resource",
+                "id": "warp_cell_t1",
                 "amount": 1
             }
         ]
@@ -64,7 +66,58 @@
         ],
         "outputs": [
             {
-                "resource_id": "warp_cell_t2",
+                "type": "resource",
+                "id": "warp_cell_t2",
+                "amount": 1
+            }
+        ]
+    },
+    {
+        "id": "portable_printer",
+        "required_facility": "printer",
+        "min_tier": 1,
+        "duration": 15,
+        "inputs": [
+            {
+                "resource_id": "iron",
+                "amount": 10
+            },
+            {
+                "resource_id": "crystal",
+                "amount": 5
+            }
+        ],
+        "outputs": [
+            {
+                "type": "item",
+                "id": "portable_printer",
+                "amount": 1
+            }
+        ]
+    },
+    {
+        "id": "portable_smelter",
+        "required_facility": "printer",
+        "min_tier": 1,
+        "duration": 15,
+        "inputs": [
+            {
+                "resource_id": "steel",
+                "amount": 5
+            },
+            {
+                "resource_id": "crystal",
+                "amount": 10
+            },
+            {
+                "resource_id": "carbon",
+                "amount": 10
+            }
+        ],
+        "outputs": [
+            {
+                "type": "item",
+                "id": "portable_smelter",
                 "amount": 1
             }
         ]

@@ -18,7 +18,7 @@ func CountTotalResourceVolume(resources []model.Resource) int {
 	return amount
 }
 
-func ProcessCraft(recipe *model.Recipe, facility *model.Facility, resources []model.Resource, targetInventoryID uuid.UUID, amount int) (updatedResources []model.Resource, createdResources []model.Resource, err error) {
+func ProcessCraft(recipe *model.Recipe, facility *model.Facility, resources []model.Resource, targetInventoryID uuid.UUID, amount int) (updatedResources []model.Resource, createdResources []model.Resource, addedItems []model.Item, err error) {
 	for _, input := range recipe.Inputs {
 		cost := int(math.Ceil(float64(input.Amount*amount) * facility.CostMultiplier))
 		flag := false
@@ -32,7 +32,7 @@ func ProcessCraft(recipe *model.Recipe, facility *model.Facility, resources []mo
 		}
 
 		if !flag {
-			return nil, nil, errs.NewWithCode(
+			return nil, nil, nil, errs.NewWithCode(
 				errs.CodeNotEnoughResources,
 				fmt.Errorf(
 					"to craft recipe `%s` it is required to have at least %d of `%s` resource: %w",
@@ -43,9 +43,16 @@ func ProcessCraft(recipe *model.Recipe, facility *model.Facility, resources []mo
 	}
 
 	for _, output := range recipe.Outputs {
+		if output.Type == model.RecipeOutputItem {
+			for range output.Amount * amount {
+				addedItems = append(addedItems, model.Item{InventoryID: targetInventoryID, ItemType: model.ItemType(output.ID)})
+			}
+			continue
+		}
+
 		flag := false
 		for _, resource := range resources {
-			if model.ResourceType(output.ResourceID) == resource.ResourceType {
+			if model.ResourceType(output.ID) == resource.ResourceType {
 				resource.Amount += output.Amount * amount
 				updatedResources = append(updatedResources, resource)
 				flag = true
@@ -54,9 +61,9 @@ func ProcessCraft(recipe *model.Recipe, facility *model.Facility, resources []mo
 		}
 
 		if !flag {
-			createdResources = append(createdResources, model.Resource{InventoryID: targetInventoryID, ResourceType: model.ResourceType(output.ResourceID), Amount: output.Amount * amount})
+			createdResources = append(createdResources, model.Resource{InventoryID: targetInventoryID, ResourceType: model.ResourceType(output.ID), Amount: output.Amount * amount})
 		}
 	}
 
-	return updatedResources, createdResources, nil
+	return updatedResources, createdResources, addedItems, nil
 }

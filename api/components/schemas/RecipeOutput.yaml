@@ -1,0 +1,17 @@
+type: object
+required:
+  - type
+  - id
+  - amount
+properties:
+  type:
+    type: string
+    description: The kind of product; resource or item
+    example: resource
+  id:
+    type: string
+    description: Resource id (type=resource) or item id (type=item)
+    example: steel
+  amount:
+    type: integer
+    minimum: 1

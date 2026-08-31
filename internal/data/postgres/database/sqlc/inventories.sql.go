@@ -30,19 +30,43 @@ func (q *Queries) CreateInventory(ctx context.Context, arg CreateInventoryParams
 }
 
 const createInventoryItem = `-- name: CreateInventoryItem :one
-INSERT INTO inventory_items (inventory_id, item_type, metadata)
-VALUES ($1, $2, $3)
+INSERT INTO inventory_items (inventory_id, item_type)
+VALUES ($1, $2)
 RETURNING id, inventory_id, item_type, metadata, created_at
 `
 
 type CreateInventoryItemParams struct {
 	InventoryID uuid.UUID
 	ItemType    string
-	Metadata    []byte
 }
 
 func (q *Queries) CreateInventoryItem(ctx context.Context, arg CreateInventoryItemParams) (InventoryItem, error) {
-	row := q.db.QueryRow(ctx, createInventoryItem, arg.InventoryID, arg.ItemType, arg.Metadata)
+	row := q.db.QueryRow(ctx, createInventoryItem, arg.InventoryID, arg.ItemType)
+	var i InventoryItem
+	err := row.Scan(
+		&i.ID,
+		&i.InventoryID,
+		&i.ItemType,
+		&i.Metadata,
+		&i.CreatedAt,
+	)
+	return i, err
+}
+
+const createInventoryItemWithMetadata = `-- name: CreateInventoryItemWithMetadata :one
+INSERT INTO inventory_items (inventory_id, item_type, metadata)
+VALUES ($1, $2, $3)
+RETURNING id, inventory_id, item_type, metadata, created_at
+`
+
+type CreateInventoryItemWithMetadataParams struct {
+	InventoryID uuid.UUID
+	ItemType    string
+	Metadata    []byte
+}
+
+func (q *Queries) CreateInventoryItemWithMetadata(ctx context.Context, arg CreateInventoryItemWithMetadataParams) (InventoryItem, error) {
+	row := q.db.QueryRow(ctx, createInventoryItemWithMetadata, arg.InventoryID, arg.ItemType, arg.Metadata)
 	var i InventoryItem
 	err := row.Scan(
 		&i.ID,

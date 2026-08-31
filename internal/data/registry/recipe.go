@@ -9,9 +9,15 @@ import (
 	"github.com/sqlmerr/astragalaxy/internal/model"
 )
 
-type RecipeResource struct {
+type RecipeInput struct {
 	ResourceID string `json:"resource_id"`
 	Amount     int    `json:"amount"`
+}
+
+type RecipeOutput struct {
+	Type   model.RecipeOutputType `json:"type"`
+	ID     string                 `json:"id"`
+	Amount int                    `json:"amount"`
 }
 
 type Recipe struct {
@@ -19,8 +25,8 @@ type Recipe struct {
 	RequiredFacility model.FacilityType `json:"required_facility"`
 	MinTier          int                `json:"min_tier"`
 	Duration         int                `json:"duration"`
-	Inputs           []RecipeResource   `json:"inputs"`
-	Outputs          []RecipeResource   `json:"outputs"`
+	Inputs           []RecipeInput      `json:"inputs"`
+	Outputs          []RecipeOutput     `json:"outputs"`
 }
 
 func recipeToModel(r Recipe) model.Recipe {
@@ -29,16 +35,17 @@ func recipeToModel(r Recipe) model.Recipe {
 		RequiredFacility: r.RequiredFacility,
 		MinTier:          r.MinTier,
 		Duration:         r.Duration,
-		Inputs: lo.Map(r.Inputs, func(item RecipeResource, index int) model.RecipeResource {
-			return model.RecipeResource{
+		Inputs: lo.Map(r.Inputs, func(item RecipeInput, index int) model.RecipeInput {
+			return model.RecipeInput{
 				ResourceID: item.ResourceID,
 				Amount:     item.Amount,
 			}
 		}),
-		Outputs: lo.Map(r.Outputs, func(item RecipeResource, index int) model.RecipeResource {
-			return model.RecipeResource{
-				ResourceID: item.ResourceID,
-				Amount:     item.Amount,
+		Outputs: lo.Map(r.Outputs, func(item RecipeOutput, index int) model.RecipeOutput {
+			return model.RecipeOutput{
+				Type:   item.Type,
+				ID:     item.ID,
+				Amount: item.Amount,
 			}
 		}),
 	}

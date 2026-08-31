@@ -147,7 +147,7 @@ function RecipeCatalogueCard({ recipe }: { recipe: SchemaRecipeData }) {
         <div>
           <span className="text-muted-foreground">Outputs: </span>
           {recipe.outputs
-            .map((output) => `${output.resource_id} x${output.amount}`)
+            .map((output) => `${output.type}:${output.id} x${output.amount}`)
             .join(", ") || "None"}
         </div>
       </CardContent>

@@ -27,16 +27,17 @@ func (h *DataHTTPHandler) GetRecipes(w http.ResponseWriter, r *http.Request) {
 				RequiredFacility: string(i.RequiredFacility),
 				MinTier:          i.MinTier,
 				Duration:         i.Duration,
-				Inputs: lo.Map(i.Inputs, func(in model.RecipeResource, _ int) RecipeResourceDTO {
-					return RecipeResourceDTO{
+				Inputs: lo.Map(i.Inputs, func(in model.RecipeInput, _ int) RecipeInputDTO {
+					return RecipeInputDTO{
 						ResourceID: in.ResourceID,
 						Amount:     in.Amount,
 					}
 				}),
-				Outputs: lo.Map(i.Outputs, func(out model.RecipeResource, _ int) RecipeResourceDTO {
-					return RecipeResourceDTO{
-						ResourceID: out.ResourceID,
-						Amount:     out.Amount,
+				Outputs: lo.Map(i.Outputs, func(out model.RecipeOutput, _ int) RecipeOutputDTO {
+					return RecipeOutputDTO{
+						Type:   string(out.Type),
+						ID:     out.ID,
+						Amount: out.Amount,
 					}
 				}),
 			}

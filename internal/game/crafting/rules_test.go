@@ -28,11 +28,11 @@ func TestProcessCraft(t *testing.T) {
 		RequiredFacility: model.FacilitySmelter,
 		MinTier:          1,
 		Duration:         10,
-		Inputs: []model.RecipeResource{
+		Inputs: []model.RecipeInput{
 			{ResourceID: "iron_ore", Amount: 2},
 		},
-		Outputs: []model.RecipeResource{
-			{ResourceID: "iron_bar", Amount: 1},
+		Outputs: []model.RecipeOutput{
+			{Type: model.RecipeOutputResource, ID: "iron_bar", Amount: 1},
 		},
 	}
 
@@ -49,7 +49,7 @@ func TestProcessCraft(t *testing.T) {
 			{InventoryID: invID, ResourceType: "iron_ore", Amount: 10},
 		}
 
-		updated, created, err := ProcessCraft(recipe, facility, resources, invID, 1)
+		updated, created, _, err := ProcessCraft(recipe, facility, resources, invID, 1)
 		require.NoError(t, err)
 
 		require.Len(t, updated, 1)
@@ -66,7 +66,7 @@ func TestProcessCraft(t *testing.T) {
 			{InventoryID: invID, ResourceType: "iron_ore", Amount: 10},
 		}
 
-		updated, created, err := ProcessCraft(recipe, facility, resources, invID, 3)
+		updated, created, _, err := ProcessCraft(recipe, facility, resources, invID, 3)
 		require.NoError(t, err)
 
 		require.Len(t, updated, 1)
@@ -81,7 +81,7 @@ func TestProcessCraft(t *testing.T) {
 			{InventoryID: invID, ResourceType: "iron_ore", Amount: 10},
 		}
 
-		updated, created, err := ProcessCraft(recipe, facility, resources, invID, 1)
+		updated, created, _, err := ProcessCraft(recipe, facility, resources, invID, 1)
 		require.NoError(t, err)
 
 		require.Len(t, updated, 1)
@@ -98,7 +98,7 @@ func TestProcessCraft(t *testing.T) {
 			{InventoryID: invID, ResourceType: "iron_ore", Amount: 1},
 		}
 
-		_, _, err := ProcessCraft(recipe, facility, resources, invID, 1)
+		_, _, _, err := ProcessCraft(recipe, facility, resources, invID, 1)
 		require.Error(t, err)
 		assert.Contains(t, err.Error(), "iron_ore")
 	})
@@ -108,7 +108,7 @@ func TestProcessCraft(t *testing.T) {
 			{InventoryID: invID, ResourceType: "carbon", Amount: 100},
 		}
 
-		_, _, err := ProcessCraft(recipe, facility, resources, invID, 1)
+		_, _, _, err := ProcessCraft(recipe, facility, resources, invID, 1)
 		require.Error(t, err)
 	})
 
@@ -125,7 +125,7 @@ func TestProcessCraft(t *testing.T) {
 			{InventoryID: invID, ResourceType: "iron_ore", Amount: 10},
 		}
 
-		updated, _, err := ProcessCraft(recipe, facility2, resources, invID, 1)
+		updated, _, _, err := ProcessCraft(recipe, facility2, resources, invID, 1)
 		require.NoError(t, err)
 
 		cost := int(2 * 1.5)
@@ -137,7 +137,7 @@ func TestProcessCraft(t *testing.T) {
 			{InventoryID: invID, ResourceType: "iron_ore", Amount: 2},
 		}
 
-		updated, _, err := ProcessCraft(recipe, facility, resources, invID, 1)
+		updated, _, _, err := ProcessCraft(recipe, facility, resources, invID, 1)
 		require.NoError(t, err)
 		assert.Equal(t, 0, updated[0].Amount)
 	})
@@ -148,12 +148,12 @@ func TestProcessCraft(t *testing.T) {
 			RequiredFacility: model.FacilitySmelter,
 			MinTier:          1,
 			Duration:         20,
-			Inputs: []model.RecipeResource{
+			Inputs: []model.RecipeInput{
 				{ResourceID: "iron_ore", Amount: 3},
 				{ResourceID: "carbon", Amount: 1},
 			},
-			Outputs: []model.RecipeResource{
-				{ResourceID: "steel", Amount: 1},
+			Outputs: []model.RecipeOutput{
+				{Type: model.RecipeOutputResource, ID: "steel", Amount: 1},
 			},
 		}
 
@@ -162,7 +162,7 @@ func TestProcessCraft(t *testing.T) {
 			{InventoryID: invID, ResourceType: "carbon", Amount: 5},
 		}
 
-		updated, created, err := ProcessCraft(recipeMulti, facility, resources, invID, 2)
+		updated, created, _, err := ProcessCraft(recipeMulti, facility, resources, invID, 2)
 		require.NoError(t, err)
 
 		ironOre := findResource(updated, "iron_ore")
@@ -184,12 +184,12 @@ func TestProcessCraft(t *testing.T) {
 			RequiredFacility: model.FacilitySmelter,
 			MinTier:          1,
 			Duration:         20,
-			Inputs: []model.RecipeResource{
+			Inputs: []model.RecipeInput{
 				{ResourceID: "iron_ore", Amount: 3},
 				{ResourceID: "carbon", Amount: 1},
 			},
-			Outputs: []model.RecipeResource{
-				{ResourceID: "steel", Amount: 1},
+			Outputs: []model.RecipeOutput{
+				{Type: model.RecipeOutputResource, ID: "steel", Amount: 1},
 			},
 		}
 
@@ -197,7 +197,7 @@ func TestProcessCraft(t *testing.T) {
 			{InventoryID: invID, ResourceType: "iron_ore", Amount: 10},
 		}
 
-		_, _, err := ProcessCraft(recipeMulti, facility, resources, invID, 1)
+		_, _, _, err := ProcessCraft(recipeMulti, facility, resources, invID, 1)
 		require.Error(t, err)
 	})
 
@@ -207,12 +207,12 @@ func TestProcessCraft(t *testing.T) {
 			RequiredFacility: model.FacilitySmelter,
 			MinTier:          1,
 			Duration:         15,
-			Inputs: []model.RecipeResource{
+			Inputs: []model.RecipeInput{
 				{ResourceID: "raw_crystal", Amount: 1},
 			},
-			Outputs: []model.RecipeResource{
-				{ResourceID: "crystal_shard", Amount: 2},
-				{ResourceID: "crystal_dust", Amount: 1},
+			Outputs: []model.RecipeOutput{
+				{Type: model.RecipeOutputResource, ID: "crystal_shard", Amount: 2},
+				{Type: model.RecipeOutputResource, ID: "crystal_dust", Amount: 1},
 			},
 		}
 
@@ -220,7 +220,7 @@ func TestProcessCraft(t *testing.T) {
 			{InventoryID: invID, ResourceType: "raw_crystal", Amount: 5},
 		}
 
-		updated, created, err := ProcessCraft(recipeMultiOut, facility, resources, invID, 1)
+		updated, created, _, err := ProcessCraft(recipeMultiOut, facility, resources, invID, 1)
 		require.NoError(t, err)
 
 		assert.Equal(t, 4, updated[0].Amount)
@@ -237,10 +237,45 @@ func TestProcessCraft(t *testing.T) {
 			{InventoryID: invID, ResourceType: "iron_ore", Amount: 2},
 		}
 
-		updated, _, err := ProcessCraft(recipe, facility, resources, invID, 1)
+		updated, _, _, err := ProcessCraft(recipe, facility, resources, invID, 1)
 		require.NoError(t, err)
 
 		assert.Equal(t, 0, updated[0].Amount)
+	})
+
+	t.Run("item output", func(t *testing.T) {
+		recipeItem := &model.Recipe{
+			ID:               "craft_printer",
+			RequiredFacility: model.FacilityPrinter,
+			MinTier:          1,
+			Duration:         15,
+			Inputs: []model.RecipeInput{
+				{ResourceID: "iron", Amount: 10},
+				{ResourceID: "crystal", Amount: 5},
+			},
+			Outputs: []model.RecipeOutput{
+				{Type: model.RecipeOutputItem, ID: "portable_printer", Amount: 1},
+			},
+		}
+
+		resources := []model.Resource{
+			{InventoryID: invID, ResourceType: "iron", Amount: 20},
+			{InventoryID: invID, ResourceType: "crystal", Amount: 20},
+		}
+
+		updated, created, items, err := ProcessCraft(recipeItem, facility, resources, invID, 2)
+		require.NoError(t, err)
+
+		ironOre := findResource(updated, "iron")
+		require.NotNil(t, ironOre)
+		assert.Equal(t, 0, ironOre.Amount)
+
+		assert.Empty(t, created)
+		require.Len(t, items, 2)
+		for _, it := range items {
+			assert.Equal(t, model.ItemType("portable_printer"), it.ItemType)
+			assert.Equal(t, invID, it.InventoryID)
+		}
 	})
 
 	t.Run("preserves other resources in inventory", func(t *testing.T) {
@@ -250,7 +285,7 @@ func TestProcessCraft(t *testing.T) {
 			{InventoryID: invID, ResourceType: "gold", Amount: 3},
 		}
 
-		updated, created, err := ProcessCraft(recipe, facility, resources, invID, 1)
+		updated, created, _, err := ProcessCraft(recipe, facility, resources, invID, 1)
 		require.NoError(t, err)
 
 		ironOre := findResource(updated, "iron_ore")

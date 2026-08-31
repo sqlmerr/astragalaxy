@@ -117,7 +117,12 @@ func (s *Service) Craft(ctx context.Context, agentID uuid.UUID, recipeID string,
 		return model.Cooldown{}, fmt.Errorf("get inventory resources: %w", err)
 	}
 
-	updatedResources, createdResources, err := ProcessCraft(&recipe, bestFacility, resources, targetInventoryID, amount)
+	items, err := s.store.Inventories().GetInventoryItems(ctx, targetInventoryID)
+	if err != nil {
+		return model.Cooldown{}, fmt.Errorf("get inventory items: %w", err)
+	}
+
+	updatedResources, createdResources, addedItems, err := ProcessCraft(&recipe, bestFacility, resources, targetInventoryID, amount)
 	if err != nil {
 		return model.Cooldown{}, err
 	}
@@ -129,6 +134,17 @@ func (s *Service) Craft(ctx context.Context, agentID uuid.UUID, recipeID string,
 			fmt.Errorf(
 				"cannot craft this recipe due to inventory resource limit (%d > %d): %w",
 				volume, inventory.MaxResourceVolume, errs.ErrUnprocessableEntity,
+			),
+		)
+	}
+
+	itemsAmount := len(addedItems) + len(items)
+	if !s.gameConfig.Rules.DisableInventoryLimit && itemsAmount > inventory.MaxItemSlots {
+		return model.Cooldown{}, errs.NewWithCode(
+			errs.CodeInventoryIsFull,
+			fmt.Errorf(
+				"cannot craft this recipe due to inventory item limit (%d > %d): %w",
+				itemsAmount, inventory.MaxItemSlots, errs.ErrUnprocessableEntity,
 			),
 		)
 	}
@@ -151,6 +167,16 @@ func (s *Service) Craft(ctx context.Context, agentID uuid.UUID, recipeID string,
 			})
 			if err != nil {
 				return fmt.Errorf("create resource: %w", err)
+			}
+		}
+
+		for _, i := range addedItems {
+			_, err := tx.Inventories().CreateItem(ctx, inventories_repository.CreateItem{
+				InventoryID: i.InventoryID,
+				ItemType:    i.ItemType,
+			})
+			if err != nil {
+				return fmt.Errorf("create item: %w", err)
 			}
 		}
 
