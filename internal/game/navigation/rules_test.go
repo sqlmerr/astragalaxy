@@ -14,6 +14,8 @@ func TestNavigateWarp(t *testing.T) {
 		name        string
 		ship        model.Ship
 		newSystem   worldgen.System
+		fuelT1      int
+		fuelT2      int
 		expectedErr bool
 		err         error
 		errCode     errs.ErrorCode
@@ -33,7 +35,41 @@ func TestNavigateWarp(t *testing.T) {
 				X: 10,
 				Y: 20,
 			},
+			fuelT1:      4,
 			expectedErr: false,
+		},
+		{
+			name: "Success with tier 2",
+			ship: model.Ship{
+				Coords: model.ShipCoords{
+					SystemX: 0,
+					SystemY: 0,
+				},
+				Status: model.ShipStatusOrbit,
+			},
+			newSystem: worldgen.System{
+				X: 18,
+				Y: 0,
+			},
+			fuelT2:      2,
+			expectedErr: false,
+		},
+		{
+			name: "Not enough fuel",
+			ship: model.Ship{
+				Status: model.ShipStatusOrbit,
+				Coords: model.ShipCoords{
+					SystemX: 10,
+					SystemY: 10,
+				},
+			},
+			newSystem: worldgen.System{
+				X: 10,
+				Y: 20,
+			},
+			expectedErr: true,
+			err:         errs.ErrUnprocessableEntity,
+			errCode:     errs.CodeNotEnoughResources,
 		},
 		{
 			name: "Invalid ship state",
@@ -58,6 +94,7 @@ func TestNavigateWarp(t *testing.T) {
 				X: 10,
 				Y: 10,
 			},
+			fuelT2:      12,
 			expectedErr: true,
 			err:         errs.ErrInvalidArgument,
 			errCode:     errs.CodeInvalidWarpPath,
@@ -83,7 +120,7 @@ func TestNavigateWarp(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			ship, cd, err := NavigateWarp(test.ship, test.newSystem)
+			ship, cd, _, _, err := NavigateWarp(test.ship, test.newSystem, test.fuelT1, test.fuelT2)
 			if test.expectedErr {
 				assert.Error(t, err)
 				assert.ErrorIs(t, err, test.err)

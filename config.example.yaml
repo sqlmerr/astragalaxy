@@ -3,6 +3,7 @@ game:
   rules:
     disableCooldowns: false
     disableInventoryLimit: false
+    disableFuelConsumption: false
 registry:
   itemsPath: data/items.json
   resourcesPath: data/resources.json

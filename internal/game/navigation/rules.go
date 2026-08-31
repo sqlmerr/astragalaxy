@@ -10,33 +10,41 @@ import (
 	"github.com/sqlmerr/astragalaxy/internal/model"
 )
 
-func NavigateWarp(ship model.Ship, newSystem worldgen.System) (model.Ship, time.Duration, error) {
+func CalcWarpDistance(x1, y1, x2, y2 int) int {
+	return int(math.Round(
+		math.Sqrt(math.Pow(float64(x2-x1), 2) + math.Pow(float64(y2-y1), 2)),
+	))
+}
+
+func NavigateWarp(ship model.Ship, newSystem worldgen.System, warpCellT1Amount, warpCellT2Amount int) (model.Ship, time.Duration, model.ResourceType, int, error) {
 	if ship.Status != model.ShipStatusOrbit {
-		return model.Ship{}, 0, errs.NewWithCode(
+		return model.Ship{}, 0, "", 0, errs.NewWithCode(
 			errs.CodeInvalidShipState,
 			fmt.Errorf("ship must be in orbit state: %w", errs.ErrUnprocessableEntity),
 		)
 	}
 
-	// TODO: fuel
 	x1, y1 := ship.Coords.SystemX, ship.Coords.SystemY
 	x2, y2 := newSystem.X, newSystem.Y
 
 	if x1 == x2 && y1 == y2 {
-		return model.Ship{}, 0, errs.NewWithCode(
+		return model.Ship{}, 0, "", 0, errs.NewWithCode(
 			errs.CodeAlreadyAtDestination,
 			fmt.Errorf("already at destination: %w", errs.ErrNotModified),
 		)
 	}
-	distance := math.Round(
-		math.Sqrt(math.Pow(float64(x2-x1), 2) + math.Pow(float64(y2-y1), 2)),
-	)
-	if distance > 10 { // TODO: ship engines
-		return model.Ship{}, 0, errs.NewWithCode(
+	distance := CalcWarpDistance(x1, y1, x2, y2)
+	resource, amount, err := WarpFuelPlan(distance, warpCellT1Amount, warpCellT2Amount)
+	if err != nil {
+		return model.Ship{}, 0, "", 0, err
+	}
+
+	if distance > 18 { // TODO: dynamic distance limit based on ship's type (or engine?)
+		return model.Ship{}, 0, "", 0, errs.NewWithCode(
 			errs.CodeInvalidWarpPath,
 			fmt.Errorf(
 				"warp path length: %d is invalid (max=10): %w",
-				int(distance),
+				distance,
 				errs.ErrInvalidArgument,
 			),
 		)
@@ -46,11 +54,61 @@ func NavigateWarp(ship model.Ship, newSystem worldgen.System) (model.Ship, time.
 
 	shipCoords, err := model.NewShipCoords(model.ShipLocationNone, 0, x2, y2)
 	if err != nil {
-		return model.Ship{}, 0, fmt.Errorf("set coords: %w", err)
+		return model.Ship{}, 0, "", 0, fmt.Errorf("set coords: %w", err)
 	}
 	ship.Coords = shipCoords
 
-	return ship, cooldownDuration, nil
+	return ship, cooldownDuration, resource, amount, nil
+}
+
+// To modify usage of warp fuel, modify this function
+// Tier 1 = distance / 3
+// Tier 2 = distance / 9
+func CalcWarpFuelCost(distance, tier int) int {
+	return int(math.Ceil(float64(distance) / math.Pow(3, float64(tier))))
+}
+
+func WarpFuelPlan(distance, t1Amount, t2Amount int) (model.ResourceType, int, error) {
+	if distance < 1 {
+		return "", 0, errs.NewWithCode(
+			errs.CodeInvalidWarpPath,
+			fmt.Errorf("warp distance must be positive: %w", errs.ErrInvalidArgument),
+		)
+	}
+
+	t1Cost := CalcWarpFuelCost(distance, 1)
+	t2Cost := CalcWarpFuelCost(distance, 2)
+
+	// For short jumps a tier-1 cell is cheaper than a tier-2 cell, so prefer tier-1.
+	// For jumps of 9+ prefer the more efficient tier-2 and fall back.
+	if distance < 9 {
+		if t1Amount >= t1Cost {
+			return model.ResourceWarpCellT1, t1Cost, nil
+		}
+		if t2Amount >= t2Cost {
+			return model.ResourceWarpCellT2, t2Cost, nil
+		}
+	} else {
+		if t2Amount >= t2Cost {
+			return model.ResourceWarpCellT2, t2Cost, nil
+		}
+		if t1Amount >= t1Cost {
+			return model.ResourceWarpCellT1, t1Cost, nil
+		}
+	}
+
+	return "", 0, errs.NewWithCode(
+		errs.CodeNotEnoughResources,
+		fmt.Errorf(
+			"not enough warp cells for distance=%d: have %d/%d, need %d/%d: %w",
+			distance,
+			t1Amount,
+			t2Amount,
+			t1Cost,
+			t2Cost,
+			errs.ErrUnprocessableEntity,
+		),
+	)
 }
 
 func NavigatePlanet(ship model.Ship, system worldgen.System, orbitIndex int) (model.Ship, time.Duration, error) {
@@ -81,8 +139,6 @@ func NavigatePlanet(ship model.Ship, system worldgen.System, orbitIndex int) (mo
 		)
 	}
 
-	// TODO: fuel
-
 	cooldownDuration := time.Second * 30
 	shipCoords, err := model.NewShipCoords(
 		model.ShipLocationPlanet,
@@ -112,8 +168,6 @@ func NavigateWaypoint(ship model.Ship, system worldgen.System, waypointID int) (
 			fmt.Errorf("already at destination: %w", errs.ErrNotModified),
 		)
 	}
-
-	// TODO: fuel
 
 	waypoint := system.FindWaypointByID(waypointID)
 	if waypoint == nil {

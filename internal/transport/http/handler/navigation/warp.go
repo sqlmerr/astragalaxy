@@ -3,6 +3,7 @@ package http_handler_navigation
 import (
 	"net/http"
 
+	"github.com/google/uuid"
 	"github.com/sqlmerr/astragalaxy/internal/auth"
 	core_logger "github.com/sqlmerr/astragalaxy/internal/logger"
 	http_dto "github.com/sqlmerr/astragalaxy/internal/transport/http/dto"
@@ -13,6 +14,23 @@ import (
 type NavigateWarpRequest struct {
 	X int `json:"x" validate:"required"`
 	Y int `json:"y" validate:"required"`
+}
+
+type ResourceDTO struct {
+	InventoryID  uuid.UUID `json:"inventory_id"`
+	ResourceType string    `json:"resource_type"`
+	Amount       int       `json:"amount"`
+}
+
+type FuelDTO struct {
+	ResourceType string `json:"resource_type"`
+	Used         int    `json:"used"`
+	Left         int    `json:"left"`
+}
+
+type NavigateWarpResponse struct {
+	Cooldown http_dto.CooldownDTO `json:"cooldown"`
+	Fuel     FuelDTO              `json:"fuel"`
 }
 
 func (h *NavigationHTTPHandler) NavigateWarp(w http.ResponseWriter, r *http.Request) {
@@ -28,14 +46,19 @@ func (h *NavigationHTTPHandler) NavigateWarp(w http.ResponseWriter, r *http.Requ
 
 	agentID := auth.GetAgentIDFromContext(ctx)
 
-	cooldown, err := h.navigationService.NavigateWarp(ctx, agentID, req.X, req.Y)
+	cooldown, fuelUsage, err := h.navigationService.NavigateWarp(ctx, agentID, req.X, req.Y)
 	if err != nil {
 		responseHandler.ErrorResponse(err, "Failed to warp")
 		return
 	}
 
-	response := NavigationResponseDTO{
+	response := NavigateWarpResponse{
 		Cooldown: http_dto.ColdownFromModel(cooldown),
+		Fuel: FuelDTO{
+			ResourceType: string(fuelUsage.ResourceType),
+			Used:         fuelUsage.Used,
+			Left:         fuelUsage.Left,
+		},
 	}
 	responseHandler.JSONResponse(http.StatusOK, response)
 }

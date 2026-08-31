@@ -1,0 +1,23 @@
+type: object
+required:
+  - cooldown
+  - fuel
+properties: 
+  cooldown:
+    $ref: Cooldown.yaml
+  fuel:
+    type: object
+    required:
+      - resource_type
+      - used
+      - left
+    properties:
+      resource_type:
+        type: string
+        description: Resource type of the warp cell consumed
+      used:
+        type: integer
+        description: Amount of warp cells consumed by this jump
+      left:
+        type: integer
+        description: Amount of warp cells left in the ship inventory after the jump (0 means exhausted)

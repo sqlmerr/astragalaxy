@@ -1,5 +1,7 @@
 # AstraGalaxy
 
+[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/sqlmerr/astragalaxy)
+
 AstraGalaxy is an API-based space exploration game inspired by No Man's Sky. Players interact with the game through HTTP requests or custom clients, managing agents that explore a procedurally generated universe, trade, mine, craft, and build facilities. This repository (monorepo) contains the game server and an official (optional) client.
 
 ## Game Overview

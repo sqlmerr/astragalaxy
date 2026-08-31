@@ -121,5 +121,13 @@
     },
     {
         "id": "steel"
+    },
+    {
+        "id": "warp_cell_t1",
+        "tags": ["fuel"]
+    },
+    {
+        "id": "warp_cell_t2",
+        "tags": ["fuel"]
     }
 ]

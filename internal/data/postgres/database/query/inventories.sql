@@ -91,3 +91,9 @@ RETURNING *;
 
 -- name: DeleteInventoryItem :execrows
 DELETE FROM inventory_items WHERE id = $1;
+
+-- name: SubtractInventoryResource :one
+UPDATE inventory_resources
+SET amount = amount - $3
+WHERE inventory_id = $1 AND resource_type = $2 AND amount >= $3
+RETURNING *;

@@ -257,6 +257,26 @@ func (q *Queries) GetInventoryResourcesTotalAmount(ctx context.Context, inventor
 	return column_1, err
 }
 
+const subtractInventoryResource = `-- name: SubtractInventoryResource :one
+UPDATE inventory_resources
+SET amount = amount - $3
+WHERE inventory_id = $1 AND resource_type = $2 AND amount >= $3
+RETURNING inventory_id, resource_type, amount
+`
+
+type SubtractInventoryResourceParams struct {
+	InventoryID  uuid.UUID
+	ResourceType string
+	Amount       int64
+}
+
+func (q *Queries) SubtractInventoryResource(ctx context.Context, arg SubtractInventoryResourceParams) (InventoryResource, error) {
+	row := q.db.QueryRow(ctx, subtractInventoryResource, arg.InventoryID, arg.ResourceType, arg.Amount)
+	var i InventoryResource
+	err := row.Scan(&i.InventoryID, &i.ResourceType, &i.Amount)
+	return i, err
+}
+
 const updateInventory = `-- name: UpdateInventory :one
 UPDATE inventories
 SET

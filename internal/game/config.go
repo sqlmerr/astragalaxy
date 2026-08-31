@@ -15,6 +15,7 @@ var (
 type RulesConfig struct {
 	DisableCooldowns      bool `koanf:"disableCooldowns"`
 	DisableInventoryLimit bool `koanf:"disableInventoryLimit"`
+	DisableFuelConsumption bool `koanf:"disableFuelConsumption"`
 }
 
 type Config struct {

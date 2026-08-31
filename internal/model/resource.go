@@ -4,28 +4,10 @@ import "github.com/google/uuid"
 
 type ResourceType string
 
-// const (
-// 	// basic
-// 	ResourceIron    ResourceType = "iron"
-// 	ResourceCrystal ResourceType = "crystal"
-// 	ResourceCarbon  ResourceType = "carbon"
-// 	ResourceIce     ResourceType = "ice"
-
-// 	// advanced
-// 	ResourceCopper   ResourceType = "copper"
-// 	ResourceTitanium ResourceType = "titanium"
-// 	ResourceSilicon  ResourceType = "silicon"
-// 	ResourceHelium   ResourceType = "helium"
-
-// 	// exotic
-// 	ResourceUranium     ResourceType = "uranium"
-// 	ResourceIridium     ResourceType = "iridium"
-// 	ResourceDarkMatter  ResourceType = "dark_matter"
-// 	ResourceBioDisputes ResourceType = "bio_disputes"
-
-// 	// composite
-// 	ResourceSteel ResourceType = "steel"
-// )
+const (
+	ResourceWarpCellT1 ResourceType = "warp_cell_t1"
+	ResourceWarpCellT2 ResourceType = "warp_cell_t2"
+)
 
 type Resource struct {
 	InventoryID  uuid.UUID

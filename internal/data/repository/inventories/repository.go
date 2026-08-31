@@ -20,6 +20,7 @@ type InventoryRepository interface {
 	GetResourcesTotalAmount(ctx context.Context, inventoryID uuid.UUID) (int, error)
 	GetResource(ctx context.Context, inventoryID uuid.UUID, resourceType model.ResourceType) (model.Resource, error)
 	SaveResource(ctx context.Context, data model.Resource) (model.Resource, error)
+	SubstractResource(ctx context.Context, inventoryID uuid.UUID, resourceType model.ResourceType, amount int) (model.Resource, error)
 	DeleteResource(ctx context.Context, inventoryID uuid.UUID, resourceType model.ResourceType) error
 
 	CreateItem(ctx context.Context, data CreateItem) (model.Item, error)

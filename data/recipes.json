@@ -20,5 +20,53 @@
                 "amount": 1
             }
         ]
+    },
+    {
+        "id": "warp_cell_t1",
+        "required_facility": "printer",
+        "min_tier": 1,
+        "duration": 25,
+        "inputs": [
+            {
+                "resource_id": "steel",
+                "amount": 5
+            },
+            {
+                "resource_id": "crystal",
+                "amount": 15
+            }
+        ],
+        "outputs": [
+            {
+                "resource_id": "warp_cell_t1",
+                "amount": 1
+            }
+        ]
+    },
+    {
+        "id": "warp_cell_t2",
+        "required_facility": "printer",
+        "min_tier": 2,
+        "duration": 35,
+        "inputs": [
+            {
+                "resource_id": "titanium",
+                "amount": 25
+            },
+            {
+                "resource_id": "crystal",
+                "amount": 10
+            },
+            {
+                "resource_id": "helium",
+                "amount": 3
+            }
+        ],
+        "outputs": [
+            {
+                "resource_id": "warp_cell_t2",
+                "amount": 1
+            }
+        ]
     }
 ]

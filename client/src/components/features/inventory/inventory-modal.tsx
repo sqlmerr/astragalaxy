@@ -110,10 +110,13 @@ export function InventoryModal({
                 <h3 className="mb-3 font-semibold">Resources</h3>
 
                 <div className="flex flex-col gap-2">
-                  {inventory.resources.length > 0 ? (
-                    inventory.resources.map((r) => (
-                      <ResourceCard key={r.resource_type} resource={r} />
-                    ))
+                  {inventory.resources.filter((v) => v.amount > 0).length >
+                  0 ? (
+                    inventory.resources
+                      .filter((v) => v.amount > 0)
+                      .map((r) => (
+                        <ResourceCard key={r.resource_type} resource={r} />
+                      ))
                   ) : (
                     <div className="flex min-h-20 place-items-center justify-center border border-dashed text-sm text-muted-foreground">
                       Inventory does not contain any resources

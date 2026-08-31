@@ -818,12 +818,23 @@ export interface components {
             /** @description System Y coordinate */
             y: number;
         };
-        NavigationResponse: {
+        WarpNavigationResponse: {
             cooldown: components["schemas"]["Cooldown"];
+            fuel: {
+                /** @description Resource type of the warp cell consumed */
+                resource_type: string;
+                /** @description Amount of warp cells consumed by this jump */
+                used: number;
+                /** @description Amount of warp cells left in the ship inventory after the jump (0 means exhausted) */
+                left: number;
+            };
         };
         NavigatePlanetRequest: {
             /** @description Planet's orbit */
             orbit: number;
+        };
+        NavigationResponse: {
+            cooldown: components["schemas"]["Cooldown"];
         };
         NavigateWaypointRequest: {
             /** @description Waypoint ID */
@@ -1544,7 +1555,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["NavigationResponse"];
+                    "application/json": components["schemas"]["WarpNavigationResponse"];
                 };
             };
             401: components["responses"]["InvalidAgentToken"];
