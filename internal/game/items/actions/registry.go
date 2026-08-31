@@ -32,5 +32,6 @@ func newOkResponse(cooldownDuration time.Duration) okActionResponse {
 type ItemAction func(ctx ActionContext, agentID uuid.UUID, item model.Item) (ActionResponse, error)
 
 var Actions = map[model.ItemType]ItemAction{
-	model.ItemPortableSmelter: UsePortableSmelter,
+	model.ItemPortableSmelter: InstallShipModule(model.ShipModulePortableSmelter),
+	model.ItemPortablePrinter: InstallShipModule(model.ShipModulePortablePrinter),
 }

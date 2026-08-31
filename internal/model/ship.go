@@ -123,3 +123,17 @@ type Ship struct {
 
 	Coords ShipCoords
 }
+
+// TODO: ship classes
+func (s Ship) GetShipModuleLimit() int {
+	switch s.Type {
+	case ShipTypeMiner:
+		return 6
+	case ShipTypeScout:
+		return 8
+	case ShipTypeTrader:
+		return 5
+	}
+
+	return 4
+}
