@@ -1,0 +1,37 @@
+delete:
+  operationId: removeShipModule
+  tags:
+    - Ships
+  summary: Remove Ship Module
+  description: Removes ship's module and gives you an item, that represents this module (inventory must not be full)
+  parameters:
+    - name: id
+      in: path
+      schema:
+        type: string
+        format: uuid
+        description: Ship ID
+      required: true
+    - name: type
+      in: path
+      schema:
+        type: string
+        description: Ship module type # TODO(docs)
+      required: true
+  responses:
+    204:
+      description: Successfully removed ship module
+    401:
+      $ref: ../../components/responses/InvalidAgentToken.yaml
+    403:
+      $ref: ../../components/responses/AccessDenied.yaml
+    422:
+      description: Can't remove ship module
+      content: 
+        application/json:
+          schema:
+            $ref: ../../components/schemas/ErrorResponse.yaml
+  security:
+    - AgentAuth: []
+    - UserAuth: []
+      AgentId: []

@@ -156,6 +156,18 @@ func (q *Queries) GetInventoryItem(ctx context.Context, id uuid.UUID) (Inventory
 	return i, err
 }
 
+const getInventoryItemCount = `-- name: GetInventoryItemCount :one
+SELECT COUNT(*)::INTEGER FROM inventory_items
+WHERE inventory_id = $1
+`
+
+func (q *Queries) GetInventoryItemCount(ctx context.Context, inventoryID uuid.UUID) (int32, error) {
+	row := q.db.QueryRow(ctx, getInventoryItemCount, inventoryID)
+	var column_1 int32
+	err := row.Scan(&column_1)
+	return column_1, err
+}
+
 const getInventoryItems = `-- name: GetInventoryItems :many
 SELECT id, inventory_id, item_type, metadata, created_at FROM inventory_items
 WHERE inventory_id = $1

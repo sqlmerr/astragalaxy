@@ -47,6 +47,7 @@ const (
 	CodeInvalidUsername              ErrorCode = "INVALID_USERNAME"
 	CodeInvalidPassword              ErrorCode = "INVALID_PASSWORD"
 	CodeInvalidFacilityType          ErrorCode = "INVALID_FACILITY_TYPE"
+	CodeInvalidShipModuleType        ErrorCode = "INVALID_SHIP_MODULE_TYPE"
 )
 
 type WithCode struct {

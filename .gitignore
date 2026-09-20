@@ -4,3 +4,6 @@
 out
 
 config.yaml
+
+# TODO: docs
+docs/ 

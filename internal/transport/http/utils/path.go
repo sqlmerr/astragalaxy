@@ -8,10 +8,19 @@ import (
 	errs "github.com/sqlmerr/astragalaxy/internal/errors"
 )
 
-func GetUUIDPathValue(r *http.Request, key string) (uuid.UUID, error) {
+func GetStringPathValue(r *http.Request, key string) (string, error) {
 	pathValue := r.PathValue(key)
 	if pathValue == "" {
-		return uuid.Nil, errs.NewWithCode(errs.CodeDecodeError, fmt.Errorf("no key %s in path values: %w", key, errs.ErrInvalidArgument))
+		return "", errs.NewWithCode(errs.CodeDecodeError, fmt.Errorf("no key %s in path values: %w", key, errs.ErrInvalidArgument))
+	}
+
+	return pathValue, nil
+}
+
+func GetUUIDPathValue(r *http.Request, key string) (uuid.UUID, error) {
+	pathValue, err := GetStringPathValue(r, key)
+	if err != nil {
+		return uuid.Nil, err
 	}
 
 	value, err := uuid.Parse(pathValue)

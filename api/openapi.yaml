@@ -73,6 +73,8 @@ paths:
     $ref: paths/data/facilities.yaml
   /api/v1/agents/current/facilities:
     $ref: paths/agents/facilities.yaml
+  /api/v1/ships/my/{id}/modules/{type}:
+    $ref: paths/ships/my-modules-type.yaml
 components:
   securitySchemes:
     UserAuth:

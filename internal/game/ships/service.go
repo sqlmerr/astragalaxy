@@ -230,6 +230,64 @@ func (s *Service) GetShipModules(ctx context.Context, agentID uuid.UUID, shipID 
 	return modules, nil
 }
 
+func (s *Service) RemoveShipModule(ctx context.Context, agentID uuid.UUID, shipID uuid.UUID, moduleType model.ShipModuleType) error {
+	ship, err := s.store.Ships().GetShip(ctx, shipID)
+	if err != nil {
+		return fmt.Errorf("get ship: %w", err)
+	}
+
+	if ship.AgentID != agentID {
+		return errs.NewWithCode(
+			errs.CodeAccessDenied,
+			fmt.Errorf("cannot access ship with id='%s': %w", shipID, errs.ErrAccessDenied),
+		)
+	}
+
+	inventory, err := s.store.Inventories().GetInventory(ctx, ship.InventoryID)
+	if err != nil {
+		return fmt.Errorf("get ship inventory: %w", err)
+	}
+
+	inventoryItemCount, err := s.store.Inventories().GetInventoryItemCount(ctx, inventory.ID)
+	if err != nil {
+		return fmt.Errorf("get inventory item count: %w", err)
+	}
+
+	if !s.gameConfig.Rules.DisableInventoryLimit && inventoryItemCount+1 > inventory.MaxItemSlots {
+		return errs.NewWithCode(errs.CodeInventoryIsFull, fmt.Errorf(
+			"cannot remove ship module due to inventory item limit (%d > %d): %w",
+			inventoryItemCount+1,
+			inventory.MaxItemSlots,
+			errs.ErrUnprocessableEntity,
+		))
+	}
+
+	itemType, err := moduleType.IntoItemType()
+	if err != nil {
+		return fmt.Errorf("converto ship module type into item: %w", err)
+	}
+
+	err = s.store.ExecTx(ctx, func(tx data.Store) error {
+		err := tx.Ships().DeleteShipModule(ctx, shipID, moduleType)
+		if err != nil {
+			return fmt.Errorf("remove ship module: %w", err)
+		}
+
+		_, err = tx.Inventories().CreateItem(ctx, inventories_repository.CreateItem{
+			InventoryID: ship.InventoryID,
+			ItemType:    itemType,
+		})
+
+		if err != nil {
+			return fmt.Errorf("create item: %w", err)
+		}
+
+		return nil
+	})
+
+	return err
+}
+
 func (s *Service) CreateStarterShip(ctx context.Context, tx data.Store, agentID uuid.UUID) (model.Ship, error) {
 	spawnSystem, err := s.worldGen.FindSpawnSystem()
 	if err != nil {

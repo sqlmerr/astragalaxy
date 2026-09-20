@@ -60,5 +60,11 @@ func (h *ShipsHTTPHandler) Routes(agentAuthMiddleware http_middleware.Middleware
 			Handler:    h.GetMyShipModules,
 			Middleware: []http_middleware.Middleware{agentAuthMiddleware},
 		},
+		{
+			Method:     http.MethodDelete,
+			Path:       "/ships/my/{id}/modules/{type}",
+			Handler:    h.RemoveShipModule,
+			Middleware: []http_middleware.Middleware{agentAuthMiddleware},
+		},
 	}
 }

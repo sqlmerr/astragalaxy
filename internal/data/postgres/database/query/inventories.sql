@@ -82,6 +82,10 @@ SELECT * FROM inventory_items
 WHERE inventory_id = $1
 ORDER BY created_at;
 
+-- name: GetInventoryItemCount :one
+SELECT COUNT(*)::INTEGER FROM inventory_items
+WHERE inventory_id = $1;
+
 -- name: GetInventoryItem :one
 SELECT * FROM inventory_items
 WHERE id = $1;

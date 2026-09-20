@@ -26,6 +26,7 @@ type InventoryRepository interface {
 	CreateItem(ctx context.Context, data CreateItem) (model.Item, error)
 	CreateItemWithMetadata(ctx context.Context, data CreateItemWithMetadata) (model.Item, error)
 	GetInventoryItems(ctx context.Context, inventoryID uuid.UUID) ([]model.Item, error)
+	GetInventoryItemCount(ctx context.Context, inventoryID uuid.UUID) (int, error)
 	GetItem(ctx context.Context, id uuid.UUID) (model.Item, error)
 	SaveItem(ctx context.Context, data model.Item) (model.Item, error)
 	DeleteItem(ctx context.Context, id uuid.UUID) error

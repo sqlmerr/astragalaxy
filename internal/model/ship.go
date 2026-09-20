@@ -84,6 +84,16 @@ const (
 	ShipModulePortablePrinter ShipModuleType = "portable_printer"
 )
 
+func (m ShipModuleType) IntoItemType() (ItemType, error) {
+	item := ItemType(m)
+	switch item {
+	case ItemPortableSmelter, ItemPortablePrinter:
+		return item, nil
+	default:
+		return "", errs.NewWithCode(errs.CodeInvalidShipModuleType, fmt.Errorf("unknown ship module type: %s: %w", m, errs.ErrInvalidArgument))
+	}
+}
+
 type ShipModule struct {
 	ShipID uuid.UUID
 	Type   ShipModuleType
