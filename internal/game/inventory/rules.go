@@ -8,11 +8,23 @@ import (
 	"github.com/sqlmerr/astragalaxy/internal/model"
 )
 
-func TransferResource(from, to model.Resource, amount int) (model.Resource, model.Resource, error) {
+func TransferResource(from, to model.Resource, amount, toInventoryVolume int, toInventory model.Inventory) (model.Resource, model.Resource, error) {
 	if from.Amount < amount {
 		return model.Resource{}, model.Resource{}, errs.NewWithCode(
 			errs.CodeNotEnoughResources,
 			fmt.Errorf("have: %d. Must be at least %d: %w", from.Amount, amount, errs.ErrUnprocessableEntity),
+		)
+	}
+
+	if toInventoryVolume+amount > toInventory.MaxResourceVolume {
+		return model.Resource{}, model.Resource{}, errs.NewWithCode(
+			errs.CodeInventoryIsFull,
+			fmt.Errorf(
+				"cannot transfer %d resources due to inventory volume limit = %d: %w",
+				amount,
+				toInventory.MaxResourceVolume,
+				errs.ErrUnprocessableEntity,
+			),
 		)
 	}
 

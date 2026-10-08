@@ -2,6 +2,7 @@
 .vscode
 .idea
 out
+node_modules
 
 config.yaml
 

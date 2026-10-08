@@ -89,12 +89,12 @@ func (s *Service) TransferResources(
 		return fmt.Errorf("check transfer direction: %w", err)
 	}
 
-	//inventoryTo, err := s.store.Inventories().GetInventory(ctx, input.ToInventoryID)
-	//if err != nil {
-	//	return fmt.Errorf("get inventory to: %w", err)
-	//}
+	inventoryTo, err := s.store.Inventories().GetInventory(ctx, input.ToInventoryID)
+	if err != nil {
+		return fmt.Errorf("get inventory to: %w", err)
+	}
 
-	err := s.store.ExecTx(ctx, func(tx data.Store) error {
+	err = s.store.ExecTx(ctx, func(tx data.Store) error {
 		for resourceType, amount := range input.Resources {
 			resourceFrom, err := tx.Inventories().GetResource(ctx, input.FromInventoryID, resourceType)
 			if err != nil {
@@ -112,8 +112,12 @@ func (s *Service) TransferResources(
 				return fmt.Errorf("get resource: %w", err)
 			}
 
-			// TODO: check resource volume
-			resourceFrom, resourceTo, err = TransferResource(resourceFrom, resourceTo, amount)
+			inventoryVolume, err := s.store.Inventories().GetResourcesTotalAmount(ctx, input.ToInventoryID)
+			if err != nil {
+				return fmt.Errorf("get inventory volume: %w", err)
+			}
+
+			resourceFrom, resourceTo, err = TransferResource(resourceFrom, resourceTo, amount, inventoryVolume, inventoryTo)
 			if err != nil {
 				return err
 			}
