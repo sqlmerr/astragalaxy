@@ -53,6 +53,8 @@ AstraGalaxy is an API-based space exploration game inspired by No Man's Sky. Pla
 3. **Run migrations:**
    ```bash
    just migrate-up
+   # or from the server binary (uses the same .env):
+   go run ./cmd/server migrate up
    ```
 
 4. **Generate API docs (optional):**
@@ -72,6 +74,29 @@ AstraGalaxy is an API-based space exploration game inspired by No Man's Sky. Pla
    just run-client
    # Client at http://localhost:3000
    ```
+
+### Docker
+
+The server ships as a container image published to GitHub Container Registry on every release:
+
+```bash
+docker build -t astragalaxy .
+
+docker run --rm -p 8080:8080 \
+  --env-file .env \
+  -e POSTGRES_HOST=host.docker.internal \
+  -e REDIS_ADDR=host.docker.internal:6379 \
+  astragalaxy
+```
+
+Images are tagged with the release version (`v1.2.3`, `1.2`), `latest`, and the commit SHA:
+
+```bash
+docker pull ghcr.io/sqlmerr/astragalaxy:latest
+```
+
+CI (`.github/workflows/test-and-build.yml`) runs `go vet`, `go test`, and validates the image build on pushes and pull requests.
+CD (`.github/workflows/publish.yml`) runs the same checks and pushes the image to GHCR when a release is published.
 
 ## Configuration
 
@@ -100,7 +125,7 @@ AstraGalaxy is an API-based space exploration game inspired by No Man's Sky. Pla
 
 ```yaml
 game:
-  seed: 67                    # Universe generation seed
+  seed: 123456789             # Universe generation seed
   rules:
     disableCooldowns: true    # Disable action cooldowns (dev)
     disableInventoryLimit: false
@@ -182,6 +207,23 @@ just run-server       # Run Go server
 just test             # Run game tests
 just run-client       # Run client dev server
 ```
+
+### Migrations from the server binary
+
+Migration SQL files are embedded into the server binary, so `migrate` can be run
+without Docker:
+
+```bash
+go run ./cmd/server migrate up        # Apply all pending migrations (default)
+go run ./cmd/server migrate up 2      # Apply only the next 2 migrations
+go run ./cmd/server migrate down 1    # Roll back the last migration
+go run ./cmd/server migrate version   # Show current migration version
+go run ./cmd/server migrate force 1   # Set version manually (dirty state recovery)
+```
+
+Configuration comes from `POSTGRES_*` environment variables; a `.env` file in the
+current working directory is loaded automatically (existing environment variables
+take precedence). In Docker the same command is `server migrate up`.
 
 ## Testing
 

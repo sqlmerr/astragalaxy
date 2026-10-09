@@ -2,16 +2,20 @@ package main
 
 import (
 	"context"
+	"errors"
 	"fmt"
+	"io/fs"
 	"net/http"
 	"os"
 	"os/signal"
 	"syscall"
 
 	scalargo "github.com/bdpiprava/scalar-go"
+	"github.com/joho/godotenv"
 	"github.com/sqlmerr/astragalaxy/internal/auth"
 	"github.com/sqlmerr/astragalaxy/internal/data"
 	database "github.com/sqlmerr/astragalaxy/internal/data/postgres/database/sqlc"
+	"github.com/sqlmerr/astragalaxy/internal/data/postgres/migrator"
 	pgx_pool "github.com/sqlmerr/astragalaxy/internal/data/postgres/pool/pgx"
 	redis_goredis "github.com/sqlmerr/astragalaxy/internal/data/redis/goredis"
 	"github.com/sqlmerr/astragalaxy/internal/data/registry"
@@ -48,8 +52,21 @@ import (
 )
 
 func main() {
+	if err := godotenv.Load(); err != nil && !errors.Is(err, fs.ErrNotExist) {
+		fmt.Fprintln(os.Stderr, "failed to load .env:", err)
+		os.Exit(1)
+	}
+
 	ctx, cancel := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
 	defer cancel()
+
+	if len(os.Args) > 1 && os.Args[1] == "migrate" {
+		if err := migrator.Run(ctx, os.Args[2:]); err != nil {
+			fmt.Fprintln(os.Stderr, "migrate:", err)
+			os.Exit(1)
+		}
+		return
+	}
 
 	log, err := core_logger.New(core_logger.NewConfigMust())
 	if err != nil {
@@ -69,6 +86,7 @@ func main() {
 	}
 
 	redisConfig := redis_goredis.LoadConfigMust()
+	fmt.Println("redis config", redisConfig)
 	rdb, err := redis_goredis.NewClient(ctx, *redisConfig)
 	if err != nil {
 		log.Error("failed to create redis client", zap.Error(err))

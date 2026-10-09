@@ -58,6 +58,10 @@ just test              # go test -v ./internal/game/...
 just run-client        # client dev server (port 3000)
 ```
 
+The server binary also has a `migrate` subcommand (`go run ./cmd/server migrate up`) that
+applies the SQL migrations embedded into the binary using `POSTGRES_*` settings from the
+environment / `.env`.
+
 Client checks (run inside `client/`):
 
 ```bash

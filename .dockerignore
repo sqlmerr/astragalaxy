@@ -1,0 +1,16 @@
+.git
+.github
+.env
+.env.example
+.vscode
+.idea
+node_modules
+client
+out
+docs
+config.yaml
+Dockerfile
+docker-compose*.yaml
+*.md
+Justfile
+sqlc.yaml
