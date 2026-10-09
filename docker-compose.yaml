@@ -15,7 +15,7 @@ services:
       retries: 10
   
   postgres-migrate:
-    build: .
+    image: ghcr.io/sqlmerr/astragalaxy:latest
     command: migrate
     environment:
       - POSTGRES_USER=${POSTGRES_USER}
@@ -41,7 +41,7 @@ services:
       retries: 10
 
   server:
-    build: .
+    image: ghcr.io/sqlmerr/astragalaxy:latest
     env_file:
       - .env
     volumes:
