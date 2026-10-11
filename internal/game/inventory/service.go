@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+	"github.com/samber/lo"
 	"github.com/sqlmerr/astragalaxy/internal/data"
 	cooldowns_repository "github.com/sqlmerr/astragalaxy/internal/data/repository/cooldowns"
 	errs "github.com/sqlmerr/astragalaxy/internal/errors"
@@ -68,7 +69,16 @@ func (s *Service) getFullInventory(ctx context.Context, inventoryID uuid.UUID) (
 		return FullInventory{}, fmt.Errorf("get inventory items: %w", err)
 	}
 
-	return FullInventory{Inventory: inv, Resources: resources, Items: items}, nil
+	return FullInventory{
+		Inventory: inv,
+		Resources: lo.Filter(
+			resources,
+			func(i model.Resource, index int) bool {
+				return i.Amount > 0
+			},
+		),
+		Items: items,
+	}, nil
 }
 
 func (s *Service) TransferResources(
@@ -109,7 +119,13 @@ func (s *Service) TransferResources(
 
 			resourceTo, err := tx.Inventories().GetResource(ctx, input.ToInventoryID, resourceType)
 			if err != nil {
-				return fmt.Errorf("get resource: %w", err)
+				if !errors.Is(err, errs.ErrNotFound) {
+					return fmt.Errorf("get resource: %w", err)
+				}
+
+				resourceTo.InventoryID = input.ToInventoryID
+				resourceTo.ResourceType = resourceType
+				resourceTo.Amount = 0
 			}
 
 			inventoryVolume, err := s.store.Inventories().GetResourcesTotalAmount(ctx, input.ToInventoryID)

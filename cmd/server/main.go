@@ -86,7 +86,6 @@ func main() {
 	}
 
 	redisConfig := redis_goredis.LoadConfigMust()
-	fmt.Println("redis config", redisConfig)
 	rdb, err := redis_goredis.NewClient(ctx, *redisConfig)
 	if err != nil {
 		log.Error("failed to create redis client", zap.Error(err))

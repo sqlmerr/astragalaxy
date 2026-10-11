@@ -18,6 +18,7 @@ import {
 import { Json } from "@/components/ui/json"
 import { CraftActionDialog } from "./craft-action-dialog"
 import { useState } from "react"
+import { TransferActionDialog } from "./transfer-action-dialog"
 
 interface InventoryModalProps {
   inventory: SchemaFullInventory | null
@@ -30,7 +31,9 @@ export function InventoryModal({
   onClose,
   agentId,
 }: InventoryModalProps) {
-  const [craftOpened, setCraftOpened] = useState(false)
+  const [openedDialog, setOpenedDialog] = useState<"craft" | "transfer" | null>(
+    null
+  )
 
   return (
     <>
@@ -48,9 +51,16 @@ export function InventoryModal({
             <Button
               type="button"
               size="sm"
-              onClick={() => setCraftOpened(true)}
+              onClick={() => setOpenedDialog("craft")}
             >
               Craft
+            </Button>
+            <Button
+              type="button"
+              size="sm"
+              onClick={() => setOpenedDialog("transfer")}
+            >
+              Transfer
             </Button>
           </DialogHeader>
           {inventory && (
@@ -142,8 +152,14 @@ export function InventoryModal({
       <CraftActionDialog
         agentId={agentId}
         inventoryId={inventory?.inventory.id || null}
-        open={craftOpened}
-        onClose={() => setCraftOpened(false)}
+        open={openedDialog === "craft"}
+        onClose={() => setOpenedDialog(null)}
+      />
+      <TransferActionDialog
+        agentId={agentId}
+        inventory={inventory}
+        open={openedDialog === "transfer"}
+        onClose={() => setOpenedDialog(null)}
       />
     </>
   )

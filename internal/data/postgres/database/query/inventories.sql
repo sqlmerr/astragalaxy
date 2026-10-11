@@ -56,6 +56,13 @@ WHERE inventory_id = $1;
 SELECT * FROM inventory_resources
 WHERE inventory_id = $1 AND resource_type = $2;
 
+-- name: UpsertInventoryResource :one
+INSERT INTO inventory_resources (inventory_id, resource_type, amount)
+VALUES ($1, $2, $3)
+ON CONFLICT (inventory_id, resource_type)
+DO UPDATE SET amount = EXCLUDED.amount
+RETURNING inventory_id, resource_type, amount;
+
 -- name: UpdateInventoryResource :one
 UPDATE inventory_resources
 SET

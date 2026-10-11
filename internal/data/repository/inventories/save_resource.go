@@ -15,7 +15,7 @@ func (r *InventoryRepositoryImpl) SaveResource(ctx context.Context, data model.R
 	ctx, cancel := context.WithTimeout(ctx, r.db.OpTimeout())
 	defer cancel()
 
-	res, err := r.q.UpdateInventoryResource(ctx, database.UpdateInventoryResourceParams{
+	res, err := r.q.UpsertInventoryResource(ctx, database.UpsertInventoryResourceParams{
 		InventoryID:  data.InventoryID,
 		ResourceType: string(data.ResourceType),
 		Amount:       int64(data.Amount),

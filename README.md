@@ -37,7 +37,7 @@ AstraGalaxy is an API-based space exploration game inspired by No Man's Sky. Pla
 - Docker & Docker Compose
 - Just (command runner)
 
-### Setup
+### Setup (Local)
 
 1. **Clone and configure environment:**
    ```bash

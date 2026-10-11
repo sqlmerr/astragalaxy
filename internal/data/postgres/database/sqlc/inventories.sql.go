@@ -384,3 +384,24 @@ func (q *Queries) UpdateInventoryResource(ctx context.Context, arg UpdateInvento
 	err := row.Scan(&i.InventoryID, &i.ResourceType, &i.Amount)
 	return i, err
 }
+
+const upsertInventoryResource = `-- name: UpsertInventoryResource :one
+INSERT INTO inventory_resources (inventory_id, resource_type, amount)
+VALUES ($1, $2, $3)
+ON CONFLICT (inventory_id, resource_type)
+DO UPDATE SET amount = EXCLUDED.amount
+RETURNING inventory_id, resource_type, amount
+`
+
+type UpsertInventoryResourceParams struct {
+	InventoryID  uuid.UUID
+	ResourceType string
+	Amount       int64
+}
+
+func (q *Queries) UpsertInventoryResource(ctx context.Context, arg UpsertInventoryResourceParams) (InventoryResource, error) {
+	row := q.db.QueryRow(ctx, upsertInventoryResource, arg.InventoryID, arg.ResourceType, arg.Amount)
+	var i InventoryResource
+	err := row.Scan(&i.InventoryID, &i.ResourceType, &i.Amount)
+	return i, err
+}
