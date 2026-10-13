@@ -16,7 +16,7 @@ func CalcWarpDistance(x1, y1, x2, y2 int) int {
 	))
 }
 
-func NavigateWarp(ship model.Ship, newSystem worldgen.System, warpCellT1Amount, warpCellT2Amount int) (model.Ship, time.Duration, model.ResourceType, int, error) {
+func NavigateWarp(ship model.Ship, class model.ShipClass, newSystem worldgen.System, warpCellT1Amount, warpCellT2Amount int) (model.Ship, time.Duration, model.ResourceType, int, error) {
 	if ship.Status != model.ShipStatusOrbit {
 		return model.Ship{}, 0, "", 0, errs.NewWithCode(
 			errs.CodeInvalidShipState,
@@ -39,12 +39,13 @@ func NavigateWarp(ship model.Ship, newSystem worldgen.System, warpCellT1Amount, 
 		return model.Ship{}, 0, "", 0, err
 	}
 
-	if distance > 18 { // TODO: dynamic distance limit based on ship's type (or engine?)
+	if distance > class.MaxWarpDistance {
 		return model.Ship{}, 0, "", 0, errs.NewWithCode(
 			errs.CodeInvalidWarpPath,
 			fmt.Errorf(
-				"warp path length: %d is invalid (max=10): %w",
+				"warp path length: %d is invalid (max=%d): %w",
 				distance,
+				class.MaxWarpDistance,
 				errs.ErrInvalidArgument,
 			),
 		)

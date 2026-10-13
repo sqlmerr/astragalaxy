@@ -37,5 +37,10 @@ func (h *DataHTTPHandler) Routes() []http_server.Route {
 			Method:  http.MethodGet,
 			Handler: h.GetFacilities,
 		},
+		{
+			Path:    "/data/ship-classes",
+			Method:  http.MethodGet,
+			Handler: h.GetShipClasses,
+		},
 	}
 }

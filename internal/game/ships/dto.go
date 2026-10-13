@@ -13,4 +13,5 @@ type CreateShipSpec struct {
 	Coords    model.ShipCoords
 	Modules   []model.ShipModuleType
 	Inventory model.Inventory
+	Class     model.ShipClassID
 }

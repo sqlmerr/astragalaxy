@@ -234,6 +234,7 @@ type Ship struct {
 	InventoryID uuid.UUID
 	Location    ShipLocation
 	LocationID  int32
+	Class       string
 }
 
 type ShipModule struct {

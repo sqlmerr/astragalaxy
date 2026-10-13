@@ -12,9 +12,9 @@ import (
 )
 
 const createShip = `-- name: CreateShip :one
-INSERT INTO ships (agent_id, type, active, system_x, system_y, status, name, inventory_id, location, location_id)
-VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
-RETURNING id, agent_id, type, active, system_x, system_y, status, created_at, name, inventory_id, location, location_id
+INSERT INTO ships (agent_id, type, active, system_x, system_y, status, name, inventory_id, location, location_id, class)
+VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
+RETURNING id, agent_id, type, active, system_x, system_y, status, created_at, name, inventory_id, location, location_id, class
 `
 
 type CreateShipParams struct {
@@ -28,6 +28,7 @@ type CreateShipParams struct {
 	InventoryID uuid.UUID
 	Location    ShipLocation
 	LocationID  int32
+	Class       string
 }
 
 func (q *Queries) CreateShip(ctx context.Context, arg CreateShipParams) (Ship, error) {
@@ -42,6 +43,7 @@ func (q *Queries) CreateShip(ctx context.Context, arg CreateShipParams) (Ship, e
 		arg.InventoryID,
 		arg.Location,
 		arg.LocationID,
+		arg.Class,
 	)
 	var i Ship
 	err := row.Scan(
@@ -57,12 +59,13 @@ func (q *Queries) CreateShip(ctx context.Context, arg CreateShipParams) (Ship, e
 		&i.InventoryID,
 		&i.Location,
 		&i.LocationID,
+		&i.Class,
 	)
 	return i, err
 }
 
 const getActiveShipByAgent = `-- name: GetActiveShipByAgent :one
-SELECT id, agent_id, type, active, system_x, system_y, status, created_at, name, inventory_id, location, location_id
+SELECT id, agent_id, type, active, system_x, system_y, status, created_at, name, inventory_id, location, location_id, class
 FROM ships
 WHERE agent_id = $1 AND active = true
 `
@@ -83,12 +86,13 @@ func (q *Queries) GetActiveShipByAgent(ctx context.Context, agentID uuid.UUID) (
 		&i.InventoryID,
 		&i.Location,
 		&i.LocationID,
+		&i.Class,
 	)
 	return i, err
 }
 
 const getShipByID = `-- name: GetShipByID :one
-SELECT id, agent_id, type, active, system_x, system_y, status, created_at, name, inventory_id, location, location_id
+SELECT id, agent_id, type, active, system_x, system_y, status, created_at, name, inventory_id, location, location_id, class
 FROM ships
 WHERE id = $1
 `
@@ -109,12 +113,13 @@ func (q *Queries) GetShipByID(ctx context.Context, id uuid.UUID) (Ship, error) {
 		&i.InventoryID,
 		&i.Location,
 		&i.LocationID,
+		&i.Class,
 	)
 	return i, err
 }
 
 const getShipsByAgent = `-- name: GetShipsByAgent :many
-SELECT id, agent_id, type, active, system_x, system_y, status, created_at, name, inventory_id, location, location_id
+SELECT id, agent_id, type, active, system_x, system_y, status, created_at, name, inventory_id, location, location_id, class
 FROM ships
 WHERE agent_id = $1
 ORDER BY created_at DESC
@@ -142,6 +147,7 @@ func (q *Queries) GetShipsByAgent(ctx context.Context, agentID uuid.UUID) ([]Shi
 			&i.InventoryID,
 			&i.Location,
 			&i.LocationID,
+			&i.Class,
 		); err != nil {
 			return nil, err
 		}
@@ -163,9 +169,10 @@ SET
     status = $6,
     name = $7,
     location = $8,
-    location_id = $9
+    location_id = $9,
+    class = $10
 WHERE id = $1
-RETURNING id, agent_id, type, active, system_x, system_y, status, created_at, name, inventory_id, location, location_id
+RETURNING id, agent_id, type, active, system_x, system_y, status, created_at, name, inventory_id, location, location_id, class
 `
 
 type SaveShipParams struct {
@@ -178,6 +185,7 @@ type SaveShipParams struct {
 	Name       string
 	Location   ShipLocation
 	LocationID int32
+	Class      string
 }
 
 func (q *Queries) SaveShip(ctx context.Context, arg SaveShipParams) (Ship, error) {
@@ -191,6 +199,7 @@ func (q *Queries) SaveShip(ctx context.Context, arg SaveShipParams) (Ship, error
 		arg.Name,
 		arg.Location,
 		arg.LocationID,
+		arg.Class,
 	)
 	var i Ship
 	err := row.Scan(
@@ -206,6 +215,7 @@ func (q *Queries) SaveShip(ctx context.Context, arg SaveShipParams) (Ship, error
 		&i.InventoryID,
 		&i.Location,
 		&i.LocationID,
+		&i.Class,
 	)
 	return i, err
 }

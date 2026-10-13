@@ -24,12 +24,19 @@ func InstallShipModule(shipModuleType model.ShipModuleType) ItemAction {
 			return nil, fmt.Errorf("get ship modules: %w", err)
 		}
 
-		if len(modules) >= ship.GetShipModuleLimit() {
+		shipClass, classExists := ctx.GameData.ShipClasses.GetShipClass(ship.Class)
+		if !classExists {
+			return nil, errs.NewWithCode(errs.CodeAnomaly, fmt.Errorf("unknown ship class %q: %w", ship.Class, errs.ErrNotFound))
+		}
+
+		shipModuleLimit := shipClass.MaxModuleSlots + ship.Type.GetModuleLimitExtension()
+
+		if len(modules) >= shipModuleLimit {
 			return nil, errs.NewWithCode(
 				errs.CodeInventoryIsFull,
 				fmt.Errorf(
 					"cannot install %s ship module due to limit (%d >= %d): %w",
-					shipModuleType, len(modules), ship.GetShipModuleLimit(), errs.ErrUnprocessableEntity,
+					shipModuleType, len(modules), shipModuleLimit, errs.ErrUnprocessableEntity,
 				),
 			)
 		}

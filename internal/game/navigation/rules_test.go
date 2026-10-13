@@ -19,6 +19,7 @@ func TestNavigateWarp(t *testing.T) {
 		expectedErr bool
 		err         error
 		errCode     errs.ErrorCode
+		shipClass   model.ShipClass
 	}
 
 	tests := []testCase{
@@ -116,11 +117,34 @@ func TestNavigateWarp(t *testing.T) {
 			err:         errs.ErrNotModified,
 			errCode:     errs.CodeAlreadyAtDestination,
 		},
+		{
+			name: "Invalid warp path length",
+			ship: model.Ship{
+				Coords: model.ShipCoords{
+					SystemX: 0,
+					SystemY: 0,
+				},
+				Status: model.ShipStatusOrbit,
+			},
+			newSystem: worldgen.System{
+				X: 18,
+				Y: 0,
+			},
+			fuelT2:      2,
+			expectedErr: true,
+			errCode:     errs.CodeInvalidWarpPath,
+			err:         errs.ErrInvalidArgument,
+			shipClass:   model.ShipClass{MaxWarpDistance: 15},
+		},
 	}
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			ship, cd, _, _, err := NavigateWarp(test.ship, test.newSystem, test.fuelT1, test.fuelT2)
+			class := model.ShipClass{MaxWarpDistance: 18}
+			if test.shipClass.MaxWarpDistance != 0 {
+				class = test.shipClass
+			}
+			ship, cd, _, _, err := NavigateWarp(test.ship, class, test.newSystem, test.fuelT1, test.fuelT2)
 			if test.expectedErr {
 				assert.Error(t, err)
 				assert.ErrorIs(t, err, test.err)

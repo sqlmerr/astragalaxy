@@ -9,3 +9,4 @@ registry:
   resourcesPath: data/resources.json
   recipesPath: data/recipes.json
   facilitiesPath: data/facilities.json
+  shipClassesPath: data/ship-classes.json

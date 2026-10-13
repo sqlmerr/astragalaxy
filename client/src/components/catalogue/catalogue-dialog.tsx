@@ -1,10 +1,18 @@
-import { BookOpen, Factory, Package, Pickaxe, Wrench } from "lucide-react"
+import {
+  BookOpen,
+  Factory,
+  Package,
+  Pickaxe,
+  Rocket,
+  Wrench,
+} from "lucide-react"
 
 import type {
   SchemaFacilityData,
   SchemaItemData,
   SchemaRecipeData,
   SchemaResourceData,
+  SchemaShipClassData,
 } from "@/api/types"
 import { Badge } from "@/components/ui/badge"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -173,9 +181,44 @@ function FacilityCatalogueCard({ facility }: { facility: SchemaFacilityData }) {
   )
 }
 
+function ShipClassCatalogueCard({
+  shipClass,
+}: {
+  shipClass: SchemaShipClassData
+}) {
+  console.log(shipClass)
+  return (
+    <Card size="sm" className="text-left">
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2 break-all">
+          <Rocket className="size-4 shrink-0 text-primary" />
+          {shipClass.id}
+        </CardTitle>
+      </CardHeader>
+      <CardContent className="grid gap-2 text-xs">
+        <div>
+          <span className="text-muted-foreground">Max module slots: </span>
+          {shipClass.max_module_slots}
+        </div>
+        <div>
+          <span className="text-muted-foreground">Max warp distance: </span>
+          {shipClass.max_warp_distance}
+        </div>
+      </CardContent>
+    </Card>
+  )
+}
+
 export function CatalogueDialog({ open, onClose }: CatalogueDialogProps) {
-  const { items, resources, recipes, facilities, isPending, isError } =
-    useData()
+  const {
+    items,
+    resources,
+    recipes,
+    facilities,
+    shipClasses,
+    isPending,
+    isError,
+  } = useData()
 
   return (
     <Dialog open={open} onOpenChange={(isOpen) => !isOpen && onClose()}>
@@ -197,6 +240,9 @@ export function CatalogueDialog({ open, onClose }: CatalogueDialogProps) {
             </TabsTrigger>
             <TabsTrigger value="facilities">
               Facilities ({facilities.length})
+            </TabsTrigger>
+            <TabsTrigger value="ship-classes">
+              Ship Classes ({shipClasses.length})
             </TabsTrigger>
           </TabsList>
           <div className="min-h-0 w-full flex-1 overflow-y-auto p-1">
@@ -247,6 +293,17 @@ export function CatalogueDialog({ open, onClose }: CatalogueDialogProps) {
                     key={facility.id}
                     facility={facility}
                   />
+                ))}
+              </CatalogueGrid>
+            </TabsContent>
+            <TabsContent value="ship-classes" className="w-full">
+              <CatalogueGrid
+                isPending={isPending}
+                isError={isError}
+                isEmpty={!shipClasses.length}
+              >
+                {shipClasses.map((s) => (
+                  <ShipClassCatalogueCard key={s.id} shipClass={s} />
                 ))}
               </CatalogueGrid>
             </TabsContent>

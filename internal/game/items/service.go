@@ -7,6 +7,7 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/sqlmerr/astragalaxy/internal/data"
+	"github.com/sqlmerr/astragalaxy/internal/data/registry"
 	cooldowns_repository "github.com/sqlmerr/astragalaxy/internal/data/repository/cooldowns"
 	errs "github.com/sqlmerr/astragalaxy/internal/errors"
 	item_actions "github.com/sqlmerr/astragalaxy/internal/game/items/actions"
@@ -14,11 +15,12 @@ import (
 )
 
 type Service struct {
-	store data.Store
+	store    data.Store
+	gameData registry.GameData
 }
 
-func NewService(store data.Store) *Service {
-	return &Service{store}
+func NewService(store data.Store, gameData registry.GameData) *Service {
+	return &Service{store, gameData}
 }
 
 func (s *Service) UseItem(ctx context.Context, agentID uuid.UUID, itemID uuid.UUID) (json.RawMessage, model.Cooldown, error) {
@@ -61,8 +63,9 @@ func (s *Service) UseItem(ctx context.Context, agentID uuid.UUID, itemID uuid.UU
 	var cooldown model.Cooldown
 	err = s.store.ExecTx(ctx, func(tx data.Store) error {
 		context := item_actions.ActionContext{
-			Context: ctx,
-			Store:   tx,
+			Context:  ctx,
+			Store:    tx,
+			GameData: s.gameData,
 		}
 		res, err = action(context, agentID, item)
 		if err != nil {

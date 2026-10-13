@@ -4,6 +4,7 @@ import {
   itemsQueryOptions,
   recipesQueryOptions,
   resourcesQueryOptions,
+  shipClassesQueryOptions,
 } from "../queries/data"
 
 export function useRecipesQuery() {
@@ -20,4 +21,8 @@ export function useResourcesQuery() {
 
 export function useFacilitiesQuery() {
   return useQuery(facilitiesQueryOptions())
+}
+
+export function useShipClassesQuery() {
+  return useQuery(shipClassesQueryOptions())
 }

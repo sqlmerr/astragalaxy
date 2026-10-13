@@ -36,6 +36,7 @@ type ShipResponseDTO struct {
 	Location    string    `json:"location"`
 	LocationID  int       `json:"location_id"`
 	InventoryID uuid.UUID `json:"inventory_id"`
+	Class       string    `json:"class"`
 }
 
 func shipDTOFromModel(m model.Ship) ShipResponseDTO {
@@ -52,6 +53,7 @@ func shipDTOFromModel(m model.Ship) ShipResponseDTO {
 		Location:    string(m.Coords.Location),
 		LocationID:  m.Coords.LocationID,
 		InventoryID: m.InventoryID,
+		Class:       string(m.Class),
 	}
 }
 

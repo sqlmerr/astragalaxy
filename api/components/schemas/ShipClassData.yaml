@@ -1,0 +1,13 @@
+type: object
+required:
+  - id
+  - max_module_slots
+  - max_warp_distance
+properties: 
+  id:
+    type: string
+    description: Ship class identifier
+  max_module_slots:
+    type: integer
+  max_warp_distance:
+    type: integer

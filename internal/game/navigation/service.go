@@ -7,6 +7,7 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/sqlmerr/astragalaxy/internal/data"
+	"github.com/sqlmerr/astragalaxy/internal/data/registry"
 	cooldowns_repository "github.com/sqlmerr/astragalaxy/internal/data/repository/cooldowns"
 	errs "github.com/sqlmerr/astragalaxy/internal/errors"
 	"github.com/sqlmerr/astragalaxy/internal/game"
@@ -18,11 +19,12 @@ type Service struct {
 	gameConfig game.Config
 	store      data.Store
 	worldGen   worldgen.WorldGen
+	gameData   registry.GameData
 }
 
-func NewService(gameConfig game.Config, store data.Store, worldGen worldgen.WorldGen) *Service {
+func NewService(gameConfig game.Config, store data.Store, worldGen worldgen.WorldGen, gameData registry.GameData) *Service {
 	return &Service{
-		gameConfig, store, worldGen,
+		gameConfig, store, worldGen, gameData,
 	}
 }
 
@@ -31,6 +33,15 @@ type WarpFuelUsage struct {
 	InventoryID  uuid.UUID
 	Used         int
 	Left         int
+}
+
+func (s *Service) getShipClass(ship model.Ship) (model.ShipClass, error) {
+	class, ok := s.gameData.ShipClasses.GetShipClass(ship.Class)
+	if !ok {
+		return model.ShipClass{}, errs.NewWithCode(errs.CodeAnomaly,
+			fmt.Errorf("unknown ship class %q: %w", ship.Class, errs.ErrNotFound))
+	}
+	return class, nil
 }
 
 func (s *Service) NavigateWarp(ctx context.Context, agentID uuid.UUID, x, y int) (model.Cooldown, WarpFuelUsage, error) {
@@ -74,7 +85,12 @@ func (s *Service) NavigateWarp(ctx context.Context, agentID uuid.UUID, x, y int)
 		t1Amount, t2Amount = int(^uint(0)>>1), int(^uint(0)>>1)
 	}
 
-	ship, cooldownDuration, fuelResource, fuelAmount, err := NavigateWarp(ship, *system, t1Amount, t2Amount)
+	class, err := s.getShipClass(ship)
+	if err != nil {
+		return model.Cooldown{}, WarpFuelUsage{}, err
+	}
+
+	ship, cooldownDuration, fuelResource, fuelAmount, err := NavigateWarp(ship, class, *system, t1Amount, t2Amount)
 	if err != nil {
 		return model.Cooldown{}, WarpFuelUsage{}, fmt.Errorf("process warp: %w", err)
 	}

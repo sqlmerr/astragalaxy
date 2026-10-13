@@ -42,3 +42,10 @@ type FacilityDTO struct {
 	TimeMultiplier float64 `json:"time_multiplier"`
 	CostMultiplier float64 `json:"cost_multiplier"`
 }
+
+type ShipClassDTO struct {
+	ID string `json:"id"`
+
+	MaxModuleSlots  int `json:"max_module_slots"`
+	MaxWarpDistance int `json:"max_warp_distance"`
+}

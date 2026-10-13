@@ -17,6 +17,7 @@ type CreateShip struct {
 	InventoryID uuid.UUID
 	Location    model.ShipLocation
 	LocationID  int
+	Class       model.ShipClassID
 }
 
 type CreateShipModule struct {
@@ -42,6 +43,7 @@ func convertModel(m database.Ship) model.Ship {
 		Name:        m.Name,
 		InventoryID: m.InventoryID,
 		Coords:      coords,
+		Class:       model.ShipClassID(m.Class),
 	}
 }
 

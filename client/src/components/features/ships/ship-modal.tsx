@@ -206,6 +206,9 @@ export function ShipModal({ ship, onClose }: ShipModalProps) {
 
                   <span className="text-muted-foreground">Status</span>
                   <Badge>{ship.status}</Badge>
+
+                  <span className="text-muted-foreground">Class</span>
+                  <code className="font-mono break-all">{ship.class}</code>
                 </div>
               </Card>
 

@@ -1,5 +1,5 @@
 type: object
-required: [id, agent_id, type, active, system_x, system_y, status, created_at, name, location, location_id, inventory_id]
+required: [id, agent_id, type, active, system_x, system_y, status, created_at, name, location, location_id, inventory_id, class]
 properties:
   id:
     type: string
@@ -46,3 +46,6 @@ properties:
   location_id:
     type: integer
     description: Location ID
+  class:
+    type: string
+    description: Ship Class # TODO(docs): link to docs

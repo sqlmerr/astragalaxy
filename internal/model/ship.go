@@ -26,6 +26,19 @@ func NewShipType(shipType string) (ShipType, error) {
 	}
 }
 
+func (s ShipType) GetModuleLimitExtension() int {
+	switch s {
+	case ShipTypeMiner:
+		return 2
+	case ShipTypeScout:
+		return 3
+	case ShipTypeTrader:
+		return 1
+	}
+
+	return 0
+}
+
 type ShipStatus string
 
 const (
@@ -99,6 +112,15 @@ type ShipModule struct {
 	Type   ShipModuleType
 }
 
+type ShipClassID string
+
+type ShipClass struct {
+	ID ShipClassID
+
+	MaxModuleSlots  int
+	MaxWarpDistance int
+}
+
 type ShipCoords struct {
 	Location   ShipLocation
 	LocationID int
@@ -131,19 +153,6 @@ type Ship struct {
 	Name        string
 	InventoryID uuid.UUID
 
+	Class  ShipClassID
 	Coords ShipCoords
-}
-
-// TODO: ship classes
-func (s Ship) GetShipModuleLimit() int {
-	switch s.Type {
-	case ShipTypeMiner:
-		return 6
-	case ShipTypeScout:
-		return 8
-	case ShipTypeTrader:
-		return 5
-	}
-
-	return 4
 }

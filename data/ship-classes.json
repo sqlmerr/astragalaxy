@@ -1,0 +1,22 @@
+[
+    {
+        "id": "S",
+        "max_module_slots": 8,
+        "max_warp_distance": 30
+    },
+    {
+        "id": "A",
+        "max_module_slots": 6,
+        "max_warp_distance": 24
+    },
+    {
+        "id": "B",
+        "max_module_slots": 5,
+        "max_warp_distance": 20
+    },
+    {
+        "id": "C",
+        "max_module_slots": 4,
+        "max_warp_distance": 16
+    }
+]

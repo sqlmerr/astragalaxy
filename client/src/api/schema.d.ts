@@ -648,6 +648,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/data/ship-classes": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Ship Classes Data */
+        get: operations["getShipClasses"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -754,6 +771,8 @@ export interface components {
             location: "none" | "planet" | "waypoint";
             /** @description Location ID */
             location_id: number;
+            /** @description Ship Class */
+            class: string;
         };
         GetMyShipsResponse: {
             data: components["schemas"]["Ship"][];
@@ -1014,6 +1033,12 @@ export interface components {
             data: {
                 [key: string]: string[];
             };
+        };
+        ShipClassData: {
+            /** @description Ship class identifier */
+            id: string;
+            max_module_slots: number;
+            max_warp_distance: number;
         };
     };
     responses: {
@@ -1991,6 +2016,28 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    getShipClasses: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Success */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["ShipClassData"][];
+                    };
                 };
             };
         };

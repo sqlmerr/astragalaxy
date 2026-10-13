@@ -29,5 +29,6 @@ export const queryKeys = {
     items: ["data", "items"] as const,
     resources: ["data", "resources"] as const,
     facilities: ["data", "facilities"] as const,
+    shipClasses: ["data", "ship-classes"] as const,
   },
 } as const

@@ -41,3 +41,13 @@ export const facilitiesQueryOptions = () =>
       return data
     },
   })
+
+export const shipClassesQueryOptions = () =>
+  queryOptions({
+    queryKey: queryKeys.data.shipClasses,
+    queryFn: async () => {
+      const { data, error } = await api.GET("/api/v1/data/ship-classes")
+      if (error) throw error
+      return data
+    },
+  })

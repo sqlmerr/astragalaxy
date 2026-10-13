@@ -311,6 +311,7 @@ func (s *Service) CreateStarterShip(ctx context.Context, tx data.Store, agentID 
 			MaxItemSlots:      15,
 			MaxResourceVolume: 3000,
 		},
+		Class: model.ShipClassID("C"),
 	})
 }
 
@@ -333,6 +334,7 @@ func (s *Service) createShip(ctx context.Context, tx data.Store, spec CreateShip
 		InventoryID: shipInventory.ID,
 		Location:    spec.Coords.Location,
 		LocationID:  spec.Coords.LocationID,
+		Class:       spec.Class,
 	})
 	if err != nil {
 		return model.Ship{}, fmt.Errorf("create ship: %w", err)

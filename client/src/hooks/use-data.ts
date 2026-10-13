@@ -3,6 +3,7 @@ import {
   useItemsQuery,
   useRecipesQuery,
   useResourcesQuery,
+  useShipClassesQuery,
 } from "@/api/hooks/use-data-queries"
 
 export function useData() {
@@ -30,20 +31,32 @@ export function useData() {
     isError: isFacilitiesError,
   } = useFacilitiesQuery()
 
+  const {
+    data: shipClasses,
+    isPending: isShipClassesPending,
+    isError: isShipClassesError,
+  } = useShipClassesQuery()
+
   const isPending =
     isRecipesPending ||
     isItemsPending ||
     isResourcesPending ||
-    isFaciltiesPending
+    isFaciltiesPending ||
+    isShipClassesPending
 
   const isError =
-    isRecipesError || isItemsError || isResourcesError || isFacilitiesError
+    isRecipesError ||
+    isItemsError ||
+    isResourcesError ||
+    isFacilitiesError ||
+    isShipClassesError
 
   return {
     recipes: recipes?.data || [],
     items: items?.data || [],
     resources: resources?.data || [],
     facilities: facilities?.data || [],
+    shipClasses: shipClasses?.data || [],
     isPending,
     isError,
   }
