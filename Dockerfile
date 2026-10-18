@@ -10,7 +10,7 @@ COPY cmd ./cmd
 COPY internal ./internal
 
 RUN CGO_ENABLED=0 go build -trimpath -ldflags="-s -w" -o /out/server ./cmd/server
-
+RUN CGO_ENABLED=0 go build -trimpath -ldflags="-s -w" -o /out/admincli ./cmd/admincli
 
 FROM node:22-alpine AS docs
 
@@ -30,8 +30,9 @@ RUN apk add --no-cache ca-certificates && adduser -D -u 10001 app
 WORKDIR /app
 
 COPY --from=build /out/server /usr/local/bin/server
+COPY --from=build /out/admincli /usr/local/bin/admincli
 COPY --from=docs /out/openapi.json ./out/openapi.json
-COPY data ./data
+COPY data ./data/
 COPY config.example.yaml ./config.yaml
 
 RUN mkdir -p /app/out/logs && chown -R app:app /app

@@ -9,18 +9,21 @@ import (
 	"github.com/sqlmerr/astragalaxy/internal/data"
 	"github.com/sqlmerr/astragalaxy/internal/data/registry"
 	cooldowns_repository "github.com/sqlmerr/astragalaxy/internal/data/repository/cooldowns"
+	inventories_repository "github.com/sqlmerr/astragalaxy/internal/data/repository/inventories"
 	errs "github.com/sqlmerr/astragalaxy/internal/errors"
+	"github.com/sqlmerr/astragalaxy/internal/game"
 	item_actions "github.com/sqlmerr/astragalaxy/internal/game/items/actions"
 	"github.com/sqlmerr/astragalaxy/internal/model"
 )
 
 type Service struct {
-	store    data.Store
-	gameData registry.GameData
+	gameConfig game.Config
+	store      data.Store
+	gameData   registry.GameData
 }
 
-func NewService(store data.Store, gameData registry.GameData) *Service {
-	return &Service{store, gameData}
+func NewService(gameConfig game.Config, store data.Store, gameData registry.GameData) *Service {
+	return &Service{gameConfig, store, gameData}
 }
 
 func (s *Service) UseItem(ctx context.Context, agentID uuid.UUID, itemID uuid.UUID) (json.RawMessage, model.Cooldown, error) {
@@ -90,4 +93,63 @@ func (s *Service) UseItem(ctx context.Context, agentID uuid.UUID, itemID uuid.UU
 	}
 
 	return res.Response(), cooldown, nil
+}
+
+func (s *Service) GrantItem(ctx context.Context, inventoryID uuid.UUID, itemID string, metadata json.RawMessage) (model.Item, error) {
+	itemData, ok := s.gameData.Items.GetItem(itemID)
+	if !ok {
+		return model.Item{}, errs.NewWithCode(
+			errs.CodeItemNotFound,
+			fmt.Errorf("item %q: %w", itemID, errs.ErrNotFound),
+		)
+	}
+
+	inv, err := s.store.Inventories().GetInventory(ctx, inventoryID)
+	if err != nil {
+		return model.Item{}, fmt.Errorf("get inventory: %w", err)
+	}
+
+	if !s.gameConfig.Rules.DisableInventoryLimit {
+		count, err := s.store.Inventories().GetInventoryItemCount(ctx, inventoryID)
+		if err != nil {
+			return model.Item{}, fmt.Errorf("get inventory item count: %w", err)
+		}
+		if count+1 > inv.MaxItemSlots {
+			return model.Item{}, errs.NewWithCode(
+				errs.CodeInventoryIsFull,
+				fmt.Errorf("inventory item limit exceeded (%d > %d): %w", count+1, inv.MaxItemSlots, errs.ErrUnprocessableEntity),
+			)
+		}
+	}
+
+	var item model.Item
+	err = s.store.ExecTx(ctx, func(tx data.Store) error {
+		if len(metadata) == 0 {
+			created, err := tx.Inventories().CreateItem(ctx, inventories_repository.CreateItem{
+				InventoryID: inventoryID,
+				ItemType:    model.ItemType(itemData.ID),
+			})
+			if err != nil {
+				return fmt.Errorf("create item: %w", err)
+			}
+			item = created
+			return nil
+		}
+
+		created, err := tx.Inventories().CreateItemWithMetadata(ctx, inventories_repository.CreateItemWithMetadata{
+			InventoryID: inventoryID,
+			ItemType:    model.ItemType(itemData.ID),
+			Metadata:    metadata,
+		})
+		if err != nil {
+			return fmt.Errorf("create item with metadata: %w", err)
+		}
+		item = created
+		return nil
+	})
+	if err != nil {
+		return model.Item{}, err
+	}
+
+	return item, nil
 }

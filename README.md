@@ -98,6 +98,11 @@ docker pull ghcr.io/sqlmerr/astragalaxy:latest
 CI (`.github/workflows/test-and-build.yml`) runs `go vet`, `go test`, and validates the image build on pushes and pull requests.
 CD (`.github/workflows/publish.yml`) runs the same checks and pushes the image to GHCR when a release is published.
 
+To use builtin admin cli to manage server instance, do this:
+```bash
+docker compose exec server admincli 
+```
+
 ## Configuration
 
 ### Environment Variables (`.env`)
