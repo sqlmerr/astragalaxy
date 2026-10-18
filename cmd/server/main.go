@@ -130,7 +130,7 @@ func main() {
 	navigationService := navigation.NewService(gameConfig, store, *worldGen, *gameData)
 	galaxyService := galaxy.NewService(store, *worldGen)
 	miningService := mining.NewService(gameConfig, store, *worldGen)
-	itemsService := items.NewService(store, *gameData)
+	itemsService := items.NewService(gameConfig, store, *gameData)
 	faciltiesService := facilities.NewService(store, *gameData, *worldGen)
 	craftingService := crafting.NewService(gameConfig, store, *gameData, *worldGen, faciltiesService)
 

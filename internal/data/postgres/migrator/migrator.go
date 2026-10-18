@@ -5,9 +5,11 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
+	"io/fs"
 	"net"
 	"net/url"
 	"strconv"
+	"strings"
 
 	"github.com/golang-migrate/migrate/v4"
 	migrate_pgx "github.com/golang-migrate/migrate/v4/database/pgx/v5"
@@ -61,6 +63,12 @@ func Run(ctx context.Context, args []string) error {
 		return err
 	}
 	defer m.Close()
+
+	if command == "up" || command == "down" {
+		if err := checkDatabaseNotAhead(m); err != nil {
+			return err
+		}
+	}
 
 	var rest []string
 	if len(args) > 0 {
@@ -156,6 +164,57 @@ func newMigrate() (*migrate.Migrate, error) {
 	}
 	m.Log = consoleLogger{}
 	return m, nil
+}
+
+func checkDatabaseNotAhead(m *migrate.Migrate) error {
+	max, err := maxEmbeddedVersion()
+	if err != nil {
+		return err
+	}
+
+	version, dirty, err := m.Version()
+	switch {
+	case errors.Is(err, migrate.ErrNilVersion):
+		return nil
+	case err != nil:
+		return err
+	case dirty:
+		return nil
+	}
+
+	if uint(version) > max {
+		return fmt.Errorf(
+			"database is at migration version %d, but this binary contains migrations only up to %d: the server image is outdated, rebuild it or use a newer image tag",
+			version, max,
+		)
+	}
+	return nil
+}
+
+func maxEmbeddedVersion() (uint, error) {
+	entries, err := fs.ReadDir(migration.FS, ".")
+	if err != nil {
+		return 0, fmt.Errorf("read embedded migrations: %w", err)
+	}
+
+	var max uint
+	for _, entry := range entries {
+		name := entry.Name()
+		if !strings.HasSuffix(name, ".up.sql") {
+			continue
+		}
+		version, err := strconv.ParseUint(strings.SplitN(name, "_", 2)[0], 10, 64)
+		if err != nil {
+			continue
+		}
+		if uint(version) > max {
+			max = uint(version)
+		}
+	}
+	if max == 0 {
+		return 0, errors.New("no migrations embedded into the binary")
+	}
+	return max, nil
 }
 
 func parseCount(args []string, command string) (int, error) {
