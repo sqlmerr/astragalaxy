@@ -7,6 +7,7 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/sqlmerr/astragalaxy/internal/data"
+	"github.com/sqlmerr/astragalaxy/internal/data/registry"
 	cooldowns_repository "github.com/sqlmerr/astragalaxy/internal/data/repository/cooldowns"
 	inventories_repository "github.com/sqlmerr/astragalaxy/internal/data/repository/inventories"
 	ships_repository "github.com/sqlmerr/astragalaxy/internal/data/repository/ships"
@@ -22,11 +23,12 @@ type Service struct {
 	gameConfig game.Config
 	store      data.Store
 	worldGen   worldgen.WorldGen
+	gameData   registry.GameData
 }
 
-func NewService(gameConfig game.Config, store data.Store, worldGen worldgen.WorldGen) *Service {
+func NewService(gameConfig game.Config, store data.Store, worldGen worldgen.WorldGen, gameData registry.GameData) *Service {
 	return &Service{
-		gameConfig, store, worldGen,
+		gameConfig, store, worldGen, gameData,
 	}
 }
 
@@ -341,6 +343,11 @@ func (s *Service) createShip(ctx context.Context, tx data.Store, spec CreateShip
 	}
 
 	for _, m := range spec.Modules {
+		_, exists := s.gameData.Items.GetItem(string(m))
+		if !exists {
+			return model.Ship{}, errs.NewWithCode(errs.CodeInvalidShipModuleType, fmt.Errorf("item id `%s` does not exist: %s: %w", m, errs.ErrNotFound))
+		}
+
 		_, err = tx.Ships().CreateShipModule(ctx, ships_repository.CreateShipModule{
 			Type:   m,
 			ShipID: ship.ID,
@@ -351,4 +358,42 @@ func (s *Service) createShip(ctx context.Context, tx data.Store, spec CreateShip
 	}
 
 	return ship, nil
+}
+
+func (s *Service) SpawnShip(ctx context.Context, spec SpawnShipSpec, coords *model.ShipCoords) (model.Ship, error) {
+	currentShip, err := s.store.Ships().GetActiveShipByAgent(ctx, spec.AgentID)
+	if err != nil {
+		return model.Ship{}, fmt.Errorf("get agent active ship: %w", err)
+	}
+
+	var shipCoords model.ShipCoords
+	if coords == nil {
+		shipCoords = currentShip.Coords
+	} else {
+		shipCoords = *coords
+	}
+
+	_, classExists := s.gameData.ShipClasses.GetShipClass(model.ShipClassID(spec.Class))
+	if !classExists {
+		return model.Ship{}, errs.NewWithCode(errs.CodeInvalidShipClass, fmt.Errorf("could not find class with id `%s`: %w", spec.Class, errs.ErrInvalidArgument))
+	}
+
+	var ship model.Ship
+
+	err = s.store.ExecTx(ctx, func(tx data.Store) error {
+		ship, err = s.createShip(ctx, s.store, CreateShipSpec{
+			AgentID:   spec.AgentID,
+			Type:      spec.Type,
+			Name:      spec.Name,
+			Active:    false,
+			Coords:    shipCoords,
+			Modules:   spec.Modules,
+			Inventory: spec.Inventory,
+			Class:     spec.Class,
+		})
+
+		return err
+	})
+
+	return ship, err
 }

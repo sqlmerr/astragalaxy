@@ -123,7 +123,7 @@ func main() {
 
 	usersService := users.NewService(store)
 	authService := auth.NewService(store, *jwtProcessor)
-	shipsService := ships.NewService(gameConfig, store, *worldGen)
+	shipsService := ships.NewService(gameConfig, store, *worldGen, *gameData)
 	agentsService := agents.NewService(store, *worldGen, shipsService)
 	cooldownsService := cooldowns.NewService(gameConfig, store)
 	inventoryService := inventory.NewService(gameConfig, store)

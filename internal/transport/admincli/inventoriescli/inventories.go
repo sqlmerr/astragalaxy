@@ -1,4 +1,4 @@
-package inventories
+package inventoriescli
 
 import (
 	"github.com/spf13/cobra"
