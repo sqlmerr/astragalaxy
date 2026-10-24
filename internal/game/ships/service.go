@@ -345,7 +345,7 @@ func (s *Service) createShip(ctx context.Context, tx data.Store, spec CreateShip
 	for _, m := range spec.Modules {
 		_, exists := s.gameData.Items.GetItem(string(m))
 		if !exists {
-			return model.Ship{}, errs.NewWithCode(errs.CodeInvalidShipModuleType, fmt.Errorf("item id `%s` does not exist: %s: %w", m, errs.ErrNotFound))
+			return model.Ship{}, errs.NewWithCode(errs.CodeInvalidShipModuleType, fmt.Errorf("item id `%s` does not exist: %w", m, errs.ErrNotFound))
 		}
 
 		_, err = tx.Ships().CreateShipModule(ctx, ships_repository.CreateShipModule{

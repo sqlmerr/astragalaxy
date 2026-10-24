@@ -4,8 +4,8 @@ info:
   version: 0.1.0
   description: API for space exploration game
 servers:
-  - url: http://localhost:8080
-    description: Local development server
+  - url: /
+    description: Current server
 paths:
   /api/v1/auth/login:
     $ref: "paths/users/login.yaml"
