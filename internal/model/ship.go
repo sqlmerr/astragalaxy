@@ -151,7 +151,7 @@ func (c ShipCoords) IsEqual(other ShipCoords) bool {
 }
 
 func (c ShipCoords) String() string {
-	return fmt.Sprintf("%d:%d-%s:%d", c.SystemX, c.SystemY, c.Location, c.LocationID)
+	return fmt.Sprintf("%d:%d:%s-%d", c.SystemX, c.SystemY, c.Location, c.LocationID)
 }
 
 type Ship struct {

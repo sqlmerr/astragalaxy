@@ -60,17 +60,17 @@ func (s *Service) GetCurrentAgentSystem(ctx context.Context, agentID uuid.UUID) 
 		return FullSystem{}, fmt.Errorf("get deposits: %w", err)
 	}
 
-	waypointDeposits := make(map[int]int)
-	planetDeposits := make(map[int]map[model.ResourceType]int)
+	waypointDeposits := make(map[int]model.ResourceDeposit)
+	planetDeposits := make(map[int]map[model.ResourceType]model.ResourceDeposit)
 	for _, deposit := range resourceDeposits {
 		switch deposit.LocationType {
 		case model.LocationWaypoint:
-			waypointDeposits[deposit.LocationID] = deposit.Remaining
+			waypointDeposits[deposit.LocationID] = deposit
 		case model.LocationPlanet:
 			if planetDeposits[deposit.LocationID] == nil {
-				planetDeposits[deposit.LocationID] = make(map[model.ResourceType]int)
+				planetDeposits[deposit.LocationID] = make(map[model.ResourceType]model.ResourceDeposit)
 			}
-			planetDeposits[deposit.LocationID][deposit.ResourceType] = deposit.Remaining
+			planetDeposits[deposit.LocationID][deposit.ResourceType] = deposit
 		}
 	}
 
@@ -79,8 +79,9 @@ func (s *Service) GetCurrentAgentSystem(ctx context.Context, agentID uuid.UUID) 
 		if waypoint.Asteroid == nil {
 			continue
 		}
-		if remaining, ok := waypointDeposits[waypoint.ID]; ok {
-			waypoint.Asteroid.Deposit.Amount = remaining
+		if deposit, ok := waypointDeposits[waypoint.ID]; ok {
+			deposit.Regenerate(waypoint.Asteroid.Deposit.Amount)
+			waypoint.Asteroid.Deposit.Amount = deposit.Remaining
 		}
 	}
 
@@ -89,8 +90,9 @@ func (s *Service) GetCurrentAgentSystem(ctx context.Context, agentID uuid.UUID) 
 		deposits := planetDeposits[planet.Orbit]
 		for j := range planet.Deposits {
 			deposit := &planet.Deposits[j]
-			if remaining, ok := deposits[deposit.Resource]; ok {
-				deposit.Amount = remaining
+			if d, ok := deposits[deposit.Resource]; ok {
+				d.Regenerate(deposit.Amount)
+				deposit.Amount = d.Remaining
 			}
 		}
 	}

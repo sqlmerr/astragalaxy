@@ -27,7 +27,7 @@ migrate-up:
         -u $(id -u):$(id -g) \
         postgres-migrate \
         -path /migration \
-        -database "postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}?sslmode=disable" \
+        -database "postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${POSTGRES_USER}:${POSTGRES_PORT}/${POSTGRES_DB}?sslmode=disable" \
         up
 
 migrate-down AMOUNT:
@@ -35,7 +35,7 @@ migrate-down AMOUNT:
         -u $(id -u):$(id -g) \
         postgres-migrate \
         -path /migration \
-        -database "postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}?sslmode=disable" \
+        -database "postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${POSTGRES_USER}:${POSTGRES_PORT}/${POSTGRES_DB}?sslmode=disable" \
         down {{ AMOUNT }}
 
 migrate-force VERSION:
@@ -43,7 +43,7 @@ migrate-force VERSION:
         -u $(id -u):$(id -g) \
         postgres-migrate \
         -path /migration \
-        -database "postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}?sslmode=disable" \
+        -database "postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${POSTGRES_USER}:${POSTGRES_PORT}/${POSTGRES_DB}?sslmode=disable" \
         force {{ VERSION }}
 
 gen-docs:

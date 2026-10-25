@@ -114,6 +114,7 @@ func (s *Service) MineAsteroid(ctx context.Context, agentID uuid.UUID, amount in
 				Remaining:    waypoint.Asteroid.Deposit.Amount,
 			}
 		}
+		deposit.Regenerate(waypoint.Asteroid.Deposit.Amount)
 
 		deposit, inventoryResource, cooldownDuration, err := MineAsteroid(s.gameConfig, *waypoint, deposit, amount, inventory, inventoryResource, inventoryVolume)
 		if err != nil {
@@ -268,6 +269,7 @@ func (s *Service) MinePlanet(ctx context.Context, agentID uuid.UUID, resourceTyp
 				Remaining:    deposit.Amount,
 			}
 		}
+		depositData.Regenerate(deposit.Amount)
 
 		depositData, inventoryResource, cooldownDuration, err := MinePlanet(s.gameConfig, deposit, depositData, amount, inventory, inventoryResource, inventoryVolume)
 		if err != nil {
