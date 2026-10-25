@@ -157,6 +157,12 @@ func main() {
 
 	httpConfig := http_server.LoadConfigMust()
 	mux := http.NewServeMux()
+	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		w.WriteHeader(http.StatusOK)
+		_, _ = w.Write([]byte(`{"message":"AstraGalaxy API is running"}`))
+	})
+
 	mux.HandleFunc("GET /openapi.json", func(w http.ResponseWriter, r *http.Request) {
 		http.ServeFile(w, r, "out/openapi.json")
 	})

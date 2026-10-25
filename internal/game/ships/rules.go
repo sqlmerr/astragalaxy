@@ -14,13 +14,35 @@ func RenameShip(ship model.Ship, name string) model.Ship {
 	return ship
 }
 
-func ChangeActiveShip(oldActiveShip *model.Ship, newActiveShip model.Ship) (model.Ship, *model.Ship) {
+func ChangeActiveShip(oldActiveShip *model.Ship, newActiveShip model.Ship) (model.Ship, *model.Ship, error) {
 	if oldActiveShip != nil {
 		oldActiveShip.Active = false
+		if !oldActiveShip.Coords.IsEqual(newActiveShip.Coords) {
+			return model.Ship{}, nil, errs.NewWithCode(
+				errs.CodeInvalidCoordinates,
+				fmt.Errorf(
+					"new ship must have the same coords as the current one (%s): %w",
+					oldActiveShip.Coords.String(),
+					errs.ErrUnprocessableEntity,
+				),
+			)
+		}
+
+		if oldActiveShip.Status != newActiveShip.Status {
+			return model.Ship{}, nil, errs.NewWithCode(
+				errs.CodeInvalidShipState,
+				fmt.Errorf(
+					"new ship state must be equal to old ship's state (old: %s; new: %s)`: %w",
+					oldActiveShip.Status,
+					newActiveShip.Status,
+					errs.ErrUnprocessableEntity,
+				),
+			)
+		}
 	}
 	newActiveShip.Active = true
 
-	return newActiveShip, oldActiveShip
+	return newActiveShip, oldActiveShip, nil
 }
 
 func OrbitShip(ship model.Ship) (model.Ship, time.Duration, error) {

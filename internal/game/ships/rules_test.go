@@ -20,18 +20,36 @@ func TestRenameShip(t *testing.T) {
 
 func TestChangeActiveShip(t *testing.T) {
 	agentID := uuid.New()
-	oldActiveShip := model.Ship{AgentID: agentID, Active: true}
-	newActiveShip := model.Ship{AgentID: agentID}
+	t.Run("success", func(t *testing.T) {
+		oldActiveShip := model.Ship{AgentID: agentID, Active: true}
+		newActiveShip := model.Ship{AgentID: agentID}
 
-	newActiveShip, oldActiveShipToSave := ChangeActiveShip(&oldActiveShip, newActiveShip)
-	assert.True(t, newActiveShip.Active)
-	if assert.NotNil(t, oldActiveShipToSave) {
-		assert.False(t, oldActiveShipToSave.Active)
-	}
+		newActiveShip, oldActiveShipToSave, _ := ChangeActiveShip(&oldActiveShip, newActiveShip)
+		assert.True(t, newActiveShip.Active)
+		if assert.NotNil(t, oldActiveShipToSave) {
+			assert.False(t, oldActiveShipToSave.Active)
+		}
+	})
 
-	newActiveShip, oldActiveShipToSave = ChangeActiveShip(nil, model.Ship{AgentID: agentID})
-	assert.True(t, newActiveShip.Active)
-	assert.Nil(t, oldActiveShipToSave)
+	t.Run("success: no old ship", func(t *testing.T) {
+		newActiveShip, oldActiveShipToSave, _ := ChangeActiveShip(nil, model.Ship{AgentID: agentID})
+		assert.True(t, newActiveShip.Active)
+		assert.Nil(t, oldActiveShipToSave)
+	})
+
+	t.Run("invalid ship location", func(t *testing.T) {
+		oldActiveShip := model.Ship{AgentID: agentID, Active: true, Coords: model.ShipCoords{SystemX: 1, SystemY: 1, Location: model.ShipLocationWaypoint, LocationID: 0}}
+		newActiveShip := model.Ship{AgentID: agentID, Coords: model.ShipCoords{SystemX: 4, SystemY: 20, Location: model.ShipLocationPlanet, LocationID: 2}}
+		_, _, err := ChangeActiveShip(&oldActiveShip, newActiveShip)
+		assert.Error(t, err)
+	})
+
+	t.Run("invalid ship state", func(t *testing.T) {
+		oldActiveShip := model.Ship{AgentID: agentID, Active: true, Status: model.ShipStatusOrbit}
+		newActiveShip := model.Ship{AgentID: agentID, Status: model.ShipStatusDocked}
+		_, _, err := ChangeActiveShip(&oldActiveShip, newActiveShip)
+		assert.Error(t, err)
+	})
 }
 
 func TestOrbitShip(t *testing.T) {

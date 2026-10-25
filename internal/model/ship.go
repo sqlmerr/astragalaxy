@@ -143,6 +143,17 @@ func NewShipCoords(location ShipLocation, locationID, systemX, systemY int) (Shi
 	}, nil
 }
 
+func (c ShipCoords) IsEqual(other ShipCoords) bool {
+	return c.Location == other.Location &&
+		c.LocationID == other.LocationID &&
+		c.SystemX == other.SystemX &&
+		c.SystemY == other.SystemY
+}
+
+func (c ShipCoords) String() string {
+	return fmt.Sprintf("%d:%d-%s:%d", c.SystemX, c.SystemY, c.Location, c.LocationID)
+}
+
 type Ship struct {
 	ID          uuid.UUID
 	AgentID     uuid.UUID

@@ -98,7 +98,11 @@ func (s *Service) ChangeActiveShip(ctx context.Context, agentID uuid.UUID, newAc
 				fmt.Errorf("new active ship does not belong to agent: %w", errs.ErrAccessDenied),
 			)
 		}
-		newActiveShip, oldActiveShipToSave = ChangeActiveShip(oldActiveShipToSave, newActiveShip)
+		
+		newActiveShip, oldActiveShipToSave, err = ChangeActiveShip(oldActiveShipToSave, newActiveShip)
+		if err != nil {
+			return err
+		}
 
 		if oldActiveShipToSave != nil {
 			_, err = tx.Ships().SaveShip(ctx, *oldActiveShipToSave)
