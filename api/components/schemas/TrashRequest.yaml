@@ -1,0 +1,21 @@
+type: object
+required:
+  - inventory_id
+properties: 
+  inventory_id:
+    type: string
+    format: uuid
+  items:
+    type: array
+    items:
+      type: string
+      format: uuid
+      description: Item ID
+  resources:
+    type: object
+    additionalProperties: 
+      type: integer
+      description: Amount of resource
+    description: Key - resource ID, Value - amount of resource to delete
+    example: 
+      iron: 100

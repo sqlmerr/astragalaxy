@@ -1,0 +1,27 @@
+delete:
+  operationId: useInventoryTrash
+  summary: Use Inventory Trash
+  tags:
+    - Inventories
+  description: Delete some unnecessary items and resources
+  requestBody:
+    required: true
+    content: 
+      application/json:
+        schema:
+          $ref: ../../components/schemas/TrashRequest.yaml
+  responses:
+    '200':
+      description: Successfully used trash
+      content: 
+        application/json:
+          schema:
+            $ref: ../../components/schemas/TrashResponse.yaml
+    '401':
+      $ref: "../../components/responses/InvalidAgentToken.yaml"
+    '403':
+      $ref: ../../components/responses/AccessDenied.yaml
+  security:
+    - AgentAuth: []
+    - UserAuth: []
+      AgentId: []

@@ -77,6 +77,8 @@ paths:
     $ref: paths/ships/my-modules-type.yaml
   /api/v1/data/ship-classes:
     $ref: paths/data/ship-classes.yaml
+  /api/v1/inventories/my/trash:
+    $ref: paths/inventories/trash.yaml
 components:
   securitySchemes:
     UserAuth:

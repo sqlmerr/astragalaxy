@@ -1,0 +1,6 @@
+type: object
+required:
+  - cooldown
+properties: 
+  cooldown:
+    $ref: Cooldown.yaml

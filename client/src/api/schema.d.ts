@@ -665,6 +665,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/inventories/my/trash": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /**
+         * Use Inventory Trash
+         * @description Delete some unnecessary items and resources
+         */
+        delete: operations["useInventoryTrash"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -1039,6 +1059,23 @@ export interface components {
             id: string;
             max_module_slots: number;
             max_warp_distance: number;
+        };
+        TrashRequest: {
+            /** Format: uuid */
+            inventory_id: string;
+            items?: string[];
+            /**
+             * @description Key - resource ID, Value - amount of resource to delete
+             * @example {
+             *       "iron": 100
+             *     }
+             */
+            resources?: {
+                [key: string]: number;
+            };
+        };
+        TrashResponse: {
+            cooldown: components["schemas"]["Cooldown"];
         };
     };
     responses: {
@@ -2040,6 +2077,32 @@ export interface operations {
                     };
                 };
             };
+        };
+    };
+    useInventoryTrash: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["TrashRequest"];
+            };
+        };
+        responses: {
+            /** @description Successfully used trash */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TrashResponse"];
+                };
+            };
+            401: components["responses"]["InvalidAgentToken"];
+            403: components["responses"]["AccessDenied"];
         };
     };
 }

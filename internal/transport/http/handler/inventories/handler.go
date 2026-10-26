@@ -50,5 +50,11 @@ func (h *InventoriesHTTPHandler) Routes(agentAuthMiddleware http_middleware.Midd
 			Handler:    h.UseItem,
 			Middleware: []http_middleware.Middleware{agentAuthMiddleware},
 		},
+		{
+			Method:     http.MethodDelete,
+			Path:       "/inventories/my/trash",
+			Handler:    h.Trash,
+			Middleware: []http_middleware.Middleware{agentAuthMiddleware},
+		},
 	}
 }
