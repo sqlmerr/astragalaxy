@@ -175,7 +175,11 @@ function FacilityCatalogueCard({ facility }: { facility: SchemaFacilityData }) {
       <CardContent className="flex flex-wrap gap-1.5">
         <Badge>{facility.type}</Badge>
         <Badge variant="outline">Tier {facility.tier}</Badge>
-        <Badge variant="outline">x{facility.time_multiplier} time</Badge>
+        {"time_multiplier" in facility.modifiers ? (
+          <Badge variant="outline">
+            x{facility.modifiers.time_multiplier} time
+          </Badge>
+        ) : null}
       </CardContent>
     </Card>
   )

@@ -23,10 +23,21 @@ func NewFacilityType(facilityType string) (FacilityType, error) {
 	}
 }
 
-type Facility struct {
-	ID             string
-	Type           FacilityType
-	Tier           int
+type FacilityCraftingModifiers struct {
 	TimeMultiplier float64
 	CostMultiplier float64
+}
+
+type Facility struct {
+	ID   string
+	Type FacilityType
+	Tier int
+
+	// FacilityCraftingModifiers or ...
+	Modifiers any
+}
+
+func (f *Facility) CraftingMods() (*FacilityCraftingModifiers, bool) {
+	m, ok := f.Modifiers.(*FacilityCraftingModifiers)
+	return m, ok
 }

@@ -1032,10 +1032,18 @@ export interface components {
             type: string;
             /** @description Facility Tier */
             tier: number;
-            /** Format: float64 */
-            time_multiplier: number;
-            /** Format: float64 */
-            cost_multiplier: number;
+            modifiers: {
+                /**
+                 * Format: float64
+                 * @example 1
+                 */
+                time_multiplier: number;
+                /**
+                 * Format: float64
+                 * @example 1
+                 */
+                cost_multiplier: number;
+            } | Record<string, never>;
         };
         GetAgentFacilitiesResponse: {
             /**

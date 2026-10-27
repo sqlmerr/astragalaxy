@@ -22,12 +22,18 @@ func (h *DataHTTPHandler) GetFacilities(w http.ResponseWriter, r *http.Request) 
 
 	response := GetFacilitiesResponse{
 		Data: lo.Map(facilities, func(i model.Facility, _ int) FacilityDTO {
+			var mods any
+			if craftingMods, ok := i.CraftingMods(); ok {
+				mods = FacilityCraftingModsDTO{
+					TimeMultiplier: craftingMods.TimeMultiplier,
+					CostMultiplier: craftingMods.CostMultiplier,
+				}
+			}
 			return FacilityDTO{
-				ID:             i.ID,
-				Type:           string(i.Type),
-				Tier:           i.Tier,
-				TimeMultiplier: i.TimeMultiplier,
-				CostMultiplier: i.CostMultiplier,
+				ID:        i.ID,
+				Type:      string(i.Type),
+				Tier:      i.Tier,
+				Modifiers: mods,
 			}
 		}),
 	}

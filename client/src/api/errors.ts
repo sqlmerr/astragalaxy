@@ -54,4 +54,9 @@ export const ERROR_CODES = {
   FACILITY_NOT_FOUND: "Facility not found",
   SHIP_MODULE_ALREADY_INSTALLED: "Ship module is already installed",
   CANNOT_USE_ITEM: "Can't use this item",
+  INVALID_USERNAME: "Invalid username",
+	INVALID_PASSWORD: "Invalid password",
+	INVALID_FACILITY_TYPE: "Invalid facility type",
+	INVALID_SHIP_MODULE_TYPE: "Invalid ship module type",
+	INVALID_SHIP_CLASS: "Invalid ship class",
 }

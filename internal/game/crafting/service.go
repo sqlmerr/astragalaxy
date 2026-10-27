@@ -72,6 +72,10 @@ func (s *Service) Craft(ctx context.Context, agentID uuid.UUID, recipeID string,
 			bestFacility = &f
 		}
 	}
+	facilityModifiers, ok := bestFacility.CraftingMods()
+	if !ok {
+		return model.Cooldown{}, errs.NewWithCode(errs.CodeAnomaly, fmt.Errorf("parse facility crafting modifiers: %v", bestFacility.Modifiers))
+	}
 
 	if bestFacility == nil {
 		fmt.Println(len(facilities[recipe.RequiredFacility]))
@@ -122,7 +126,7 @@ func (s *Service) Craft(ctx context.Context, agentID uuid.UUID, recipeID string,
 		return model.Cooldown{}, fmt.Errorf("get inventory items: %w", err)
 	}
 
-	updatedResources, createdResources, addedItems, err := ProcessCraft(&recipe, bestFacility, resources, targetInventoryID, amount)
+	updatedResources, createdResources, addedItems, err := ProcessCraft(&recipe, facilityModifiers, resources, targetInventoryID, amount)
 	if err != nil {
 		return model.Cooldown{}, err
 	}
@@ -183,7 +187,7 @@ func (s *Service) Craft(ctx context.Context, agentID uuid.UUID, recipeID string,
 		cooldown, err = tx.Cooldowns().SetCooldown(ctx, cooldowns_repository.SetCooldown{
 			AgentID:  agentID,
 			Action:   "craft",
-			Duration: recipe.GetDuration() * time.Duration(amount) * time.Duration(bestFacility.TimeMultiplier),
+			Duration: recipe.GetDuration() * time.Duration(amount) * time.Duration(facilityModifiers.TimeMultiplier),
 		})
 		if err != nil {
 			return fmt.Errorf("set cooldown: %w", err)

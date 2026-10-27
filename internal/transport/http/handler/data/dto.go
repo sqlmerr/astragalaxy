@@ -35,12 +35,16 @@ type ResourceDTO struct {
 	Tags []string `json:"tags"`
 }
 
-type FacilityDTO struct {
-	ID             string  `json:"id"`
-	Type           string  `json:"type"`
-	Tier           int     `json:"tier"`
+type FacilityCraftingModsDTO struct {
 	TimeMultiplier float64 `json:"time_multiplier"`
 	CostMultiplier float64 `json:"cost_multiplier"`
+}
+
+type FacilityDTO struct {
+	ID        string `json:"id"`
+	Type      string `json:"type"`
+	Tier      int    `json:"tier"`
+	Modifiers any    `json:"modifiers"`
 }
 
 type ShipClassDTO struct {

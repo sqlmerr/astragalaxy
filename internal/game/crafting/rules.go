@@ -18,9 +18,9 @@ func CountTotalResourceVolume(resources []model.Resource) int {
 	return amount
 }
 
-func ProcessCraft(recipe *model.Recipe, facility *model.Facility, resources []model.Resource, targetInventoryID uuid.UUID, amount int) (updatedResources []model.Resource, createdResources []model.Resource, addedItems []model.Item, err error) {
+func ProcessCraft(recipe *model.Recipe, facilityModifiers *model.FacilityCraftingModifiers, resources []model.Resource, targetInventoryID uuid.UUID, amount int) (updatedResources []model.Resource, createdResources []model.Resource, addedItems []model.Item, err error) {
 	for _, input := range recipe.Inputs {
-		cost := int(math.Ceil(float64(input.Amount*amount) * facility.CostMultiplier))
+		cost := int(math.Ceil(float64(input.Amount*amount) * facilityModifiers.CostMultiplier))
 		flag := false
 		for _, resource := range resources {
 			if model.ResourceType(input.ResourceID) == resource.ResourceType && resource.Amount >= cost {

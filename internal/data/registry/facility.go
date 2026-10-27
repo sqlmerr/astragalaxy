@@ -10,21 +10,60 @@ import (
 )
 
 type Facility struct {
-	ID             string             `json:"id"`
-	Type           model.FacilityType `json:"type"`
-	Tier           int                `json:"tier"`
-	TimeMultiplier float64            `json:"time_multiplier"`
-	CostMultiplier float64            `json:"cost_multiplier"`
+	ID        string             `json:"id"`
+	Type      model.FacilityType `json:"type"`
+	Tier      int                `json:"tier"`
+	Modifiers any                `json:"-"`
+}
+
+type FacilityCraftingModifiers struct {
+	TimeMultiplier float64 `json:"time_multiplier"`
+	CostMultiplier float64 `json:"cost_multiplier"`
 }
 
 func facilityToModel(f Facility) model.Facility {
-	return model.Facility{
-		ID:             f.ID,
-		Type:           model.FacilityType(f.Type),
-		Tier:           f.Tier,
-		TimeMultiplier: f.TimeMultiplier,
-		CostMultiplier: f.CostMultiplier,
+	var mods any
+	if craftingModifiers, ok := f.Modifiers.(*FacilityCraftingModifiers); ok {
+		mods = &model.FacilityCraftingModifiers{
+			TimeMultiplier: craftingModifiers.TimeMultiplier,
+			CostMultiplier: craftingModifiers.CostMultiplier,
+		}
 	}
+	return model.Facility{
+		ID:        f.ID,
+		Type:      model.FacilityType(f.Type),
+		Tier:      f.Tier,
+		Modifiers: mods,
+	}
+}
+
+func (f *Facility) UnmarshalJSON(data []byte) error {
+	// temp
+	type Alias Facility
+	aux := &struct {
+		RawModifiers json.RawMessage `json:"modifiers"`
+		*Alias
+	}{
+		Alias: (*Alias)(f),
+	}
+
+	if err := json.Unmarshal(data, &aux); err != nil {
+		return err
+	}
+
+	switch f.Type {
+	case model.FacilityPrinter, model.FacilitySmelter:
+		var m FacilityCraftingModifiers
+		if err := json.Unmarshal(aux.RawModifiers, &m); err != nil {
+			return err
+		}
+		f.Modifiers = &m
+
+	default:
+		return fmt.Errorf("unknown facility type: %s", f.Type)
+	}
+
+	return nil
 }
 
 type FacilityRegistry struct {

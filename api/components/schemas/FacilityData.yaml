@@ -3,8 +3,7 @@ required:
   - id
   - type
   - tier
-  - time_multiplier
-  - cost_multiplier
+  - modifiers
 properties: 
   id:
     type: string
@@ -18,9 +17,20 @@ properties:
     type: integer
     description: Facility Tier
     minimum: 1
-  time_multiplier:
-    type: number
-    format: float64
-  cost_multiplier:
-    type: number
-    format: float64
+  modifiers:
+    oneOf:
+      - type: object
+        required:
+          - time_multiplier
+          - cost_multiplier
+        properties: 
+          time_multiplier:
+            type: number
+            format: float64
+            example: 1.0
+          cost_multiplier:
+            type: number
+            format: float64
+            example: 1.0
+      - type: object
+        description: dummy modifier type for now
