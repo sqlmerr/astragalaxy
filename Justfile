@@ -54,7 +54,10 @@ gen-db:
     sqlc generate
 
 run-server:
-    @go mod tidy && go run cmd/server/main.go
+    @go mod tidy && go run ./cmd/server/main.go
+
+admincli *ARGS:
+    @go mod tidy && go run ./cmd/admincli/main.go {{ ARGS }}
 
 test:
     @go test -v ./internal/game/...

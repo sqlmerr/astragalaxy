@@ -9,7 +9,9 @@ import (
 	"github.com/google/uuid"
 	"github.com/samber/lo"
 	"github.com/sqlmerr/astragalaxy/internal/data"
+	"github.com/sqlmerr/astragalaxy/internal/data/registry"
 	cooldowns_repository "github.com/sqlmerr/astragalaxy/internal/data/repository/cooldowns"
+	inventories_repository "github.com/sqlmerr/astragalaxy/internal/data/repository/inventories"
 	errs "github.com/sqlmerr/astragalaxy/internal/errors"
 	"github.com/sqlmerr/astragalaxy/internal/game"
 	core_logger "github.com/sqlmerr/astragalaxy/internal/logger"
@@ -20,11 +22,12 @@ import (
 type Service struct {
 	gameConfig game.Config
 	store      data.Store
+	gameData   registry.GameData
 }
 
-func NewService(gameConfig game.Config, store data.Store) *Service {
+func NewService(gameConfig game.Config, store data.Store, gameData registry.GameData) *Service {
 	return &Service{
-		gameConfig, store,
+		gameConfig, store, gameData,
 	}
 }
 
@@ -433,4 +436,69 @@ func (s *Service) checkTransferDirection(ctx context.Context, agentID uuid.UUID,
 		),
 	)
 
+}
+
+func (s *Service) GrantResource(ctx context.Context, inventoryID uuid.UUID, resourceID model.ResourceType, amount int) (model.Resource, error) {
+	_, ok := s.gameData.Resources.GetResource(string(resourceID))
+	if !ok {
+		return model.Resource{}, fmt.Errorf("resource type %q does not exist: %w", resourceID, errs.ErrNotFound)
+	}
+
+	inv, err := s.store.Inventories().GetInventory(ctx, inventoryID)
+	if err != nil {
+		return model.Resource{}, fmt.Errorf("get inventory: %w", err)
+	}
+
+	if !s.gameConfig.Rules.DisableInventoryLimit {
+		volume, err := s.store.Inventories().GetResourcesTotalAmount(ctx, inventoryID)
+		if err != nil {
+			return model.Resource{}, fmt.Errorf("get resource total amount: %w", err)
+		}
+		if volume+amount > inv.MaxResourceVolume {
+			return model.Resource{}, errs.NewWithCode(
+				errs.CodeInventoryIsFull,
+				fmt.Errorf("inventory resource volume limit exceeded (%d > %d): %w", volume+amount, inv.MaxResourceVolume, errs.ErrUnprocessableEntity),
+			)
+		}
+	}
+
+	var resource model.Resource
+	err = s.store.ExecTx(ctx, func(tx data.Store) error {
+		resource, err = tx.Inventories().GetResource(ctx, inventoryID, resourceID)
+		if err != nil {
+			if !errors.Is(err, errs.ErrNotFound) {
+				return fmt.Errorf("get resource: %w", err)
+			}
+			resource, err = tx.Inventories().CreateResource(ctx, inventories_repository.CreateResource{
+				InventoryID:  inventoryID,
+				ResourceType: resourceID,
+				Amount:       amount,
+			})
+			if err != nil {
+				return fmt.Errorf("create resource: %w", err)
+			}
+		} else {
+			resource.Amount += amount
+			if resource.Amount <= 0 {
+				err = tx.Inventories().DeleteResource(ctx, inventoryID, resourceID)
+				if err != nil {
+					return fmt.Errorf("delete resource: %w", err)
+				}
+				resource = model.Resource{}
+			} else {
+				resource, err = tx.Inventories().SaveResource(ctx, resource)
+				if err != nil {
+					return fmt.Errorf("save resource: %w", err)
+				}
+			}
+
+		}
+
+		return nil
+	})
+	if err != nil {
+		return model.Resource{}, err
+	}
+
+	return resource, nil
 }

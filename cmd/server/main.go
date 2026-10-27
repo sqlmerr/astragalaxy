@@ -126,7 +126,7 @@ func main() {
 	shipsService := ships.NewService(gameConfig, store, *worldGen, *gameData)
 	agentsService := agents.NewService(store, *worldGen, shipsService)
 	cooldownsService := cooldowns.NewService(gameConfig, store)
-	inventoryService := inventory.NewService(gameConfig, store)
+	inventoryService := inventory.NewService(gameConfig, store, *gameData)
 	navigationService := navigation.NewService(gameConfig, store, *worldGen, *gameData)
 	galaxyService := galaxy.NewService(store, *worldGen)
 	miningService := mining.NewService(gameConfig, store, *worldGen)

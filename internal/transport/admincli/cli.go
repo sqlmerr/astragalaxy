@@ -17,11 +17,12 @@ import (
 	ships_repository "github.com/sqlmerr/astragalaxy/internal/data/repository/ships"
 	users_repository "github.com/sqlmerr/astragalaxy/internal/data/repository/users"
 	"github.com/sqlmerr/astragalaxy/internal/game"
+	"github.com/sqlmerr/astragalaxy/internal/game/inventory"
 	"github.com/sqlmerr/astragalaxy/internal/game/items"
 	"github.com/sqlmerr/astragalaxy/internal/game/ships"
 	"github.com/sqlmerr/astragalaxy/internal/game/worldgen"
 	"github.com/sqlmerr/astragalaxy/internal/transport/admincli/inventoriescli"
-	shipscli "github.com/sqlmerr/astragalaxy/internal/transport/admincli/ships"
+	shipscli "github.com/sqlmerr/astragalaxy/internal/transport/admincli/shipscli"
 )
 
 var rootCmd = &cobra.Command{
@@ -61,8 +62,9 @@ func Execute() error {
 
 	itemsService := items.NewService(gameConfig, store, *gameData)
 	shipsService := ships.NewService(gameConfig, store, *worldGen, *gameData)
+	inventoryService := inventory.NewService(gameConfig, store, *gameData)
 
-	rootCmd.AddCommand(inventoriescli.NewCommand(itemsService), shipscli.NewCommand(shipsService))
+	rootCmd.AddCommand(inventoriescli.NewCommand(itemsService, inventoryService), shipscli.NewCommand(shipsService))
 
 	return rootCmd.Execute()
 }
