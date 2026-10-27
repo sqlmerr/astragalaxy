@@ -469,6 +469,9 @@ func (s *Service) GrantResource(ctx context.Context, inventoryID uuid.UUID, reso
 			if !errors.Is(err, errs.ErrNotFound) {
 				return fmt.Errorf("get resource: %w", err)
 			}
+			if amount <= 0 {
+				return fmt.Errorf("it is impossible to subtract the resource, as it does not exist")
+			}
 			resource, err = tx.Inventories().CreateResource(ctx, inventories_repository.CreateResource{
 				InventoryID:  inventoryID,
 				ResourceType: resourceID,
