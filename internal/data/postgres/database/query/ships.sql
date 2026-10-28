@@ -12,7 +12,7 @@ SELECT
     )::text[] AS modules
 FROM new_ship ns
 LEFT JOIN ship_modules sm ON sm.ship_id = ns.id
-GROUP BY ns.id, ns.agent_id, ns.type, ns.active, ns.system_x, ns.system_y, ns.status, ns.name, ns.inventory_id, ns.location, ns.location_id, ns.class;
+GROUP BY ns.id, ns.agent_id, ns.type, ns.active, ns.system_x, ns.system_y, ns.status, ns.name, ns.inventory_id, ns.location, ns.location_id, ns.class, ns.created_at;
 
 -- name: GetActiveShipByAgent :one
 SELECT 
@@ -74,4 +74,4 @@ SELECT
     )::text[] AS modules
 FROM updated_ship us
 LEFT JOIN ship_modules sm ON sm.ship_id = us.id
-GROUP BY us.id, us.agent_id, us.type, us.active, us.system_x, us.system_y, us.status, us.name, us.inventory_id, us.location, us.location_id, us.class;
+GROUP BY us.id, us.agent_id, us.type, us.active, us.system_x, us.system_y, us.status, us.name, us.inventory_id, us.location, us.location_id, us.class, us.created_at;

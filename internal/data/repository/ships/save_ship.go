@@ -25,6 +25,7 @@ func (r *ShipRepositoryImpl) SaveShip(ctx context.Context, ship model.Ship) (mod
 		Name:       ship.Name,
 		Location:   database.ShipLocation(ship.Coords.Location),
 		LocationID: int32(ship.Coords.LocationID),
+		Class:      string(ship.Class),
 	})
 	err = postgres_pool.TranslateError(err)
 	if err != nil {

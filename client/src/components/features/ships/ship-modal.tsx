@@ -137,7 +137,11 @@ export function ShipModal({ ship, onClose }: ShipModalProps) {
                 </>
               ) : (
                 <>
-                  <span>{ship?.name}</span>
+                  <span>
+                    {ship?.name && ship?.name.length <= 18
+                      ? ship.name
+                      : ship?.name.slice(0, 18) + "..."}
+                  </span>
 
                   {ship?.active && (
                     <>
