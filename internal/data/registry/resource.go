@@ -41,11 +41,12 @@ func (r *Resource) Normalize() {
 }
 
 type ResourceRegistry struct {
-	resources []Resource
+	resources      map[string]Resource
+	resourcesSlice []Resource
 }
 
 func NewResourceRegistry() *ResourceRegistry {
-	return &ResourceRegistry{resources: nil}
+	return &ResourceRegistry{resources: nil, resourcesSlice: nil}
 }
 
 func (r *ResourceRegistry) Load(cfg Config) error {
@@ -65,26 +66,27 @@ func (r *ResourceRegistry) Load(cfg Config) error {
 		normalizedResources = append(normalizedResources, r)
 	}
 
-	r.resources = normalizedResources
+	r.resources = lo.SliceToMap(normalizedResources, func(i Resource) (string, Resource) {
+		return i.ID, i
+	})
+	r.resourcesSlice = normalizedResources
 	return nil
 }
 
 func (r *ResourceRegistry) GetResource(id string) (model.ResourceData, bool) {
-	resource, found := lo.Find(r.resources, func(i Resource) bool {
-		return i.ID == id
-	})
+	resource, found := r.resources[id]
 	return resourceToModel(resource), found
 }
 
 func (r *ResourceRegistry) GetAllResources() []model.ResourceData {
-	return lo.Map(r.resources, func(resource Resource, _ int) model.ResourceData {
+	return lo.Map(r.resourcesSlice, func(resource Resource, _ int) model.ResourceData {
 		return resourceToModel(resource)
 	})
 }
 
 func (r *ResourceRegistry) GetAllResourcesByTag(tag string) []model.ResourceData {
 	var resources []model.ResourceData
-	for _, res := range r.resources {
+	for _, res := range r.resourcesSlice {
 		if slices.Contains(res.Tags, tag) {
 			resources = append(resources, resourceToModel(res))
 		}
@@ -94,7 +96,7 @@ func (r *ResourceRegistry) GetAllResourcesByTag(tag string) []model.ResourceData
 
 func (r *ResourceRegistry) GetAllResourcesByWorldgenParams(paramName string) []model.ResourceData {
 	var resources []model.ResourceData
-	for _, res := range r.resources {
+	for _, res := range r.resourcesSlice {
 		_, exists := res.WorldGen[paramName]
 		if exists {
 			resources = append(resources, resourceToModel(res))

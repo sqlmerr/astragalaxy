@@ -15,7 +15,7 @@ Resources can be gathered from celestial bodies within solar systems:
 
 Each deposit has two primary parameters:
 * **Resource Type:** The specific resource available (e.g., `iron`, `crystals`, `carbon`, `ice`, `titanium`, etc.).
-* **Richness (`richness`):** A normalized float value between `$0.0$` and `$1.0$` reflecting the quality or density of the deposit.
+* **Richness (`richness`):** A normalized float value between $0.0$ and $1.0$ reflecting the quality or density of the deposit.
 
 ### Regeneration
 

@@ -44,11 +44,12 @@ func itemToModel(i Item) model.ItemData {
 }
 
 type ItemRegistry struct {
-	items []Item
+	items      map[string]Item
+	itemsSlice []Item
 }
 
 func NewItemRegistry() *ItemRegistry {
-	return &ItemRegistry{items: nil}
+	return &ItemRegistry{items: nil, itemsSlice: nil}
 }
 
 func (r *ItemRegistry) Load(cfg Config) error {
@@ -63,19 +64,20 @@ func (r *ItemRegistry) Load(cfg Config) error {
 		return fmt.Errorf("unmarshal data: %w", err)
 	}
 
-	r.items = items
+	r.items = lo.SliceToMap(items, func(i Item) (string, Item) {
+		return i.ID, i
+	})
+	r.itemsSlice = items
 	return nil
 }
 
 func (r *ItemRegistry) GetItem(id string) (model.ItemData, bool) {
-	item, found := lo.Find(r.items, func(i Item) bool {
-		return i.ID == id
-	})
+	item, found := r.items[id]
 	return itemToModel(item), found
 }
 
 func (r *ItemRegistry) GetAllItems() []model.ItemData {
-	return lo.Map(r.items, func(item Item, _ int) model.ItemData {
+	return lo.Map(r.itemsSlice, func(item Item, _ int) model.ItemData {
 		return itemToModel(item)
 	})
 }

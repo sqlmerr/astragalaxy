@@ -67,11 +67,12 @@ func (f *Facility) UnmarshalJSON(data []byte) error {
 }
 
 type FacilityRegistry struct {
-	facilities []Facility
+	facilities      map[string]Facility
+	facilitiesSlice []Facility
 }
 
 func NewFacilityRegistry() *FacilityRegistry {
-	return &FacilityRegistry{facilities: nil}
+	return &FacilityRegistry{facilities: nil, facilitiesSlice: nil}
 }
 
 func (r *FacilityRegistry) Load(cfg Config) error {
@@ -86,33 +87,34 @@ func (r *FacilityRegistry) Load(cfg Config) error {
 		return fmt.Errorf("unmarshal data: %w", err)
 	}
 
-	r.facilities = facilities
+	r.facilities = lo.SliceToMap(facilities, func(i Facility) (string, Facility) {
+		return i.ID, i
+	})
+	r.facilitiesSlice = facilities
 	return nil
 }
 
 func (r *FacilityRegistry) GetFacility(id string) (model.Facility, bool) {
-	facility, found := lo.Find(r.facilities, func(i Facility) bool {
-		return i.ID == id
-	})
-	return facilityToModel(facility), found
+	facility, exists := r.facilities[id]
+	return facilityToModel(facility), exists
 }
 
 func (r *FacilityRegistry) GetFacilityByTypeAndTier(facilityType model.FacilityType, tier int) (model.Facility, bool) {
-	facility, found := lo.Find(r.facilities, func(i Facility) bool {
+	facility, found := lo.Find(r.facilitiesSlice, func(i Facility) bool {
 		return i.Tier == tier && i.Type == facilityType
 	})
 	return facilityToModel(facility), found
 }
 
 func (r *FacilityRegistry) GetAllFacilities() []model.Facility {
-	return lo.Map(r.facilities, func(f Facility, _ int) model.Facility {
+	return lo.Map(r.facilitiesSlice, func(f Facility, _ int) model.Facility {
 		return facilityToModel(f)
 	})
 }
 
 func (r *FacilityRegistry) GetAllFacilitiesByType(facilityType model.FacilityType) []model.Facility {
 	var facilities []model.Facility
-	for _, f := range r.facilities {
+	for _, f := range r.facilitiesSlice {
 		if f.Type == facilityType {
 			facilities = append(facilities, facilityToModel(f))
 		}

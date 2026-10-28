@@ -52,11 +52,12 @@ func recipeToModel(r Recipe) model.Recipe {
 }
 
 type RecipeRegistry struct {
-	recipes []Recipe
+	recipes      map[string]Recipe
+	recipesSlice []Recipe
 }
 
 func NewRecipeRegistry() *RecipeRegistry {
-	return &RecipeRegistry{recipes: nil}
+	return &RecipeRegistry{recipes: nil, recipesSlice: nil}
 }
 
 func (r *RecipeRegistry) Load(cfg Config) error {
@@ -71,26 +72,27 @@ func (r *RecipeRegistry) Load(cfg Config) error {
 		return fmt.Errorf("unmarshal data: %w", err)
 	}
 
-	r.recipes = recipes
+	r.recipes = lo.SliceToMap(recipes, func(i Recipe) (string, Recipe) {
+		return i.ID, i
+	})
+	r.recipesSlice = recipes
 	return nil
 }
 
 func (r *RecipeRegistry) GetRecipe(id string) (model.Recipe, bool) {
-	recipe, found := lo.Find(r.recipes, func(i Recipe) bool {
-		return i.ID == id
-	})
+	recipe, found := r.recipes[id]
 	return recipeToModel(recipe), found
 }
 
 func (r *RecipeRegistry) GetAllRecipes() []model.Recipe {
-	return lo.Map(r.recipes, func(recipe Recipe, _ int) model.Recipe {
+	return lo.Map(r.recipesSlice, func(recipe Recipe, _ int) model.Recipe {
 		return recipeToModel(recipe)
 	})
 }
 
 func (r *RecipeRegistry) GetAllRecipesByFacility(facility model.FacilityType) []model.Recipe {
 	var recipes []model.Recipe
-	for _, recipe := range r.recipes {
+	for _, recipe := range r.recipesSlice {
 		if recipe.RequiredFacility == facility {
 			recipes = append(recipes, recipeToModel(recipe))
 		}
