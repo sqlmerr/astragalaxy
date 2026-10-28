@@ -878,6 +878,19 @@ export interface components {
             /** @description System Y coordinate */
             y: number;
         };
+        SystemDiscovery: {
+            /** @description System X coord */
+            system_x: number;
+            /** @description System Y coord */
+            system_y: number;
+            /**
+             * Format: uuid
+             * @description Agent ID
+             */
+            discovered_by: string;
+            /** Format: date-time */
+            discovered_at: string;
+        };
         WarpNavigationResponse: {
             cooldown: components["schemas"]["Cooldown"];
             fuel: {
@@ -888,6 +901,7 @@ export interface components {
                 /** @description Amount of warp cells left in the ship inventory after the jump (0 means exhausted) */
                 left: number;
             };
+            discovery: components["schemas"]["SystemDiscovery"] | null;
         };
         NavigatePlanetRequest: {
             /** @description Planet's orbit */
@@ -895,6 +909,24 @@ export interface components {
         };
         NavigationResponse: {
             cooldown: components["schemas"]["Cooldown"];
+        };
+        PlanetDiscovery: {
+            /** @description System X coord */
+            system_x: number;
+            /** @description System Y coord */
+            system_y: number;
+            /** @description Planet orbit */
+            orbit: number;
+            /**
+             * Format: uuid
+             * @description Agent ID
+             */
+            discovered_by: string;
+            /** Format: date-time */
+            discovered_at: string;
+        };
+        PlanetNavigationResponse: components["schemas"]["NavigationResponse"] & {
+            discovery: components["schemas"]["PlanetDiscovery"] | null;
         };
         NavigateWaypointRequest: {
             /** @description Waypoint ID */
@@ -931,11 +963,9 @@ export interface components {
              * @enum {string}
              */
             type: "station" | "asteroid";
-            /** @description Asteroid data. Not null if type == asteroid */
             asteroid?: {
                 deposit: components["schemas"]["ResourceDeposit"];
             } | null;
-            /** @description Station data. Not null if type == station */
             station?: {
                 /** @description List of available facilities on this station */
                 facilities: string[];
@@ -944,6 +974,13 @@ export interface components {
         System: components["schemas"]["ShortSystem"] & {
             planets: components["schemas"]["Planet"][];
             waypoints: components["schemas"]["Waypoint"][];
+            /**
+             * Format: uuid
+             * @description Agent ID that discovered this system
+             */
+            discovered_by: string;
+            /** Format: date-time */
+            discovered_at: string;
         };
         MineAsteroidRequest: {
             /** @description Amount of resource to mine */
@@ -1009,10 +1046,6 @@ export interface components {
             id: string;
             /** @description Item's ship module characteristics */
             ship_module?: {
-                /**
-                 * @description Facility that item provides being ship module
-                 * @example portable_printer
-                 */
                 provides_facility: string | null;
                 /** @description Mining modifiers */
                 mining: {
@@ -1701,7 +1734,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["NavigationResponse"];
+                    "application/json": components["schemas"]["PlanetNavigationResponse"];
                 };
             };
             401: components["responses"]["InvalidAgentToken"];

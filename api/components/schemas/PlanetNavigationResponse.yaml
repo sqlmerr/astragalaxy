@@ -1,0 +1,10 @@
+allOf:
+  - $ref: NavigationResponse.yaml
+  - type: object
+    required:
+      - discovery
+    properties: 
+      discovery:
+        oneOf:
+          - $ref: PlanetDiscovery.yaml
+          - type: "null"

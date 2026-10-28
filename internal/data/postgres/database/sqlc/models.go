@@ -211,6 +211,14 @@ type InventoryResource struct {
 	Amount       int64
 }
 
+type PlanetDiscovery struct {
+	SystemX      int32
+	SystemY      int32
+	Orbit        int32
+	DiscoveredAt pgtype.Timestamp
+	DiscoveredBy uuid.UUID
+}
+
 type ResourceDepositState struct {
 	SystemX      int32
 	SystemY      int32
@@ -240,6 +248,13 @@ type Ship struct {
 type ShipModule struct {
 	ShipID     uuid.UUID
 	ModuleType string
+}
+
+type SystemDiscovery struct {
+	SystemX      int32
+	SystemY      int32
+	DiscoveredAt pgtype.Timestamp
+	DiscoveredBy uuid.UUID
 }
 
 type User struct {

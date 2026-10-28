@@ -14,6 +14,11 @@ type NavigatePlanetRequest struct {
 	Orbit *int `json:"orbit" validate:"required"`
 }
 
+type NavigatePlanetResponse struct {
+	NavigationResponseDTO
+	Discovery *PlanetDiscoveryDTO `json:"discovery"`
+}
+
 func (h *NavigationHTTPHandler) NavigatePlanet(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	log := core_logger.FromContext(ctx)
@@ -27,14 +32,26 @@ func (h *NavigationHTTPHandler) NavigatePlanet(w http.ResponseWriter, r *http.Re
 
 	agentID := auth.GetAgentIDFromContext(ctx)
 
-	cooldown, err := h.navigationService.NavigatePlanet(ctx, agentID, *req.Orbit)
+	cooldown, discovery, err := h.navigationService.NavigatePlanet(ctx, agentID, *req.Orbit)
 	if err != nil {
 		responseHandler.ErrorResponse(err, "Failed to navigate")
 		return
 	}
 
-	response := NavigationResponseDTO{
-		Cooldown: http_dto.ColdownFromModel(cooldown),
+	var discoveryDTO *PlanetDiscoveryDTO
+	if discovery != nil {
+		discoveryDTO = &PlanetDiscoveryDTO{
+			SystemX:      discovery.SystemX,
+			SystemY:      discovery.SystemY,
+			Orbit:        discovery.Orbit,
+			DiscoveredAt: discovery.DiscoveredAt,
+			DiscoveredBy: discovery.DiscoveredBy,
+		}
+	}
+
+	response := NavigatePlanetResponse{
+		NavigationResponseDTO: NavigationResponseDTO{Cooldown: http_dto.ColdownFromModel(cooldown)},
+		Discovery:             discoveryDTO,
 	}
 	responseHandler.JSONResponse(http.StatusOK, response)
 }

@@ -1,0 +1,24 @@
+type: object
+required:
+  - system_x
+  - system_y
+  - discovered_by
+  - discovered_at
+  - orbit
+properties: 
+  system_x:
+    type: integer
+    description: System X coord
+  system_y:
+    type: integer
+    description: System Y coord
+  orbit:
+    type: integer
+    description: Planet orbit
+  discovered_by:
+    type: string
+    format: uuid
+    description: Agent ID
+  discovered_at:
+    type: string
+    format: date-time

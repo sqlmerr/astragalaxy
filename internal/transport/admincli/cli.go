@@ -12,6 +12,7 @@ import (
 	"github.com/sqlmerr/astragalaxy/internal/data/registry"
 	agents_repository "github.com/sqlmerr/astragalaxy/internal/data/repository/agents"
 	cooldowns_repository "github.com/sqlmerr/astragalaxy/internal/data/repository/cooldowns"
+	discoveries_repository "github.com/sqlmerr/astragalaxy/internal/data/repository/discoveries"
 	inventories_repository "github.com/sqlmerr/astragalaxy/internal/data/repository/inventories"
 	resource_deposits_repository "github.com/sqlmerr/astragalaxy/internal/data/repository/resource_deposits"
 	ships_repository "github.com/sqlmerr/astragalaxy/internal/data/repository/ships"
@@ -49,8 +50,9 @@ func Execute() error {
 	inventoryRepo := inventories_repository.NewInventoryRepository(*queries, pool)
 	cooldownRepo := cooldowns_repository.NewCooldownRepository(nil) // ?
 	resourceDepositsRepo := resource_deposits_repository.New(*queries, pool)
+	discoveryRepo := discoveries_repository.New(*queries, pool)
 
-	store := data.NewStore(pool, userRepo, agentRepo, shipRepo, inventoryRepo, cooldownRepo, resourceDepositsRepo)
+	store := data.NewStore(pool, userRepo, agentRepo, shipRepo, inventoryRepo, cooldownRepo, resourceDepositsRepo, discoveryRepo)
 	gameConfig := game.LoadConfigMust()
 	registryConfig := registry.LoadConfigMust()
 	gameData, err := registry.LoadGameData(registryConfig)

@@ -9,6 +9,7 @@ import (
 	"github.com/sqlmerr/astragalaxy/internal/data"
 	"github.com/sqlmerr/astragalaxy/internal/data/registry"
 	cooldowns_repository "github.com/sqlmerr/astragalaxy/internal/data/repository/cooldowns"
+	discoveries_repository "github.com/sqlmerr/astragalaxy/internal/data/repository/discoveries"
 	errs "github.com/sqlmerr/astragalaxy/internal/errors"
 	"github.com/sqlmerr/astragalaxy/internal/game"
 	"github.com/sqlmerr/astragalaxy/internal/game/worldgen"
@@ -44,16 +45,16 @@ func (s *Service) getShipClass(ship model.Ship) (model.ShipClass, error) {
 	return class, nil
 }
 
-func (s *Service) NavigateWarp(ctx context.Context, agentID uuid.UUID, x, y int) (model.Cooldown, WarpFuelUsage, error) {
+func (s *Service) NavigateWarp(ctx context.Context, agentID uuid.UUID, x, y int) (model.Cooldown, WarpFuelUsage, *model.SystemDiscovery, error) {
 	if !s.gameConfig.Rules.DisableCooldowns {
 		if err := s.store.Cooldowns().CheckCooldown(ctx, agentID); err != nil {
-			return model.Cooldown{}, WarpFuelUsage{}, fmt.Errorf("cooldown: %w", err)
+			return model.Cooldown{}, WarpFuelUsage{}, nil, fmt.Errorf("cooldown: %w", err)
 		}
 	}
 
 	system, exists := s.worldGen.GenerateSystemByCoords(x, y)
 	if !exists {
-		return model.Cooldown{}, WarpFuelUsage{}, errs.NewWithCode(
+		return model.Cooldown{}, WarpFuelUsage{}, nil, errs.NewWithCode(
 			errs.CodeInvalidWarpPath,
 			fmt.Errorf(
 				"system x=%d y=%d doesn't exist: %w",
@@ -66,17 +67,17 @@ func (s *Service) NavigateWarp(ctx context.Context, agentID uuid.UUID, x, y int)
 
 	ship, err := s.store.Ships().GetActiveShipByAgent(ctx, agentID)
 	if err != nil {
-		return model.Cooldown{}, WarpFuelUsage{}, fmt.Errorf("get active agent ship: %w", err)
+		return model.Cooldown{}, WarpFuelUsage{}, nil, fmt.Errorf("get active agent ship: %w", err)
 	}
 
 	warpCellT1, err := s.store.Inventories().GetResource(ctx, ship.InventoryID, model.ResourceWarpCellT1)
 	if err != nil && !errors.Is(err, errs.ErrNotFound) {
-		return model.Cooldown{}, WarpFuelUsage{}, fmt.Errorf("get warp_cell_t1 resource: %w", err)
+		return model.Cooldown{}, WarpFuelUsage{}, nil, fmt.Errorf("get warp_cell_t1 resource: %w", err)
 	}
 
 	warpCellT2, err := s.store.Inventories().GetResource(ctx, ship.InventoryID, model.ResourceWarpCellT2)
 	if err != nil && !errors.Is(err, errs.ErrNotFound) {
-		return model.Cooldown{}, WarpFuelUsage{}, fmt.Errorf("get warp_cell_t2 resource: %w", err)
+		return model.Cooldown{}, WarpFuelUsage{}, nil, fmt.Errorf("get warp_cell_t2 resource: %w", err)
 	}
 
 	t1Amount, t2Amount := warpCellT1.Amount, warpCellT2.Amount
@@ -87,16 +88,17 @@ func (s *Service) NavigateWarp(ctx context.Context, agentID uuid.UUID, x, y int)
 
 	class, err := s.getShipClass(ship)
 	if err != nil {
-		return model.Cooldown{}, WarpFuelUsage{}, err
+		return model.Cooldown{}, WarpFuelUsage{}, nil, err
 	}
 
 	ship, cooldownDuration, fuelResource, fuelAmount, err := NavigateWarp(ship, class, *system, t1Amount, t2Amount)
 	if err != nil {
-		return model.Cooldown{}, WarpFuelUsage{}, fmt.Errorf("process warp: %w", err)
+		return model.Cooldown{}, WarpFuelUsage{}, nil, fmt.Errorf("process warp: %w", err)
 	}
 
 	var cooldown model.Cooldown
 	var fuelLeft int
+	var discovery *model.SystemDiscovery
 
 	err = s.store.ExecTx(ctx, func(tx data.Store) error {
 		_, err := tx.Ships().SaveShip(ctx, ship)
@@ -110,6 +112,22 @@ func (s *Service) NavigateWarp(ctx context.Context, agentID uuid.UUID, x, y int)
 				return fmt.Errorf("substract warp fuel resource: %w", err)
 			}
 			fuelLeft = res.Amount
+		}
+
+		isDiscovered, err := tx.Discoveries().IsSystemDiscovered(ctx, x, y)
+		if err != nil {
+			return fmt.Errorf("is system discovered: %w", err)
+		}
+		if !isDiscovered {
+			d, err := tx.Discoveries().CreateSystemDiscovery(ctx, discoveries_repository.CreateSystemDiscovery{
+				SystemX:      x,
+				SystemY:      y,
+				DiscoveredBy: agentID,
+			})
+			if err != nil {
+				return fmt.Errorf("create system discovery: %w", err)
+			}
+			discovery = &d
 		}
 
 		cooldown, err = tx.Cooldowns().SetCooldown(ctx, cooldowns_repository.SetCooldown{
@@ -126,7 +144,7 @@ func (s *Service) NavigateWarp(ctx context.Context, agentID uuid.UUID, x, y int)
 	})
 
 	if err != nil {
-		return model.Cooldown{}, WarpFuelUsage{}, err
+		return model.Cooldown{}, WarpFuelUsage{}, nil, err
 	}
 
 	return cooldown, WarpFuelUsage{
@@ -134,24 +152,24 @@ func (s *Service) NavigateWarp(ctx context.Context, agentID uuid.UUID, x, y int)
 		InventoryID:  ship.InventoryID,
 		Used:         fuelAmount,
 		Left:         fuelLeft,
-	}, nil
+	}, discovery, nil
 }
 
-func (s *Service) NavigatePlanet(ctx context.Context, agentID uuid.UUID, orbit int) (model.Cooldown, error) {
+func (s *Service) NavigatePlanet(ctx context.Context, agentID uuid.UUID, orbit int) (model.Cooldown, *model.PlanetDiscovery, error) {
 	if !s.gameConfig.Rules.DisableCooldowns {
 		if err := s.store.Cooldowns().CheckCooldown(ctx, agentID); err != nil {
-			return model.Cooldown{}, fmt.Errorf("cooldown: %w", err)
+			return model.Cooldown{}, nil, fmt.Errorf("cooldown: %w", err)
 		}
 	}
 
 	ship, err := s.store.Ships().GetActiveShipByAgent(ctx, agentID)
 	if err != nil {
-		return model.Cooldown{}, fmt.Errorf("get active agent ship: %w", err)
+		return model.Cooldown{}, nil, fmt.Errorf("get active agent ship: %w", err)
 	}
 
 	system, exists := s.worldGen.GenerateSystemByCoords(ship.Coords.SystemX, ship.Coords.SystemY)
 	if !exists {
-		return model.Cooldown{}, errs.NewWithCode(
+		return model.Cooldown{}, nil, errs.NewWithCode(
 			errs.CodeAnomaly,
 			fmt.Errorf(
 				"system x=%d y=%d doesn't exist: %w",
@@ -164,25 +182,52 @@ func (s *Service) NavigatePlanet(ctx context.Context, agentID uuid.UUID, orbit i
 
 	ship, cooldownDuration, err := NavigatePlanet(ship, *system, orbit)
 	if err != nil {
-		return model.Cooldown{}, fmt.Errorf("process navigation: %w", err)
+		return model.Cooldown{}, nil, fmt.Errorf("process navigation: %w", err)
 	}
 
-	_, err = s.store.Ships().SaveShip(ctx, ship)
-	if err != nil {
-		return model.Cooldown{}, fmt.Errorf("save ship: %w", err)
-	}
+	var cooldown model.Cooldown
+	var discovery *model.PlanetDiscovery
+	err = s.store.ExecTx(ctx, func(tx data.Store) error {
+		_, err = tx.Ships().SaveShip(ctx, ship)
+		if err != nil {
+			return fmt.Errorf("save ship: %w", err)
+		}
 
-	cooldown, err := s.store.Cooldowns().SetCooldown(ctx, cooldowns_repository.SetCooldown{
-		AgentID:  agentID,
-		Duration: cooldownDuration,
-		Action:   "planet_navigation",
+		isDiscovered, err := tx.Discoveries().IsPlanetDiscovered(ctx, system.X, system.Y, orbit)
+		if err != nil {
+			return fmt.Errorf("is system discovered: %w", err)
+		}
+		if !isDiscovered {
+			d, err := tx.Discoveries().CreatePlanetDiscovery(ctx, discoveries_repository.CreatePlanetDiscovery{
+				SystemX:      system.X,
+				SystemY:      system.Y,
+				DiscoveredBy: agentID,
+				Orbit:        orbit,
+			})
+			if err != nil {
+				return fmt.Errorf("create system discovery: %w", err)
+			}
+			discovery = &d
+		}
+
+		cooldown, err = tx.Cooldowns().SetCooldown(ctx, cooldowns_repository.SetCooldown{
+			AgentID:  agentID,
+			Duration: cooldownDuration,
+			Action:   "planet_navigation",
+		})
+
+		if err != nil {
+			return fmt.Errorf("set cooldown: %w", err)
+		}
+
+		return nil
 	})
 
 	if err != nil {
-		return model.Cooldown{}, fmt.Errorf("set cooldown: %w", err)
+		return model.Cooldown{}, nil, err
 	}
 
-	return cooldown, nil
+	return cooldown, discovery, nil
 }
 
 func (s *Service) NavigateWaypoint(ctx context.Context, agentID uuid.UUID, waypointID int) (model.Cooldown, error) {
@@ -215,18 +260,28 @@ func (s *Service) NavigateWaypoint(ctx context.Context, agentID uuid.UUID, waypo
 		return model.Cooldown{}, fmt.Errorf("process navigation: %w", err)
 	}
 
-	_, err = s.store.Ships().SaveShip(ctx, ship)
-	if err != nil {
-		return model.Cooldown{}, fmt.Errorf("save ship: %w", err)
-	}
+	var cooldown model.Cooldown
 
-	cooldown, err := s.store.Cooldowns().SetCooldown(ctx, cooldowns_repository.SetCooldown{
-		AgentID:  agentID,
-		Duration: cooldownDuration,
-		Action:   "waypoint_navigation",
+	err = s.store.ExecTx(ctx, func(tx data.Store) error {
+		_, err = tx.Ships().SaveShip(ctx, ship)
+		if err != nil {
+			return fmt.Errorf("save ship: %w", err)
+		}
+
+		cooldown, err = tx.Cooldowns().SetCooldown(ctx, cooldowns_repository.SetCooldown{
+			AgentID:  agentID,
+			Duration: cooldownDuration,
+			Action:   "waypoint_navigation",
+		})
+		if err != nil {
+			return fmt.Errorf("set cooldown: %w", err)
+		}
+
+		return nil
 	})
+
 	if err != nil {
-		return model.Cooldown{}, fmt.Errorf("set cooldown: %w", err)
+		return model.Cooldown{}, err
 	}
 
 	return cooldown, nil

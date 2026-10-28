@@ -1,6 +1,9 @@
 package http_handler_systems
 
 import (
+	"time"
+
+	"github.com/google/uuid"
 	"github.com/samber/lo"
 	"github.com/sqlmerr/astragalaxy/internal/game/galaxy"
 	"github.com/sqlmerr/astragalaxy/internal/game/worldgen"
@@ -97,12 +100,14 @@ type ShortSystemResponseDTO struct {
 }
 
 type FullSystemResponseDTO struct {
-	Name      string                `json:"name"`
-	X         int                   `json:"x"`
-	Y         int                   `json:"y"`
-	Archetype string                `json:"archetype"`
-	Planets   []PlanetResponseDTO   `json:"planets"`
-	Waypoints []WaypointResponseDTO `json:"waypoints"`
+	Name         string                `json:"name"`
+	X            int                   `json:"x"`
+	Y            int                   `json:"y"`
+	Archetype    string                `json:"archetype"`
+	Planets      []PlanetResponseDTO   `json:"planets"`
+	Waypoints    []WaypointResponseDTO `json:"waypoints"`
+	DiscoveredBy uuid.UUID             `json:"discovered_by"`
+	DiscoveredAt time.Time             `json:"discovered_at"`
 }
 
 func shortSystemDTOFromModel(m worldgen.System) ShortSystemResponseDTO {
@@ -116,12 +121,14 @@ func shortSystemDTOFromModel(m worldgen.System) ShortSystemResponseDTO {
 
 func fullSystemDTOFromModel(m galaxy.FullSystem) FullSystemResponseDTO {
 	return FullSystemResponseDTO{
-		Name:      m.Name,
-		X:         m.X,
-		Y:         m.Y,
-		Archetype: m.Archetype.Name,
-		Planets:   planetDTOsFromModels(m.Planets),
-		Waypoints: waypointDTOsFromModels(m.Waypoints),
+		Name:         m.Name,
+		X:            m.X,
+		Y:            m.Y,
+		Archetype:    m.Archetype.Name,
+		Planets:      planetDTOsFromModels(m.Planets),
+		Waypoints:    waypointDTOsFromModels(m.Waypoints),
+		DiscoveredBy: m.DiscoveredBy,
+		DiscoveredAt: m.DiscoveredAt,
 	}
 }
 

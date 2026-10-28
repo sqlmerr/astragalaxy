@@ -2,6 +2,7 @@ type: object
 required:
   - cooldown
   - fuel
+  - discovery
 properties: 
   cooldown:
     $ref: Cooldown.yaml
@@ -21,3 +22,7 @@ properties:
       left:
         type: integer
         description: Amount of warp cells left in the ship inventory after the jump (0 means exhausted)
+  discovery:
+    oneOf:
+      - $ref: SystemDiscovery.yaml
+      - type: "null"

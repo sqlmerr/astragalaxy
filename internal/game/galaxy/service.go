@@ -2,13 +2,16 @@ package galaxy
 
 import (
 	"context"
+	"errors"
 	"fmt"
 
 	"github.com/google/uuid"
 	"github.com/sqlmerr/astragalaxy/internal/data"
 	errs "github.com/sqlmerr/astragalaxy/internal/errors"
 	"github.com/sqlmerr/astragalaxy/internal/game/worldgen"
+	core_logger "github.com/sqlmerr/astragalaxy/internal/logger"
 	"github.com/sqlmerr/astragalaxy/internal/model"
+	"go.uber.org/zap"
 )
 
 type Service struct {
@@ -97,5 +100,30 @@ func (s *Service) GetCurrentAgentSystem(ctx context.Context, agentID uuid.UUID) 
 		}
 	}
 
-	return FullSystem(*system), nil
+	discovery, err := s.store.Discoveries().GetSystemDiscovery(ctx, system.X, system.Y)
+	if err != nil {
+		if !errors.Is(err, errs.ErrNotFound) {
+			return FullSystem{}, fmt.Errorf("get system discovery: %w", err)
+		}
+		logger := core_logger.TryFromContext(ctx)
+		if logger != nil {
+			logger.Error(
+				"why is agent in system but this system is not discovered? Must be a bug",
+				zap.String("agent_id", agentID.String()),
+				zap.Int("x", system.X),
+				zap.Int("y", system.Y),
+			)
+		}
+	}
+
+	return FullSystem{
+		Name:         system.Name,
+		X:            system.X,
+		Y:            system.Y,
+		Archetype:    system.Archetype,
+		Planets:      system.Planets,
+		Waypoints:    system.Waypoints,
+		DiscoveredBy: discovery.DiscoveredBy,
+		DiscoveredAt: discovery.DiscoveredAt,
+	}, nil
 }

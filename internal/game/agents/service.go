@@ -8,6 +8,7 @@ import (
 	"github.com/sqlmerr/astragalaxy/internal/auth"
 	"github.com/sqlmerr/astragalaxy/internal/data"
 	agents_repository "github.com/sqlmerr/astragalaxy/internal/data/repository/agents"
+	discoveries_repository "github.com/sqlmerr/astragalaxy/internal/data/repository/discoveries"
 	inventories_repository "github.com/sqlmerr/astragalaxy/internal/data/repository/inventories"
 	errs "github.com/sqlmerr/astragalaxy/internal/errors"
 	"github.com/sqlmerr/astragalaxy/internal/game/worldgen"
@@ -115,9 +116,24 @@ func (s *Service) RegisterAgent(ctx context.Context, userID uuid.UUID, username 
 			log.Debug("created agent", zap.String("agent_id", agent.ID.String()))
 		}
 
-		_, err = s.shipProvider.CreateStarterShip(ctx, tx, agent.ID)
+		s, err := s.shipProvider.CreateStarterShip(ctx, tx, agent.ID)
 		if err != nil {
 			return err
+		}
+
+		isSystemDiscovered, err := tx.Discoveries().IsSystemDiscovered(ctx, s.Coords.SystemX, s.Coords.SystemY)
+		if err != nil {
+			return fmt.Errorf("get is system discovered: %w", err)
+		}
+		if !isSystemDiscovered {
+			_, err = tx.Discoveries().CreateSystemDiscovery(ctx, discoveries_repository.CreateSystemDiscovery{
+				SystemX:      s.Coords.SystemX,
+				SystemY:      s.Coords.SystemY,
+				DiscoveredBy: agent.ID,
+			})
+			if err != nil {
+				return fmt.Errorf("create system discovery: %w", err)
+			}
 		}
 		return nil
 	})

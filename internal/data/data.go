@@ -10,6 +10,7 @@ import (
 	postgres_pool "github.com/sqlmerr/astragalaxy/internal/data/postgres/pool"
 	agents_repository "github.com/sqlmerr/astragalaxy/internal/data/repository/agents"
 	cooldowns_repository "github.com/sqlmerr/astragalaxy/internal/data/repository/cooldowns"
+	discoveries_repository "github.com/sqlmerr/astragalaxy/internal/data/repository/discoveries"
 	inventories_repository "github.com/sqlmerr/astragalaxy/internal/data/repository/inventories"
 	resource_deposits_repository "github.com/sqlmerr/astragalaxy/internal/data/repository/resource_deposits"
 	ships_repository "github.com/sqlmerr/astragalaxy/internal/data/repository/ships"
@@ -23,6 +24,7 @@ type Store interface {
 	Inventories() inventories_repository.InventoryRepository
 	Cooldowns() cooldowns_repository.CooldownRepository
 	ResourceDeposits() resource_deposits_repository.ResourceDepositsRepository
+	Discoveries() discoveries_repository.DiscoveryRepository
 
 	ExecTx(ctx context.Context, fn func(tx Store) error) error
 }
@@ -36,6 +38,7 @@ type Storage struct {
 	inventories      inventories_repository.InventoryRepository
 	cooldowns        cooldowns_repository.CooldownRepository
 	resourceDeposits resource_deposits_repository.ResourceDepositsRepository
+	discoveries      discoveries_repository.DiscoveryRepository
 }
 
 func NewStore(
@@ -46,6 +49,7 @@ func NewStore(
 	inventories inventories_repository.InventoryRepository,
 	cooldowns cooldowns_repository.CooldownRepository,
 	resourceDeposits resource_deposits_repository.ResourceDepositsRepository,
+	discoveries discoveries_repository.DiscoveryRepository,
 ) *Storage {
 	return &Storage{
 		pool:             pool,
@@ -55,6 +59,7 @@ func NewStore(
 		inventories:      inventories,
 		cooldowns:        cooldowns,
 		resourceDeposits: resourceDeposits,
+		discoveries:      discoveries,
 	}
 }
 
@@ -82,6 +87,10 @@ func (s *Storage) ResourceDeposits() resource_deposits_repository.ResourceDeposi
 	return s.resourceDeposits
 }
 
+func (s *Storage) Discoveries() discoveries_repository.DiscoveryRepository {
+	return s.discoveries
+}
+
 func (s *Storage) ExecTx(ctx context.Context, fn func(tx Store) error) error {
 	tx, err := s.pool.Begin(ctx)
 	if err != nil {
@@ -99,6 +108,7 @@ func (s *Storage) ExecTx(ctx context.Context, fn func(tx Store) error) error {
 		inventories:      inventories_repository.NewInventoryRepository(*q, tx),
 		cooldowns:        s.cooldowns,
 		resourceDeposits: resource_deposits_repository.New(*q, tx),
+		discoveries:      discoveries_repository.New(*q, tx),
 	}
 
 	err = fn(txStorage)

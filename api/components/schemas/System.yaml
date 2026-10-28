@@ -4,6 +4,8 @@ allOf:
     required:
       - planets
       - waypoints
+      - discovered_by
+      - discovered_at
     properties:
       planets:
         type: array
@@ -13,3 +15,10 @@ allOf:
         type: array
         items:
           $ref: "./Waypoint.yaml"
+      discovered_by:
+        type: string
+        format: uuid
+        description: Agent ID that discovered this system
+      discovered_at:
+        type: string
+        format: date-time

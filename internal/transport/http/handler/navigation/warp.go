@@ -29,8 +29,9 @@ type FuelDTO struct {
 }
 
 type NavigateWarpResponse struct {
-	Cooldown http_dto.CooldownDTO `json:"cooldown"`
-	Fuel     FuelDTO              `json:"fuel"`
+	Cooldown  http_dto.CooldownDTO `json:"cooldown"`
+	Fuel      FuelDTO              `json:"fuel"`
+	Discovery *SystemDiscoveryDTO  `json:"discovery"`
 }
 
 func (h *NavigationHTTPHandler) NavigateWarp(w http.ResponseWriter, r *http.Request) {
@@ -46,10 +47,20 @@ func (h *NavigationHTTPHandler) NavigateWarp(w http.ResponseWriter, r *http.Requ
 
 	agentID := auth.GetAgentIDFromContext(ctx)
 
-	cooldown, fuelUsage, err := h.navigationService.NavigateWarp(ctx, agentID, req.X, req.Y)
+	cooldown, fuelUsage, discovery, err := h.navigationService.NavigateWarp(ctx, agentID, req.X, req.Y)
 	if err != nil {
 		responseHandler.ErrorResponse(err, "Failed to warp")
 		return
+	}
+
+	var discoveryDTO *SystemDiscoveryDTO
+	if discovery != nil {
+		discoveryDTO = &SystemDiscoveryDTO{
+			SystemX:      discovery.SystemX,
+			SystemY:      discovery.SystemY,
+			DiscoveredAt: discovery.DiscoveredAt,
+			DiscoveredBy: discovery.DiscoveredBy,
+		}
 	}
 
 	response := NavigateWarpResponse{
@@ -59,6 +70,7 @@ func (h *NavigationHTTPHandler) NavigateWarp(w http.ResponseWriter, r *http.Requ
 			Used:         fuelUsage.Used,
 			Left:         fuelUsage.Left,
 		},
+		Discovery: discoveryDTO,
 	}
 	responseHandler.JSONResponse(http.StatusOK, response)
 }

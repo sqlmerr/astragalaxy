@@ -13,10 +13,11 @@ properties:
       - mining
     properties: 
       provides_facility:
-        type: string
-        description: Facility that item provides being ship module
-        example: portable_printer
-        nullable: true
+        oneOf: 
+          - type: string
+            description: Facility that item provides being ship module
+            example: portable_printer
+          - type: "null"
       mining:
         type: object
         description: Mining modifiers

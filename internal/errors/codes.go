@@ -50,6 +50,8 @@ const (
 	CodeInvalidShipModuleType        ErrorCode = "INVALID_SHIP_MODULE_TYPE"
 	CodeInvalidShipClass             ErrorCode = "INVALID_SHIP_CLASS"
 	CodeMiningLimitExceeded          ErrorCode = "MINING_LIMIT_EXCEEDED"
+	CodePlanetDiscoveryNotFound      ErrorCode = "PLANET_DISCOVERY_NOT_FOUND"
+	CodeSystemDiscoveryNotFound      ErrorCode = "SYSTEM_DISCOVERY_NOT_FOUND"
 )
 
 type WithCode struct {

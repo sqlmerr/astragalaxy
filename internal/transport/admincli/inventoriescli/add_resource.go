@@ -43,7 +43,7 @@ func newAddResourceCmd(service *inventory.Service) *cobra.Command {
 				return nil
 			}
 
-			if !substract {
+			if substract {
 				fmt.Printf("substracted %d resource of type %q from inventory %s\n", int(math.Abs(float64(amount))), resourceID, inventoryID)
 			} else {
 				fmt.Printf("added %d resource of type %q to inventory %s\n", int(math.Abs(float64(amount))), resourceID, inventoryID)

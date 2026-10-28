@@ -13,24 +13,26 @@ properties:
       - station
       - asteroid
   asteroid:
-    type: object
-    description: Asteroid data. Not null if type == asteroid
-    nullable: true
-    required:
-      - deposit
-    properties: 
-      deposit:
-        $ref: ResourceDeposit.yaml
+    oneOf: 
+    - type: object
+      description: Asteroid data. Not null if type == asteroid
+      required:
+        - deposit
+      properties: 
+        deposit:
+          $ref: ResourceDeposit.yaml
+    - type: "null"
   station:
-    type: object
-    description: Station data. Not null if type == station
-    nullable: true
-    required:
-      - facilities
-    properties: 
-      facilities:
-        type: array
-        description: List of available facilities on this station
-        items: 
-          type: string
-          description: Facility ID # TODO(docs)
+    oneOf: 
+    - type: object
+      description: Station data. Not null if type == station
+      required:
+        - facilities
+      properties: 
+        facilities:
+          type: array
+          description: List of available facilities on this station
+          items: 
+            type: string
+            description: Facility ID # TODO(docs)
+    - type: "null"
