@@ -6,6 +6,7 @@ import (
 	"fmt"
 
 	"github.com/google/uuid"
+	database "github.com/sqlmerr/astragalaxy/internal/data/postgres/database/sqlc"
 	postgres_pool "github.com/sqlmerr/astragalaxy/internal/data/postgres/pool"
 	errs "github.com/sqlmerr/astragalaxy/internal/errors"
 	"github.com/sqlmerr/astragalaxy/internal/model"
@@ -26,5 +27,5 @@ func (r *ShipRepositoryImpl) GetActiveShipByAgent(ctx context.Context, agentID u
 		return model.Ship{}, fmt.Errorf("scan: %w", err)
 	}
 
-	return convertModel(s), nil
+	return convertModel(database.GetShipByIDRow(s)), nil
 }

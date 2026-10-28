@@ -95,12 +95,13 @@ type ShipModuleType string
 const (
 	ShipModulePortableSmelter ShipModuleType = "portable_smelter"
 	ShipModulePortablePrinter ShipModuleType = "portable_printer"
+	ShipModuleLaserDrill      ShipModuleType = "laser_drill"
 )
 
 func (m ShipModuleType) IntoItemType() (ItemType, error) {
 	item := ItemType(m)
 	switch item {
-	case ItemPortableSmelter, ItemPortablePrinter:
+	case ItemPortableSmelter, ItemPortablePrinter, ItemLaserDrill:
 		return item, nil
 	default:
 		return "", errs.NewWithCode(errs.CodeInvalidShipModuleType, fmt.Errorf("unknown ship module type: %s: %w", m, errs.ErrInvalidArgument))
@@ -117,8 +118,9 @@ type ShipClassID string
 type ShipClass struct {
 	ID ShipClassID
 
-	MaxModuleSlots  int
-	MaxWarpDistance int
+	MaxModuleSlots      int
+	MaxWarpDistance     int
+	MiningLimitModifier float64
 }
 
 type ShipCoords struct {
@@ -164,6 +166,7 @@ type Ship struct {
 	Name        string
 	InventoryID uuid.UUID
 
-	Class  ShipClassID
-	Coords ShipCoords
+	Class   ShipClassID
+	Coords  ShipCoords
+	Modules []ShipModuleType
 }

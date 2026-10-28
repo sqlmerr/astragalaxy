@@ -7,6 +7,7 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/sqlmerr/astragalaxy/internal/data"
+	"github.com/sqlmerr/astragalaxy/internal/data/registry"
 	cooldowns_repository "github.com/sqlmerr/astragalaxy/internal/data/repository/cooldowns"
 	inventories_repository "github.com/sqlmerr/astragalaxy/internal/data/repository/inventories"
 	resource_deposits_repository "github.com/sqlmerr/astragalaxy/internal/data/repository/resource_deposits"
@@ -20,10 +21,11 @@ type Service struct {
 	gameConfig game.Config
 	store      data.Store
 	worldGen   worldgen.WorldGen
+	gameData   registry.GameData
 }
 
-func NewService(gameConfig game.Config, store data.Store, worldGen worldgen.WorldGen) *Service {
-	return &Service{gameConfig, store, worldGen}
+func NewService(gameConfig game.Config, store data.Store, worldGen worldgen.WorldGen, gameData registry.GameData) *Service {
+	return &Service{gameConfig, store, worldGen, gameData}
 }
 
 func (s *Service) MineAsteroid(ctx context.Context, agentID uuid.UUID, amount int) (model.Cooldown, error) {
@@ -91,6 +93,30 @@ func (s *Service) MineAsteroid(ctx context.Context, agentID uuid.UUID, amount in
 	if err != nil {
 		return model.Cooldown{}, fmt.Errorf("get inventory volume: %w", err)
 	}
+
+	shipClass, exists := s.gameData.ShipClasses.GetShipClass(ship.Class)
+	if !exists {
+		return model.Cooldown{}, fmt.Errorf("ship class %q does not exist: %w", ship.Class, errs.ErrInternal)
+	}
+
+	speedMultiplier := 1.0
+	if ship.Modules != nil {
+		for _, m := range ship.Modules {
+			itemType, err := m.IntoItemType()
+			if err != nil {
+				return model.Cooldown{}, fmt.Errorf("convert ship module %s into item: %w", m, err)
+			}
+			item, exists := s.gameData.Items.GetItem(string(itemType))
+			if !exists {
+				return model.Cooldown{}, fmt.Errorf("item %s (ship module) does not exist: %w", itemType, errs.ErrInternal)
+			}
+
+			if item.ShipModule != nil && item.ShipModule.Mining != nil && item.ShipModule.Mining.SpeedMultiplier != 0 {
+				speedMultiplier *= item.ShipModule.Mining.SpeedMultiplier
+			}
+		}
+	}
+
 	var cooldown model.Cooldown
 
 	err = s.store.ExecTx(ctx, func(tx data.Store) error {
@@ -116,7 +142,7 @@ func (s *Service) MineAsteroid(ctx context.Context, agentID uuid.UUID, amount in
 		}
 		deposit.Regenerate(waypoint.Asteroid.Deposit.Amount)
 
-		deposit, inventoryResource, cooldownDuration, err := MineAsteroid(s.gameConfig, *waypoint, deposit, amount, inventory, inventoryResource, inventoryVolume)
+		deposit, inventoryResource, cooldownDuration, err := Mine(s.gameConfig, waypoint.Asteroid.Deposit, deposit, amount, inventory, inventoryResource, inventoryVolume, ship, shipClass, speedMultiplier)
 		if err != nil {
 			return fmt.Errorf("process mining: %w", err)
 		}
@@ -246,6 +272,29 @@ func (s *Service) MinePlanet(ctx context.Context, agentID uuid.UUID, resourceTyp
 		return model.Cooldown{}, fmt.Errorf("get inventory volume: %w", err)
 	}
 
+	shipClass, exists := s.gameData.ShipClasses.GetShipClass(ship.Class)
+	if !exists {
+		return model.Cooldown{}, fmt.Errorf("ship class %q does not exist: %w", ship.Class, errs.ErrInternal)
+	}
+
+	speedMultiplier := 1.0
+	if ship.Modules != nil {
+		for _, m := range ship.Modules {
+			itemType, err := m.IntoItemType()
+			if err != nil {
+				return model.Cooldown{}, fmt.Errorf("convert ship module %s into item: %w", m, err)
+			}
+			item, exists := s.gameData.Items.GetItem(string(itemType))
+			if !exists {
+				return model.Cooldown{}, fmt.Errorf("item %s (ship module) does not exist: %w", itemType, errs.ErrInternal)
+			}
+
+			if item.ShipModule != nil && item.ShipModule.Mining != nil && item.ShipModule.Mining.SpeedMultiplier != 0 {
+				speedMultiplier *= item.ShipModule.Mining.SpeedMultiplier
+			}
+		}
+	}
+
 	var cooldown model.Cooldown
 
 	err = s.store.ExecTx(ctx, func(tx data.Store) error {
@@ -271,7 +320,7 @@ func (s *Service) MinePlanet(ctx context.Context, agentID uuid.UUID, resourceTyp
 		}
 		depositData.Regenerate(deposit.Amount)
 
-		depositData, inventoryResource, cooldownDuration, err := MinePlanet(s.gameConfig, deposit, depositData, amount, inventory, inventoryResource, inventoryVolume)
+		depositData, inventoryResource, cooldownDuration, err := Mine(s.gameConfig, deposit, depositData, amount, inventory, inventoryResource, inventoryVolume, ship, shipClass, speedMultiplier)
 		if err != nil {
 			return fmt.Errorf("process mining: %w", err)
 		}

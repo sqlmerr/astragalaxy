@@ -23,9 +23,10 @@ func (h *DataHTTPHandler) GetShipClasses(w http.ResponseWriter, r *http.Request)
 	response := GetShipClassesResponse{
 		Data: lo.Map(classes, func(i model.ShipClass, _ int) ShipClassDTO {
 			return ShipClassDTO{
-				ID:              string(i.ID),
-				MaxModuleSlots:  i.MaxModuleSlots,
-				MaxWarpDistance: i.MaxWarpDistance,
+				ID:                  string(i.ID),
+				MaxModuleSlots:      i.MaxModuleSlots,
+				MaxWarpDistance:     i.MaxWarpDistance,
+				MiningLimitModifier: i.MiningLimitModifier,
 			}
 		}),
 	}

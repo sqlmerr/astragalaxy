@@ -22,18 +22,28 @@ func (h *DataHTTPHandler) GetItems(w http.ResponseWriter, r *http.Request) {
 
 	response := GetItemsResponse{
 		Data: lo.Map(items, func(i model.ItemData, _ int) ItemDTO {
-			var providesFacility *ItemProvidesFacilityDTO
-			if i.ProvidesFacility != nil {
-				providesFacility = &ItemProvidesFacilityDTO{
-					ID: i.ProvidesFacility.ID,
-					As: lo.Map(i.ProvidesFacility.As, func(item model.ItemDataProvidesFacilityAsType, _ int) string {
-						return string(item)
-					}),
+			var shipModule *ItemShipModule
+			if i.ShipModule != nil {
+				var providesFacility *string
+				if i.ShipModule.ProvidesFacility != "" {
+					providesFacility = &i.ShipModule.ProvidesFacility
+				}
+
+				var miningModule *ItemShipModuleMining
+				if i.ShipModule.Mining != nil {
+					miningModule = &ItemShipModuleMining{
+						SpeedMultiplier: i.ShipModule.Mining.SpeedMultiplier,
+					}
+				}
+
+				shipModule = &ItemShipModule{
+					ProvidesFacility: providesFacility,
+					Mining:           miningModule,
 				}
 			}
 			return ItemDTO{
-				ID:               i.ID,
-				ProvidesFacility: providesFacility,
+				ID:         i.ID,
+				ShipModule: shipModule,
 			}
 		}),
 	}

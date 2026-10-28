@@ -793,6 +793,7 @@ export interface components {
             location_id: number;
             /** @description Ship Class */
             class: string;
+            modules: string[];
         };
         GetMyShipsResponse: {
             data: components["schemas"]["Ship"][];
@@ -1006,13 +1007,19 @@ export interface components {
         ItemData: {
             /** @description Item ID */
             id: string;
-            /** @description Facility that item provides */
-            provides_facility: {
-                /** @description Facility ID */
-                id: string;
-                /** @description In which item states it provides this facility */
-                as: string[];
-            } | null;
+            /** @description Item's ship module characteristics */
+            ship_module?: {
+                /**
+                 * @description Facility that item provides being ship module
+                 * @example portable_printer
+                 */
+                provides_facility: string | null;
+                /** @description Mining modifiers */
+                mining: {
+                    /** Format: float64 */
+                    speed_multiplier: number;
+                };
+            };
         };
         ResourceData: {
             /** @description Resource ID */
@@ -1067,6 +1074,8 @@ export interface components {
             id: string;
             max_module_slots: number;
             max_warp_distance: number;
+            /** Format: float64 */
+            mining_limit_modifier: number;
         };
         TrashRequest: {
             /** Format: uuid */

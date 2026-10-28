@@ -1,5 +1,19 @@
 type: object
-required: [id, agent_id, type, active, system_x, system_y, status, created_at, name, location, location_id, inventory_id, class]
+required: 
+  - id
+  - agent_id
+  - type
+  - active
+  - system_x
+  - system_y
+  - status
+  - created_at
+  - name
+  - location
+  - location_id
+  - inventory_id
+  - class
+  - modules
 properties:
   id:
     type: string
@@ -49,3 +63,9 @@ properties:
   class:
     type: string
     description: Ship Class # TODO(docs): link to docs
+  modules:
+    type: array
+    items: 
+      type: string
+      description: Ship module type
+      example: portable_printer

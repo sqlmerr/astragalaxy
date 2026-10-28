@@ -2,21 +2,25 @@
     {
         "id": "S",
         "max_module_slots": 8,
-        "max_warp_distance": 30
+        "max_warp_distance": 30,
+        "mining_limit_modifier": 1.2
     },
     {
         "id": "A",
         "max_module_slots": 6,
-        "max_warp_distance": 24
+        "max_warp_distance": 24,
+        "mining_limit_modifier": 1.1
     },
     {
         "id": "B",
         "max_module_slots": 5,
-        "max_warp_distance": 20
+        "max_warp_distance": 20,
+        "mining_limit_modifier": 1.05
     },
     {
         "id": "C",
         "max_module_slots": 4,
-        "max_warp_distance": 16
+        "max_warp_distance": 16,
+        "mining_limit_modifier": 1.0
     }
 ]

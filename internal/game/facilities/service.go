@@ -3,7 +3,6 @@ package facilities
 import (
 	"context"
 	"fmt"
-	"slices"
 
 	"github.com/google/uuid"
 
@@ -43,17 +42,13 @@ func (s *FacilitiesService) GatherAvailableFacilities(ctx context.Context, agent
 		if !ok {
 			return nil, fmt.Errorf("item does not exist: %w", errs.ErrInternal)
 		}
-		if item.ProvidesFacility == nil {
+		if item.ShipModule == nil || item.ShipModule.ProvidesFacility == "" {
 			continue
 		}
 
-		if !slices.Contains(item.ProvidesFacility.As, model.ItemProvidesFacilityAsShipModule) {
-			continue
-		}
-
-		f, ok := s.gameData.Facilities.GetFacility(item.ProvidesFacility.ID)
+		f, ok := s.gameData.Facilities.GetFacility(item.ShipModule.ProvidesFacility)
 		if !ok {
-			return nil, fmt.Errorf("facility %s does not exist: %w", item.ProvidesFacility, errs.ErrInternal)
+			return nil, fmt.Errorf("facility %s does not exist: %w", item.ShipModule.ProvidesFacility, errs.ErrInternal)
 		}
 		facilities[f.Type] = append(facilities[f.Type], f.ID)
 	}

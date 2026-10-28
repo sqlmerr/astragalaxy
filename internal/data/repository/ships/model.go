@@ -2,6 +2,7 @@ package ships_repository
 
 import (
 	"github.com/google/uuid"
+	"github.com/samber/lo"
 	database "github.com/sqlmerr/astragalaxy/internal/data/postgres/database/sqlc"
 	"github.com/sqlmerr/astragalaxy/internal/model"
 )
@@ -25,7 +26,7 @@ type CreateShipModule struct {
 	ShipID uuid.UUID
 }
 
-func convertModel(m database.Ship) model.Ship {
+func convertModel(m database.GetShipByIDRow) model.Ship {
 	coords := model.ShipCoords{
 		Location:   model.ShipLocation(m.Location),
 		LocationID: int(m.LocationID),
@@ -44,6 +45,9 @@ func convertModel(m database.Ship) model.Ship {
 		InventoryID: m.InventoryID,
 		Coords:      coords,
 		Class:       model.ShipClassID(m.Class),
+		Modules: lo.Map(m.Modules, func(i string, _ int) model.ShipModuleType {
+			return model.ShipModuleType(i)
+		}),
 	}
 }
 

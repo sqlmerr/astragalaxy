@@ -10,21 +10,28 @@ import (
 	"github.com/sqlmerr/astragalaxy/internal/model"
 )
 
-const DefaultMiningSpeed = 0.25 // seconds per one resource
+const DefaultMiningSpeed = 4 // resources per second
+const DefaultLimit = 500
 
-func MineAsteroid(
+const ShipMinerLimitModifier = 1.5
+const ShipMinerCooldownModifier = 0.8
+
+func Mine(
 	gameConfig game.Config,
-	w worldgen.Waypoint,
-	deposit model.ResourceDeposit,
+	deposit worldgen.ResourceDeposit,
+	depositData model.ResourceDeposit,
 	amount int,
 	inventory model.Inventory,
 	resource model.Resource,
 	inventoryVolume int,
+	ship model.Ship,
+	shipClass model.ShipClass,
+	speedModifier float64,
 ) (model.ResourceDeposit, model.Resource, time.Duration, error) {
-	if deposit.Remaining < amount {
+	if depositData.Remaining < amount {
 		return model.ResourceDeposit{}, model.Resource{}, 0, errs.NewWithCode(
 			errs.CodeNotEnoughResources,
-			fmt.Errorf("asteroid has %d resources: %w", deposit.Remaining, errs.ErrUnprocessableEntity),
+			fmt.Errorf("cannot mine %d resources: deposit has %d resources: %w", amount, depositData.Remaining, errs.ErrUnprocessableEntity),
 		)
 	}
 
@@ -38,50 +45,28 @@ func MineAsteroid(
 		)
 	}
 
-	resource.Amount += amount
-
-	deposit.Remaining -= amount
-	deposit.LastMinedAt = time.Now()
-
-	cooldownSeconds := DefaultMiningSpeed * float64(amount) / w.Asteroid.Deposit.Richness
-	cooldownDuration := time.Duration(cooldownSeconds * float64(time.Second))
-
-	return deposit, resource, cooldownDuration, nil
-}
-
-func MinePlanet(
-	gameConfig game.Config,
-	d worldgen.ResourceDeposit,
-	deposit model.ResourceDeposit,
-	amount int,
-	inventory model.Inventory,
-	resource model.Resource,
-	inventoryVolume int,
-) (model.ResourceDeposit, model.Resource, time.Duration, error) {
-	if deposit.Remaining < amount {
-		return model.ResourceDeposit{}, model.Resource{}, 0, errs.NewWithCode(
-			errs.CodeNotEnoughResources,
-			fmt.Errorf("planet resource deposit has %d resources: %w", deposit.Remaining, errs.ErrUnprocessableEntity),
-		)
+	limit := DefaultLimit * shipClass.MiningLimitModifier
+	if ship.Type == model.ShipTypeMiner {
+		limit = float64(limit) * ShipMinerLimitModifier
 	}
 
-	if inventoryVolume+amount > inventory.MaxResourceVolume && !gameConfig.Rules.DisableInventoryLimit {
+	if amount > int(limit) {
 		return model.ResourceDeposit{}, model.Resource{}, 0, errs.NewWithCode(
-			errs.CodeInventoryIsFull,
-			fmt.Errorf(
-				"cannot mine %d resources due to inventory volume limit = %d: %w",
-				amount, inventory.MaxResourceVolume, errs.ErrUnprocessableEntity,
-			),
+			errs.CodeMiningLimitExceeded, fmt.Errorf("cannot mine %d due to mining limit = %d: %w", amount, int(limit), errs.ErrUnprocessableEntity),
 		)
 	}
 
 	resource.Amount += amount
 
-	deposit.Remaining -= amount
-	deposit.LastMinedAt = time.Now()
+	depositData.Remaining -= amount
+	depositData.LastMinedAt = time.Now()
 
-	cooldownSeconds := DefaultMiningSpeed * float64(amount) / d.Richness
+	speed := DefaultMiningSpeed * speedModifier
+	cooldownSeconds := float64(amount) / (deposit.Richness * speed)
+	if ship.Type == model.ShipTypeMiner {
+		cooldownSeconds *= ShipMinerCooldownModifier
+	}
 	cooldownDuration := time.Duration(cooldownSeconds * float64(time.Second))
 
-	return deposit, resource, cooldownDuration, nil
+	return depositData, resource, cooldownDuration, nil
 }

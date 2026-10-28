@@ -37,6 +37,7 @@ type ShipResponseDTO struct {
 	LocationID  int       `json:"location_id"`
 	InventoryID uuid.UUID `json:"inventory_id"`
 	Class       string    `json:"class"`
+	Modules     []string  `json:"modules"`
 }
 
 func shipDTOFromModel(m model.Ship) ShipResponseDTO {
@@ -54,6 +55,9 @@ func shipDTOFromModel(m model.Ship) ShipResponseDTO {
 		LocationID:  m.Coords.LocationID,
 		InventoryID: m.InventoryID,
 		Class:       string(m.Class),
+		Modules: lo.Map(m.Modules, func(i model.ShipModuleType, _ int) string {
+			return string(i)
+		}),
 	}
 }
 

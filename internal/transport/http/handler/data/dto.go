@@ -20,14 +20,18 @@ type RecipeDTO struct {
 	Outputs          []RecipeOutputDTO `json:"outputs"`
 }
 
-type ItemProvidesFacilityDTO struct {
-	ID string   `json:"id"`
-	As []string `json:"as"`
+type ItemShipModuleMining struct {
+	SpeedMultiplier float64 `json:"speed_multiplier"`
+}
+
+type ItemShipModule struct {
+	ProvidesFacility *string               `json:"provides_facility"`
+	Mining           *ItemShipModuleMining `json:"mining"`
 }
 
 type ItemDTO struct {
-	ID               string                   `json:"id"`
-	ProvidesFacility *ItemProvidesFacilityDTO `json:"provides_facility,omitempty"`
+	ID         string          `json:"id"`
+	ShipModule *ItemShipModule `json:"ship_module,omitempty"`
 }
 
 type ResourceDTO struct {
@@ -50,6 +54,7 @@ type FacilityDTO struct {
 type ShipClassDTO struct {
 	ID string `json:"id"`
 
-	MaxModuleSlots  int `json:"max_module_slots"`
-	MaxWarpDistance int `json:"max_warp_distance"`
+	MaxModuleSlots      int     `json:"max_module_slots"`
+	MaxWarpDistance     int     `json:"max_warp_distance"`
+	MiningLimitModifier float64 `json:"mining_limit_modifier"`
 }

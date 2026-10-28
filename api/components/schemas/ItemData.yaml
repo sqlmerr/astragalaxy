@@ -1,25 +1,28 @@
 type: object
 required:
   - id
-  - provides_facility
 properties: 
   id: 
     type: string
     description: Item ID
-  provides_facility:
+  ship_module:
     type: object
-    description: Facility that item provides
-    nullable: true
+    description: Item's ship module characteristics
     required:
-      - id
-      - as
+      - provides_facility
+      - mining
     properties: 
-      id:
+      provides_facility:
         type: string
-        description: Facility ID
-      as:
-        type: array
-        items: 
-          type: string
-          example: ship_module
-        description: In which item states it provides this facility
+        description: Facility that item provides being ship module
+        example: portable_printer
+        nullable: true
+      mining:
+        type: object
+        description: Mining modifiers
+        required:
+          - speed_multiplier
+        properties: 
+          speed_multiplier:
+            type: number
+            format: float64

@@ -41,5 +41,5 @@ func (r *ShipRepositoryImpl) CreateShip(ctx context.Context, data CreateShip) (m
 		return model.Ship{}, fmt.Errorf("scan: %w", err)
 	}
 
-	return convertModel(s), nil
+	return convertModel(database.GetShipByIDRow(s)), nil
 }

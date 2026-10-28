@@ -3,6 +3,7 @@ required:
   - id
   - max_module_slots
   - max_warp_distance
+  - mining_limit_modifier
 properties: 
   id:
     type: string
@@ -11,3 +12,6 @@ properties:
     type: integer
   max_warp_distance:
     type: integer
+  mining_limit_modifier:
+    type: number
+    format: float64

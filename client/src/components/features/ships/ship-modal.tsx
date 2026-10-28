@@ -48,16 +48,6 @@ export function ShipModal({ ship, onClose }: ShipModalProps) {
     ship !== null
   )
 
-  const {
-    data: modules,
-    isPending: isModulesPending,
-    isError: isModulesError,
-  } = useShipModulesQuery(
-    ship ? ship.agent_id : "",
-    ship ? ship.id : "",
-    ship !== null
-  )
-
   useEffect(() => {
     if (ship) {
       setName(ship.name)
@@ -102,14 +92,7 @@ export function ShipModal({ ship, onClose }: ShipModalProps) {
     setIsRenaming(false)
   }
 
-  if (
-    !inventory ||
-    isInventoryPending ||
-    isInventoryError ||
-    !modules ||
-    isModulesError ||
-    isModulesPending
-  ) {
+  if (!inventory || isInventoryPending || isInventoryError) {
     return null
   }
 
@@ -232,9 +215,9 @@ export function ShipModal({ ship, onClose }: ShipModalProps) {
 
               <Card className="p-4">
                 <h3 className="mb-3 font-semibold">Modules</h3>
-                {modules.data.length > 0 ? (
+                {ship.modules.length > 0 ? (
                   <ul className="space-y-2 text-sm">
-                    {modules.data.map((module) => (
+                    {ship.modules.map((module) => (
                       <li key={module}>
                         <Badge variant="secondary">{module}</Badge>
                       </li>

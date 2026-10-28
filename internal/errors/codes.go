@@ -49,6 +49,7 @@ const (
 	CodeInvalidFacilityType          ErrorCode = "INVALID_FACILITY_TYPE"
 	CodeInvalidShipModuleType        ErrorCode = "INVALID_SHIP_MODULE_TYPE"
 	CodeInvalidShipClass             ErrorCode = "INVALID_SHIP_CLASS"
+	CodeMiningLimitExceeded          ErrorCode = "MINING_LIMIT_EXCEEDED"
 )
 
 type WithCode struct {

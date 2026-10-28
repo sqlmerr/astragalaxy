@@ -12,17 +12,7 @@ type ItemType string
 const (
 	ItemPortableSmelter ItemType = "portable_smelter"
 	ItemPortablePrinter ItemType = "portable_printer"
-)
-
-// As describes how/where an item provides a facility capability.
-//   - empty list: the capability is not provided anywhere
-//   - "none": the capability is active but not tied to any module type
-//     (e.g. the item is not a ship module)
-type ItemDataProvidesFacilityAsType string
-
-var (
-	ItemProvidesFacilityAsShipModule ItemDataProvidesFacilityAsType = "ship_module"
-	ItemProvidesFacilityAsNone       ItemDataProvidesFacilityAsType = "none"
+	ItemLaserDrill      ItemType = "laser_drill"
 )
 
 type Item struct {
@@ -33,12 +23,16 @@ type Item struct {
 	CreatedAt   time.Time
 }
 
-type ItemDataProvidesFacility struct {
-	ID string
-	As []ItemDataProvidesFacilityAsType
+type ItemData struct {
+	ID         string
+	ShipModule *ItemDataShipModule
 }
 
-type ItemData struct {
-	ID               string
-	ProvidesFacility *ItemDataProvidesFacility
+type ItemDataShipModule struct {
+	ProvidesFacility string
+	Mining           *ItemDataShipModuleMining
+}
+
+type ItemDataShipModuleMining struct {
+	SpeedMultiplier float64
 }

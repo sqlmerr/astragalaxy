@@ -12,15 +12,17 @@ import (
 type ShipClass struct {
 	ID model.ShipClassID `json:"id"`
 
-	MaxModuleSlots  int `json:"max_module_slots"`
-	MaxWarpDistance int `json:"max_warp_distance"`
+	MaxModuleSlots      int     `json:"max_module_slots"`
+	MaxWarpDistance     int     `json:"max_warp_distance"`
+	MiningLimitModifier float64 `json:"mining_limit_modifier"`
 }
 
 func shipClassToModel(m ShipClass) model.ShipClass {
 	return model.ShipClass{
-		ID:              model.ShipClassID(m.ID),
-		MaxModuleSlots:  m.MaxModuleSlots,
-		MaxWarpDistance: m.MaxWarpDistance,
+		ID:                  model.ShipClassID(m.ID),
+		MaxModuleSlots:      m.MaxModuleSlots,
+		MaxWarpDistance:     m.MaxWarpDistance,
+		MiningLimitModifier: m.MiningLimitModifier,
 	}
 }
 

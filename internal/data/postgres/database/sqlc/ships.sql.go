@@ -9,12 +9,24 @@ import (
 	"context"
 
 	"github.com/google/uuid"
+	"github.com/jackc/pgx/v5/pgtype"
 )
 
 const createShip = `-- name: CreateShip :one
-INSERT INTO ships (agent_id, type, active, system_x, system_y, status, name, inventory_id, location, location_id, class)
-VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
-RETURNING id, agent_id, type, active, system_x, system_y, status, created_at, name, inventory_id, location, location_id, class
+WITH new_ship AS (
+    INSERT INTO ships (agent_id, type, active, system_x, system_y, status, name, inventory_id, location, location_id, class)
+    VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
+    RETURNING id, agent_id, type, active, system_x, system_y, status, created_at, name, inventory_id, location, location_id, class
+)
+SELECT 
+    ns.id, ns.agent_id, ns.type, ns.active, ns.system_x, ns.system_y, ns.status, ns.created_at, ns.name, ns.inventory_id, ns.location, ns.location_id, ns.class,
+    COALESCE(
+        array_agg(sm.module_type ORDER BY sm.module_type) FILTER (WHERE sm.module_type IS NOT NULL),
+        '{}'::text[]
+    )::text[] AS modules
+FROM new_ship ns
+LEFT JOIN ship_modules sm ON sm.ship_id = ns.id
+GROUP BY ns.id, ns.agent_id, ns.type, ns.active, ns.system_x, ns.system_y, ns.status, ns.name, ns.inventory_id, ns.location, ns.location_id, ns.class
 `
 
 type CreateShipParams struct {
@@ -31,7 +43,24 @@ type CreateShipParams struct {
 	Class       string
 }
 
-func (q *Queries) CreateShip(ctx context.Context, arg CreateShipParams) (Ship, error) {
+type CreateShipRow struct {
+	ID          uuid.UUID
+	AgentID     uuid.UUID
+	Type        ShipType
+	Active      bool
+	SystemX     int32
+	SystemY     int32
+	Status      ShipStatus
+	CreatedAt   pgtype.Timestamp
+	Name        string
+	InventoryID uuid.UUID
+	Location    ShipLocation
+	LocationID  int32
+	Class       string
+	Modules     []string
+}
+
+func (q *Queries) CreateShip(ctx context.Context, arg CreateShipParams) (CreateShipRow, error) {
 	row := q.db.QueryRow(ctx, createShip,
 		arg.AgentID,
 		arg.Type,
@@ -45,7 +74,7 @@ func (q *Queries) CreateShip(ctx context.Context, arg CreateShipParams) (Ship, e
 		arg.LocationID,
 		arg.Class,
 	)
-	var i Ship
+	var i CreateShipRow
 	err := row.Scan(
 		&i.ID,
 		&i.AgentID,
@@ -60,19 +89,44 @@ func (q *Queries) CreateShip(ctx context.Context, arg CreateShipParams) (Ship, e
 		&i.Location,
 		&i.LocationID,
 		&i.Class,
+		&i.Modules,
 	)
 	return i, err
 }
 
 const getActiveShipByAgent = `-- name: GetActiveShipByAgent :one
-SELECT id, agent_id, type, active, system_x, system_y, status, created_at, name, inventory_id, location, location_id, class
-FROM ships
-WHERE agent_id = $1 AND active = true
+SELECT 
+    s.id, s.agent_id, s.type, s.active, s.system_x, s.system_y, s.status, s.created_at, s.name, s.inventory_id, s.location, s.location_id, s.class,
+    COALESCE(
+        array_agg(sm.module_type ORDER BY sm.module_type) FILTER (WHERE sm.module_type IS NOT NULL),
+        '{}'::text[]
+    )::text[] AS modules
+FROM ships s
+LEFT JOIN ship_modules sm ON sm.ship_id = s.id
+WHERE s.agent_id = $1 AND s.active = true
+GROUP BY s.id
 `
 
-func (q *Queries) GetActiveShipByAgent(ctx context.Context, agentID uuid.UUID) (Ship, error) {
+type GetActiveShipByAgentRow struct {
+	ID          uuid.UUID
+	AgentID     uuid.UUID
+	Type        ShipType
+	Active      bool
+	SystemX     int32
+	SystemY     int32
+	Status      ShipStatus
+	CreatedAt   pgtype.Timestamp
+	Name        string
+	InventoryID uuid.UUID
+	Location    ShipLocation
+	LocationID  int32
+	Class       string
+	Modules     []string
+}
+
+func (q *Queries) GetActiveShipByAgent(ctx context.Context, agentID uuid.UUID) (GetActiveShipByAgentRow, error) {
 	row := q.db.QueryRow(ctx, getActiveShipByAgent, agentID)
-	var i Ship
+	var i GetActiveShipByAgentRow
 	err := row.Scan(
 		&i.ID,
 		&i.AgentID,
@@ -87,19 +141,44 @@ func (q *Queries) GetActiveShipByAgent(ctx context.Context, agentID uuid.UUID) (
 		&i.Location,
 		&i.LocationID,
 		&i.Class,
+		&i.Modules,
 	)
 	return i, err
 }
 
 const getShipByID = `-- name: GetShipByID :one
-SELECT id, agent_id, type, active, system_x, system_y, status, created_at, name, inventory_id, location, location_id, class
-FROM ships
-WHERE id = $1
+SELECT 
+    s.id, s.agent_id, s.type, s.active, s.system_x, s.system_y, s.status, s.created_at, s.name, s.inventory_id, s.location, s.location_id, s.class,
+    COALESCE(
+        array_agg(sm.module_type ORDER BY sm.module_type) FILTER (WHERE sm.module_type IS NOT NULL),
+        '{}'::text[]
+    )::text[] AS modules
+FROM ships s
+LEFT JOIN ship_modules sm ON sm.ship_id = s.id
+WHERE s.id = $1
+GROUP BY s.id
 `
 
-func (q *Queries) GetShipByID(ctx context.Context, id uuid.UUID) (Ship, error) {
+type GetShipByIDRow struct {
+	ID          uuid.UUID
+	AgentID     uuid.UUID
+	Type        ShipType
+	Active      bool
+	SystemX     int32
+	SystemY     int32
+	Status      ShipStatus
+	CreatedAt   pgtype.Timestamp
+	Name        string
+	InventoryID uuid.UUID
+	Location    ShipLocation
+	LocationID  int32
+	Class       string
+	Modules     []string
+}
+
+func (q *Queries) GetShipByID(ctx context.Context, id uuid.UUID) (GetShipByIDRow, error) {
 	row := q.db.QueryRow(ctx, getShipByID, id)
-	var i Ship
+	var i GetShipByIDRow
 	err := row.Scan(
 		&i.ID,
 		&i.AgentID,
@@ -114,26 +193,50 @@ func (q *Queries) GetShipByID(ctx context.Context, id uuid.UUID) (Ship, error) {
 		&i.Location,
 		&i.LocationID,
 		&i.Class,
+		&i.Modules,
 	)
 	return i, err
 }
 
 const getShipsByAgent = `-- name: GetShipsByAgent :many
-SELECT id, agent_id, type, active, system_x, system_y, status, created_at, name, inventory_id, location, location_id, class
-FROM ships
-WHERE agent_id = $1
-ORDER BY created_at DESC
+SELECT 
+    s.id, s.agent_id, s.type, s.active, s.system_x, s.system_y, s.status, s.created_at, s.name, s.inventory_id, s.location, s.location_id, s.class,
+    COALESCE(
+        array_agg(sm.module_type ORDER BY sm.module_type) FILTER (WHERE sm.module_type IS NOT NULL),
+        '{}'::text[]
+    )::text[] AS modules
+FROM ships s
+LEFT JOIN ship_modules sm ON sm.ship_id = s.id
+WHERE s.agent_id = $1
+GROUP BY s.id, s.created_at
 `
 
-func (q *Queries) GetShipsByAgent(ctx context.Context, agentID uuid.UUID) ([]Ship, error) {
+type GetShipsByAgentRow struct {
+	ID          uuid.UUID
+	AgentID     uuid.UUID
+	Type        ShipType
+	Active      bool
+	SystemX     int32
+	SystemY     int32
+	Status      ShipStatus
+	CreatedAt   pgtype.Timestamp
+	Name        string
+	InventoryID uuid.UUID
+	Location    ShipLocation
+	LocationID  int32
+	Class       string
+	Modules     []string
+}
+
+func (q *Queries) GetShipsByAgent(ctx context.Context, agentID uuid.UUID) ([]GetShipsByAgentRow, error) {
 	rows, err := q.db.Query(ctx, getShipsByAgent, agentID)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
-	var items []Ship
+	var items []GetShipsByAgentRow
 	for rows.Next() {
-		var i Ship
+		var i GetShipsByAgentRow
 		if err := rows.Scan(
 			&i.ID,
 			&i.AgentID,
@@ -148,6 +251,7 @@ func (q *Queries) GetShipsByAgent(ctx context.Context, agentID uuid.UUID) ([]Shi
 			&i.Location,
 			&i.LocationID,
 			&i.Class,
+			&i.Modules,
 		); err != nil {
 			return nil, err
 		}
@@ -160,19 +264,30 @@ func (q *Queries) GetShipsByAgent(ctx context.Context, agentID uuid.UUID) ([]Shi
 }
 
 const saveShip = `-- name: SaveShip :one
-UPDATE ships
-SET
-    type = $2,
-    active = $3,
-    system_x = $4,
-    system_y = $5,
-    status = $6,
-    name = $7,
-    location = $8,
-    location_id = $9,
-    class = $10
-WHERE id = $1
-RETURNING id, agent_id, type, active, system_x, system_y, status, created_at, name, inventory_id, location, location_id, class
+WITH updated_ship AS (
+    UPDATE ships
+    SET
+        type = $2,
+        active = $3,
+        system_x = $4,
+        system_y = $5,
+        status = $6,
+        name = $7,
+        location = $8,
+        location_id = $9,
+        class = $10
+    WHERE id = $1
+    RETURNING id, agent_id, type, active, system_x, system_y, status, created_at, name, inventory_id, location, location_id, class
+)
+SELECT 
+    us.id, us.agent_id, us.type, us.active, us.system_x, us.system_y, us.status, us.created_at, us.name, us.inventory_id, us.location, us.location_id, us.class,
+    COALESCE(
+        array_agg(sm.module_type ORDER BY sm.module_type) FILTER (WHERE sm.module_type IS NOT NULL),
+        '{}'::text[]
+    )::text[] AS modules
+FROM updated_ship us
+LEFT JOIN ship_modules sm ON sm.ship_id = us.id
+GROUP BY us.id, us.agent_id, us.type, us.active, us.system_x, us.system_y, us.status, us.name, us.inventory_id, us.location, us.location_id, us.class
 `
 
 type SaveShipParams struct {
@@ -188,7 +303,24 @@ type SaveShipParams struct {
 	Class      string
 }
 
-func (q *Queries) SaveShip(ctx context.Context, arg SaveShipParams) (Ship, error) {
+type SaveShipRow struct {
+	ID          uuid.UUID
+	AgentID     uuid.UUID
+	Type        ShipType
+	Active      bool
+	SystemX     int32
+	SystemY     int32
+	Status      ShipStatus
+	CreatedAt   pgtype.Timestamp
+	Name        string
+	InventoryID uuid.UUID
+	Location    ShipLocation
+	LocationID  int32
+	Class       string
+	Modules     []string
+}
+
+func (q *Queries) SaveShip(ctx context.Context, arg SaveShipParams) (SaveShipRow, error) {
 	row := q.db.QueryRow(ctx, saveShip,
 		arg.ID,
 		arg.Type,
@@ -201,7 +333,7 @@ func (q *Queries) SaveShip(ctx context.Context, arg SaveShipParams) (Ship, error
 		arg.LocationID,
 		arg.Class,
 	)
-	var i Ship
+	var i SaveShipRow
 	err := row.Scan(
 		&i.ID,
 		&i.AgentID,
@@ -216,6 +348,7 @@ func (q *Queries) SaveShip(ctx context.Context, arg SaveShipParams) (Ship, error
 		&i.Location,
 		&i.LocationID,
 		&i.Class,
+		&i.Modules,
 	)
 	return i, err
 }

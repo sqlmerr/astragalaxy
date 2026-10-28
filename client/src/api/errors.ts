@@ -59,4 +59,5 @@ export const ERROR_CODES = {
 	INVALID_FACILITY_TYPE: "Invalid facility type",
 	INVALID_SHIP_MODULE_TYPE: "Invalid ship module type",
 	INVALID_SHIP_CLASS: "Invalid ship class",
+  MINING_LIMIT_EXCEEDED: "Mining limit exceeded"
 }
