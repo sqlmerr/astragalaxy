@@ -46,6 +46,10 @@ func (s *Service) GetAgentWallets(ctx context.Context, agentID uuid.UUID) ([]mod
 }
 
 func (s *Service) Pay(ctx context.Context, input PayInput) (PayOutput, error) {
+	if err := ValidateAddress(input.ToAddress); err != nil {
+		return PayOutput{}, fmt.Errorf("validate wallet address: %w", err)
+	}
+
 	fromWallet, err := s.store.Wallets().GetWallet(ctx, input.FromAddress)
 	if err != nil {
 		return PayOutput{}, fmt.Errorf("get from wallet: %w", err)

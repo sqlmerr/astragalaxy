@@ -71,6 +71,10 @@ func Pay(
 	fromWallet, toWallet model.Wallet,
 	units, quarks int,
 ) (model.Wallet, model.Wallet, int, time.Duration, error) {
+	if fromWallet.Address == toWallet.Address {
+		return model.Wallet{}, model.Wallet{}, 0, 0, errs.ErrNotModified
+	}
+
 	var fee int
 	if fromWallet.OwnerID != toWallet.OwnerID {
 		fee = int(float64(units)*FeeUnits + float64(quarks)*FeeQuarks)

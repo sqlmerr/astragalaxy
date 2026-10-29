@@ -93,3 +93,15 @@ func TestGenerateAddress(t *testing.T) {
 	assert.Len(t, addr, 43)
 	assert.True(t, strings.HasPrefix(addr, "ag1q"))
 }
+
+func TestValidateAddress(t *testing.T) {
+	addr, _ := GenerateAddress()
+	err := ValidateAddress(addr)
+	require.NoError(t, err)
+
+	err2 := ValidateAddress("ag1qcju8kvwy3zw6t29m7tdewfu4hhfeh6ckskdpclc")
+	require.NoError(t, err2)
+
+	err3 := ValidateAddress("ag1qcju8kvwy3zw6t29m7tdewfu4hhfeh6ckskdpclx")
+	require.Error(t, err3)
+}
