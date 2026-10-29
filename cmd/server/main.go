@@ -130,7 +130,8 @@ func main() {
 	usersService := users.NewService(store)
 	authService := auth.NewService(store, *jwtProcessor)
 	shipsService := ships.NewService(gameConfig, store, *worldGen, *gameData)
-	walletsService := wallets.NewService(store)
+	facilitiesService := facilities.NewService(store, *gameData, *worldGen)
+	walletsService := wallets.NewService(store, facilitiesService)
 	agentsService := agents.NewService(store, *worldGen, shipsService, walletsService)
 	cooldownsService := cooldowns.NewService(gameConfig, store)
 	inventoryService := inventory.NewService(gameConfig, store, *gameData)
@@ -138,13 +139,12 @@ func main() {
 	galaxyService := galaxy.NewService(store, *worldGen)
 	miningService := mining.NewService(gameConfig, store, *worldGen, *gameData)
 	itemsService := items.NewService(gameConfig, store, *gameData)
-	faciltiesService := facilities.NewService(store, *gameData, *worldGen)
-	craftingService := crafting.NewService(gameConfig, store, *gameData, *worldGen, faciltiesService)
+	craftingService := crafting.NewService(gameConfig, store, *gameData, *worldGen, facilitiesService)
 
 	usersHandler := http_handler_users.NewUsersHTTPHandler(*usersService, *authService)
 	apiVersionRouter.AddRoutes(usersHandler.Routes(userAuthMiddleware)...)
 
-	agentsHandler := http_handler_agents.NewAgentsHTTPHandler(*agentsService, *cooldownsService, *miningService, *craftingService, *faciltiesService)
+	agentsHandler := http_handler_agents.NewAgentsHTTPHandler(*agentsService, *cooldownsService, *miningService, *craftingService, *facilitiesService)
 	apiVersionRouter.AddRoutes(agentsHandler.Routes(userAuthMiddleware, agentAuthMiddleware)...)
 
 	shipsHandler := http_handler_ships.NewShipsHTTPHandler(*shipsService)

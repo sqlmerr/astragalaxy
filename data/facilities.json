@@ -43,5 +43,11 @@
             "time_multiplier": 1.0,
             "cost_multiplier": 1.0
         }
+    },
+    {
+        "id": "wallet_terminal",
+        "type": "wallet_terminal",
+        "tier": 1,
+        "modifiers": {}
     }
 ]

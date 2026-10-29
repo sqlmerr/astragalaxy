@@ -56,6 +56,8 @@ const (
 	CodeInvalidWalletAddress         ErrorCode = "INVALID_WALLET_ADDRESS"
 	CodeInsufficientBalance          ErrorCode = "INSUFFICIENT_BALANCE"
 	CodeInvalidPaymentAmount         ErrorCode = "INVALID_PAYMENT_AMOUNT"
+	CodeWalletLimitExceeded          ErrorCode = "WALLET_LIMIT_EXCEEDED"
+	CodeCannotRegisterWallet         ErrorCode = "CANNOT_REGISTER_WALLET"
 )
 
 type WithCode struct {

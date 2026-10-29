@@ -13,15 +13,69 @@ import (
 	"github.com/sqlmerr/astragalaxy/internal/model"
 )
 
+const MaxWallets = 5
+
+type facilityProvider interface {
+	GatherAvailableFacilities(ctx context.Context, agentID uuid.UUID) (map[model.FacilityType][]string, error)
+}
+
 type Service struct {
 	store data.Store
+
+	facilityProvider facilityProvider
 }
 
-func NewService(store data.Store) *Service {
-	return &Service{store}
+func NewService(store data.Store, facilityProvider facilityProvider) *Service {
+	return &Service{store, facilityProvider}
 }
 
-// func (s *Service) RegisterWallet TODO: register new wallets (max: 5) at station (wallet terminal or sum)
+func (s *Service) RegisterWallet(ctx context.Context, agentID uuid.UUID) (model.Wallet, error) {
+	wallets, err := s.store.Wallets().GetWalletsByAgent(ctx, agentID)
+	if err != nil {
+		return model.Wallet{}, fmt.Errorf("get wallets by agent: %w", err)
+	}
+
+	if len(wallets) >= MaxWallets {
+		return model.Wallet{}, errs.NewWithCode(errs.CodeWalletLimitExceeded, fmt.Errorf(
+			"too many wallets (%d). Max: %d: %w",
+			len(wallets), MaxWallets, errs.ErrUnprocessableEntity,
+		))
+	}
+
+	facilities, err := s.facilityProvider.GatherAvailableFacilities(ctx, agentID)
+	if err != nil {
+		return model.Wallet{}, fmt.Errorf("gather available facilities: %w", err)
+	}
+	f, ok := facilities[model.FacilityWalletTerminal]
+	if !ok || len(f) == 0 { // we don't care about wallet_terminal facility tier here
+		return model.Wallet{}, errs.NewWithCode(
+			errs.CodeCannotRegisterWallet,
+			fmt.Errorf("cannot register new wallet: no `%s` facility available: %w", model.FacilityWalletTerminal, errs.ErrUnprocessableEntity),
+		)
+	}
+
+	addr, err := GenerateAddress()
+	if err != nil {
+		return model.Wallet{}, fmt.Errorf("generate address: %w", err)
+	}
+	var wallet model.Wallet
+	err = s.store.ExecTx(ctx, func(tx data.Store) error {
+		wallet, err = tx.Wallets().CreateWallet(ctx, wallets_repository.CreateWallet{
+			Address: addr,
+			Quarks:  0,
+			Units:   0,
+			OwnerID: agentID,
+		})
+		if err != nil {
+			return fmt.Errorf("create wallet: %w", err)
+		}
+		return nil
+	})
+	if err != nil {
+		return model.Wallet{}, err
+	}
+	return wallet, nil
+}
 
 func (s *Service) CreateStarterWallet(ctx context.Context, tx data.Store, agentID uuid.UUID) (model.Wallet, error) {
 	address, err := GenerateAddress()

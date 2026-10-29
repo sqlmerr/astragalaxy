@@ -1,0 +1,19 @@
+post:
+  operationId: registerWallet
+  tags:
+    - Wallets
+  summary: Register Wallet
+  description: Register a new wallet. Agent has to be near `wallet_terminal` facility
+  responses:
+    '201':
+      description: Successfully registered new wallet
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/Wallet.yaml
+    '401':
+      $ref: ../../components/responses/InvalidAgentToken.yaml
+  security:
+    - AgentAuth: []
+    - UserAuth: []
+      AgentId: []

@@ -148,7 +148,7 @@ var (
 		StationChance:                0.8,
 		MaxAsteroids:                 3,
 		PlanetResourcesWorldGenParam: "planet.habitable",
-		StationFacilities:            map[model.FacilityType]int{model.FacilityPrinter: 3, model.FacilitySmelter: 2},
+		StationFacilities:            map[model.FacilityType]int{model.FacilityPrinter: 3, model.FacilitySmelter: 2, model.FacilityWalletTerminal: 1},
 	}
 	ArchetypeDead = SystemArchetype{
 		Name:       "dead",
@@ -197,7 +197,7 @@ var (
 		},
 		MaxAsteroids:                 6,
 		PlanetResourcesWorldGenParam: "planet.frozen",
-		StationFacilities:            map[model.FacilityType]int{model.FacilityPrinter: 2, model.FacilitySmelter: 2},
+		StationFacilities:            map[model.FacilityType]int{model.FacilityPrinter: 2, model.FacilitySmelter: 2, model.FacilityWalletTerminal: 1},
 	}
 
 	Archetypes = []SystemArchetype{

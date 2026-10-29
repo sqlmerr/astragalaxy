@@ -83,6 +83,8 @@ paths:
     $ref: paths/wallets/my.yaml
   /api/v1/wallets/my/{addr}/pay:
     $ref: paths/wallets/pay.yaml
+  /api/v1/wallets:
+    $ref: paths/wallets/register.yaml
 components:
   securitySchemes:
     UserAuth:

@@ -59,6 +59,8 @@ func (f *Facility) UnmarshalJSON(data []byte) error {
 		}
 		f.Modifiers = &m
 
+	case model.FacilityWalletTerminal:
+
 	default:
 		return fmt.Errorf("unknown facility type: %s", f.Type)
 	}

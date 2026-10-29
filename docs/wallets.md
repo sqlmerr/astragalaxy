@@ -36,6 +36,13 @@ $$\text{fee} = (\text{units} \times \text{FeeUnits}) + (\text{quarks} \times \te
 
 > **Balance Requirement**: The sending wallet must have sufficient Units to cover both the outgoing Units amount (if transferring Units) and the total computed fee in Units.
 
+## Creating wallet
+
+By default, a wallet is created when an agent is registered.
+
+To register a wallet (***for free***), you have to be near `wallet_terminal` facility. It can be found at stations. Just send a POST request to /api/v1/wallets
+Agent can have a maximum of 5 wallets.
+
 ## Error Codes
 
 - `INSUFFICIENT_BALANCE`

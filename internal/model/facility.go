@@ -9,14 +9,15 @@ import (
 type FacilityType string
 
 const (
-	FacilityPrinter FacilityType = "printer"
-	FacilitySmelter FacilityType = "smelter"
+	FacilityPrinter        FacilityType = "printer"
+	FacilitySmelter        FacilityType = "smelter"
+	FacilityWalletTerminal FacilityType = "wallet_terminal"
 )
 
 func NewFacilityType(facilityType string) (FacilityType, error) {
 	f := FacilityType(facilityType)
 	switch f {
-	case FacilityPrinter, FacilitySmelter:
+	case FacilityPrinter, FacilitySmelter, FacilityWalletTerminal:
 		return f, nil
 	default:
 		return "", errs.NewWithCode(errs.CodeInvalidFacilityType, fmt.Errorf("invalid facility type %s: %w", facilityType, errs.ErrInvalidArgument))
