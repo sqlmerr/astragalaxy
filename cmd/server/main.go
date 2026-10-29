@@ -26,6 +26,7 @@ import (
 	resource_deposits_repository "github.com/sqlmerr/astragalaxy/internal/data/repository/resource_deposits"
 	ships_repository "github.com/sqlmerr/astragalaxy/internal/data/repository/ships"
 	users_repository "github.com/sqlmerr/astragalaxy/internal/data/repository/users"
+	wallets_repository "github.com/sqlmerr/astragalaxy/internal/data/repository/wallets"
 	"github.com/sqlmerr/astragalaxy/internal/game"
 	"github.com/sqlmerr/astragalaxy/internal/game/agents"
 	"github.com/sqlmerr/astragalaxy/internal/game/cooldowns"
@@ -38,6 +39,7 @@ import (
 	"github.com/sqlmerr/astragalaxy/internal/game/navigation"
 	"github.com/sqlmerr/astragalaxy/internal/game/ships"
 	"github.com/sqlmerr/astragalaxy/internal/game/users"
+	"github.com/sqlmerr/astragalaxy/internal/game/wallets"
 	"github.com/sqlmerr/astragalaxy/internal/game/worldgen"
 	core_logger "github.com/sqlmerr/astragalaxy/internal/logger"
 	http_handler_agents "github.com/sqlmerr/astragalaxy/internal/transport/http/handler/agents"
@@ -47,6 +49,7 @@ import (
 	http_handler_ships "github.com/sqlmerr/astragalaxy/internal/transport/http/handler/ships"
 	http_handler_systems "github.com/sqlmerr/astragalaxy/internal/transport/http/handler/systems"
 	http_handler_users "github.com/sqlmerr/astragalaxy/internal/transport/http/handler/users"
+	http_handler_wallets "github.com/sqlmerr/astragalaxy/internal/transport/http/handler/wallets"
 	http_middleware "github.com/sqlmerr/astragalaxy/internal/transport/http/middleware"
 	http_server "github.com/sqlmerr/astragalaxy/internal/transport/http/server"
 	"go.uber.org/zap"
@@ -104,8 +107,9 @@ func main() {
 	cooldownRepo := cooldowns_repository.NewCooldownRepository(rdb)
 	resourceDepositsRepo := resource_deposits_repository.New(*queries, pool)
 	discoveryRepo := discoveries_repository.New(*queries, pool)
+	walletRepo := wallets_repository.New(*queries, pool)
 
-	store := data.NewStore(pool, userRepo, agentRepo, shipRepo, inventoryRepo, cooldownRepo, resourceDepositsRepo, discoveryRepo)
+	store := data.NewStore(pool, userRepo, agentRepo, shipRepo, inventoryRepo, cooldownRepo, resourceDepositsRepo, discoveryRepo, walletRepo)
 
 	log.Debug("Initializing game logic")
 	authConfig := auth.LoadConfigMust()
@@ -126,7 +130,8 @@ func main() {
 	usersService := users.NewService(store)
 	authService := auth.NewService(store, *jwtProcessor)
 	shipsService := ships.NewService(gameConfig, store, *worldGen, *gameData)
-	agentsService := agents.NewService(store, *worldGen, shipsService)
+	walletsService := wallets.NewService(store)
+	agentsService := agents.NewService(store, *worldGen, shipsService, walletsService)
 	cooldownsService := cooldowns.NewService(gameConfig, store)
 	inventoryService := inventory.NewService(gameConfig, store, *gameData)
 	navigationService := navigation.NewService(gameConfig, store, *worldGen, *gameData)
@@ -156,6 +161,9 @@ func main() {
 
 	dataHandler := http_handler_data.New(*gameData)
 	apiVersionRouter.AddRoutes(dataHandler.Routes()...)
+
+	walletsHandler := http_handler_wallets.New(*walletsService)
+	apiVersionRouter.AddRoutes(walletsHandler.Routes(agentAuthMiddleware)...)
 
 	httpConfig := http_server.LoadConfigMust()
 	mux := http.NewServeMux()

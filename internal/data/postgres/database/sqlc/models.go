@@ -263,3 +263,11 @@ type User struct {
 	Password  string
 	CreatedAt pgtype.Timestamp
 }
+
+type Wallet struct {
+	Address   string
+	Units     int64
+	Quarks    int64
+	OwnerID   uuid.UUID
+	CreatedAt pgtype.Timestamp
+}

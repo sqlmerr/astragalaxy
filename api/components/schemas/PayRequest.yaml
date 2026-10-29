@@ -1,0 +1,16 @@
+type: object
+required:
+  - to
+properties: 
+  to:
+    allOf:
+      - $ref: WalletAddress.yaml
+    description: Receiver wallet address
+  units:
+    type: integer
+    minimum: 0
+    description: Amount of units you want to pay
+  quarks:
+    type: integer
+    minimum: 0
+    description: Amount of quarks you want to pay

@@ -1,0 +1,4 @@
+type: string
+description: Wallet address
+example: ag1q9z9pc0gze9zeqr5ek97dcweyd7vyk5xuqrylrtg
+default: ""

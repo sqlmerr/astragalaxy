@@ -1,0 +1,23 @@
+type: object
+required:
+  - address
+  - units
+  - quarks
+  - owner_id
+  - created_at
+properties: 
+  address:
+    $ref: WalletAddress.yaml
+  units:
+    type: integer
+    description: Amount of units
+  quarks:
+    type: integer
+    description: Amount of quarks
+  owner_id:
+    type: string
+    format: uuid
+    description: Agent ID
+  created_at:
+    type: string
+    format: date-time

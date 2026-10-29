@@ -1,0 +1,8 @@
+CREATE TABLE IF NOT EXISTS wallets (
+    address VARCHAR(255) PRIMARY KEY,
+    units BIGINT NOT NULL DEFAULT 0,
+    quarks BIGINT NOT NULL DEFAULT 0,
+
+    owner_id UUID NOT NULL REFERENCES agents(id),
+    created_at TIMESTAMP NOT NULL DEFAULT NOW()
+)

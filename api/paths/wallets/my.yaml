@@ -1,0 +1,25 @@
+get:
+  operationId: getMyWallets
+  summary: Get My Wallets
+  tags:
+    - Wallets
+  responses:
+    '200':
+      description: Successfully got agent's wallets
+      content: 
+        application/json:
+          schema:
+            type: object
+            required:
+              - data
+            properties: 
+              data:
+                type: array
+                items: 
+                  $ref: ../../components/schemas/Wallet.yaml
+    '401':
+      $ref: ../../components/responses/InvalidAgentToken.yaml
+  security:
+    - AgentAuth: []
+    - UserAuth: []
+      AgentId: []

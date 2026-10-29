@@ -52,6 +52,10 @@ const (
 	CodeMiningLimitExceeded          ErrorCode = "MINING_LIMIT_EXCEEDED"
 	CodePlanetDiscoveryNotFound      ErrorCode = "PLANET_DISCOVERY_NOT_FOUND"
 	CodeSystemDiscoveryNotFound      ErrorCode = "SYSTEM_DISCOVERY_NOT_FOUND"
+	CodeWalletNotFound               ErrorCode = "WALLET_NOT_FOUND"
+	CodeInvalidWalletAddress         ErrorCode = "INVALID_WALLET_ADDRESS"
+	CodeInsufficientBalance          ErrorCode = "INSUFFICIENT_BALANCE"
+	CodeInvalidPaymentAmount         ErrorCode = "INVALID_PAYMENT_AMOUNT"
 )
 
 type WithCode struct {

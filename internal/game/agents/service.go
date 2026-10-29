@@ -21,16 +21,21 @@ type shipProvider interface {
 	CreateStarterShip(ctx context.Context, tx data.Store, agentID uuid.UUID) (model.Ship, error)
 }
 
+type walletProvider interface {
+	CreateStarterWallet(ctx context.Context, tx data.Store, agentID uuid.UUID) (model.Wallet, error)
+}
+
 type Service struct {
 	store    data.Store
 	worldGen worldgen.WorldGen
 
-	shipProvider shipProvider
+	shipProvider   shipProvider
+	walletProvider walletProvider
 }
 
-func NewService(store data.Store, worldGen worldgen.WorldGen, shipProvider shipProvider) *Service {
+func NewService(store data.Store, worldGen worldgen.WorldGen, shipProvider shipProvider, walletProvider walletProvider) *Service {
 	return &Service{
-		store, worldGen, shipProvider,
+		store, worldGen, shipProvider, walletProvider,
 	}
 }
 
@@ -116,25 +121,31 @@ func (s *Service) RegisterAgent(ctx context.Context, userID uuid.UUID, username 
 			log.Debug("created agent", zap.String("agent_id", agent.ID.String()))
 		}
 
-		s, err := s.shipProvider.CreateStarterShip(ctx, tx, agent.ID)
+		ship, err := s.shipProvider.CreateStarterShip(ctx, tx, agent.ID)
 		if err != nil {
 			return err
 		}
 
-		isSystemDiscovered, err := tx.Discoveries().IsSystemDiscovered(ctx, s.Coords.SystemX, s.Coords.SystemY)
+		isSystemDiscovered, err := tx.Discoveries().IsSystemDiscovered(ctx, ship.Coords.SystemX, ship.Coords.SystemY)
 		if err != nil {
 			return fmt.Errorf("get is system discovered: %w", err)
 		}
 		if !isSystemDiscovered {
 			_, err = tx.Discoveries().CreateSystemDiscovery(ctx, discoveries_repository.CreateSystemDiscovery{
-				SystemX:      s.Coords.SystemX,
-				SystemY:      s.Coords.SystemY,
+				SystemX:      ship.Coords.SystemX,
+				SystemY:      ship.Coords.SystemY,
 				DiscoveredBy: agent.ID,
 			})
 			if err != nil {
 				return fmt.Errorf("create system discovery: %w", err)
 			}
 		}
+
+		_, err = s.walletProvider.CreateStarterWallet(ctx, tx, agent.ID)
+		if err != nil {
+			return err
+		}
+
 		return nil
 	})
 

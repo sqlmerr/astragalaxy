@@ -15,6 +15,7 @@ import (
 	resource_deposits_repository "github.com/sqlmerr/astragalaxy/internal/data/repository/resource_deposits"
 	ships_repository "github.com/sqlmerr/astragalaxy/internal/data/repository/ships"
 	users_repository "github.com/sqlmerr/astragalaxy/internal/data/repository/users"
+	wallets_repository "github.com/sqlmerr/astragalaxy/internal/data/repository/wallets"
 )
 
 type Store interface {
@@ -25,6 +26,7 @@ type Store interface {
 	Cooldowns() cooldowns_repository.CooldownRepository
 	ResourceDeposits() resource_deposits_repository.ResourceDepositsRepository
 	Discoveries() discoveries_repository.DiscoveryRepository
+	Wallets() wallets_repository.WalletRepository
 
 	ExecTx(ctx context.Context, fn func(tx Store) error) error
 }
@@ -39,6 +41,7 @@ type Storage struct {
 	cooldowns        cooldowns_repository.CooldownRepository
 	resourceDeposits resource_deposits_repository.ResourceDepositsRepository
 	discoveries      discoveries_repository.DiscoveryRepository
+	wallets          wallets_repository.WalletRepository
 }
 
 func NewStore(
@@ -50,6 +53,7 @@ func NewStore(
 	cooldowns cooldowns_repository.CooldownRepository,
 	resourceDeposits resource_deposits_repository.ResourceDepositsRepository,
 	discoveries discoveries_repository.DiscoveryRepository,
+	wallets wallets_repository.WalletRepository,
 ) *Storage {
 	return &Storage{
 		pool:             pool,
@@ -60,6 +64,7 @@ func NewStore(
 		cooldowns:        cooldowns,
 		resourceDeposits: resourceDeposits,
 		discoveries:      discoveries,
+		wallets:          wallets,
 	}
 }
 
@@ -91,6 +96,10 @@ func (s *Storage) Discoveries() discoveries_repository.DiscoveryRepository {
 	return s.discoveries
 }
 
+func (s *Storage) Wallets() wallets_repository.WalletRepository {
+	return s.wallets
+}
+
 func (s *Storage) ExecTx(ctx context.Context, fn func(tx Store) error) error {
 	tx, err := s.pool.Begin(ctx)
 	if err != nil {
@@ -109,6 +118,7 @@ func (s *Storage) ExecTx(ctx context.Context, fn func(tx Store) error) error {
 		cooldowns:        s.cooldowns,
 		resourceDeposits: resource_deposits_repository.New(*q, tx),
 		discoveries:      discoveries_repository.New(*q, tx),
+		wallets:          wallets_repository.New(*q, tx),
 	}
 
 	err = fn(txStorage)

@@ -685,6 +685,40 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/wallets/my": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get My Wallets */
+        get: operations["getMyWallets"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/wallets/my/{addr}/pay": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Pay */
+        post: operations["pay"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -1127,6 +1161,35 @@ export interface components {
         TrashResponse: {
             cooldown: components["schemas"]["Cooldown"];
         };
+        /**
+         * @description Wallet address
+         * @default
+         * @example ag1q9z9pc0gze9zeqr5ek97dcweyd7vyk5xuqrylrtg
+         */
+        WalletAddress: string;
+        Wallet: {
+            address: components["schemas"]["WalletAddress"];
+            /** @description Amount of units */
+            units: number;
+            /** @description Amount of quarks */
+            quarks: number;
+            /**
+             * Format: uuid
+             * @description Agent ID
+             */
+            owner_id: string;
+            /** Format: date-time */
+            created_at: string;
+        };
+        PayRequest: {
+            /** @description Receiver wallet address */
+            to: components["schemas"]["WalletAddress"];
+            /** @description Amount of units you want to pay */
+            units?: number;
+            /** @description Amount of quarks you want to pay */
+            quarks?: number;
+        };
+        PayResponse: Record<string, never>;
     };
     responses: {
         /** @description Decode json error */
@@ -2149,6 +2212,58 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["TrashResponse"];
+                };
+            };
+            401: components["responses"]["InvalidAgentToken"];
+            403: components["responses"]["AccessDenied"];
+        };
+    };
+    getMyWallets: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successfully got agent's wallets */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["Wallet"][];
+                    };
+                };
+            };
+            401: components["responses"]["InvalidAgentToken"];
+        };
+    };
+    pay: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Your wallet address */
+                addr: components["schemas"]["WalletAddress"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PayRequest"];
+            };
+        };
+        responses: {
+            /** @description Successfully paid */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PayResponse"];
                 };
             };
             401: components["responses"]["InvalidAgentToken"];

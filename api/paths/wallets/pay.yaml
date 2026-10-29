@@ -1,0 +1,34 @@
+post:
+  operationId: pay
+  tags:
+    - Wallets
+    - Actions
+  summary: Pay
+  parameters:
+    - name: addr
+      in: path
+      description: Your wallet address
+      schema:
+        $ref: ../../components/schemas/WalletAddress.yaml
+      required: true
+  requestBody:
+    required: true
+    content: 
+      application/json:
+        schema:
+          $ref: ../../components/schemas/PayRequest.yaml
+  responses:
+    '200':
+      description: Successfully paid
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/PayResponse.yaml
+    '401':
+      $ref: ../../components/responses/InvalidAgentToken.yaml
+    '403':
+      $ref: ../../components/responses/AccessDenied.yaml
+  security:
+    - AgentAuth: []
+    - UserAuth: []
+      AgentId: []

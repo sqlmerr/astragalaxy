@@ -14,7 +14,7 @@ import (
 )
 
 type TrashRequest struct {
-	InventoryID uuid.UUID      `json:"inventory_id"`
+	InventoryID uuid.UUID      `json:"inventory_id" validate:"required"`
 	Items       []uuid.UUID    `json:"items"`
 	Resources   map[string]int `json:"resources"`
 }

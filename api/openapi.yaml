@@ -79,6 +79,10 @@ paths:
     $ref: paths/data/ship-classes.yaml
   /api/v1/inventories/my/trash:
     $ref: paths/inventories/trash.yaml
+  /api/v1/wallets/my:
+    $ref: paths/wallets/my.yaml
+  /api/v1/wallets/my/{addr}/pay:
+    $ref: paths/wallets/pay.yaml
 components:
   securitySchemes:
     UserAuth:
