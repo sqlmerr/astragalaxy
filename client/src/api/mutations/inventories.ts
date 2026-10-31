@@ -26,11 +26,12 @@ export async function transferItems(
   if (error) throw error
 }
 
-export async function useItem(agentId: string, itemId: string) {
+export async function useItem(agentId: string, itemId: string, input: any) {
   const { data, error } = await api.POST(
     "/api/v1/inventories/my/items/{id}/use",
     {
       params: { path: { id: itemId } },
+      body: { input: input },
       headers: getAuthHeaders(agentId),
     }
   )

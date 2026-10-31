@@ -6,7 +6,7 @@ type ErrorCode string
 
 const (
 	CodeInternalServerError          ErrorCode = "INTERNAL_SERVER_ERROR"
-	CodeAnomaly                      ErrorCode = "ANOMALY" // something unexpected happened in game
+	CodeAnomaly                      ErrorCode = "ANOMALY" // something unexpected happened in the game
 	CodeUnknown                      ErrorCode = "UNKNOWN"
 	CodeDecodeError                  ErrorCode = "DECODE_ERROR"
 	CodeValidationError              ErrorCode = "VALIDATION_ERROR"

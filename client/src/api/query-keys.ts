@@ -31,4 +31,7 @@ export const queryKeys = {
     facilities: ["data", "facilities"] as const,
     shipClasses: ["data", "ship-classes"] as const,
   },
+  wallets: {
+    my: (agentId: string) => ["wallets", "my", agentId] as const,
+  },
 } as const

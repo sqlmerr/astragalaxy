@@ -26,6 +26,9 @@ import { queryKeys } from "@/api/query-keys"
 import { toast } from "@/components/ui/toast"
 import { InventoryModal } from "../inventory/inventory-modal"
 import { Button } from "@/components/ui/button"
+import { useMyWalletsQuery } from "@/api/hooks/use-wallets-query"
+import { WalletCard } from "../wallets/wallet-card"
+import { WalletModal } from "../wallets/wallet-modal"
 
 interface AgentModalProps {
   agent: AgentExtended | null
@@ -84,6 +87,9 @@ export function AgentModal({ agent, setAgent }: AgentModalProps) {
   }
 
   const [selectedShipId, setSelectedShipId] = useState<string | null>(null)
+  const [selectedWalletAddr, setSelectedWalletAddr] = useState<string | null>(
+    null
+  )
   const [invModalOpen, setInvModalOpen] = useState(false)
 
   const {
@@ -92,9 +98,24 @@ export function AgentModal({ agent, setAgent }: AgentModalProps) {
     isError: isInventoryError,
   } = useMyInventoryQuery(agent ? agent.agent.id : "", agent !== null)
 
-  const selectedShip = agent?.ships.find((s) => s.id === selectedShipId) ?? null
+  const {
+    data: wallets,
+    isPending: isWalletsPending,
+    isError: isWalletsError,
+  } = useMyWalletsQuery(agent ? agent.agent.id : "", agent !== null)
 
-  if (!inventory || isInventoryPending || isInventoryError) {
+  const selectedShip = agent?.ships.find((s) => s.id === selectedShipId) ?? null
+  const selectedWallet =
+    wallets?.data.find((s) => s.address === selectedWalletAddr) ?? null
+
+  if (
+    !inventory ||
+    isInventoryPending ||
+    isInventoryError ||
+    !wallets ||
+    isWalletsError ||
+    isWalletsPending
+  ) {
     return null
   }
 
@@ -193,6 +214,17 @@ export function AgentModal({ agent, setAgent }: AgentModalProps) {
                 ))}
               </Card>
 
+              <Card className="p-4">
+                <h3 className="mb-3 font-semibold">Wallets</h3>
+                {wallets.data.map((w) => (
+                  <WalletCard
+                    key={w.address}
+                    wallet={w}
+                    onOpen={() => setSelectedWalletAddr(w.address)}
+                  />
+                ))}
+              </Card>
+
               <Accordion>
                 <AccordionItem value="json">
                   <AccordionTrigger>JSON</AccordionTrigger>
@@ -212,6 +244,10 @@ export function AgentModal({ agent, setAgent }: AgentModalProps) {
         inventory={invModalOpen ? inventory : null}
         onClose={() => setInvModalOpen(false)}
         agentId={agent?.agent.id || ""}
+      />
+      <WalletModal
+        wallet={selectedWallet}
+        onClose={() => setSelectedWalletAddr(null)}
       />
     </>
   )

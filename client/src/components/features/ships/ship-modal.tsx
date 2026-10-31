@@ -24,7 +24,6 @@ import { useQueryClient } from "@tanstack/react-query"
 import { Check, Pencil, X } from "lucide-react"
 import { useEffect, useState } from "react"
 import { InventoryModal } from "../inventory/inventory-modal"
-import { useShipModulesQuery } from "@/api/hooks/use-ships-query"
 
 interface ShipModalProps {
   ship: SchemaShip | null

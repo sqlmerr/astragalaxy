@@ -49,6 +49,7 @@ export type SchemaItemData = components["schemas"]["ItemData"]
 export type SchemaResourceData = components["schemas"]["ResourceData"]
 export type SchemaFacilityData = components["schemas"]["FacilityData"]
 export type SchemaShipClassData = components["schemas"]["ShipClassData"]
+export type SchemaWallet = components["schemas"]["Wallet"]
 
 export interface AgentExtended {
   agent: SchemaAgent

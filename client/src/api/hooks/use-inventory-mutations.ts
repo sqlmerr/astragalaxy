@@ -36,7 +36,14 @@ export function useTransferItemsMutation() {
 
 export function useUseItemMutation() {
   return useMutation({
-    mutationFn: ({ agentId, itemId }: { agentId: string; itemId: string }) =>
-      useItem(agentId, itemId),
+    mutationFn: ({
+      agentId,
+      itemId,
+      input,
+    }: {
+      agentId: string
+      itemId: string
+      input: any
+    }) => useItem(agentId, itemId, input),
   })
 }
