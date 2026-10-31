@@ -12,6 +12,11 @@ post:
         type: string
         format: uuid
       required: true
+  requestBody:
+    content:
+      application/json:
+        schema:
+          $ref: ../../components/schemas/UseItemRequest.yaml
   responses:
     '200':
       description: Successfully used item

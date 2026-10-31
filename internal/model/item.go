@@ -13,6 +13,7 @@ const (
 	ItemPortableSmelter ItemType = "portable_smelter"
 	ItemPortablePrinter ItemType = "portable_printer"
 	ItemLaserDrill      ItemType = "laser_drill"
+	ItemContract        ItemType = "contract"
 )
 
 type Item struct {

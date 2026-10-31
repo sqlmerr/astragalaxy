@@ -56,8 +56,9 @@ gen-db:
 run-server:
     @go mod tidy && go run ./cmd/server/main.go
 
+[positional-arguments]
 admincli *ARGS:
-    @go mod tidy && go run ./cmd/admincli/main.go {{ ARGS }}
+    @go mod tidy && go run ./cmd/admincli/main.go "$@"
 
 test:
     @go test -v ./internal/game/...

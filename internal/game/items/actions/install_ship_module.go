@@ -1,6 +1,7 @@
 package item_actions
 
 import (
+	"encoding/json"
 	"fmt"
 	"slices"
 	"time"
@@ -13,7 +14,7 @@ import (
 
 // InstallShipModule equips item as ship module to agents active ship
 func InstallShipModule(shipModuleType model.ShipModuleType) ItemAction {
-	return func(ctx ActionContext, agentID uuid.UUID, item model.Item) (ActionResponse, error) {
+	return func(ctx ActionContext, agentID uuid.UUID, item model.Item, _ json.RawMessage) (ActionResponse, error) {
 		ship, err := ctx.Store.Ships().GetActiveShipByAgent(ctx.Context, agentID)
 		if err != nil {
 			return nil, fmt.Errorf("get agent active ship: %w", err)

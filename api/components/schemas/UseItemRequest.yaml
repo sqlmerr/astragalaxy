@@ -1,0 +1,5 @@
+type: object
+properties: 
+  input:
+    description: ANYTHING that item action accepts. Must be in json format. Can be empty
+    example: {"address": "ag1q9z9pc0gze9zeqr5ek97dcweyd7vyk5xuqrylrtg"}

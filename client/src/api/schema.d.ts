@@ -1046,6 +1046,15 @@ export interface components {
             /** @description Resource type to time */
             resource: string;
         };
+        UseItemRequest: {
+            /**
+             * @description ANYTHING that item action accepts. Must be in json format. Can be empty
+             * @example {
+             *       "address": "ag1q9z9pc0gze9zeqr5ek97dcweyd7vyk5xuqrylrtg"
+             *     }
+             */
+            input?: unknown;
+        };
         UseItemResponse: {
             /** Format: any */
             data: string;
@@ -1974,7 +1983,11 @@ export interface operations {
             };
             cookie?: never;
         };
-        requestBody?: never;
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["UseItemRequest"];
+            };
+        };
         responses: {
             /** @description Successfully used item */
             200: {

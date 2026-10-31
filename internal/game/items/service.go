@@ -26,7 +26,7 @@ func NewService(gameConfig game.Config, store data.Store, gameData registry.Game
 	return &Service{gameConfig, store, gameData}
 }
 
-func (s *Service) UseItem(ctx context.Context, agentID uuid.UUID, itemID uuid.UUID) (json.RawMessage, model.Cooldown, error) {
+func (s *Service) UseItem(ctx context.Context, agentID uuid.UUID, itemID uuid.UUID, input json.RawMessage) (json.RawMessage, model.Cooldown, error) {
 	item, err := s.store.Inventories().GetItem(ctx, itemID)
 	if err != nil {
 		return nil, model.Cooldown{}, fmt.Errorf("get item: %w", err)
@@ -70,7 +70,7 @@ func (s *Service) UseItem(ctx context.Context, agentID uuid.UUID, itemID uuid.UU
 			Store:    tx,
 			GameData: s.gameData,
 		}
-		res, err = action(context, agentID, item)
+		res, err = action(context, agentID, item, input)
 		if err != nil {
 			return err
 		}

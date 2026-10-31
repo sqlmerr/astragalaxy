@@ -29,9 +29,11 @@ func newOkResponse(cooldownDuration time.Duration) okActionResponse {
 	return okActionResponse{cooldownDuration: cooldownDuration}
 }
 
-type ItemAction func(ctx ActionContext, agentID uuid.UUID, item model.Item) (ActionResponse, error)
+type ItemAction func(ctx ActionContext, agentID uuid.UUID, item model.Item, input json.RawMessage) (ActionResponse, error)
 
 var Actions = map[model.ItemType]ItemAction{
 	model.ItemPortableSmelter: InstallShipModule(model.ShipModulePortableSmelter),
 	model.ItemPortablePrinter: InstallShipModule(model.ShipModulePortablePrinter),
+	model.ItemLaserDrill:      InstallShipModule(model.ShipModuleLaserDrill),
+	model.ItemContract:        UseContract,
 }
