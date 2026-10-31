@@ -1218,7 +1218,11 @@ export interface components {
             /** @description Amount of quarks you want to pay */
             quarks?: number;
         };
-        PayResponse: Record<string, never>;
+        PayResponse: {
+            /** @description Fee in units */
+            fee: number;
+            cooldown: components["schemas"]["Cooldown"];
+        };
     };
     responses: {
         /** @description Decode json error */

@@ -102,7 +102,7 @@ export function CraftActionDialog({
           <DialogTitle>Craft Action Request</DialogTitle>
         </DialogHeader>
         <form className="space-y-4" onSubmit={craft}>
-          <Label className="grid gap-2 text-sm font-medium" htmlFor="amount">
+          <Label className="grid gap-2 text-sm font-medium" htmlFor="recipe">
             Recipe
             <Select
               items={recipeSelectItems}
