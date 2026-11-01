@@ -2,7 +2,7 @@ import type { SchemaWaypoint, SystemExtended, AgentExtended } from "@/api/types"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
-import { ArrowRight, Pickaxe, X } from "lucide-react"
+import { ArrowRight, Pickaxe, Wallet, X } from "lucide-react"
 import { Separator } from "@/components/ui/separator"
 import { WAYPOINT_PARAMS } from "../constants"
 import { AgentCard } from "../../agents/agent-card"
@@ -16,6 +16,7 @@ interface WaypointPanelProps {
   onClose: () => void
   onNavigate: (w: SchemaWaypoint) => void
   onAsteroidMine: () => void
+  onWalletRegister: () => void
 }
 
 export function WaypointPanel({
@@ -25,6 +26,7 @@ export function WaypointPanel({
   onClose,
   onNavigate,
   onAsteroidMine,
+  onWalletRegister,
 }: WaypointPanelProps) {
   const thisWaypointAgents = system.agents.filter(
     (a) => a.ship.location === "waypoint" && a.ship.location_id === waypoint.id
@@ -115,6 +117,19 @@ export function WaypointPanel({
                   >
                     <Pickaxe className="mr-2 size-4" />
                     Mine
+                  </Button>
+                ) : waypoint.type === "station" &&
+                  waypoint.station &&
+                  waypoint.station.facilities.find(
+                    (v) => v === "wallet_terminal"
+                  ) !== undefined ? (
+                  <Button
+                    className="justify-start"
+                    variant="secondary"
+                    onClick={onWalletRegister}
+                  >
+                    <Wallet className="mr-2 size-4" />
+                    Register wallet
                   </Button>
                 ) : null}
               </>

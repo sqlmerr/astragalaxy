@@ -1,6 +1,6 @@
 import { useMutation } from "@tanstack/react-query"
 import type { SchemaPayRequest } from "../types"
-import { pay } from "../mutations/wallets"
+import { pay, registerWallet } from "../mutations/wallets"
 
 export function usePayMutation() {
   return useMutation({
@@ -13,5 +13,11 @@ export function usePayMutation() {
       address: string
       body: SchemaPayRequest
     }) => pay(agentId, address, body),
+  })
+}
+
+export function useRegisterWalletMutation() {
+  return useMutation({
+    mutationFn: ({ agentId }: { agentId: string }) => registerWallet(agentId),
   })
 }

@@ -17,14 +17,14 @@ export const api = createClient<paths>({
   },
 })
 
-export function getAuthHeaders(agentID?: string): Record<string, string> {
+export function getAuthHeaders(agentId?: string): Record<string, string> {
   const token = getAuthToken()
   if (!token) return {}
   const headers = { Authorization: `Bearer ${token}` }
-  if (agentID) {
+  if (agentId) {
     return {
       ...headers,
-      "X-Agent-ID": agentID,
+      "X-Agent-ID": agentId,
     }
   }
   return headers

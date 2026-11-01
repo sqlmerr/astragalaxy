@@ -178,7 +178,7 @@ export function PayActionDialog({
           toast.add({
             type: "success",
             title: "Success",
-            description: `Successfully payed to ${toAddress}`,
+            description: `Successfully paid to ${toAddress}`,
           })
           setUnits(0)
           setQuarks(0)

@@ -18,3 +18,12 @@ export async function pay(
   if (error) throw error
   return data
 }
+
+export async function registerWallet(agentId: string) {
+  const { data, error } = await api.POST("/api/v1/wallets", {
+    headers: getAuthHeaders(agentId),
+  })
+
+  if (error) throw error
+  return data
+}

@@ -1,10 +1,11 @@
-import {
-  isSystemExtended
-  
-  
-  
+import { isSystemExtended } from "@/api/types"
+import type {
+  AnySystemExtended,
+  SchemaPlanet,
+  SchemaWaypoint,
+  AgentExtended,
+  SchemaResourceDeposit,
 } from "@/api/types"
-import type {AnySystemExtended, SchemaPlanet, SchemaWaypoint, AgentExtended, SchemaResourceDeposit } from "@/api/types";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area"
 import { SystemPanel } from "./system-panel"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
@@ -12,8 +13,9 @@ import { PlanetPanel } from "./planet-panel"
 import { WaypointPanel } from "./waypoint-panel"
 import { WAYPOINT_PARAMS } from "../constants"
 import { AsteroidMineDialog } from "./asteroid-mine-dialog"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { PlanetMineDialog } from "./planet-mine-dialog"
+import { RegisterWalletDialog } from "../../wallets/register-wallet-dialog"
 
 interface PanelProps {
   system: AnySystemExtended | null
@@ -50,9 +52,20 @@ export function Panel({
   const [isAsteroidMineDialogOpened, setIsAsteroidMineDialogOpened] =
     useState(false)
 
+  const [isWalletRegisterDialogOpened, setIsWalletRegisterDialogOpened] =
+    useState(false)
+
   const [planetMineDialogDeposits, setPlanetMineDialogDeposits] = useState<
     SchemaResourceDeposit[] | null
   >(null)
+
+  useEffect(() => {
+    if (!system) {
+      setIsAsteroidMineDialogOpened(false)
+      setIsWalletRegisterDialogOpened(false)
+      setPlanetMineDialogDeposits(null)
+    }
+  }, [system])
 
   return (
     <>
@@ -151,6 +164,9 @@ export function Panel({
                     onClose={onClose}
                     onNavigate={onWaypointNavigate}
                     onAsteroidMine={() => setIsAsteroidMineDialogOpened(true)}
+                    onWalletRegister={() => {
+                      setIsWalletRegisterDialogOpened(true)
+                    }}
                   />
                 </TabsContent>
               ))}
@@ -167,6 +183,11 @@ export function Panel({
               agentId={currentAgent.agent.id}
               onClose={() => setPlanetMineDialogDeposits(null)}
               deposits={planetMineDialogDeposits}
+            />
+            <RegisterWalletDialog
+              agentId={currentAgent.agent.id}
+              open={isWalletRegisterDialogOpened}
+              onClose={() => setIsWalletRegisterDialogOpened(false)}
             />
           </>
         )}
