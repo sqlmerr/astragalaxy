@@ -892,10 +892,13 @@ export interface components {
             /** @description Item type */
             item_type: string;
             /**
-             * Format: json
-             * @example {"durability": 42, "name": "Hello World"}
+             * @description JSON
+             * @example {
+             *       "durability": 42,
+             *       "name": "Hello World"
+             *     }
              */
-            metadata: string;
+            metadata: unknown;
             /** Format: date-time */
             created_at: string;
         };
@@ -1025,9 +1028,35 @@ export interface components {
                 facilities: string[];
             } | null;
         };
+        DynamicWaypoint: {
+            /** Format: uuid */
+            id: string;
+            /** @description System X coord */
+            system_x: number;
+            /** @description System Y coord */
+            system_y: number;
+            /**
+             * Format: uuid
+             * @description Agent ID
+             */
+            owner_id: string;
+            /**
+             * @description waypoint type
+             * @example cartography_beacon
+             */
+            type: string;
+            /**
+             * @description JSON
+             * @example {}
+             */
+            metadata: unknown;
+            /** Format: date-time */
+            created_at: string;
+        };
         System: components["schemas"]["ShortSystem"] & {
             planets: components["schemas"]["Planet"][];
             waypoints: components["schemas"]["Waypoint"][];
+            dynamic_waypoints: components["schemas"]["DynamicWaypoint"][];
             /**
              * Format: uuid
              * @description Agent ID that discovered this system

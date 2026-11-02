@@ -121,5 +121,64 @@
                 "amount": 1
             }
         ]
+    },
+    {
+        "id": "laser_drill",
+        "required_facility": "printer",
+        "min_tier": 2,
+        "duration": 30,
+        "inputs": [
+            {
+                "resource_id": "steel",
+                "amount": 10
+            },
+            {
+                "resource_id": "copper",
+                "amount": 40
+            },
+            {
+                "resource_id": "crystal",
+                "amount": 25
+            }
+        ],
+        "outputs": [
+            {
+                "type": "item",
+                "id": "laser_drill",
+                "amount": 1
+            }
+        ]
+    },
+    {
+        "id": "cartography_beacon_kit",
+        "required_facility": "printer",
+        "min_tier": 3,
+        "duration": 60,
+        "inputs": [
+            {
+                "resource_id": "steel",
+                "amount": 25
+            },
+            {
+                "resource_id": "crystal",
+                "amount": 30
+            },
+            {
+                "resource_id": "silicon",
+                "amount": 30
+            },
+            {
+                "resource_id": "titanium",
+                "amount": 40
+            },
+            {
+                "resource_id": "iridium",
+                "amount": 10
+            },
+            {
+                "resource_id": "copper",
+                "amount": 35
+            }
+        ]
     }
 ]

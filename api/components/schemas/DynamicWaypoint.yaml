@@ -1,0 +1,33 @@
+type: object
+required:
+  - id
+  - system_x
+  - system_y
+  - owner_id
+  - type
+  - metadata
+  - created_at
+properties: 
+  id: 
+    type: string
+    format: uuid
+  system_x:
+    type: integer
+    description: System X coord
+  system_y:
+    type: integer
+    description: System Y coord
+  owner_id:
+    type: string
+    format: uuid
+    description: Agent ID
+  type:
+    type: string
+    description: waypoint type # TODO(docs)
+    example: cartography_beacon
+  metadata:
+    description: JSON
+    example: {}
+  created_at:
+    type: string
+    format: date-time

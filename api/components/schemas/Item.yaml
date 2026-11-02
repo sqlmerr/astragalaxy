@@ -16,9 +16,8 @@ properties:
     type: string
     description: Item type # TODO(docs): link to documentation with item types
   metadata:
-    type: string
-    format: json
-    example: '{"durability": 42, "name": "Hello World"}'
+    description: JSON
+    example: {"durability": 42, "name": "Hello World"}
   created_at:
     type: string
     format: date-time

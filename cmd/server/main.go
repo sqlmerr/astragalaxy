@@ -22,6 +22,7 @@ import (
 	agents_repository "github.com/sqlmerr/astragalaxy/internal/data/repository/agents"
 	cooldowns_repository "github.com/sqlmerr/astragalaxy/internal/data/repository/cooldowns"
 	discoveries_repository "github.com/sqlmerr/astragalaxy/internal/data/repository/discoveries"
+	dynamic_waypoints_repository "github.com/sqlmerr/astragalaxy/internal/data/repository/dynamic_waypoints"
 	inventories_repository "github.com/sqlmerr/astragalaxy/internal/data/repository/inventories"
 	resource_deposits_repository "github.com/sqlmerr/astragalaxy/internal/data/repository/resource_deposits"
 	ships_repository "github.com/sqlmerr/astragalaxy/internal/data/repository/ships"
@@ -108,8 +109,9 @@ func main() {
 	resourceDepositsRepo := resource_deposits_repository.New(*queries, pool)
 	discoveryRepo := discoveries_repository.New(*queries, pool)
 	walletRepo := wallets_repository.New(*queries, pool)
+	dynamicWaypointsRepo := dynamic_waypoints_repository.New(*queries, pool)
 
-	store := data.NewStore(pool, userRepo, agentRepo, shipRepo, inventoryRepo, cooldownRepo, resourceDepositsRepo, discoveryRepo, walletRepo)
+	store := data.NewStore(pool, userRepo, agentRepo, shipRepo, inventoryRepo, cooldownRepo, resourceDepositsRepo, discoveryRepo, walletRepo, dynamicWaypointsRepo)
 
 	log.Debug("Initializing game logic")
 	authConfig := auth.LoadConfigMust()

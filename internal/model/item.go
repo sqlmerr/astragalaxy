@@ -10,10 +10,11 @@ import (
 type ItemType string
 
 const (
-	ItemPortableSmelter ItemType = "portable_smelter"
-	ItemPortablePrinter ItemType = "portable_printer"
-	ItemLaserDrill      ItemType = "laser_drill"
-	ItemContract        ItemType = "contract"
+	ItemPortableSmelter      ItemType = "portable_smelter"
+	ItemPortablePrinter      ItemType = "portable_printer"
+	ItemLaserDrill           ItemType = "laser_drill"
+	ItemContract             ItemType = "contract"
+	ItemCartographyBeaconKit ItemType = "cartography_beacon_kit"
 )
 
 type Item struct {

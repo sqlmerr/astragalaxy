@@ -4,6 +4,7 @@ allOf:
     required:
       - planets
       - waypoints
+      - dynamic_waypoints
       - discovered_by
       - discovered_at
     properties:
@@ -15,6 +16,10 @@ allOf:
         type: array
         items:
           $ref: "./Waypoint.yaml"
+      dynamic_waypoints:
+        type: array
+        items:
+          $ref: DynamicWaypoint.yaml
       discovered_by:
         type: string
         format: uuid

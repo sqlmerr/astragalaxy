@@ -116,14 +116,20 @@ func (s *Service) GetCurrentAgentSystem(ctx context.Context, agentID uuid.UUID) 
 		}
 	}
 
+	dynamicWaypoints, err := s.store.DynamicWaypoints().GetDynamicWaypointsBySystem(ctx, system.X, system.Y)
+	if err != nil {
+		return FullSystem{}, fmt.Errorf("get dynamic waypoints by system: %w", err)
+	}
+
 	return FullSystem{
-		Name:         system.Name,
-		X:            system.X,
-		Y:            system.Y,
-		Archetype:    system.Archetype,
-		Planets:      system.Planets,
-		Waypoints:    system.Waypoints,
-		DiscoveredBy: discovery.DiscoveredBy,
-		DiscoveredAt: discovery.DiscoveredAt,
+		Name:             system.Name,
+		X:                system.X,
+		Y:                system.Y,
+		Archetype:        system.Archetype,
+		Planets:          system.Planets,
+		Waypoints:        system.Waypoints,
+		DiscoveredBy:     discovery.DiscoveredBy,
+		DiscoveredAt:     discovery.DiscoveredAt,
+		DynamicWaypoints: dynamicWaypoints,
 	}, nil
 }

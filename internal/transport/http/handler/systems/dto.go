@@ -1,12 +1,14 @@
 package http_handler_systems
 
 import (
+	"encoding/json"
 	"time"
 
 	"github.com/google/uuid"
 	"github.com/samber/lo"
 	"github.com/sqlmerr/astragalaxy/internal/game/galaxy"
 	"github.com/sqlmerr/astragalaxy/internal/game/worldgen"
+	"github.com/sqlmerr/astragalaxy/internal/model"
 )
 
 type PlanetResponseDTO struct {
@@ -92,6 +94,30 @@ func waypointDTOsFromModels(m []worldgen.Waypoint) []WaypointResponseDTO {
 	})
 }
 
+type DynamicWaypointDTO struct {
+	ID      uuid.UUID `json:"id"`
+	SystemX int       `json:"system_x"`
+	SystemY int       `json:"system_y"`
+	OwnerID uuid.UUID `json:"owner_id"`
+
+	Type     string          `json:"type"`
+	Metadata json.RawMessage `json:"metadata"`
+
+	CreatedAt time.Time `json:"created_at"`
+}
+
+func dynamicWaypointDTOFromModel(m model.DynamicWaypoint) DynamicWaypointDTO {
+	return DynamicWaypointDTO{
+		ID:        m.ID,
+		SystemX:   m.SystemX,
+		SystemY:   m.SystemY,
+		OwnerID:   m.OwnerID,
+		Type:      string(m.Type),
+		Metadata:  m.Metadata,
+		CreatedAt: m.CreatedAt,
+	}
+}
+
 type ShortSystemResponseDTO struct {
 	Name      string `json:"name"`
 	X         int    `json:"x"`
@@ -100,14 +126,15 @@ type ShortSystemResponseDTO struct {
 }
 
 type FullSystemResponseDTO struct {
-	Name         string                `json:"name"`
-	X            int                   `json:"x"`
-	Y            int                   `json:"y"`
-	Archetype    string                `json:"archetype"`
-	Planets      []PlanetResponseDTO   `json:"planets"`
-	Waypoints    []WaypointResponseDTO `json:"waypoints"`
-	DiscoveredBy uuid.UUID             `json:"discovered_by"`
-	DiscoveredAt time.Time             `json:"discovered_at"`
+	Name             string                `json:"name"`
+	X                int                   `json:"x"`
+	Y                int                   `json:"y"`
+	Archetype        string                `json:"archetype"`
+	Planets          []PlanetResponseDTO   `json:"planets"`
+	Waypoints        []WaypointResponseDTO `json:"waypoints"`
+	DynamicWaypoints []DynamicWaypointDTO  `json:"dynamic_waypoints"`
+	DiscoveredBy     uuid.UUID             `json:"discovered_by"`
+	DiscoveredAt     time.Time             `json:"discovered_at"`
 }
 
 func shortSystemDTOFromModel(m worldgen.System) ShortSystemResponseDTO {
@@ -129,6 +156,9 @@ func fullSystemDTOFromModel(m galaxy.FullSystem) FullSystemResponseDTO {
 		Waypoints:    waypointDTOsFromModels(m.Waypoints),
 		DiscoveredBy: m.DiscoveredBy,
 		DiscoveredAt: m.DiscoveredAt,
+		DynamicWaypoints: lo.Map(m.DynamicWaypoints, func(i model.DynamicWaypoint, _ int) DynamicWaypointDTO {
+			return dynamicWaypointDTOFromModel(i)
+		}),
 	}
 }
 

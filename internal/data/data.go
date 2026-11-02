@@ -11,6 +11,7 @@ import (
 	agents_repository "github.com/sqlmerr/astragalaxy/internal/data/repository/agents"
 	cooldowns_repository "github.com/sqlmerr/astragalaxy/internal/data/repository/cooldowns"
 	discoveries_repository "github.com/sqlmerr/astragalaxy/internal/data/repository/discoveries"
+	dynamic_waypoints_repository "github.com/sqlmerr/astragalaxy/internal/data/repository/dynamic_waypoints"
 	inventories_repository "github.com/sqlmerr/astragalaxy/internal/data/repository/inventories"
 	resource_deposits_repository "github.com/sqlmerr/astragalaxy/internal/data/repository/resource_deposits"
 	ships_repository "github.com/sqlmerr/astragalaxy/internal/data/repository/ships"
@@ -27,6 +28,7 @@ type Store interface {
 	ResourceDeposits() resource_deposits_repository.ResourceDepositsRepository
 	Discoveries() discoveries_repository.DiscoveryRepository
 	Wallets() wallets_repository.WalletRepository
+	DynamicWaypoints() dynamic_waypoints_repository.DynamicWaypointRepository
 
 	ExecTx(ctx context.Context, fn func(tx Store) error) error
 }
@@ -42,6 +44,7 @@ type Storage struct {
 	resourceDeposits resource_deposits_repository.ResourceDepositsRepository
 	discoveries      discoveries_repository.DiscoveryRepository
 	wallets          wallets_repository.WalletRepository
+	dynamicWaypoints dynamic_waypoints_repository.DynamicWaypointRepository
 }
 
 func NewStore(
@@ -54,6 +57,7 @@ func NewStore(
 	resourceDeposits resource_deposits_repository.ResourceDepositsRepository,
 	discoveries discoveries_repository.DiscoveryRepository,
 	wallets wallets_repository.WalletRepository,
+	dynamicWaypoints dynamic_waypoints_repository.DynamicWaypointRepository,
 ) *Storage {
 	return &Storage{
 		pool:             pool,
@@ -65,6 +69,7 @@ func NewStore(
 		resourceDeposits: resourceDeposits,
 		discoveries:      discoveries,
 		wallets:          wallets,
+		dynamicWaypoints: dynamicWaypoints,
 	}
 }
 
@@ -100,6 +105,10 @@ func (s *Storage) Wallets() wallets_repository.WalletRepository {
 	return s.wallets
 }
 
+func (s *Storage) DynamicWaypoints() dynamic_waypoints_repository.DynamicWaypointRepository {
+	return s.dynamicWaypoints
+}
+
 func (s *Storage) ExecTx(ctx context.Context, fn func(tx Store) error) error {
 	tx, err := s.pool.Begin(ctx)
 	if err != nil {
@@ -119,6 +128,7 @@ func (s *Storage) ExecTx(ctx context.Context, fn func(tx Store) error) error {
 		resourceDeposits: resource_deposits_repository.New(*q, tx),
 		discoveries:      discoveries_repository.New(*q, tx),
 		wallets:          wallets_repository.New(*q, tx),
+		dynamicWaypoints: dynamic_waypoints_repository.New(*q, tx),
 	}
 
 	err = fn(txStorage)

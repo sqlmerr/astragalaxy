@@ -191,6 +191,16 @@ type Agent struct {
 	InventoryID uuid.UUID
 }
 
+type DynamicWaypoint struct {
+	ID        uuid.UUID
+	SystemX   int32
+	SystemY   int32
+	OwnerID   uuid.UUID
+	Type      string
+	Metadata  []byte
+	CreatedAt pgtype.Timestamp
+}
+
 type Inventory struct {
 	ID                uuid.UUID
 	MaxItemSlots      int32
