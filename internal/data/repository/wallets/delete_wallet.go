@@ -19,9 +19,9 @@ func (r *WalletRepositoryImpl) DeleteWallet(ctx context.Context, address string)
 	}
 
 	if rowsAffected == 0 {
-		return errs.NewWithCode(errs.CodeWalletNotFound, fmt.Errorf(
-			"wallet with address %q: %w", address, errs.ErrNotFound,
-		))
+		return fmt.Errorf(
+			"wallet with address %q: %w", address, errs.CodeWalletNotFound,
+		)
 	}
 
 	return nil

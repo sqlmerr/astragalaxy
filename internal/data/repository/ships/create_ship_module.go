@@ -22,10 +22,7 @@ func (r *ShipRepositoryImpl) CreateShipModule(ctx context.Context, data CreateSh
 	err = postgres_pool.TranslateError(err)
 	if err != nil {
 		if errors.Is(err, postgres_pool.ErrViolatesForeignKey) {
-			return model.ShipModule{}, errs.NewWithCode(
-				errs.CodeShipNotFound,
-				fmt.Errorf("ship with id='%s': %w", data.ShipID, errs.ErrNotFound),
-			)
+			return model.ShipModule{}, fmt.Errorf("ship with id='%s': %w", data.ShipID, errs.CodeShipNotFound)
 		}
 
 		return model.ShipModule{}, fmt.Errorf("create ship module: %w", err)

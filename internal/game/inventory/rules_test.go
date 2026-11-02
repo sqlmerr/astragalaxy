@@ -20,19 +20,13 @@ func TestTransferResource(t *testing.T) {
 	t.Run("not enough resources", func(t *testing.T) {
 		_, _, err := TransferResource(model.Resource{Amount: 3}, model.Resource{}, 4, 0, model.Inventory{MaxResourceVolume: 100})
 		assert.ErrorIs(t, err, errs.ErrUnprocessableEntity)
-		var withCode errs.WithCode
-		if assert.ErrorAs(t, err, &withCode) {
-			assert.Equal(t, errs.CodeNotEnoughResources, withCode.Code)
-		}
+		assert.ErrorIs(t, err, errs.CodeNotEnoughResources)
 	})
 
 	t.Run("inventory full", func(t *testing.T) {
 		_, _, err := TransferResource(model.Resource{Amount: 50}, model.Resource{Amount: 5}, 50, 5, model.Inventory{MaxResourceVolume: 50})
 		assert.ErrorIs(t, err, errs.ErrUnprocessableEntity)
-		var withCode errs.WithCode
-		if assert.ErrorAs(t, err, &withCode) {
-			assert.Equal(t, errs.CodeInventoryIsFull, withCode.Code)
-		}
+		assert.ErrorIs(t, err, errs.CodeInventoryIsFull)
 	})
 }
 
@@ -41,10 +35,7 @@ func TestCheckItemCapacity(t *testing.T) {
 
 	err := CheckItemCapacity(model.Inventory{MaxItemSlots: 3}, 2, 2)
 	assert.ErrorIs(t, err, errs.ErrUnprocessableEntity)
-	var withCode errs.WithCode
-	if assert.ErrorAs(t, err, &withCode) {
-		assert.Equal(t, errs.CodeInventoryIsFull, withCode.Code)
-	}
+	assert.ErrorIs(t, err, errs.CodeInventoryIsFull)
 }
 
 func TestTransferItem(t *testing.T) {
@@ -58,8 +49,5 @@ func TestTransferItem(t *testing.T) {
 
 	_, err = TransferItem(item, uuid.New(), toInventoryID)
 	assert.ErrorIs(t, err, errs.ErrUnprocessableEntity)
-	var withCode errs.WithCode
-	if assert.ErrorAs(t, err, &withCode) {
-		assert.Equal(t, errs.CodeItemNotInInventory, withCode.Code)
-	}
+	assert.ErrorIs(t, err, errs.CodeItemNotInInventory)
 }

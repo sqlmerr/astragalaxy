@@ -57,10 +57,7 @@ func (s *Service) RenameShip(ctx context.Context, agentID uuid.UUID, shipID uuid
 	}
 
 	if ship.AgentID != agentID {
-		return model.Ship{}, errs.NewWithCode(
-			errs.CodeAccessDenied,
-			fmt.Errorf("this ship does not belong to agent: %w", errs.ErrAccessDenied),
-		)
+		return model.Ship{}, fmt.Errorf("this ship does not belong to agent: %w", errs.CodeAccessDenied)
 	}
 	ship = RenameShip(ship, newShipName)
 
@@ -93,10 +90,7 @@ func (s *Service) ChangeActiveShip(ctx context.Context, agentID uuid.UUID, newAc
 		}
 
 		if newActiveShip.AgentID != agentID {
-			return errs.NewWithCode(
-				errs.CodeAccessDenied,
-				fmt.Errorf("new active ship does not belong to agent: %w", errs.ErrAccessDenied),
-			)
+			return fmt.Errorf("new active ship does not belong to agent: %w", errs.CodeAccessDenied)
 		}
 
 		newActiveShip, oldActiveShipToSave, err = ChangeActiveShip(oldActiveShipToSave, newActiveShip)
@@ -173,14 +167,11 @@ func (s *Service) DockShip(ctx context.Context, agentID uuid.UUID) (model.Cooldo
 
 	system, exists := s.worldGen.GenerateSystemByCoords(ship.Coords.SystemX, ship.Coords.SystemY)
 	if !exists {
-		return model.Cooldown{}, errs.NewWithCode(
-			errs.CodeAnomaly,
-			fmt.Errorf(
-				"system x=%d y=%d doesn't exist: %w",
-				ship.Coords.SystemX,
-				ship.Coords.SystemY,
-				errs.ErrNotFound,
-			),
+		return model.Cooldown{}, fmt.Errorf(
+			"system x=%d y=%d doesn't exist: %w",
+			ship.Coords.SystemX,
+			ship.Coords.SystemY,
+			errs.CodeAnomaly.WithBase(errs.ErrNotFound),
 		)
 	}
 
@@ -222,10 +213,7 @@ func (s *Service) GetShipModules(ctx context.Context, agentID uuid.UUID, shipID 
 	}
 
 	if ship.AgentID != agentID {
-		return nil, errs.NewWithCode(
-			errs.CodeAccessDenied,
-			fmt.Errorf("cannot access ship with id='%s': %w", shipID, errs.ErrAccessDenied),
-		)
+		return nil, fmt.Errorf("cannot access ship with id='%s': %w", shipID, errs.CodeAccessDenied)
 	}
 
 	modules, err := s.store.Ships().GetShipModules(ctx, shipID)
@@ -243,10 +231,7 @@ func (s *Service) RemoveShipModule(ctx context.Context, agentID uuid.UUID, shipI
 	}
 
 	if ship.AgentID != agentID {
-		return errs.NewWithCode(
-			errs.CodeAccessDenied,
-			fmt.Errorf("cannot access ship with id='%s': %w", shipID, errs.ErrAccessDenied),
-		)
+		return fmt.Errorf("cannot access ship with id='%s': %w", shipID, errs.CodeAccessDenied)
 	}
 
 	inventory, err := s.store.Inventories().GetInventory(ctx, ship.InventoryID)
@@ -260,12 +245,12 @@ func (s *Service) RemoveShipModule(ctx context.Context, agentID uuid.UUID, shipI
 	}
 
 	if !s.gameConfig.Rules.DisableInventoryLimit && inventoryItemCount+1 > inventory.MaxItemSlots {
-		return errs.NewWithCode(errs.CodeInventoryIsFull, fmt.Errorf(
+		return fmt.Errorf(
 			"cannot remove ship module due to inventory item limit (%d > %d): %w",
 			inventoryItemCount+1,
 			inventory.MaxItemSlots,
-			errs.ErrUnprocessableEntity,
-		))
+			errs.CodeInventoryIsFull,
+		)
 	}
 
 	itemType, err := moduleType.IntoItemType()
@@ -349,7 +334,7 @@ func (s *Service) createShip(ctx context.Context, tx data.Store, spec CreateShip
 	for _, m := range spec.Modules {
 		_, exists := s.gameData.Items.GetItem(string(m))
 		if !exists {
-			return model.Ship{}, errs.NewWithCode(errs.CodeInvalidShipModuleType, fmt.Errorf("item id `%s` does not exist: %w", m, errs.ErrNotFound))
+			return model.Ship{}, fmt.Errorf("item id `%s` does not exist: %w", m, errs.CodeInvalidShipModuleType.WithBase(errs.ErrNotFound))
 		}
 
 		_, err = tx.Ships().CreateShipModule(ctx, ships_repository.CreateShipModule{
@@ -379,7 +364,7 @@ func (s *Service) SpawnShip(ctx context.Context, spec SpawnShipSpec, coords *mod
 
 	_, classExists := s.gameData.ShipClasses.GetShipClass(model.ShipClassID(spec.Class))
 	if !classExists {
-		return model.Ship{}, errs.NewWithCode(errs.CodeInvalidShipClass, fmt.Errorf("could not find class with id `%s`: %w", spec.Class, errs.ErrInvalidArgument))
+		return model.Ship{}, fmt.Errorf("could not find class with id `%s`: %w", spec.Class, errs.CodeInvalidShipClass)
 	}
 
 	var ship model.Ship

@@ -23,10 +23,7 @@ func (r *DiscoveryRepositoryImpl) CreateSystemDiscovery(ctx context.Context, dat
 	err = postgres_pool.TranslateError(err)
 	if err != nil {
 		if errors.Is(err, postgres_pool.ErrViolatesForeignKey) {
-			return model.SystemDiscovery{}, errs.NewWithCode(
-				errs.CodeAgentNotFound,
-				fmt.Errorf("agent with id %s: %w", data.DiscoveredBy, errs.ErrNotFound),
-			)
+			return model.SystemDiscovery{}, fmt.Errorf("agent with id %s: %w", data.DiscoveredBy, errs.CodeAgentNotFound)
 		}
 
 		return model.SystemDiscovery{}, fmt.Errorf("create system discovery: %w", err)

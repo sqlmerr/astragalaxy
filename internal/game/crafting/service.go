@@ -42,7 +42,7 @@ func (s *Service) Craft(ctx context.Context, agentID uuid.UUID, recipeID string,
 
 	recipe, ok := s.gameData.Recipes.GetRecipe(recipeID)
 	if !ok {
-		return model.Cooldown{}, errs.NewWithCode(errs.CodeRecipeNotFound, fmt.Errorf("recipe `%s`: %w", recipeID, errs.ErrNotFound))
+		return model.Cooldown{}, fmt.Errorf("recipe `%s`: %w", recipeID, errs.CodeRecipeNotFound)
 	}
 
 	facilities, err := s.facilityProvider.GatherAvailableFacilities(ctx, agentID)
@@ -51,10 +51,7 @@ func (s *Service) Craft(ctx context.Context, agentID uuid.UUID, recipeID string,
 	}
 
 	if len(facilities[recipe.RequiredFacility]) == 0 {
-		return model.Cooldown{}, errs.NewWithCode(
-			errs.CodeFacilityNotFound,
-			fmt.Errorf("could not find `%s` facility: %w", recipe.RequiredFacility, errs.ErrUnprocessableEntity),
-		)
+		return model.Cooldown{}, fmt.Errorf("facility `%s` not found: %w", recipe.RequiredFacility, errs.CodeFacilityNotFound)
 	}
 
 	var bestFacility *model.Facility
@@ -74,15 +71,12 @@ func (s *Service) Craft(ctx context.Context, agentID uuid.UUID, recipeID string,
 	}
 	facilityModifiers, ok := bestFacility.CraftingMods()
 	if !ok {
-		return model.Cooldown{}, errs.NewWithCode(errs.CodeAnomaly, fmt.Errorf("parse facility crafting modifiers: %v", bestFacility.Modifiers))
+		return model.Cooldown{}, fmt.Errorf("parse facility crafting modifiers: %v: %w", bestFacility.Modifiers, errs.CodeAnomaly)
 	}
 
 	if bestFacility == nil {
 		fmt.Println(len(facilities[recipe.RequiredFacility]))
-		return model.Cooldown{}, errs.NewWithCode(
-			errs.CodeFacilityNotFound,
-			fmt.Errorf("cannot find facility of type='%s' with tier greater than or equal to %d: %w", recipe.RequiredFacility, recipe.MinTier, errs.ErrUnprocessableEntity),
-		)
+		return model.Cooldown{}, fmt.Errorf("cannot find facility of type='%s' with tier greater than or equal to %d: %w", recipe.RequiredFacility, recipe.MinTier, errs.CodeFacilityNotFound)
 	}
 
 	inventory, err := s.store.Inventories().GetInventory(ctx, targetInventoryID)
@@ -95,10 +89,7 @@ func (s *Service) Craft(ctx context.Context, agentID uuid.UUID, recipeID string,
 		return model.Cooldown{}, fmt.Errorf("get inventory owner: %w", err)
 	}
 
-	accessDeniedErr := errs.NewWithCode(
-		errs.CodeAccessDenied,
-		fmt.Errorf("cannot access this inventory: %w", errs.ErrAccessDenied),
-	)
+	accessDeniedErr := fmt.Errorf("cannot access this inventory: %w", errs.CodeAccessDenied)
 	switch owner.OwnerType {
 	case model.InventoryOwnerAgent:
 		if owner.OwnerID != agentID {
@@ -133,23 +124,17 @@ func (s *Service) Craft(ctx context.Context, agentID uuid.UUID, recipeID string,
 
 	volume := CountTotalResourceVolume(append(updatedResources, createdResources...))
 	if !s.gameConfig.Rules.DisableInventoryLimit && volume > inventory.MaxResourceVolume {
-		return model.Cooldown{}, errs.NewWithCode(
-			errs.CodeInventoryIsFull,
-			fmt.Errorf(
-				"cannot craft this recipe due to inventory resource limit (%d > %d): %w",
-				volume, inventory.MaxResourceVolume, errs.ErrUnprocessableEntity,
-			),
+		return model.Cooldown{}, fmt.Errorf(
+			"cannot craft this recipe due to inventory resource limit (%d > %d): %w",
+			volume, inventory.MaxResourceVolume, errs.CodeInventoryIsFull,
 		)
 	}
 
 	itemsAmount := len(addedItems) + len(items)
 	if !s.gameConfig.Rules.DisableInventoryLimit && itemsAmount > inventory.MaxItemSlots {
-		return model.Cooldown{}, errs.NewWithCode(
-			errs.CodeInventoryIsFull,
-			fmt.Errorf(
-				"cannot craft this recipe due to inventory item limit (%d > %d): %w",
-				itemsAmount, inventory.MaxItemSlots, errs.ErrUnprocessableEntity,
-			),
+		return model.Cooldown{}, fmt.Errorf(
+			"cannot craft this recipe due to inventory item limit (%d > %d): %w",
+			itemsAmount, inventory.MaxItemSlots, errs.CodeInventoryIsFull,
 		)
 	}
 

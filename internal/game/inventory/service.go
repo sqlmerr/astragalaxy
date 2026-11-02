@@ -47,10 +47,7 @@ func (s *Service) GetShipInventory(ctx context.Context, agentID, shipID uuid.UUI
 	}
 
 	if ship.AgentID != agentID {
-		return FullInventory{}, errs.NewWithCode(
-			errs.CodeAccessDenied,
-			fmt.Errorf("can't get ship's inventory: %w", errs.ErrAccessDenied),
-		)
+		return FullInventory{}, fmt.Errorf("can't get ship's inventory: %w", errs.CodeAccessDenied)
 	}
 
 	return s.getFullInventory(ctx, ship.InventoryID)
@@ -112,10 +109,7 @@ func (s *Service) TransferResources(
 			resourceFrom, err := tx.Inventories().GetResource(ctx, input.FromInventoryID, resourceType)
 			if err != nil {
 				if errors.Is(err, errs.ErrNotFound) {
-					return errs.NewWithCode(
-						errs.CodeNotEnoughResources,
-						fmt.Errorf("resource amount must be at least %d: %w", amount, errs.ErrUnprocessableEntity),
-					)
+					return fmt.Errorf("resource amount must be at least %d: %w", amount, errs.CodeNotEnoughResources)
 				}
 				return fmt.Errorf("get resource: %w", err)
 			}
@@ -275,7 +269,7 @@ func (s *Service) Trash(ctx context.Context, agentID uuid.UUID, inventoryID uuid
 	switch owner.OwnerType {
 	case model.InventoryOwnerAgent:
 		if owner.OwnerID != agentID {
-			return model.Cooldown{}, errs.NewWithCode(errs.CodeAccessDenied, fmt.Errorf("can't access this inventory: %w", errs.ErrAccessDenied))
+			return model.Cooldown{}, fmt.Errorf("can't access this inventory: %w", errs.CodeAccessDenied)
 		}
 	case model.InventoryOwnerShip:
 		ship, err := s.store.Ships().GetShip(ctx, owner.OwnerID)
@@ -284,11 +278,11 @@ func (s *Service) Trash(ctx context.Context, agentID uuid.UUID, inventoryID uuid
 		}
 
 		if ship.AgentID != agentID {
-			return model.Cooldown{}, errs.NewWithCode(errs.CodeAccessDenied, fmt.Errorf("can't access this inventory: %w", errs.ErrAccessDenied))
+			return model.Cooldown{}, fmt.Errorf("can't access this inventory: %w", errs.CodeAccessDenied)
 		}
 
 		if !ship.Active {
-			return model.Cooldown{}, errs.NewWithCode(errs.CodeAccessDenied, fmt.Errorf("can't access inventory of non-active ships: %w", errs.ErrAccessDenied))
+			return model.Cooldown{}, fmt.Errorf("can't access inventory of non-active ships: %w", errs.CodeAccessDenied)
 		}
 	}
 
@@ -301,7 +295,7 @@ func (s *Service) Trash(ctx context.Context, agentID uuid.UUID, inventoryID uuid
 			}
 
 			if item.InventoryID != inventoryID {
-				return errs.NewWithCode(errs.CodeAccessDenied, fmt.Errorf("can't access this inventory: %w", errs.ErrAccessDenied))
+				return fmt.Errorf("can't access this inventory: %w", errs.CodeAccessDenied)
 			}
 
 			tx.Inventories().DeleteItem(ctx, item.ID)
@@ -309,7 +303,7 @@ func (s *Service) Trash(ctx context.Context, agentID uuid.UUID, inventoryID uuid
 
 		for resourceType, amount := range resources {
 			if amount <= 0 {
-				return errs.NewWithCode(errs.CodeValidationError, fmt.Errorf("resource amount can't be less or equal to 0 (%s %d): %w", resourceType, amount, errs.ErrInvalidArgument))
+				return fmt.Errorf("resource amount can't be less or equal to 0 (%s %d): %w", resourceType, amount, errs.CodeValidationError)
 			}
 
 			resource, err := tx.Inventories().GetResource(ctx, inventoryID, resourceType)
@@ -318,15 +312,12 @@ func (s *Service) Trash(ctx context.Context, agentID uuid.UUID, inventoryID uuid
 			}
 
 			if resource.Amount < amount {
-				return errs.NewWithCode(
+				return fmt.Errorf(
+					"inventory doesn't have enough resource of type %s (got %d, need %d): %w",
+					resourceType,
+					resource.Amount,
+					amount,
 					errs.CodeNotEnoughResources,
-					fmt.Errorf(
-						"inventory doesn't have enough resource of type %s (got %d, need %d): %w",
-						resourceType,
-						resource.Amount,
-						amount,
-						errs.ErrUnprocessableEntity,
-					),
 				)
 			}
 
@@ -381,12 +372,10 @@ func (s *Service) checkTransferDirection(ctx context.Context, agentID uuid.UUID,
 	if ownerFrom.OwnerType == model.InventoryOwnerAgent || ownerTo.OwnerType == model.InventoryOwnerAgent {
 		if !((ownerFrom.OwnerType == model.InventoryOwnerAgent && ownerFrom.OwnerID == agentID) ||
 			(ownerTo.OwnerType == model.InventoryOwnerAgent && ownerTo.OwnerID == agentID)) {
-			return errs.NewWithCode(
-				errs.CodeAccessDenied, fmt.Errorf(
-					"can't access this agent's inventory with id='%s': %w",
-					toInventoryID,
-					errs.ErrAccessDenied,
-				),
+			return fmt.Errorf(
+				"can't access this agent's inventory with id='%s': %w",
+				toInventoryID,
+				errs.CodeAccessDenied,
 			)
 		}
 
@@ -403,37 +392,29 @@ func (s *Service) checkTransferDirection(ctx context.Context, agentID uuid.UUID,
 			}
 
 			if ship.AgentID != agentID {
-				return errs.NewWithCode(
-					errs.CodeAccessDenied, fmt.Errorf(
-						"can't access this ship's inventory: %w", errs.ErrAccessDenied,
-					),
+				return fmt.Errorf(
+					"can't access this ship's inventory: %w", errs.CodeAccessDenied,
 				)
 			}
 
 			if !ship.Active { // TODO: check ship's location to match agent's. Not be active
-				return errs.NewWithCode(
+				return fmt.Errorf(
+					"ship with id='%s' must be active: %w",
+					ship.ID,
 					errs.CodeShipMustBeActive,
-					fmt.Errorf(
-						"ship with id='%s' must be active: %w",
-						ship.ID,
-						errs.ErrInvalidArgument,
-					),
 				)
 			}
 
 			return nil
 		}
 	}
-	return errs.NewWithCode(
+	return fmt.Errorf(
+		"invalid transfer direction: %s -> %s (%s -> %s): %w",
+		fromInventoryID,
+		toInventoryID,
+		ownerFrom.OwnerType,
+		ownerTo.OwnerType,
 		errs.CodeInvalidTransferDirection,
-		fmt.Errorf(
-			"invalid transfer direction: %s -> %s (%s -> %s): %w",
-			fromInventoryID,
-			toInventoryID,
-			ownerFrom.OwnerType,
-			ownerTo.OwnerType,
-			errs.ErrInvalidArgument,
-		),
 	)
 
 }
@@ -455,10 +436,7 @@ func (s *Service) GrantResource(ctx context.Context, inventoryID uuid.UUID, reso
 			return model.Resource{}, fmt.Errorf("get resource total amount: %w", err)
 		}
 		if volume+amount > inv.MaxResourceVolume {
-			return model.Resource{}, errs.NewWithCode(
-				errs.CodeInventoryIsFull,
-				fmt.Errorf("inventory resource volume limit exceeded (%d > %d): %w", volume+amount, inv.MaxResourceVolume, errs.ErrUnprocessableEntity),
-			)
+			return model.Resource{}, fmt.Errorf("inventory resource volume limit exceeded (%d > %d): %w", volume+amount, inv.MaxResourceVolume, errs.CodeInventoryIsFull)
 		}
 	}
 

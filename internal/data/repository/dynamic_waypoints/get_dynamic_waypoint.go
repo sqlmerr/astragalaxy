@@ -19,7 +19,7 @@ func (r *DynamicWaypointRepositoryImpl) GetDynamicWaypoint(ctx context.Context, 
 	err = postgres_pool.TranslateError(err)
 	if err != nil {
 		if errors.Is(err, postgres_pool.ErrNoRows) {
-			return model.DynamicWaypoint{}, errs.NewWithCode(errs.CodeWaypointNotFound, fmt.Errorf("dynamic waypoint with id = %s: %w", id, errs.ErrNotFound))
+			return model.DynamicWaypoint{}, fmt.Errorf("dynamic waypoint with id = %s: %w", id, errs.CodeWaypointNotFound)
 		}
 
 		return model.DynamicWaypoint{}, fmt.Errorf("get dynamic waypoint: %w", err)

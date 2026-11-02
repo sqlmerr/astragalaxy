@@ -23,7 +23,7 @@ func (r *WalletRepositoryImpl) SaveWallet(ctx context.Context, wallet model.Wall
 	err = postgres_pool.TranslateError(err)
 	if err != nil {
 		if errors.Is(err, postgres_pool.ErrNoRows) {
-			return model.Wallet{}, errs.NewWithCode(errs.CodeWalletNotFound, fmt.Errorf("wallet with address %q: %w", wallet.Address, errs.ErrNotFound))
+			return model.Wallet{}, fmt.Errorf("wallet with address %q: %w", wallet.Address, errs.CodeWalletNotFound)
 		}
 		return model.Wallet{}, fmt.Errorf("save wallet: %w", err)
 	}

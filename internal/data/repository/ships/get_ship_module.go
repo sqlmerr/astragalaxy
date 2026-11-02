@@ -23,10 +23,7 @@ func (r *ShipRepositoryImpl) GetShipModule(ctx context.Context, shipID uuid.UUID
 	err = postgres_pool.TranslateError(err)
 	if err != nil {
 		if errors.Is(err, postgres_pool.ErrNoRows) {
-			return model.ShipModule{}, errs.NewWithCode(
-				errs.CodeShipNotFound,
-				fmt.Errorf("module with type='%s' in ship with id='%s': %w", moduleType, shipID, errs.ErrNotFound),
-			)
+			return model.ShipModule{}, fmt.Errorf("module with type='%s' in ship with id='%s': %w", moduleType, shipID, errs.CodeShipNotFound)
 		}
 
 		return model.ShipModule{}, fmt.Errorf("get ship module: %w", err)

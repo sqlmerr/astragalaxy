@@ -19,7 +19,7 @@ type BeaconKitInput struct {
 func UseCartographyBeaconKit(ctx ActionContext, agentID uuid.UUID, item model.Item, input json.RawMessage) (ActionResponse, error) {
 	var i BeaconKitInput
 	if err := json.Unmarshal(input, &i); err != nil {
-		return nil, errs.NewWithCode(errs.CodeDecodeError, fmt.Errorf("decode action input json: %w: %w", err, errs.ErrInvalidArgument))
+		return nil, fmt.Errorf("decode action input json: %w: %w", err, errs.CodeDecodeError)
 	}
 
 	ship, err := ctx.Store.Ships().GetActiveShipByAgent(ctx.Context, agentID)
@@ -36,7 +36,7 @@ func UseCartographyBeaconKit(ctx ActionContext, agentID uuid.UUID, item model.It
 	if slices.ContainsFunc(waypoints, func(i model.DynamicWaypoint) bool {
 		return i.Type == model.DynamicWaypointCartographyBeacon
 	}) {
-		return nil, errs.NewWithCode(errs.CodeCannotUseItem, fmt.Errorf("cannot place cartography beacon in this system: you already placed one: %w", errs.ErrUnprocessableEntity))
+		return nil, fmt.Errorf("cannot place cartography beacon in this system: you already placed one: %w", errs.CodeCannotUseItem)
 	}
 
 	wallet, err := ctx.Store.Wallets().GetWallet(ctx.Context, i.PayoutAddress)

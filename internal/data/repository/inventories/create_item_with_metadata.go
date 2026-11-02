@@ -23,12 +23,10 @@ func (r *InventoryRepositoryImpl) CreateItemWithMetadata(ctx context.Context, da
 	err = postgres_pool.TranslateError(err)
 	if err != nil {
 		if errors.Is(err, postgres_pool.ErrViolatesForeignKey) {
-			return model.Item{}, errs.NewWithCode(
-				errs.CodeInventoryNotFound, fmt.Errorf(
-					"inventory with id='%s': %w",
-					data.InventoryID,
-					errs.ErrNotFound,
-				),
+			return model.Item{}, fmt.Errorf(
+				"inventory with id='%s': %w",
+				data.InventoryID,
+				errs.CodeInventoryNotFound,
 			)
 		}
 

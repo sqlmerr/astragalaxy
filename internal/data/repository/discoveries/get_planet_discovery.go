@@ -23,10 +23,7 @@ func (r *DiscoveryRepositoryImpl) GetPlanetDiscovery(ctx context.Context, system
 	err = postgres_pool.TranslateError(err)
 	if err != nil {
 		if errors.Is(err, postgres_pool.ErrNoRows) {
-			return model.PlanetDiscovery{}, errs.NewWithCode(
-				errs.CodePlanetDiscoveryNotFound,
-				fmt.Errorf("planet discovery x=%d y=%d orbit=%d: %w", systemX, systemY, orbit, errs.ErrNotFound),
-			)
+			return model.PlanetDiscovery{}, fmt.Errorf("planet discovery x=%d y=%d orbit=%d: %w", systemX, systemY, orbit, errs.CodePlanetDiscoveryNotFound)
 		}
 		return model.PlanetDiscovery{}, fmt.Errorf("get planet discovery: %w", err)
 	}

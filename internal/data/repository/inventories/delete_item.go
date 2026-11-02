@@ -20,10 +20,7 @@ func (r *InventoryRepositoryImpl) DeleteItem(ctx context.Context, id uuid.UUID) 
 	}
 
 	if rowsAffected == 0 {
-		return errs.NewWithCode(
-			errs.CodeItemNotFound,
-			fmt.Errorf("item with id='%s': %w", id, errs.ErrNotFound),
-		)
+		return fmt.Errorf("item with id='%s': %w", id, errs.CodeItemNotFound)
 	}
 
 	return nil

@@ -49,15 +49,13 @@ func (s *Service) GetCurrentAgentSystem(ctx context.Context, agentID uuid.UUID) 
 
 	system, exists := s.worldGen.GenerateSystemByCoords(ship.Coords.SystemX, ship.Coords.SystemY)
 	if !exists {
-		return FullSystem{}, errs.NewWithCode(
-			errs.CodeAnomaly,
+		return FullSystem{},
 			fmt.Errorf(
 				"something happened to system with x=%d y=%d: %w",
 				ship.Coords.SystemX,
 				ship.Coords.SystemY,
-				errs.ErrUnprocessableEntity,
-			),
-		)
+				errs.CodeAnomaly.WithBase(errs.ErrUnprocessableEntity),
+			)
 	}
 
 	resourceDeposits, err := s.store.ResourceDeposits().GetSystemResourceDeposits(ctx, ship.Coords.SystemX, ship.Coords.SystemY)

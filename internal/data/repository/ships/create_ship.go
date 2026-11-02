@@ -32,10 +32,7 @@ func (r *ShipRepositoryImpl) CreateShip(ctx context.Context, data CreateShip) (m
 
 	if err != nil {
 		if errors.Is(err, postgres_pool.ErrViolatesForeignKey) {
-			return model.Ship{}, errs.NewWithCode(
-				errs.CodeAgentNotFound,
-				fmt.Errorf("agent with id='%s': %w", data.AgentID, errs.ErrNotFound),
-			)
+			return model.Ship{}, fmt.Errorf("agent with id='%s': %w", data.AgentID, errs.CodeAgentNotFound)
 		}
 
 		return model.Ship{}, fmt.Errorf("scan: %w", err)

@@ -18,12 +18,9 @@ func (r *AgentRepositoryImpl) GetAgentByToken(ctx context.Context, tokenHash str
 	err = postgres_pool.TranslateError(err)
 	if err != nil {
 		if errors.Is(err, postgres_pool.ErrNoRows) {
-			return model.Agent{}, errs.NewWithCode(
+			return model.Agent{}, fmt.Errorf(
+				"get agent: %w",
 				errs.CodeAgentNotFound,
-				fmt.Errorf(
-					"get agent: %w",
-					errs.ErrNotFound,
-				),
 			)
 		}
 

@@ -63,10 +63,7 @@ func (s *Service) RegisterAgent(ctx context.Context, userID uuid.UUID, username 
 	}
 
 	if exists {
-		return model.Agent{}, "", errs.NewWithCode(
-			errs.CodeAgentUsernameAlreadyOccupied,
-			fmt.Errorf("agent's username already occupied: %w", errs.ErrConflict),
-		)
+		return model.Agent{}, "", fmt.Errorf("agent's username already occupied: %w", errs.CodeAgentUsernameAlreadyOccupied)
 	}
 
 	var tokenHash string
@@ -87,10 +84,7 @@ func (s *Service) RegisterAgent(ctx context.Context, userID uuid.UUID, username 
 	}
 
 	if agentCount >= 5 {
-		return model.Agent{}, "", errs.NewWithCode(
-			errs.CodeAgentLimitExceeded,
-			fmt.Errorf("agent limit exceeded: %w", errs.ErrAccessDenied),
-		)
+		return model.Agent{}, "", fmt.Errorf("agent limit exceeded: %w", errs.CodeAgentLimitExceeded)
 	}
 
 	err = s.store.ExecTx(ctx, func(tx data.Store) error {
@@ -162,10 +156,8 @@ func (s *Service) ResetAgentToken(ctx context.Context, userID uuid.UUID, agentID
 		return "", fmt.Errorf("get agent: %w", err)
 	}
 	if agent.UserID != userID {
-		return "", errs.NewWithCode(
-			errs.CodeAccessDenied,
-			fmt.Errorf("cannot access agent with id='%s': %w", agentID, errs.ErrAccessDenied),
-		)
+		return "", fmt.Errorf("cannot access agent with id='%s': %w", agentID, errs.CodeAccessDenied)
+
 	}
 
 	rawToken, tokenHash, err := auth.GenerateAgentToken()

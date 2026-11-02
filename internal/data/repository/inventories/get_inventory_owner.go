@@ -19,10 +19,7 @@ func (r *InventoryRepositoryImpl) GetInventoryOwner(ctx context.Context, invento
 	err = postgres_pool.TranslateError(err)
 	if err != nil {
 		if errors.Is(err, postgres_pool.ErrNoRows) {
-			return model.InventoryOwner{}, errs.NewWithCode(
-				errs.CodeInventoryNotFound,
-				fmt.Errorf("inventory with id='%s': %w", inventoryID, errs.ErrNotFound),
-			)
+			return model.InventoryOwner{}, fmt.Errorf("inventory with id='%s': %w", inventoryID, errs.CodeInventoryNotFound)
 		}
 
 		return model.InventoryOwner{}, fmt.Errorf("get inventory owner: %w", err)

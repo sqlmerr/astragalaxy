@@ -36,10 +36,10 @@ func (s *Service) RegisterWallet(ctx context.Context, agentID uuid.UUID) (model.
 	}
 
 	if len(wallets) >= MaxWallets {
-		return model.Wallet{}, errs.NewWithCode(errs.CodeWalletLimitExceeded, fmt.Errorf(
+		return model.Wallet{}, fmt.Errorf(
 			"too many wallets (%d). Max: %d: %w",
-			len(wallets), MaxWallets, errs.ErrUnprocessableEntity,
-		))
+			len(wallets), MaxWallets, errs.CodeWalletLimitExceeded,
+		)
 	}
 
 	facilities, err := s.facilityProvider.GatherAvailableFacilities(ctx, agentID)
@@ -48,10 +48,7 @@ func (s *Service) RegisterWallet(ctx context.Context, agentID uuid.UUID) (model.
 	}
 	f, ok := facilities[model.FacilityWalletTerminal]
 	if !ok || len(f) == 0 { // we don't care about wallet_terminal facility tier here
-		return model.Wallet{}, errs.NewWithCode(
-			errs.CodeCannotRegisterWallet,
-			fmt.Errorf("cannot register new wallet: no `%s` facility available: %w", model.FacilityWalletTerminal, errs.ErrUnprocessableEntity),
-		)
+		return model.Wallet{}, fmt.Errorf("cannot register new wallet: no `%s` facility available: %w", model.FacilityWalletTerminal, errs.CodeCannotRegisterWallet)
 	}
 
 	addr, err := GenerateAddress()
@@ -110,7 +107,7 @@ func (s *Service) Pay(ctx context.Context, input PayInput) (PayOutput, error) {
 	}
 
 	if fromWallet.OwnerID != input.AgentID {
-		return PayOutput{}, errs.NewWithCode(errs.CodeAccessDenied, fmt.Errorf("cannot access wallet %q: %w", input.FromAddress, errs.ErrAccessDenied))
+		return PayOutput{}, fmt.Errorf("cannot access wallet %q: %w", input.FromAddress, errs.CodeAccessDenied)
 	}
 
 	toWallet, err := s.store.Wallets().GetWallet(ctx, input.ToAddress)
@@ -119,7 +116,7 @@ func (s *Service) Pay(ctx context.Context, input PayInput) (PayOutput, error) {
 	}
 
 	if input.Quarks < 0 || input.Units < 0 {
-		return PayOutput{}, errs.NewWithCode(errs.CodeInvalidPaymentAmount, fmt.Errorf("cannot send amount less than 0: %w", errs.ErrInvalidArgument))
+		return PayOutput{}, fmt.Errorf("cannot send amount less than 0: %w", errs.CodeInvalidPaymentAmount)
 	}
 
 	fromWallet, toWallet, fee, cooldownDuration, err := Pay(fromWallet, toWallet, input.Units, input.Quarks)

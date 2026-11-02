@@ -148,10 +148,7 @@ func TestNavigateWarp(t *testing.T) {
 			if test.expectedErr {
 				assert.Error(t, err)
 				assert.ErrorIs(t, err, test.err)
-				var withCode errs.WithCode
-				if assert.ErrorAs(t, err, &withCode) {
-					assert.Equal(t, test.errCode, withCode.Code)
-				}
+				assert.ErrorIs(t, err, test.errCode)
 			} else {
 				assert.NoError(t, err)
 				assert.Equal(t, test.newSystem.X, ship.Coords.SystemX)
@@ -239,10 +236,7 @@ func TestNavigatePlanet(t *testing.T) {
 			if test.expectedErr {
 				assert.Error(t, err)
 				assert.ErrorIs(t, err, test.err)
-				var withCode errs.WithCode
-				if assert.ErrorAs(t, err, &withCode) {
-					assert.Equal(t, test.errCode, withCode.Code)
-				}
+				assert.ErrorIs(t, err, test.errCode)
 			} else {
 				assert.NoError(t, err)
 				assert.Equal(t, model.ShipLocationPlanet, ship.Coords.Location)
@@ -326,10 +320,7 @@ func TestNavigateWaypoint(t *testing.T) {
 			if test.expectedErr {
 				assert.Error(t, err)
 				assert.ErrorIs(t, err, test.err)
-				var withCode errs.WithCode
-				if assert.ErrorAs(t, err, &withCode) {
-					assert.Equal(t, test.errCode, withCode.Code)
-				}
+				assert.ErrorIs(t, err, test.errCode)
 			} else {
 				assert.NoError(t, err)
 				assert.Equal(t, model.ShipLocationWaypoint, ship.Coords.Location)

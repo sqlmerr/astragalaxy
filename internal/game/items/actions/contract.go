@@ -35,7 +35,7 @@ func (r useContactResponse) Cooldown() time.Duration {
 func UseContract(ctx ActionContext, agentID uuid.UUID, item model.Item, input json.RawMessage) (ActionResponse, error) {
 	var i UseContractInput
 	if err := json.Unmarshal(input, &i); err != nil {
-		return nil, errs.NewWithCode(errs.CodeDecodeError, fmt.Errorf("decode action input json: %w: %w", err, errs.ErrInvalidArgument))
+		return nil, fmt.Errorf("decode action input json: %w: %w", err, errs.CodeDecodeError)
 	}
 
 	wallet, err := ctx.Store.Wallets().GetWallet(ctx.Context, i.Address)
@@ -44,12 +44,12 @@ func UseContract(ctx ActionContext, agentID uuid.UUID, item model.Item, input js
 	}
 
 	if wallet.OwnerID != agentID {
-		return nil, errs.NewWithCode(errs.CodeAccessDenied, fmt.Errorf("cannot access this wallet (%s): %w", i.Address, errs.ErrAccessDenied))
+		return nil, fmt.Errorf("cannot access this wallet (%s): %w", i.Address, errs.CodeAccessDenied)
 	}
 
 	var m ContactMetadata
 	if err := json.Unmarshal(item.Metadata, &m); err != nil {
-		return nil, errs.NewWithCode(errs.CodeDecodeError, fmt.Errorf("decode item metadata json: %w", err))
+		return nil, fmt.Errorf("decode item metadata json: %w: %w", err, errs.CodeDecodeError)
 	}
 
 	wallet.Units += m.Units

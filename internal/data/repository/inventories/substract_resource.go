@@ -24,10 +24,7 @@ func (r *InventoryRepositoryImpl) SubstractResource(ctx context.Context, invento
 	err = postgres_pool.TranslateError(err)
 	if err != nil {
 		if errors.Is(err, postgres_pool.ErrNoRows) {
-			return model.Resource{}, errs.NewWithCode(
-				errs.CodeResourceNotFound,
-				fmt.Errorf("resource in inventory %s of type %s: %w", inventoryID, resourceType, errs.ErrNotFound),
-			)
+			return model.Resource{}, fmt.Errorf("resource in inventory %s of type %s: %w", inventoryID, resourceType, errs.CodeResourceNotFound)
 		}
 		return model.Resource{}, fmt.Errorf("db error: %w", err)
 	}

@@ -37,10 +37,7 @@ func (s *Service) UseItem(ctx context.Context, agentID uuid.UUID, itemID uuid.UU
 		return nil, model.Cooldown{}, fmt.Errorf("get inventory owner: %w", err)
 	}
 
-	accessDeniedErr := errs.NewWithCode(
-		errs.CodeAccessDenied,
-		fmt.Errorf("cannot access this inventory: %w", errs.ErrAccessDenied),
-	)
+	accessDeniedErr := fmt.Errorf("cannot access this inventory: %w", errs.CodeAccessDenied)
 	switch owner.OwnerType {
 	case model.InventoryOwnerAgent:
 		if owner.OwnerID != agentID {
@@ -60,7 +57,7 @@ func (s *Service) UseItem(ctx context.Context, agentID uuid.UUID, itemID uuid.UU
 
 	action, ok := item_actions.Actions[item.ItemType]
 	if !ok {
-		return nil, model.Cooldown{}, errs.NewWithCode(errs.CodeCannotUseItem, fmt.Errorf("item cannot be used: %w", errs.ErrInvalidArgument))
+		return nil, model.Cooldown{}, fmt.Errorf("item cannot be used: %w", errs.CodeCannotUseItem)
 	}
 	var res item_actions.ActionResponse
 	var cooldown model.Cooldown
@@ -98,10 +95,7 @@ func (s *Service) UseItem(ctx context.Context, agentID uuid.UUID, itemID uuid.UU
 func (s *Service) GrantItem(ctx context.Context, inventoryID uuid.UUID, itemID string, metadata json.RawMessage) (model.Item, error) {
 	itemData, ok := s.gameData.Items.GetItem(itemID)
 	if !ok {
-		return model.Item{}, errs.NewWithCode(
-			errs.CodeItemNotFound,
-			fmt.Errorf("item %q: %w", itemID, errs.ErrNotFound),
-		)
+		return model.Item{}, fmt.Errorf("item %q: %w", itemID, errs.CodeItemNotFound)
 	}
 
 	inv, err := s.store.Inventories().GetInventory(ctx, inventoryID)
@@ -115,10 +109,7 @@ func (s *Service) GrantItem(ctx context.Context, inventoryID uuid.UUID, itemID s
 			return model.Item{}, fmt.Errorf("get inventory item count: %w", err)
 		}
 		if count+1 > inv.MaxItemSlots {
-			return model.Item{}, errs.NewWithCode(
-				errs.CodeInventoryIsFull,
-				fmt.Errorf("inventory item limit exceeded (%d > %d): %w", count+1, inv.MaxItemSlots, errs.ErrUnprocessableEntity),
-			)
+			return model.Item{}, fmt.Errorf("inventory item limit exceeded (%d > %d): %w", count+1, inv.MaxItemSlots, errs.CodeInventoryIsFull)
 		}
 	}
 

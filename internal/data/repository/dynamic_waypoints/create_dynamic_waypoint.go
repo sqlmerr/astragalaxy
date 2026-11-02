@@ -25,10 +25,7 @@ func (r *DynamicWaypointRepositoryImpl) CreateDynamicWaypoint(ctx context.Contex
 	err = postgres_pool.TranslateError(err)
 	if err != nil {
 		if errors.Is(err, postgres_pool.ErrViolatesForeignKey) {
-			return model.DynamicWaypoint{}, errs.NewWithCode(
-				errs.CodeAgentNotFound,
-				fmt.Errorf("agent with id = %s: %w", data.OwnerID, errs.ErrNotFound),
-			)
+			return model.DynamicWaypoint{}, fmt.Errorf("agent with id = %s: %w", data.OwnerID, errs.CodeAgentNotFound)
 		}
 
 		return model.DynamicWaypoint{}, fmt.Errorf("create dynamic waypoint: %w", err)

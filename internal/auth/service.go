@@ -28,14 +28,11 @@ var usernameRegex = regexp.MustCompile(`^[a-zA-Z0-9_]+$`)
 func checkUsername(username string) error {
 	usernameLen := len([]rune(username))
 	if usernameLen < 3 || usernameLen > 32 {
-		return errs.NewWithCode(
-			errs.CodeInvalidUsername,
-			fmt.Errorf("invalid username length: must be between 3 and 27 characters: %w", errs.ErrInvalidArgument),
-		)
+		return fmt.Errorf("invalid username length: must be between 3 and 27 characters: %w", errs.CodeInvalidUsername)
 	}
 
 	if !usernameRegex.MatchString(username) {
-		return errs.NewWithCode(errs.CodeInvalidUsername, fmt.Errorf("invalid username format: must contain only latin letters, digits, and underscores: %w", errs.ErrInvalidArgument))
+		return fmt.Errorf("invalid username format: must contain only latin letters, digits, and underscores: %w", errs.CodeInvalidUsername)
 	}
 
 	return nil
@@ -52,10 +49,7 @@ func (s *Service) RegisterUser(ctx context.Context, username, password string) (
 	}
 
 	if userExists {
-		return model.User{}, errs.NewWithCode(
-			errs.CodeUserUsernameAlreadyOccupied,
-			fmt.Errorf("username='%s' already occupied: %w", username, errs.ErrConflict),
-		)
+		return model.User{}, fmt.Errorf("username='%s' already occupied: %w", username, errs.CodeUserUsernameAlreadyOccupied)
 	}
 
 	hashedPassword, err := HashPassword(password) // TODO: add interface PasswordHasher
@@ -79,19 +73,13 @@ func (s *Service) LoginUser(ctx context.Context, username, password string) (str
 	user, err := s.store.Users().GetUserByUsername(ctx, username)
 	if err != nil {
 		if errors.Is(err, errs.ErrNotFound) {
-			return "", errs.NewWithCode(
-				errs.CodeInvalidCredentials,
-				fmt.Errorf("invalid credentials: %w", errs.ErrUnauthorized),
-			)
+			return "", fmt.Errorf("invalid credentials: %w", errs.CodeInvalidCredentials)
 		}
 		return "", fmt.Errorf("get user: %w", err)
 	}
 
 	if err := ComparePassword(user.Password, password); err != nil { // TODO: add interface PasswordHasher
-		return "", errs.NewWithCode(
-			errs.CodeInvalidCredentials,
-			fmt.Errorf("invalid credentials: %w", errs.ErrUnauthorized),
-		)
+		return "", fmt.Errorf("invalid credentials: %w", errs.CodeInvalidCredentials)
 	}
 
 	token, err := s.jwtProcessor.GenerateToken(user.ID)

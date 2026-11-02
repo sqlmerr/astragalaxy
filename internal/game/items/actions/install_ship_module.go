@@ -27,28 +27,22 @@ func InstallShipModule(shipModuleType model.ShipModuleType) ItemAction {
 
 		shipClass, classExists := ctx.GameData.ShipClasses.GetShipClass(ship.Class)
 		if !classExists {
-			return nil, errs.NewWithCode(errs.CodeAnomaly, fmt.Errorf("unknown ship class %q: %w", ship.Class, errs.ErrNotFound))
+			return nil, fmt.Errorf("unknown ship class %q: %w", ship.Class, errs.CodeAnomaly.WithBase(errs.ErrNotFound))
 		}
 
 		shipModuleLimit := shipClass.MaxModuleSlots + ship.Type.GetModuleLimitExtension()
 
 		if len(modules) >= shipModuleLimit {
-			return nil, errs.NewWithCode(
-				errs.CodeInventoryIsFull,
-				fmt.Errorf(
-					"cannot install %s ship module due to limit (%d >= %d): %w",
-					shipModuleType, len(modules), shipModuleLimit, errs.ErrUnprocessableEntity,
-				),
+			return nil, fmt.Errorf(
+				"cannot install %s ship module due to limit (%d >= %d): %w",
+				shipModuleType, len(modules), shipModuleLimit, errs.CodeInventoryIsFull,
 			)
 		}
 
 		if slices.ContainsFunc(modules, func(e model.ShipModule) bool {
 			return e.Type == shipModuleType
 		}) {
-			return nil, errs.NewWithCode(
-				errs.CodeShipModuleAlreadyInstalled,
-				fmt.Errorf("ship module %s is already installed: %w", shipModuleType, errs.ErrUnprocessableEntity),
-			)
+			return nil, fmt.Errorf("ship module %s is already installed: %w", shipModuleType, errs.CodeShipModuleAlreadyInstalled)
 		}
 
 		_, err = ctx.Store.Ships().CreateShipModule(ctx.Context, ships_repository.CreateShipModule{

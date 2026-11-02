@@ -19,13 +19,10 @@ func (r *AgentRepositoryImpl) GetAgent(ctx context.Context, id uuid.UUID) (model
 	err = postgres_pool.TranslateError(err)
 	if err != nil {
 		if errors.Is(err, postgres_pool.ErrNoRows) {
-			return model.Agent{}, errs.NewWithCode(
+			return model.Agent{}, fmt.Errorf(
+				"agent with id='%s': %w",
+				id,
 				errs.CodeAgentNotFound,
-				fmt.Errorf(
-					"agent with id='%s': %w",
-					id,
-					errs.ErrNotFound,
-				),
 			)
 		}
 

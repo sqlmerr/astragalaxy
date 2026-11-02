@@ -40,13 +40,13 @@ func GenerateAddress() (string, error) {
 
 func ValidateAddress(addr string) error {
 	if !strings.HasPrefix(addr, AddressPrefix) {
-		return errs.NewWithCode(errs.CodeInvalidWalletAddress, fmt.Errorf("invalid address prefix: %w", errs.ErrInvalidArgument))
+		return fmt.Errorf("invalid address prefix: %w", errs.CodeInvalidWalletAddress)
 	}
 
 	rawPart := strings.TrimPrefix(addr, AddressPrefix)
 	decoded, err := encoding.DecodeString(rawPart)
 	if err != nil || len(decoded) != 24 {
-		return errs.NewWithCode(errs.CodeInvalidWalletAddress, fmt.Errorf("invalid address format: %w", errs.ErrInvalidArgument))
+		return fmt.Errorf("invalid address format: %w", errs.CodeInvalidWalletAddress)
 	}
 
 	payload := decoded[:20]
@@ -55,7 +55,7 @@ func ValidateAddress(addr string) error {
 
 	for i := 0; i < 4; i++ {
 		if actualChecksum[i] != expectedChecksum[i] {
-			return errs.NewWithCode(errs.CodeInvalidWalletAddress, fmt.Errorf("address checksum mismatch (typo detected): %w", errs.ErrInvalidArgument))
+			return fmt.Errorf("address checksum mismatch (typo detected): %w", errs.CodeInvalidWalletAddress)
 		}
 	}
 	return nil
@@ -81,22 +81,16 @@ func Pay(
 	}
 
 	if fromWallet.Units < units+fee {
-		return model.Wallet{}, model.Wallet{}, 0, 0, errs.NewWithCode(
-			errs.CodeInsufficientBalance,
-			fmt.Errorf(
-				"insufficient balance (have %d units, need %d): %w",
-				fromWallet.Units, units+fee, errs.ErrUnprocessableEntity,
-			),
+		return model.Wallet{}, model.Wallet{}, 0, 0, fmt.Errorf(
+			"insufficient balance (have %d units, need %d): %w",
+			fromWallet.Units, units+fee, errs.CodeInsufficientBalance,
 		)
 	}
 
 	if fromWallet.Quarks < quarks {
-		return model.Wallet{}, model.Wallet{}, 0, 0, errs.NewWithCode(
-			errs.CodeInsufficientBalance,
-			fmt.Errorf(
-				"insufficient balance (have %d quarks, need %d): %w",
-				fromWallet.Quarks, quarks, errs.ErrUnprocessableEntity,
-			),
+		return model.Wallet{}, model.Wallet{}, 0, 0, fmt.Errorf(
+			"insufficient balance (have %d quarks, need %d): %w",
+			fromWallet.Quarks, quarks, errs.CodeInsufficientBalance,
 		)
 	}
 

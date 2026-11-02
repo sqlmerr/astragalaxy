@@ -23,10 +23,7 @@ func (r *InventoryRepositoryImpl) CreateResource(ctx context.Context, data Creat
 	err = postgres_pool.TranslateError(err)
 	if err != nil {
 		if errors.Is(err, postgres_pool.ErrViolatesForeignKey) {
-			return model.Resource{}, errs.NewWithCode(
-				errs.CodeInventoryNotFound,
-				fmt.Errorf("inventory with id='%s': %w", data.InventoryID, errs.ErrNotFound),
-			)
+			return model.Resource{}, fmt.Errorf("inventory with id='%s': %w", data.InventoryID, errs.CodeInventoryNotFound)
 		}
 
 		return model.Resource{}, fmt.Errorf("create inventory resource: %w", err)

@@ -24,10 +24,7 @@ func (r *DiscoveryRepositoryImpl) CreatePlanetDiscovery(ctx context.Context, dat
 	err = postgres_pool.TranslateError(err)
 	if err != nil {
 		if errors.Is(err, postgres_pool.ErrViolatesForeignKey) {
-			return model.PlanetDiscovery{}, errs.NewWithCode(
-				errs.CodeAgentNotFound,
-				fmt.Errorf("agent with id %s: %w", data.DiscoveredBy, errs.ErrNotFound),
-			)
+			return model.PlanetDiscovery{}, fmt.Errorf("agent with id %s: %w", data.DiscoveredBy, errs.CodeAgentNotFound)
 		}
 
 		return model.PlanetDiscovery{}, fmt.Errorf("create planet discovery: %w", err)

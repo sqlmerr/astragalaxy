@@ -22,10 +22,7 @@ func (r *DiscoveryRepositoryImpl) GetSystemDiscovery(ctx context.Context, system
 	err = postgres_pool.TranslateError(err)
 	if err != nil {
 		if errors.Is(err, postgres_pool.ErrNoRows) {
-			return model.SystemDiscovery{}, errs.NewWithCode(
-				errs.CodePlanetDiscoveryNotFound,
-				fmt.Errorf("system discovery x=%d y=%d: %w", systemX, systemY, errs.ErrNotFound),
-			)
+			return model.SystemDiscovery{}, fmt.Errorf("system discovery x=%d y=%d: %w", systemX, systemY, errs.CodePlanetDiscoveryNotFound)
 		}
 		return model.SystemDiscovery{}, fmt.Errorf("get system discovery: %w", err)
 	}

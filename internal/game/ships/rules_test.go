@@ -66,10 +66,7 @@ func TestOrbitShip(t *testing.T) {
 	}
 	_, _, err = OrbitShip(ship2)
 	assert.Error(t, err)
-	var withCode errs.WithCode
-	if assert.ErrorAs(t, err, &withCode) {
-		assert.Equal(t, withCode.Code, errs.CodeShipAlreadyInThisState)
-	}
+	assert.ErrorIs(t, err, errs.CodeShipAlreadyInThisState)
 }
 
 func TestDockShip(t *testing.T) {
@@ -132,7 +129,7 @@ func TestDockShip(t *testing.T) {
 			},
 			system:      worldgen.System{},
 			expectedErr: true,
-			err:         errs.ErrUnprocessableEntity,
+			err:         errs.ErrNotModified,
 			errCode:     errs.CodeShipAlreadyInThisState,
 		},
 		{
@@ -166,10 +163,7 @@ func TestDockShip(t *testing.T) {
 			if test.expectedErr {
 				assert.Error(t, err)
 				assert.ErrorIs(t, err, test.err)
-				var withCode errs.WithCode
-				if assert.ErrorAs(t, err, &withCode) {
-					assert.Equal(t, test.errCode, withCode.Code)
-				}
+				assert.ErrorIs(t, err, test.errCode)
 			} else {
 				assert.NoError(t, err)
 				assert.True(t, cd > 0)

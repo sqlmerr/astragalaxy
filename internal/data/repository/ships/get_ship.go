@@ -20,10 +20,7 @@ func (r *ShipRepositoryImpl) GetShip(ctx context.Context, shipID uuid.UUID) (mod
 
 	if err != nil {
 		if errors.Is(err, postgres_pool.ErrNoRows) {
-			return model.Ship{}, errs.NewWithCode(
-				errs.CodeShipNotFound,
-				fmt.Errorf("ship with id='%s': %w", shipID, errs.ErrNotFound),
-			)
+			return model.Ship{}, fmt.Errorf("ship with id='%s': %w", shipID, errs.CodeShipNotFound)
 		}
 
 		return model.Ship{}, fmt.Errorf("scan: %w", err)

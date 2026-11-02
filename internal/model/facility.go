@@ -20,7 +20,7 @@ func NewFacilityType(facilityType string) (FacilityType, error) {
 	case FacilityPrinter, FacilitySmelter, FacilityWalletTerminal:
 		return f, nil
 	default:
-		return "", errs.NewWithCode(errs.CodeInvalidFacilityType, fmt.Errorf("invalid facility type %s: %w", facilityType, errs.ErrInvalidArgument))
+		return "", fmt.Errorf("invalid facility type %s: %w", facilityType, errs.CodeInvalidFacilityType)
 	}
 }
 

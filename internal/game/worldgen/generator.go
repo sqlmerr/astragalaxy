@@ -64,10 +64,7 @@ func (w *WorldGen) GetSystemsInBox(minX, minY, maxX, maxY int) ([]System, error)
 	var foundSystems []System
 
 	if (maxX-minX) > 50 || (maxY-minY) > 50 {
-		return nil, errs.NewWithCode(
-			errs.CodeRadarAreaTooLarge,
-			fmt.Errorf("the radar area is too large: %w", errs.ErrInvalidArgument),
-		)
+		return nil, fmt.Errorf("the radar area is too large: %w", errs.CodeRadarAreaTooLarge)
 	}
 
 	for x := minX; x <= maxX; x++ {

@@ -40,8 +40,7 @@ type WarpFuelUsage struct {
 func (s *Service) getShipClass(ship model.Ship) (model.ShipClass, error) {
 	class, ok := s.gameData.ShipClasses.GetShipClass(ship.Class)
 	if !ok {
-		return model.ShipClass{}, errs.NewWithCode(errs.CodeAnomaly,
-			fmt.Errorf("unknown ship class %q: %w", ship.Class, errs.ErrNotFound))
+		return model.ShipClass{}, fmt.Errorf("unknown ship class %q: %w", ship.Class, errs.CodeAnomaly.WithBase(errs.ErrNotFound))
 	}
 	return class, nil
 }
@@ -55,14 +54,11 @@ func (s *Service) NavigateWarp(ctx context.Context, agentID uuid.UUID, x, y int)
 
 	system, exists := s.worldGen.GenerateSystemByCoords(x, y)
 	if !exists {
-		return model.Cooldown{}, WarpFuelUsage{}, nil, errs.NewWithCode(
-			errs.CodeInvalidWarpPath,
-			fmt.Errorf(
-				"system x=%d y=%d doesn't exist: %w",
-				x,
-				y,
-				errs.ErrNotFound,
-			),
+		return model.Cooldown{}, WarpFuelUsage{}, nil, fmt.Errorf(
+			"system x=%d y=%d doesn't exist: %w",
+			x,
+			y,
+			errs.CodeInvalidWarpPath.WithBase(errs.ErrNotFound),
 		)
 	}
 
@@ -176,14 +172,11 @@ func (s *Service) NavigatePlanet(ctx context.Context, agentID uuid.UUID, orbit i
 
 	system, exists := s.worldGen.GenerateSystemByCoords(ship.Coords.SystemX, ship.Coords.SystemY)
 	if !exists {
-		return model.Cooldown{}, nil, errs.NewWithCode(
-			errs.CodeAnomaly,
-			fmt.Errorf(
-				"system x=%d y=%d doesn't exist: %w",
-				ship.Coords.SystemX,
-				ship.Coords.SystemY,
-				errs.ErrNotFound,
-			),
+		return model.Cooldown{}, nil, fmt.Errorf(
+			"system x=%d y=%d doesn't exist: %w",
+			ship.Coords.SystemX,
+			ship.Coords.SystemY,
+			errs.CodeAnomaly.WithBase(errs.ErrNotFound),
 		)
 	}
 
@@ -251,15 +244,13 @@ func (s *Service) NavigateWaypoint(ctx context.Context, agentID uuid.UUID, waypo
 
 	system, exists := s.worldGen.GenerateSystemByCoords(ship.Coords.SystemX, ship.Coords.SystemY)
 	if !exists {
-		return model.Cooldown{}, errs.NewWithCode(
-			errs.CodeAnomaly,
+		return model.Cooldown{},
 			fmt.Errorf(
 				"system x=%d y=%d doesn't exist: %w",
 				ship.Coords.SystemX,
 				ship.Coords.SystemY,
-				errs.ErrNotFound,
-			),
-		)
+				errs.CodeAnomaly.WithBase(errs.ErrNotFound),
+			)
 	}
 
 	ship, cooldownDuration, err := NavigateWaypoint(ship, *system, waypointID)

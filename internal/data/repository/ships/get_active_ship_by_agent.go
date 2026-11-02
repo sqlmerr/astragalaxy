@@ -21,7 +21,7 @@ func (r *ShipRepositoryImpl) GetActiveShipByAgent(ctx context.Context, agentID u
 
 	if err != nil {
 		if errors.Is(err, postgres_pool.ErrNoRows) {
-			return model.Ship{}, errs.NewWithCode(errs.CodeShipNotFound, fmt.Errorf("ship: %w", errs.ErrNotFound))
+			return model.Ship{}, fmt.Errorf("ship: %w", errs.CodeShipNotFound)
 		}
 
 		return model.Ship{}, fmt.Errorf("scan: %w", err)

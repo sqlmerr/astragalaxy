@@ -18,20 +18,14 @@ func CalcWarpDistance(x1, y1, x2, y2 int) int {
 
 func NavigateWarp(ship model.Ship, class model.ShipClass, newSystem worldgen.System, warpCellT1Amount, warpCellT2Amount int) (model.Ship, time.Duration, model.ResourceType, int, error) {
 	if ship.Status != model.ShipStatusOrbit {
-		return model.Ship{}, 0, "", 0, errs.NewWithCode(
-			errs.CodeInvalidShipState,
-			fmt.Errorf("ship must be in orbit state: %w", errs.ErrUnprocessableEntity),
-		)
+		return model.Ship{}, 0, "", 0, fmt.Errorf("ship must be in orbit state: %w", errs.CodeInvalidShipState)
 	}
 
 	x1, y1 := ship.Coords.SystemX, ship.Coords.SystemY
 	x2, y2 := newSystem.X, newSystem.Y
 
 	if x1 == x2 && y1 == y2 {
-		return model.Ship{}, 0, "", 0, errs.NewWithCode(
-			errs.CodeAlreadyAtDestination,
-			fmt.Errorf("already at destination: %w", errs.ErrNotModified),
-		)
+		return model.Ship{}, 0, "", 0, fmt.Errorf("already at destination: %w", errs.CodeAlreadyAtDestination)
 	}
 	distance := CalcWarpDistance(x1, y1, x2, y2)
 	resource, amount, err := WarpFuelPlan(distance, warpCellT1Amount, warpCellT2Amount)
@@ -40,14 +34,11 @@ func NavigateWarp(ship model.Ship, class model.ShipClass, newSystem worldgen.Sys
 	}
 
 	if distance > class.MaxWarpDistance {
-		return model.Ship{}, 0, "", 0, errs.NewWithCode(
+		return model.Ship{}, 0, "", 0, fmt.Errorf(
+			"warp path length: %d is invalid (max=%d): %w",
+			distance,
+			class.MaxWarpDistance,
 			errs.CodeInvalidWarpPath,
-			fmt.Errorf(
-				"warp path length: %d is invalid (max=%d): %w",
-				distance,
-				class.MaxWarpDistance,
-				errs.ErrInvalidArgument,
-			),
 		)
 	}
 
@@ -71,10 +62,7 @@ func CalcWarpFuelCost(distance, tier int) int {
 
 func WarpFuelPlan(distance, t1Amount, t2Amount int) (model.ResourceType, int, error) {
 	if distance < 1 {
-		return "", 0, errs.NewWithCode(
-			errs.CodeInvalidWarpPath,
-			fmt.Errorf("warp distance must be positive: %w", errs.ErrInvalidArgument),
-		)
+		return "", 0, fmt.Errorf("warp distance must be positive: %w", errs.CodeInvalidWarpPath)
 	}
 
 	t1Cost := CalcWarpFuelCost(distance, 1)
@@ -98,45 +86,33 @@ func WarpFuelPlan(distance, t1Amount, t2Amount int) (model.ResourceType, int, er
 		}
 	}
 
-	return "", 0, errs.NewWithCode(
+	return "", 0, fmt.Errorf(
+		"not enough warp cells for distance=%d: have %d/%d, need %d/%d: %w",
+		distance,
+		t1Amount,
+		t2Amount,
+		t1Cost,
+		t2Cost,
 		errs.CodeNotEnoughResources,
-		fmt.Errorf(
-			"not enough warp cells for distance=%d: have %d/%d, need %d/%d: %w",
-			distance,
-			t1Amount,
-			t2Amount,
-			t1Cost,
-			t2Cost,
-			errs.ErrUnprocessableEntity,
-		),
 	)
 }
 
 func NavigatePlanet(ship model.Ship, system worldgen.System, orbitIndex int) (model.Ship, time.Duration, error) {
 	if ship.Status != model.ShipStatusOrbit {
-		return model.Ship{}, 0, errs.NewWithCode(
-			errs.CodeInvalidShipState,
-			fmt.Errorf("ship must be in orbit state: %w", errs.ErrUnprocessableEntity),
-		)
+		return model.Ship{}, 0, fmt.Errorf("ship must be in orbit state: %w", errs.CodeInvalidShipState)
 	}
 
 	if ship.Coords.Location == model.ShipLocationPlanet && ship.Coords.LocationID == orbitIndex {
-		return model.Ship{}, 0, errs.NewWithCode(
-			errs.CodeAlreadyAtDestination,
-			fmt.Errorf("already at destination: %w", errs.ErrNotModified),
-		)
+		return model.Ship{}, 0, fmt.Errorf("already at destination: %w", errs.CodeAlreadyAtDestination)
 	}
 
 	planet := system.FindPlanetByOrbit(orbitIndex)
 
 	if planet == nil {
-		return model.Ship{}, 0, errs.NewWithCode(
-			errs.CodeInvalidCoordinates,
-			fmt.Errorf(
-				"planet with orbit=%d: %w",
-				orbitIndex,
-				errs.ErrNotFound,
-			),
+		return model.Ship{}, 0, fmt.Errorf(
+			"planet with orbit=%d: %w",
+			orbitIndex,
+			errs.CodeInvalidCoordinates.WithBase(errs.ErrNotFound),
 		)
 	}
 
@@ -157,25 +133,16 @@ func NavigatePlanet(ship model.Ship, system worldgen.System, orbitIndex int) (mo
 
 func NavigateWaypoint(ship model.Ship, system worldgen.System, waypointID int) (model.Ship, time.Duration, error) {
 	if ship.Status != model.ShipStatusOrbit {
-		return model.Ship{}, 0, errs.NewWithCode(
-			errs.CodeInvalidShipState,
-			fmt.Errorf("ship must be in orbit state: %w", errs.ErrUnprocessableEntity),
-		)
+		return model.Ship{}, 0, fmt.Errorf("ship must be in orbit state: %w", errs.CodeInvalidShipState)
 	}
 
 	if ship.Coords.Location == model.ShipLocationWaypoint && ship.Coords.LocationID == waypointID {
-		return model.Ship{}, 0, errs.NewWithCode(
-			errs.CodeAlreadyAtDestination,
-			fmt.Errorf("already at destination: %w", errs.ErrNotModified),
-		)
+		return model.Ship{}, 0, fmt.Errorf("already at destination: %w", errs.CodeAlreadyAtDestination)
 	}
 
 	waypoint := system.FindWaypointByID(waypointID)
 	if waypoint == nil {
-		return model.Ship{}, 0, errs.NewWithCode(
-			errs.CodeInvalidCoordinates,
-			fmt.Errorf("waypoint with id=%d: %w", waypointID, errs.ErrNotFound),
-		)
+		return model.Ship{}, 0, fmt.Errorf("waypoint with id=%d: %w", waypointID, errs.CodeInvalidCoordinates.WithBase(errs.ErrNotFound))
 	}
 
 	cooldownDuration := time.Second * 30

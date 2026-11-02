@@ -32,13 +32,11 @@ func ProcessCraft(recipe *model.Recipe, facilityModifiers *model.FacilityCraftin
 		}
 
 		if !flag {
-			return nil, nil, nil, errs.NewWithCode(
-				errs.CodeNotEnoughResources,
-				fmt.Errorf(
-					"to craft recipe `%s` it is required to have at least %d of `%s` resource: %w",
-					recipe.ID, cost, input.ResourceID, errs.ErrUnprocessableEntity,
-				),
+			return nil, nil, nil, fmt.Errorf(
+				"to craft recipe `%s` it is required to have at least %d of `%s` resource: %w",
+				recipe.ID, cost, input.ResourceID, errs.CodeNotEnoughResources,
 			)
+
 		}
 	}
 

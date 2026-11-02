@@ -22,10 +22,7 @@ func (r *AgentRepositoryImpl) ChangeAgentToken(ctx context.Context, agentID uuid
 	}
 
 	if rowsAffected == 0 {
-		return errs.NewWithCode(
-			errs.CodeAgentNotFound,
-			fmt.Errorf("agent with id='%s': %w", agentID, errs.ErrNotFound),
-		)
+		return fmt.Errorf("agent with id='%s': %w", agentID, errs.CodeAgentNotFound)
 	}
 
 	return nil

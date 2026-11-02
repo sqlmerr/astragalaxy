@@ -20,10 +20,10 @@ func (r *InventoryRepositoryImpl) GetResource(ctx context.Context, inventoryID u
 	err = postgres_pool.TranslateError(err)
 	if err != nil {
 		if errors.Is(err, postgres_pool.ErrNoRows) {
-			return model.Resource{}, errs.NewWithCode(errs.CodeResourceNotFound, fmt.Errorf(
+			return model.Resource{}, fmt.Errorf(
 				"resource of type='%s' in inventory with id='%s': %w",
-				resourceType, inventoryID, errs.ErrNotFound,
-			))
+				resourceType, inventoryID, errs.CodeResourceNotFound,
+			)
 		}
 
 		return model.Resource{}, fmt.Errorf("get resource: %w", err)

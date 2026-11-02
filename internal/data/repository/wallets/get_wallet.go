@@ -18,7 +18,7 @@ func (r *WalletRepositoryImpl) GetWallet(ctx context.Context, address string) (m
 	err = postgres_pool.TranslateError(err)
 	if err != nil {
 		if errors.Is(err, postgres_pool.ErrNoRows) {
-			return model.Wallet{}, errs.NewWithCode(errs.CodeWalletNotFound, fmt.Errorf("wallet with address %q: %w", address, errs.ErrNotFound))
+			return model.Wallet{}, fmt.Errorf("wallet with address %q: %w", address, errs.CodeWalletNotFound)
 		}
 		return model.Wallet{}, fmt.Errorf("get wallet: %w", err)
 	}

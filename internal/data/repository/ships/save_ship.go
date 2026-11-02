@@ -30,10 +30,7 @@ func (r *ShipRepositoryImpl) SaveShip(ctx context.Context, ship model.Ship) (mod
 	err = postgres_pool.TranslateError(err)
 	if err != nil {
 		if errors.Is(err, postgres_pool.ErrNoRows) {
-			return model.Ship{}, errs.NewWithCode(
-				errs.CodeShipNotFound,
-				fmt.Errorf("ship with id='%s': %w", ship.ID, errs.ErrNotFound),
-			)
+			return model.Ship{}, fmt.Errorf("ship with id='%s': %w", ship.ID, errs.CodeShipNotFound)
 		}
 
 		return model.Ship{}, fmt.Errorf("scan: %w", err)

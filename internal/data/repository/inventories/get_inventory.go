@@ -19,7 +19,7 @@ func (r *InventoryRepositoryImpl) GetInventory(ctx context.Context, id uuid.UUID
 	err = postgres_pool.TranslateError(err)
 	if err != nil {
 		if errors.Is(err, postgres_pool.ErrNoRows) {
-			return model.Inventory{}, errs.NewWithCode(errs.CodeInventoryNotFound, fmt.Errorf("inventory with id='%s': %w", id, errs.ErrNotFound))
+			return model.Inventory{}, fmt.Errorf("inventory with id='%s': %w", id, errs.CodeInventoryNotFound)
 		}
 
 		return model.Inventory{}, fmt.Errorf("get inventory: %w", err)

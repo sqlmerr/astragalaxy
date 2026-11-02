@@ -2,62 +2,95 @@ package errs
 
 import "errors"
 
-type ErrorCode string
+type ErrorCode struct {
+	code string
+	base error
+}
 
-const (
-	CodeInternalServerError          ErrorCode = "INTERNAL_SERVER_ERROR"
-	CodeAnomaly                      ErrorCode = "ANOMALY" // something unexpected happened in the game
-	CodeUnknown                      ErrorCode = "UNKNOWN"
-	CodeDecodeError                  ErrorCode = "DECODE_ERROR"
-	CodeValidationError              ErrorCode = "VALIDATION_ERROR"
-	CodeInvalidJWTToken              ErrorCode = "INVALID_JWT_TOKEN"
-	CodeUserUsernameAlreadyOccupied  ErrorCode = "USER_USERNAME_ALREADY_OCCUPIED"
-	CodeUserNotFound                 ErrorCode = "USER_NOT_FOUND"
-	CodeInvalidCredentials           ErrorCode = "INVALID_CREDENTIALS"
-	CodeAccessDenied                 ErrorCode = "ACCESS_DENIED"
-	CodeAgentNotFound                ErrorCode = "AGENT_NOT_FOUND"
-	CodeAgentUsernameAlreadyOccupied ErrorCode = "AGENT_USERNAME_ALREADY_OCCUPIED"
-	CodeInvalidAgentToken            ErrorCode = "INVALID_AGENT_TOKEN"
-	CodeAgentLimitExceeded           ErrorCode = "AGENT_LIMIT_EXCEEDED"
-	CodeRadarAreaTooLarge            ErrorCode = "RADAR_AREA_TOO_LARGE"
-	CodeShipNotFound                 ErrorCode = "SHIP_NOT_FOUND"
-	CodeInventoryNotFound            ErrorCode = "INVENTORY_NOT_FOUND"
-	CodeResourceNotFound             ErrorCode = "RESOURCE_NOT_FOUND"
-	CodeItemNotFound                 ErrorCode = "ITEM_NOT_FOUND"
-	CodeShipMustBeActive             ErrorCode = "SHIP_MUST_BE_ACTIVE"
-	CodeInvalidTransferDirection     ErrorCode = "INVALID_TRANSFER_DIRECTION"
-	CodeNotEnoughResources           ErrorCode = "NOT_ENOUGH_RESOURCES"
-	CodeInventoryIsFull              ErrorCode = "INVENTORY_IS_FULL"
-	CodeItemNotInInventory           ErrorCode = "ITEM_NOT_IN_INVENTORY"
-	CodeAgentInCooldown              ErrorCode = "AGENT_IN_COOLDOWN"
-	CodeInvalidWarpPath              ErrorCode = "INVALID_WARP_PATH"
-	CodeAlreadyAtDestination         ErrorCode = "ALREADY_AT_DESTINATION"
-	CodeInvalidCoordinates           ErrorCode = "INVALID_COORDINATES"
-	CodeInvalidShipState             ErrorCode = "INVALID_SHIP_STATE"
-	CodeShipAlreadyInThisState       ErrorCode = "SHIP_ALREADY_IN_THIS_STATE"
-	CodeCannotDock                   ErrorCode = "CANNOT_DOCK_HERE"
-	CodeInvalidUUID                  ErrorCode = "INVALID_UUID"
-	CodeInvalidLocation              ErrorCode = "INVALID_LOCATION"
-	CodeWaypointNotFound             ErrorCode = "WAYPOINT_NOT_FOUND"
-	CodeResourceDepositNotFound      ErrorCode = "RESOURCE_DEPOSIT_NOT_FOUND"
-	CodeRecipeNotFound               ErrorCode = "RECIPE_NOT_FOUND"
-	CodeFacilityNotFound             ErrorCode = "FACILITY_NOT_FOUND"
-	CodeShipModuleAlreadyInstalled   ErrorCode = "SHIP_MODULE_ALREADY_INSTALLED"
-	CodeCannotUseItem                ErrorCode = "CANNOT_USE_ITEM"
-	CodeInvalidUsername              ErrorCode = "INVALID_USERNAME"
-	CodeInvalidPassword              ErrorCode = "INVALID_PASSWORD"
-	CodeInvalidFacilityType          ErrorCode = "INVALID_FACILITY_TYPE"
-	CodeInvalidShipModuleType        ErrorCode = "INVALID_SHIP_MODULE_TYPE"
-	CodeInvalidShipClass             ErrorCode = "INVALID_SHIP_CLASS"
-	CodeMiningLimitExceeded          ErrorCode = "MINING_LIMIT_EXCEEDED"
-	CodePlanetDiscoveryNotFound      ErrorCode = "PLANET_DISCOVERY_NOT_FOUND"
-	CodeSystemDiscoveryNotFound      ErrorCode = "SYSTEM_DISCOVERY_NOT_FOUND"
-	CodeWalletNotFound               ErrorCode = "WALLET_NOT_FOUND"
-	CodeInvalidWalletAddress         ErrorCode = "INVALID_WALLET_ADDRESS"
-	CodeInsufficientBalance          ErrorCode = "INSUFFICIENT_BALANCE"
-	CodeInvalidPaymentAmount         ErrorCode = "INVALID_PAYMENT_AMOUNT"
-	CodeWalletLimitExceeded          ErrorCode = "WALLET_LIMIT_EXCEEDED"
-	CodeCannotRegisterWallet         ErrorCode = "CANNOT_REGISTER_WALLET"
+func newCode(code string, base error) ErrorCode {
+	return ErrorCode{code: code, base: base}
+}
+
+func (c ErrorCode) String() string {
+	return c.code
+}
+
+func (c ErrorCode) Error() string {
+	return c.base.Error()
+}
+
+func (c ErrorCode) Unwrap() error {
+	return c.base
+}
+
+func (c ErrorCode) WithBase(err error) ErrorCode {
+	return ErrorCode{
+		code: c.code,
+		base: err,
+	}
+}
+
+func (c ErrorCode) Is(target error) bool {
+	if t, ok := target.(ErrorCode); ok {
+		return c.code == t.code
+	}
+	return false
+}
+
+var (
+	CodeInternalServerError          ErrorCode = newCode("INTERNAL_SERVER_ERROR", ErrInternal)
+	CodeAnomaly                      ErrorCode = newCode("ANOMALY", ErrInternal) // something unexpected happened in the game
+	CodeUnknown                      ErrorCode = newCode("UNKNOWN", ErrInternal)
+	CodeDecodeError                  ErrorCode = newCode("DECODE_ERROR", ErrInvalidArgument)
+	CodeValidationError              ErrorCode = newCode("VALIDATION_ERROR", ErrInvalidArgument)
+	CodeInvalidJWTToken              ErrorCode = newCode("INVALID_JWT_TOKEN", ErrUnauthorized)
+	CodeUserUsernameAlreadyOccupied  ErrorCode = newCode("USER_USERNAME_ALREADY_OCCUPIED", ErrConflict)
+	CodeUserNotFound                 ErrorCode = newCode("USER_NOT_FOUND", ErrNotFound)
+	CodeInvalidCredentials           ErrorCode = newCode("INVALID_CREDENTIALS", ErrUnauthorized)
+	CodeAccessDenied                 ErrorCode = newCode("ACCESS_DENIED", ErrAccessDenied)
+	CodeAgentNotFound                ErrorCode = newCode("AGENT_NOT_FOUND", ErrNotFound)
+	CodeAgentUsernameAlreadyOccupied ErrorCode = newCode("AGENT_USERNAME_ALREADY_OCCUPIED", ErrConflict)
+	CodeInvalidAgentToken            ErrorCode = newCode("INVALID_AGENT_TOKEN", ErrUnauthorized)
+	CodeAgentLimitExceeded           ErrorCode = newCode("AGENT_LIMIT_EXCEEDED", ErrUnprocessableEntity)
+	CodeRadarAreaTooLarge            ErrorCode = newCode("RADAR_AREA_TOO_LARGE", ErrInvalidArgument)
+	CodeShipNotFound                 ErrorCode = newCode("SHIP_NOT_FOUND", ErrNotFound)
+	CodeInventoryNotFound            ErrorCode = newCode("INVENTORY_NOT_FOUND", ErrNotFound)
+	CodeResourceNotFound             ErrorCode = newCode("RESOURCE_NOT_FOUND", ErrNotFound)
+	CodeItemNotFound                 ErrorCode = newCode("ITEM_NOT_FOUND", ErrNotFound)
+	CodeShipMustBeActive             ErrorCode = newCode("SHIP_MUST_BE_ACTIVE", ErrInternal)
+	CodeInvalidTransferDirection     ErrorCode = newCode("INVALID_TRANSFER_DIRECTION", ErrInvalidArgument)
+	CodeNotEnoughResources           ErrorCode = newCode("NOT_ENOUGH_RESOURCES", ErrUnprocessableEntity)
+	CodeInventoryIsFull              ErrorCode = newCode("INVENTORY_IS_FULL", ErrUnprocessableEntity)
+	CodeItemNotInInventory           ErrorCode = newCode("ITEM_NOT_IN_INVENTORY", ErrUnprocessableEntity)
+	CodeAgentInCooldown              ErrorCode = newCode("AGENT_IN_COOLDOWN", ErrUnprocessableEntity)
+	CodeInvalidWarpPath              ErrorCode = newCode("INVALID_WARP_PATH", ErrInvalidArgument)
+	CodeAlreadyAtDestination         ErrorCode = newCode("ALREADY_AT_DESTINATION", ErrNotModified)
+	CodeInvalidCoordinates           ErrorCode = newCode("INVALID_COORDINATES", ErrInvalidArgument)
+	CodeInvalidShipState             ErrorCode = newCode("INVALID_SHIP_STATE", ErrUnprocessableEntity)
+	CodeShipAlreadyInThisState       ErrorCode = newCode("SHIP_ALREADY_IN_THIS_STATE", ErrNotModified)
+	CodeCannotDock                   ErrorCode = newCode("CANNOT_DOCK_HERE", ErrUnprocessableEntity)
+	CodeInvalidUUID                  ErrorCode = newCode("INVALID_UUID", ErrInvalidArgument)
+	CodeInvalidLocation              ErrorCode = newCode("INVALID_LOCATION", ErrUnprocessableEntity) // can be changed
+	CodeWaypointNotFound             ErrorCode = newCode("WAYPOINT_NOT_FOUND", ErrNotFound)
+	CodeResourceDepositNotFound      ErrorCode = newCode("RESOURCE_DEPOSIT_NOT_FOUND", ErrNotFound)
+	CodeRecipeNotFound               ErrorCode = newCode("RECIPE_NOT_FOUND", ErrNotFound)
+	CodeFacilityNotFound             ErrorCode = newCode("FACILITY_NOT_FOUND", ErrNotFound)
+	CodeShipModuleAlreadyInstalled   ErrorCode = newCode("SHIP_MODULE_ALREADY_INSTALLED", ErrConflict)
+	CodeCannotUseItem                ErrorCode = newCode("CANNOT_USE_ITEM", ErrUnprocessableEntity)
+	CodeInvalidUsername              ErrorCode = newCode("INVALID_USERNAME", ErrInvalidArgument)
+	CodeInvalidPassword              ErrorCode = newCode("INVALID_PASSWORD", ErrInvalidArgument)
+	CodeInvalidFacilityType          ErrorCode = newCode("INVALID_FACILITY_TYPE", ErrInvalidArgument)
+	CodeInvalidShipModuleType        ErrorCode = newCode("INVALID_SHIP_MODULE_TYPE", ErrInvalidArgument)
+	CodeInvalidShipClass             ErrorCode = newCode("INVALID_SHIP_CLASS", ErrInvalidArgument)
+	CodeMiningLimitExceeded          ErrorCode = newCode("MINING_LIMIT_EXCEEDED", ErrUnprocessableEntity)
+	CodePlanetDiscoveryNotFound      ErrorCode = newCode("PLANET_DISCOVERY_NOT_FOUND", ErrNotFound)
+	CodeSystemDiscoveryNotFound      ErrorCode = newCode("SYSTEM_DISCOVERY_NOT_FOUND", ErrNotFound)
+	CodeWalletNotFound               ErrorCode = newCode("WALLET_NOT_FOUND", ErrNotFound)
+	CodeInvalidWalletAddress         ErrorCode = newCode("INVALID_WALLET_ADDRESS", ErrInvalidArgument)
+	CodeInsufficientBalance          ErrorCode = newCode("INSUFFICIENT_BALANCE", ErrUnprocessableEntity)
+	CodeInvalidPaymentAmount         ErrorCode = newCode("INVALID_PAYMENT_AMOUNT", ErrInvalidArgument)
+	CodeWalletLimitExceeded          ErrorCode = newCode("WALLET_LIMIT_EXCEEDED", ErrUnprocessableEntity)
+	CodeCannotRegisterWallet         ErrorCode = newCode("CANNOT_REGISTER_WALLET", ErrUnprocessableEntity)
 )
 
 type WithCode struct {
@@ -81,9 +114,16 @@ func NewWithCode(code ErrorCode, err error) WithCode {
 }
 
 func IsCode(err error, code ErrorCode) bool {
-	if codeErr, ok := errors.AsType[WithCode](err); ok {
-		return codeErr.Code == code
+	return errors.Is(err, code)
+}
+
+func GetCode(err error) ErrorCode {
+	if codeErr, ok := errors.AsType[ErrorCode](err); ok {
+		return codeErr
 	}
 
-	return false
+	if oldCodeErr, ok := errors.AsType[WithCode](err); ok {
+		return oldCodeErr.Code
+	}
+	return CodeInternalServerError
 }

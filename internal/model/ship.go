@@ -63,11 +63,11 @@ func (s ShipLocation) ValidateLocationID(id int) error {
 	switch s {
 	case ShipLocationNone:
 		if id != 0 {
-			return errs.NewWithCode(errs.CodeInvalidCoordinates, fmt.Errorf("location `none` must always have id 0"))
+			return fmt.Errorf("location `none` must always have id 0: %w", errs.CodeInvalidCoordinates)
 		}
 	case ShipLocationPlanet, ShipLocationWaypoint:
 		if id < 0 {
-			return errs.NewWithCode(errs.CodeInvalidCoordinates, fmt.Errorf("location `planet` and location `waypoint` must always have id greater than or equal to 0"))
+			return fmt.Errorf("location `planet` and location `waypoint` must always have id greater than or equal to 0: %w", errs.CodeInvalidCoordinates)
 		}
 	}
 
@@ -86,7 +86,7 @@ func NewShipLocation(location string) (ShipLocation, error) {
 	case ShipLocationNone, ShipLocationPlanet, ShipLocationWaypoint:
 		return loc, nil
 	default:
-		return "", errs.NewWithCode(errs.CodeInvalidLocation, fmt.Errorf("invalid location %s: %w", location, errs.ErrInvalidArgument))
+		return "", fmt.Errorf("invalid location %s: %w", location, errs.CodeInvalidLocation.WithBase(errs.ErrInvalidArgument))
 	}
 }
 
@@ -104,7 +104,7 @@ func (m ShipModuleType) IntoItemType() (ItemType, error) {
 	case ItemPortableSmelter, ItemPortablePrinter, ItemLaserDrill:
 		return item, nil
 	default:
-		return "", errs.NewWithCode(errs.CodeInvalidShipModuleType, fmt.Errorf("unknown ship module type: %s: %w", m, errs.ErrInvalidArgument))
+		return "", fmt.Errorf("unknown ship module type: %s: %w", m, errs.CodeInvalidShipModuleType)
 	}
 }
 

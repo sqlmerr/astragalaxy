@@ -44,10 +44,7 @@ func TestPay(t *testing.T) {
 		to := baseWallet("2", 0, 0, agent2)
 		_, _, _, _, err := Pay(from, to, 1000, 0)
 		require.Error(t, err)
-		var withCode errs.WithCode
-		if assert.ErrorAs(t, err, &withCode) {
-			assert.Equal(t, errs.CodeInsufficientBalance, withCode.Code)
-		}
+		assert.ErrorIs(t, err, errs.CodeInsufficientBalance)
 	})
 
 	t.Run("insufficient balance (quarks)", func(t *testing.T) {
@@ -55,10 +52,7 @@ func TestPay(t *testing.T) {
 		to := baseWallet("2", 0, 0, agent2)
 		_, _, _, _, err := Pay(from, to, 0, 100)
 		require.Error(t, err)
-		var withCode errs.WithCode
-		if assert.ErrorAs(t, err, &withCode) {
-			assert.Equal(t, errs.CodeInsufficientBalance, withCode.Code)
-		}
+		assert.ErrorIs(t, err, errs.CodeInsufficientBalance)
 	})
 
 	t.Run("insufficient balance (fee)", func(t *testing.T) {
@@ -66,10 +60,7 @@ func TestPay(t *testing.T) {
 		to := baseWallet("2", 0, 0, agent2)
 		_, _, _, _, err := Pay(from, to, 100, 10)
 		require.Error(t, err)
-		var withCode errs.WithCode
-		if assert.ErrorAs(t, err, &withCode) {
-			assert.Equal(t, errs.CodeInsufficientBalance, withCode.Code)
-		}
+		assert.ErrorIs(t, err, errs.CodeInsufficientBalance)
 	})
 
 	t.Run("success (no fee)", func(t *testing.T) {

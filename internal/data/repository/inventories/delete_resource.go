@@ -22,12 +22,9 @@ func (r *InventoryRepositoryImpl) DeleteResource(ctx context.Context, inventoryI
 	}
 
 	if rowsAffected == 0 {
-		return errs.NewWithCode(
-			errs.CodeResourceNotFound,
-			fmt.Errorf(
-				"resource with type='%s' in inventory with id='%s': %w",
-				resourceType, inventoryID, errs.ErrNotFound,
-			),
+		return fmt.Errorf(
+			"resource with type='%s' in inventory with id='%s': %w",
+			resourceType, inventoryID, errs.CodeResourceNotFound,
 		)
 	}
 

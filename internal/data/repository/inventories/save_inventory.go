@@ -26,10 +26,7 @@ func (r *InventoryRepositoryImpl) SaveInventory(ctx context.Context, data model.
 	err = postgres_pool.TranslateError(err)
 	if err != nil {
 		if errors.Is(err, postgres_pool.ErrNoRows) {
-			return model.Inventory{}, errs.NewWithCode(
-				errs.CodeInventoryNotFound,
-				fmt.Errorf("inventory with id='%s': %w", data.ID, errs.ErrNotFound),
-			)
+			return model.Inventory{}, fmt.Errorf("inventory with id='%s': %w", data.ID, errs.CodeInventoryNotFound)
 		}
 		return model.Inventory{}, fmt.Errorf("update inventory: %w", err)
 	}

@@ -24,7 +24,7 @@ func (r *WalletRepositoryImpl) CreateWallet(ctx context.Context, data CreateWall
 	err = postgres_pool.TranslateError(err)
 	if err != nil {
 		if errors.Is(err, postgres_pool.ErrViolatesForeignKey) {
-			return model.Wallet{}, errs.NewWithCode(errs.CodeAgentNotFound, fmt.Errorf("agent with id %s: %w", data.OwnerID, errs.ErrNotFound))
+			return model.Wallet{}, fmt.Errorf("agent with id %s: %w", data.OwnerID, errs.CodeAgentNotFound)
 		}
 		return model.Wallet{}, fmt.Errorf("create wallet: %w", err)
 	}
