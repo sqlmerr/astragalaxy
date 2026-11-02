@@ -19,6 +19,14 @@ SET
 WHERE address = $1
 RETURNING *;
 
+-- name: AddFundsToWallet :one
+UPDATE wallets
+SET
+    units = units + $2,
+    quarks = quarks + $3
+WHERE address = $1
+RETURNING *;
+
 -- name: DeleteWallet :execrows
 DELETE FROM wallets
 WHERE address = $1;

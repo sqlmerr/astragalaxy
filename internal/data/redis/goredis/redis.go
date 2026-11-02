@@ -42,3 +42,13 @@ func (c *Client) Del(ctx context.Context, keys ...string) redis.IntCmd {
 	cmd := c.Client.Del(ctx, keys...)
 	return goredisIntCmd{cmd}
 }
+
+func (c *Client) LPush(ctx context.Context, key string, values ...any) redis.IntCmd {
+	cmd := c.Client.LPush(ctx, key, values)
+	return goredisIntCmd{cmd}
+}
+
+func (c *Client) BRPop(ctx context.Context, timeout time.Duration, keys ...string) redis.StringSliceCmd {
+	cmd := c.Client.BRPop(ctx, timeout, keys...)
+	return goredisStringSliceCmd{cmd}
+}

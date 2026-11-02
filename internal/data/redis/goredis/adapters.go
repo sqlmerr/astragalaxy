@@ -15,3 +15,7 @@ type goredisStatusCmd struct {
 type goredisIntCmd struct {
 	*goredis.IntCmd
 }
+
+type goredisStringSliceCmd struct {
+	*goredis.StringSliceCmd
+}

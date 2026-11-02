@@ -15,6 +15,7 @@ type WalletRepository interface {
 	GetWalletsByAgent(ctx context.Context, agentID uuid.UUID) ([]model.Wallet, error)
 	SaveWallet(ctx context.Context, wallet model.Wallet) (model.Wallet, error)
 	DeleteWallet(ctx context.Context, address string) error
+	AddFunds(ctx context.Context, address string, units, quarks int) (model.Wallet, error)
 }
 
 type WalletRepositoryImpl struct {

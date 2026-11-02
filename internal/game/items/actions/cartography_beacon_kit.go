@@ -12,7 +12,16 @@ import (
 	"github.com/sqlmerr/astragalaxy/internal/model"
 )
 
-func UseCartographyBeaconKit(ctx ActionContext, agentID uuid.UUID, item model.Item, _ json.RawMessage) (ActionResponse, error) {
+type BeaconKitInput struct {
+	PayoutAddress string `json:"payout_address"`
+}
+
+func UseCartographyBeaconKit(ctx ActionContext, agentID uuid.UUID, item model.Item, input json.RawMessage) (ActionResponse, error) {
+	var i BeaconKitInput
+	if err := json.Unmarshal(input, &i); err != nil {
+		return nil, errs.NewWithCode(errs.CodeDecodeError, fmt.Errorf("decode action input json: %w: %w", err, errs.ErrInvalidArgument))
+	}
+
 	ship, err := ctx.Store.Ships().GetActiveShipByAgent(ctx.Context, agentID)
 	if err != nil {
 		return nil, fmt.Errorf("get active ship: %w", err)
@@ -30,12 +39,18 @@ func UseCartographyBeaconKit(ctx ActionContext, agentID uuid.UUID, item model.It
 		return nil, errs.NewWithCode(errs.CodeCannotUseItem, fmt.Errorf("cannot place cartography beacon in this system: you already placed one: %w", errs.ErrUnprocessableEntity))
 	}
 
+	wallet, err := ctx.Store.Wallets().GetWallet(ctx.Context, i.PayoutAddress)
+	if err != nil {
+		return nil, fmt.Errorf("get wallet: %w", err)
+	}
+	// TODO: (?) check wallet permissions to pay
+
 	_, err = ctx.Store.DynamicWaypoints().CreateDynamicWaypoint(ctx.Context, dynamic_waypoints_repository.CreateDynamicWaypoint{
 		SystemX:  ship.Coords.SystemX,
 		SystemY:  ship.Coords.SystemY,
 		OwnerID:  agentID,
 		Type:     model.DynamicWaypointCartographyBeacon,
-		Metadata: []byte("{}"),
+		Metadata: fmt.Appendf(nil, "{\"payout_address\": \"%s\"}", wallet.Address),
 	})
 	if err != nil {
 		return nil, fmt.Errorf("create dynamic waypoint: %w", err)
@@ -43,7 +58,7 @@ func UseCartographyBeaconKit(ctx ActionContext, agentID uuid.UUID, item model.It
 
 	err = ctx.Store.Inventories().DeleteItem(ctx.Context, item.ID)
 	if err != nil {
-		return nil, fmt.Errorf("delet item: %w", err)
+		return nil, fmt.Errorf("delete item: %w", err)
 	}
 
 	return newOkResponse(time.Second * 15), nil

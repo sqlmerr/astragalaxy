@@ -14,6 +14,7 @@ import (
 	"github.com/joho/godotenv"
 	"github.com/sqlmerr/astragalaxy/internal/auth"
 	"github.com/sqlmerr/astragalaxy/internal/data"
+	"github.com/sqlmerr/astragalaxy/internal/data/eventbus"
 	database "github.com/sqlmerr/astragalaxy/internal/data/postgres/database/sqlc"
 	"github.com/sqlmerr/astragalaxy/internal/data/postgres/migrator"
 	pgx_pool "github.com/sqlmerr/astragalaxy/internal/data/postgres/pool/pgx"
@@ -113,6 +114,8 @@ func main() {
 
 	store := data.NewStore(pool, userRepo, agentRepo, shipRepo, inventoryRepo, cooldownRepo, resourceDepositsRepo, discoveryRepo, walletRepo, dynamicWaypointsRepo)
 
+	bus := eventbus.New(rdb, *log)
+
 	log.Debug("Initializing game logic")
 	authConfig := auth.LoadConfigMust()
 	jwtProcessor := auth.NewJWTProcessor(*authConfig)
@@ -137,11 +140,13 @@ func main() {
 	agentsService := agents.NewService(store, *worldGen, shipsService, walletsService)
 	cooldownsService := cooldowns.NewService(gameConfig, store)
 	inventoryService := inventory.NewService(gameConfig, store, *gameData)
-	navigationService := navigation.NewService(gameConfig, store, *worldGen, *gameData)
+	navigationService := navigation.NewService(gameConfig, store, *worldGen, *gameData, bus)
 	galaxyService := galaxy.NewService(store, *worldGen)
 	miningService := mining.NewService(gameConfig, store, *worldGen, *gameData)
 	itemsService := items.NewService(gameConfig, store, *gameData)
 	craftingService := crafting.NewService(gameConfig, store, *gameData, *worldGen, facilitiesService)
+
+	eventbus.Subsribe(bus, galaxyService.HandleBeaconAgentWarped)
 
 	usersHandler := http_handler_users.NewUsersHTTPHandler(*usersService, *authService)
 	apiVersionRouter.AddRoutes(usersHandler.Routes(userAuthMiddleware)...)
@@ -199,6 +204,8 @@ func main() {
 		http_middleware.CORS([]string{"*"}),
 	)
 	httpServer.RegisterRouters(apiVersionRouter)
+
+	go bus.StartWorker(ctx)
 
 	if err := httpServer.Run(ctx); err != nil {
 		log.Error("failed to run http server", zap.Error(err))

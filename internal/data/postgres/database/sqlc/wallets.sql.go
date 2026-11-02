@@ -11,6 +11,34 @@ import (
 	"github.com/google/uuid"
 )
 
+const addFundsToWallet = `-- name: AddFundsToWallet :one
+UPDATE wallets
+SET
+    units = units + $2,
+    quarks = quarks + $3
+WHERE address = $1
+RETURNING address, units, quarks, owner_id, created_at
+`
+
+type AddFundsToWalletParams struct {
+	Address string
+	Units   int64
+	Quarks  int64
+}
+
+func (q *Queries) AddFundsToWallet(ctx context.Context, arg AddFundsToWalletParams) (Wallet, error) {
+	row := q.db.QueryRow(ctx, addFundsToWallet, arg.Address, arg.Units, arg.Quarks)
+	var i Wallet
+	err := row.Scan(
+		&i.Address,
+		&i.Units,
+		&i.Quarks,
+		&i.OwnerID,
+		&i.CreatedAt,
+	)
+	return i, err
+}
+
 const createWallet = `-- name: CreateWallet :one
 INSERT INTO wallets (address, units, quarks, owner_id)
 VALUES ($1, $2, $3, $4)

@@ -21,11 +21,12 @@ type Service struct {
 	store      data.Store
 	worldGen   worldgen.WorldGen
 	gameData   registry.GameData
+	bus        model.EventBus
 }
 
-func NewService(gameConfig game.Config, store data.Store, worldGen worldgen.WorldGen, gameData registry.GameData) *Service {
+func NewService(gameConfig game.Config, store data.Store, worldGen worldgen.WorldGen, gameData registry.GameData, bus model.EventBus) *Service {
 	return &Service{
-		gameConfig, store, worldGen, gameData,
+		gameConfig, store, worldGen, gameData, bus,
 	}
 }
 
@@ -146,6 +147,12 @@ func (s *Service) NavigateWarp(ctx context.Context, agentID uuid.UUID, x, y int)
 	if err != nil {
 		return model.Cooldown{}, WarpFuelUsage{}, nil, err
 	}
+
+	s.bus.Publish(ctx, model.AgentWarpedEvent{
+		AgentID: agentID,
+		SystemX: x,
+		SystemY: y,
+	})
 
 	return cooldown, WarpFuelUsage{
 		ResourceType: fuelResource,
