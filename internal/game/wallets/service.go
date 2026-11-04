@@ -124,6 +124,7 @@ func (s *Service) Pay(ctx context.Context, input PayInput) (PayOutput, error) {
 		return PayOutput{}, err
 	}
 	var cooldown model.Cooldown
+	var transaction model.WalletTransaction
 	err = s.store.ExecTx(ctx, func(tx data.Store) error {
 		_, err := tx.Wallets().SaveWallet(ctx, fromWallet)
 		if err != nil {
@@ -133,6 +134,16 @@ func (s *Service) Pay(ctx context.Context, input PayInput) (PayOutput, error) {
 		_, err = tx.Wallets().SaveWallet(ctx, toWallet)
 		if err != nil {
 			return fmt.Errorf("save to wallet: %w", err)
+		}
+
+		transaction, err = tx.Wallets().CreateTransaction(ctx, wallets_repository.CreateTransaction{
+			FromAddress: input.FromAddress,
+			ToAddress:   input.ToAddress,
+			Units:       input.Units,
+			Quarks:      input.Quarks,
+		})
+		if err != nil {
+			return fmt.Errorf("create transaction: %w", err)
 		}
 
 		cooldown, err = tx.Cooldowns().SetCooldown(ctx, cooldowns_repository.SetCooldown{
@@ -147,7 +158,50 @@ func (s *Service) Pay(ctx context.Context, input PayInput) (PayOutput, error) {
 	})
 
 	return PayOutput{
-		Fee:      fee,
-		Cooldown: cooldown,
+		Fee:         fee,
+		Cooldown:    cooldown,
+		Transaction: transaction,
 	}, nil
+}
+
+func (s *Service) checkWalletViewRights(ctx context.Context, agentID uuid.UUID, wallet model.Wallet) error {
+	if agentID == wallet.OwnerID {
+		return nil
+	}
+	// TODO: (?) private wallets
+
+	facilities, err := s.facilityProvider.GatherAvailableFacilities(ctx, agentID)
+	if err != nil {
+		return fmt.Errorf("gather available facilities: %w", err)
+	}
+
+	f, ok := facilities[model.FacilityWalletTerminal]
+	if !ok || len(f) == 0 { // we don't care about wallet_terminal facility tier here
+		return fmt.Errorf("cannot get this wallet: no `%s` facility available: %w", model.FacilityWalletTerminal, errs.CodeAccessDenied)
+	}
+
+	return nil
+}
+
+func (s *Service) GetPublicWallet(ctx context.Context, agentID uuid.UUID, address string) (model.Wallet, error) {
+	wallet, err := s.store.Wallets().GetWallet(ctx, address)
+	if err != nil {
+		return model.Wallet{}, fmt.Errorf("get public wallet: %w", err)
+	}
+	if err := s.checkWalletViewRights(ctx, agentID, wallet); err != nil {
+		return model.Wallet{}, err
+	}
+	return wallet, nil
+}
+
+func (s *Service) GetPublicWalletTransactions(ctx context.Context, agentID uuid.UUID, address string) ([]model.WalletTransaction, error) {
+	wallet, err := s.GetPublicWallet(ctx, agentID, address)
+	if err != nil {
+		return nil, err
+	}
+	transactions, err := s.store.Wallets().GetTransactionsByAddress(ctx, wallet.Address)
+	if err != nil {
+		return nil, fmt.Errorf("get public wallet transactions: %w", err)
+	}
+	return transactions, nil
 }

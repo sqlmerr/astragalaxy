@@ -1,0 +1,34 @@
+get:
+  operationId: getWalletTransactions
+  tags:
+    - Wallets
+  summary: Get Wallet Transactions
+  description: Get public wallet transactions by address. You can get not your wallet only near `wallet_terminal` facility
+  parameters:
+    - name: addr
+      in: path
+      schema:
+        $ref: ../../components/schemas/WalletAddress.yaml
+      required: true
+  responses:
+    '200':
+      description: Successfully fetched wallet transactions
+      content: 
+        application/json:
+          schema:
+            type: object
+            required:
+              - data
+            properties: 
+              data:
+                type: array
+                items: 
+                  $ref: ../../components/schemas/Wallet.yaml
+    '401':
+      $ref: ../../components/responses/InvalidAgentToken.yaml
+    '403':
+      $ref: ../../components/responses/AccessDenied.yaml
+  security:
+    - AgentAuth: []
+    - UserAuth: []
+      AgentId: []

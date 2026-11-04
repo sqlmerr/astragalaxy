@@ -1,0 +1,27 @@
+get:
+  operationId: getWallet
+  tags:
+    - Wallets
+  summary: Get Wallet
+  description: Get public wallet by address. You can get not your wallet only near `wallet_terminal` facility
+  parameters:
+    - name: addr
+      in: path
+      schema:
+        $ref: ../../components/schemas/WalletAddress.yaml
+      required: true
+  responses:
+    '200':
+      description: Successfully fetched wallet
+      content: 
+        application/json:
+          schema:
+            $ref: ../../components/schemas/Wallet.yaml
+    '401':
+      $ref: ../../components/responses/InvalidAgentToken.yaml
+    '403':
+      $ref: ../../components/responses/AccessDenied.yaml
+  security:
+    - AgentAuth: []
+    - UserAuth: []
+      AgentId: []

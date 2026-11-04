@@ -22,3 +22,22 @@ func convertWallet(m database.Wallet) model.Wallet {
 		CreatedAt: m.CreatedAt.Time,
 	}
 }
+
+type CreateTransaction struct {
+	FromAddress string
+	ToAddress   string
+
+	Units  int
+	Quarks int
+}
+
+func convertTransaction(m database.WalletTransaction) model.WalletTransaction {
+	return model.WalletTransaction{
+		ID:          m.ID,
+		FromAddress: m.FromAddress,
+		ToAddress:   m.ToAddress,
+		Units:       int(m.Units),
+		Quarks:      int(m.Quarks),
+		CreatedAt:   m.CreatedAt.Time,
+	}
+}

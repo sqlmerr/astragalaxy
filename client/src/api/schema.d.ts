@@ -739,6 +739,46 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/wallets/{addr}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Wallet
+         * @description Get public wallet by address. You can get not your wallet only near `wallet_terminal` facility
+         */
+        get: operations["getWallet"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/wallets/{addr}/transactions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Wallet Transactions
+         * @description Get public wallet transactions by address. You can get not your wallet only near `wallet_terminal` facility
+         */
+        get: operations["getWalletTransactions"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -1247,10 +1287,23 @@ export interface components {
             /** @description Amount of quarks you want to pay */
             quarks?: number;
         };
+        WalletTransaction: {
+            /** Format: uuid */
+            id: string;
+            from_address: components["schemas"]["WalletAddress"];
+            to_address: components["schemas"]["WalletAddress"];
+            /** @description Amount of units */
+            units: number;
+            /** @description Amount of quarks */
+            quarks: number;
+            /** Format: date-time */
+            created_at: string;
+        };
         PayResponse: {
             /** @description Fee in units */
             fee: number;
             cooldown: components["schemas"]["Cooldown"];
+            transaction: components["schemas"]["WalletTransaction"];
         };
     };
     responses: {
@@ -2355,6 +2408,56 @@ export interface operations {
                 };
             };
             401: components["responses"]["InvalidAgentToken"];
+        };
+    };
+    getWallet: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                addr: components["schemas"]["WalletAddress"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successfully fetched wallet */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Wallet"];
+                };
+            };
+            401: components["responses"]["InvalidAgentToken"];
+            403: components["responses"]["AccessDenied"];
+        };
+    };
+    getWalletTransactions: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                addr: components["schemas"]["WalletAddress"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successfully fetched wallet transactions */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["Wallet"][];
+                    };
+                };
+            };
+            401: components["responses"]["InvalidAgentToken"];
+            403: components["responses"]["AccessDenied"];
         };
     };
 }

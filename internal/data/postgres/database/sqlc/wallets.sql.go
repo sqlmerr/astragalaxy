@@ -70,6 +70,38 @@ func (q *Queries) CreateWallet(ctx context.Context, arg CreateWalletParams) (Wal
 	return i, err
 }
 
+const createWalletTransaction = `-- name: CreateWalletTransaction :one
+INSERT INTO wallet_transactions (from_address, to_address, units, quarks)
+VALUES ($1, $2, $3, $4)
+RETURNING id, from_address, to_address, units, quarks, created_at
+`
+
+type CreateWalletTransactionParams struct {
+	FromAddress string
+	ToAddress   string
+	Units       int64
+	Quarks      int64
+}
+
+func (q *Queries) CreateWalletTransaction(ctx context.Context, arg CreateWalletTransactionParams) (WalletTransaction, error) {
+	row := q.db.QueryRow(ctx, createWalletTransaction,
+		arg.FromAddress,
+		arg.ToAddress,
+		arg.Units,
+		arg.Quarks,
+	)
+	var i WalletTransaction
+	err := row.Scan(
+		&i.ID,
+		&i.FromAddress,
+		&i.ToAddress,
+		&i.Units,
+		&i.Quarks,
+		&i.CreatedAt,
+	)
+	return i, err
+}
+
 const deleteWallet = `-- name: DeleteWallet :execrows
 DELETE FROM wallets
 WHERE address = $1
@@ -77,6 +109,19 @@ WHERE address = $1
 
 func (q *Queries) DeleteWallet(ctx context.Context, address string) (int64, error) {
 	result, err := q.db.Exec(ctx, deleteWallet, address)
+	if err != nil {
+		return 0, err
+	}
+	return result.RowsAffected(), nil
+}
+
+const deleteWalletTransaction = `-- name: DeleteWalletTransaction :execrows
+DELETE FROM wallet_transactions
+WHERE id = $1
+`
+
+func (q *Queries) DeleteWalletTransaction(ctx context.Context, id uuid.UUID) (int64, error) {
+	result, err := q.db.Exec(ctx, deleteWalletTransaction, id)
 	if err != nil {
 		return 0, err
 	}
@@ -99,6 +144,124 @@ func (q *Queries) GetWalletByAddress(ctx context.Context, address string) (Walle
 		&i.CreatedAt,
 	)
 	return i, err
+}
+
+const getWalletTransaction = `-- name: GetWalletTransaction :one
+SELECT id, from_address, to_address, units, quarks, created_at FROM wallet_transactions
+WHERE id = $1
+`
+
+func (q *Queries) GetWalletTransaction(ctx context.Context, id uuid.UUID) (WalletTransaction, error) {
+	row := q.db.QueryRow(ctx, getWalletTransaction, id)
+	var i WalletTransaction
+	err := row.Scan(
+		&i.ID,
+		&i.FromAddress,
+		&i.ToAddress,
+		&i.Units,
+		&i.Quarks,
+		&i.CreatedAt,
+	)
+	return i, err
+}
+
+const getWalletTransactionsByAddress = `-- name: GetWalletTransactionsByAddress :many
+SELECT id, from_address, to_address, units, quarks, created_at FROM wallet_transactions
+WHERE from_address = $1 OR to_address = $1
+ORDER BY created_at
+`
+
+func (q *Queries) GetWalletTransactionsByAddress(ctx context.Context, fromAddress string) ([]WalletTransaction, error) {
+	rows, err := q.db.Query(ctx, getWalletTransactionsByAddress, fromAddress)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []WalletTransaction
+	for rows.Next() {
+		var i WalletTransaction
+		if err := rows.Scan(
+			&i.ID,
+			&i.FromAddress,
+			&i.ToAddress,
+			&i.Units,
+			&i.Quarks,
+			&i.CreatedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getWalletTransactionsByFromAddress = `-- name: GetWalletTransactionsByFromAddress :many
+SELECT id, from_address, to_address, units, quarks, created_at FROM wallet_transactions
+WHERE from_address = $1
+ORDER BY created_at
+`
+
+func (q *Queries) GetWalletTransactionsByFromAddress(ctx context.Context, fromAddress string) ([]WalletTransaction, error) {
+	rows, err := q.db.Query(ctx, getWalletTransactionsByFromAddress, fromAddress)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []WalletTransaction
+	for rows.Next() {
+		var i WalletTransaction
+		if err := rows.Scan(
+			&i.ID,
+			&i.FromAddress,
+			&i.ToAddress,
+			&i.Units,
+			&i.Quarks,
+			&i.CreatedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getWalletTransactionsByToAddress = `-- name: GetWalletTransactionsByToAddress :many
+SELECT id, from_address, to_address, units, quarks, created_at FROM wallet_transactions
+WHERE to_address = $1
+ORDER BY created_at
+`
+
+func (q *Queries) GetWalletTransactionsByToAddress(ctx context.Context, toAddress string) ([]WalletTransaction, error) {
+	rows, err := q.db.Query(ctx, getWalletTransactionsByToAddress, toAddress)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []WalletTransaction
+	for rows.Next() {
+		var i WalletTransaction
+		if err := rows.Scan(
+			&i.ID,
+			&i.FromAddress,
+			&i.ToAddress,
+			&i.Units,
+			&i.Quarks,
+			&i.CreatedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
 }
 
 const getWalletsByAgent = `-- name: GetWalletsByAgent :many

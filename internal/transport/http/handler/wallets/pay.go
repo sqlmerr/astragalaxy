@@ -19,8 +19,9 @@ type PayRequest struct {
 }
 
 type PayResponse struct {
-	Fee      int                  `json:"fee"`
-	Cooldown http_dto.CooldownDTO `json:"cooldown"`
+	Fee         int                  `json:"fee"`
+	Cooldown    http_dto.CooldownDTO `json:"cooldown"`
+	Transaction TransactionDTO       `json:"transaction"`
 }
 
 func (h *WalletsHTTPHandler) Pay(w http.ResponseWriter, r *http.Request) {
@@ -53,8 +54,9 @@ func (h *WalletsHTTPHandler) Pay(w http.ResponseWriter, r *http.Request) {
 	}
 
 	response := PayResponse{
-		Fee:      output.Fee,
-		Cooldown: http_dto.ColdownFromModel(output.Cooldown),
+		Fee:         output.Fee,
+		Cooldown:    http_dto.ColdownFromModel(output.Cooldown),
+		Transaction: convertTransactionModelToDTO(output.Transaction),
 	}
 	rh.JSONResponse(http.StatusOK, response)
 }

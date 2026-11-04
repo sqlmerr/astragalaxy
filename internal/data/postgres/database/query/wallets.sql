@@ -30,3 +30,32 @@ RETURNING *;
 -- name: DeleteWallet :execrows
 DELETE FROM wallets
 WHERE address = $1;
+
+
+-- name: CreateWalletTransaction :one
+INSERT INTO wallet_transactions (from_address, to_address, units, quarks)
+VALUES ($1, $2, $3, $4)
+RETURNING *;
+
+-- name: GetWalletTransaction :one
+SELECT * FROM wallet_transactions
+WHERE id = $1;
+
+-- name: GetWalletTransactionsByFromAddress :many
+SELECT * FROM wallet_transactions
+WHERE from_address = $1
+ORDER BY created_at;
+
+-- name: GetWalletTransactionsByToAddress :many
+SELECT * FROM wallet_transactions
+WHERE to_address = $1
+ORDER BY created_at;
+
+-- name: GetWalletTransactionsByAddress :many
+SELECT * FROM wallet_transactions
+WHERE from_address = $1 OR to_address = $1
+ORDER BY created_at;
+
+-- name: DeleteWalletTransaction :execrows
+DELETE FROM wallet_transactions
+WHERE id = $1;

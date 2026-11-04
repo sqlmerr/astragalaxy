@@ -27,7 +27,7 @@ func (h *WalletsHTTPHandler) GetMyWallets(w http.ResponseWriter, r *http.Request
 	}
 	response := GetMyWalletsResponse{
 		Data: lo.Map(wallets, func(i model.Wallet, _ int) WalletResponseDTO {
-			return convertModelToDTO(i)
+			return convertWalletModelToDTO(i)
 		}),
 	}
 	rh.JSONResponse(http.StatusOK, response)

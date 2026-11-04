@@ -1,0 +1,25 @@
+type: object
+required:
+  - id
+  - from_address
+  - to_address
+  - units
+  - quarks
+  - created_at
+properties: 
+  id:
+    type: string
+    format: uuid
+  from_address:
+    $ref: WalletAddress.yaml
+  to_address:
+    $ref: WalletAddress.yaml
+  units:
+    type: integer
+    description: Amount of units
+  quarks:
+    type: integer
+    description: Amount of quarks
+  created_at:
+    type: string
+    format: date-time

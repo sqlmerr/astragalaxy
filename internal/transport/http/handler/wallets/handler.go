@@ -36,5 +36,17 @@ func (h *WalletsHTTPHandler) Routes(agentAuthMiddleware http_middleware.Middlewa
 			Handler:    h.RegisterWallet,
 			Middleware: []http_middleware.Middleware{agentAuthMiddleware},
 		},
+		{
+			Method:     http.MethodGet,
+			Path:       "/wallets/{addr}",
+			Handler:    h.GetPublicWallet,
+			Middleware: []http_middleware.Middleware{agentAuthMiddleware},
+		},
+		{
+			Method:     http.MethodGet,
+			Path:       "/wallets/{addr}/transactions",
+			Handler:    h.GetWalletTransactions,
+			Middleware: []http_middleware.Middleware{agentAuthMiddleware},
+		},
 	}
 }

@@ -16,6 +16,11 @@ type WalletRepository interface {
 	SaveWallet(ctx context.Context, wallet model.Wallet) (model.Wallet, error)
 	DeleteWallet(ctx context.Context, address string) error
 	AddFunds(ctx context.Context, address string, units, quarks int) (model.Wallet, error)
+
+	CreateTransaction(ctx context.Context, data CreateTransaction) (model.WalletTransaction, error)
+	GetTransactionsByToAddress(ctx context.Context, address string) ([]model.WalletTransaction, error)
+	GetTransactionsByAddress(ctx context.Context, address string) ([]model.WalletTransaction, error)
+	// DeleteTransaction(ctx context.Context, id uuid.UUID) error
 }
 
 type WalletRepositoryImpl struct {

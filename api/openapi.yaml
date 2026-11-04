@@ -85,6 +85,10 @@ paths:
     $ref: paths/wallets/pay.yaml
   /api/v1/wallets:
     $ref: paths/wallets/register.yaml
+  /api/v1/wallets/{addr}:
+    $ref: paths/wallets/get-public.yaml
+  /api/v1/wallets/{addr}/transactions:
+    $ref: paths/wallets/transactions.yaml
 components:
   securitySchemes:
     UserAuth:

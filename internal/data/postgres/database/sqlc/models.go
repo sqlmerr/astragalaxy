@@ -281,3 +281,12 @@ type Wallet struct {
 	OwnerID   uuid.UUID
 	CreatedAt pgtype.Timestamp
 }
+
+type WalletTransaction struct {
+	ID          uuid.UUID
+	FromAddress string
+	ToAddress   string
+	Units       int64
+	Quarks      int64
+	CreatedAt   pgtype.Timestamp
+}

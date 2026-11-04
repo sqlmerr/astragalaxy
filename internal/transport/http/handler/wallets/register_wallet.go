@@ -21,5 +21,5 @@ func (h *WalletsHTTPHandler) RegisterWallet(w http.ResponseWriter, r *http.Reque
 		return
 	}
 
-	rh.JSONResponse(http.StatusCreated, convertModelToDTO(wallet))
+	rh.JSONResponse(http.StatusCreated, convertWalletModelToDTO(wallet))
 }

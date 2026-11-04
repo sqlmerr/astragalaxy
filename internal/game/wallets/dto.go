@@ -14,6 +14,7 @@ type PayInput struct {
 }
 
 type PayOutput struct {
-	Fee      int // in units
-	Cooldown model.Cooldown
+	Fee         int // in units
+	Cooldown    model.Cooldown
+	Transaction model.WalletTransaction
 }

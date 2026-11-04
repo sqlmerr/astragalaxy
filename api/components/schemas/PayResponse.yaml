@@ -2,9 +2,12 @@ type: object
 required:
   - fee
   - cooldown
+  - transaction
 properties: 
   fee:
     type: integer
     description: Fee in units
   cooldown:
     $ref: Cooldown.yaml
+  transaction:
+    $ref: WalletTransaction.yaml
