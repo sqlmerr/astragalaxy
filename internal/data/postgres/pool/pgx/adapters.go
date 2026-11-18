@@ -32,6 +32,7 @@ type pgxCommandTag struct {
 
 type pgxTx struct {
 	pgx.Tx
+
 	opTimeout time.Duration
 }
 

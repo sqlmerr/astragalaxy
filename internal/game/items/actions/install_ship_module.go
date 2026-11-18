@@ -12,7 +12,7 @@ import (
 	"github.com/sqlmerr/astragalaxy/internal/model"
 )
 
-// InstallShipModule equips item as ship module to agents active ship
+// InstallShipModule equips item as ship module to agents active ship.
 func InstallShipModule(shipModuleType model.ShipModuleType) ItemAction {
 	return func(ctx ActionContext, agentID uuid.UUID, item model.Item, _ json.RawMessage) (ActionResponse, error) {
 		ship, err := ctx.Store.Ships().GetActiveShipByAgent(ctx.Context, agentID)

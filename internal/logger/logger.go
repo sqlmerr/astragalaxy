@@ -19,7 +19,7 @@ type Logger struct {
 
 var LoggerKey = "logger"
 
-// FromContext returns *Logger or panics
+// FromContext returns *Logger or panics.
 func FromContext(ctx context.Context) *Logger {
 	logger, ok := ctx.Value(LoggerKey).(*Logger)
 	if !ok {
@@ -28,7 +28,7 @@ func FromContext(ctx context.Context) *Logger {
 	return logger
 }
 
-// TryFromContext Returns *Logger or nil
+// TryFromContext Returns *Logger or nil.
 func TryFromContext(ctx context.Context) *Logger {
 	logger, ok := ctx.Value(LoggerKey).(*Logger)
 	if !ok {

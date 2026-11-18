@@ -165,7 +165,6 @@ func (s *Service) ResetAgentToken(ctx context.Context, userID uuid.UUID, agentID
 	}
 	if agent.UserID != userID {
 		return "", fmt.Errorf("cannot access agent with id='%s': %w", agentID, errs.CodeAccessDenied)
-
 	}
 
 	rawToken, tokenHash, err := auth.GenerateAgentToken()

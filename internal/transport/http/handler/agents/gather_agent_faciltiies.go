@@ -27,7 +27,7 @@ func (h *AgentsHTTPHandler) GetAgentFacilities(w http.ResponseWriter, r *http.Re
 	}
 
 	response := GatherAgentFacilitiesResponse{
-		Data: lo.MapKeys(facilities, func(value []string, key model.FacilityType) string {
+		Data: lo.MapKeys(facilities, func(_ []string, key model.FacilityType) string {
 			return string(key)
 		}),
 	}

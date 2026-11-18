@@ -1,12 +1,14 @@
-package navigation
+package navigation_test
 
 import (
 	"testing"
 
 	errs "github.com/sqlmerr/astragalaxy/internal/errors"
+	"github.com/sqlmerr/astragalaxy/internal/game/navigation"
 	"github.com/sqlmerr/astragalaxy/internal/game/worldgen"
 	"github.com/sqlmerr/astragalaxy/internal/model"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestNavigateWarp(t *testing.T) {
@@ -144,16 +146,16 @@ func TestNavigateWarp(t *testing.T) {
 			if test.shipClass.MaxWarpDistance != 0 {
 				class = test.shipClass
 			}
-			ship, cd, _, _, err := NavigateWarp(test.ship, class, test.newSystem, test.fuelT1, test.fuelT2)
+			ship, cd, _, _, err := navigation.NavigateWarp(test.ship, class, test.newSystem, test.fuelT1, test.fuelT2)
 			if test.expectedErr {
-				assert.Error(t, err)
-				assert.ErrorIs(t, err, test.err)
-				assert.ErrorIs(t, err, test.errCode)
+				require.Error(t, err)
+				require.ErrorIs(t, err, test.err)
+				require.ErrorIs(t, err, test.errCode)
 			} else {
-				assert.NoError(t, err)
+				require.NoError(t, err)
 				assert.Equal(t, test.newSystem.X, ship.Coords.SystemX)
 				assert.Equal(t, test.newSystem.Y, ship.Coords.SystemY)
-				assert.True(t, cd > 0)
+				assert.Positive(t, cd)
 			}
 		})
 	}
@@ -232,16 +234,16 @@ func TestNavigatePlanet(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			ship, cd, err := NavigatePlanet(test.ship, test.system, test.orbitIndex)
+			ship, cd, err := navigation.NavigatePlanet(test.ship, test.system, test.orbitIndex)
 			if test.expectedErr {
-				assert.Error(t, err)
-				assert.ErrorIs(t, err, test.err)
-				assert.ErrorIs(t, err, test.errCode)
+				require.Error(t, err)
+				require.ErrorIs(t, err, test.err)
+				require.ErrorIs(t, err, test.errCode)
 			} else {
-				assert.NoError(t, err)
+				require.NoError(t, err)
 				assert.Equal(t, model.ShipLocationPlanet, ship.Coords.Location)
 				assert.Equal(t, test.orbitIndex, ship.Coords.LocationID)
-				assert.True(t, cd > 0)
+				assert.Positive(t, cd)
 			}
 		})
 	}
@@ -316,16 +318,16 @@ func TestNavigateWaypoint(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			ship, cd, err := NavigateWaypoint(test.ship, test.system, test.waypointID)
+			ship, cd, err := navigation.NavigateWaypoint(test.ship, test.system, test.waypointID)
 			if test.expectedErr {
-				assert.Error(t, err)
-				assert.ErrorIs(t, err, test.err)
-				assert.ErrorIs(t, err, test.errCode)
+				require.Error(t, err)
+				require.ErrorIs(t, err, test.err)
+				require.ErrorIs(t, err, test.errCode)
 			} else {
-				assert.NoError(t, err)
+				require.NoError(t, err)
 				assert.Equal(t, model.ShipLocationWaypoint, ship.Coords.Location)
 				assert.Equal(t, test.waypointID, ship.Coords.LocationID)
-				assert.True(t, cd > 0)
+				assert.Positive(t, cd)
 			}
 		})
 	}

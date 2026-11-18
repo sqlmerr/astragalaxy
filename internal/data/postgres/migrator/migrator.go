@@ -14,7 +14,7 @@ import (
 	"github.com/golang-migrate/migrate/v4"
 	migrate_pgx "github.com/golang-migrate/migrate/v4/database/pgx/v5"
 	"github.com/golang-migrate/migrate/v4/source/iofs"
-	_ "github.com/jackc/pgx/v5/stdlib"
+	_ "github.com/jackc/pgx/v5/stdlib" //nolint:revive // pgx/v5/stdlib has init() function which registers pgx driver.
 
 	"github.com/sqlmerr/astragalaxy/internal/data/postgres/database/migration"
 	pgx_pool "github.com/sqlmerr/astragalaxy/internal/data/postgres/pool/pgx"
@@ -36,6 +36,11 @@ Configuration is read from environment variables (POSTGRES_*), .env is loaded
 from the current working directory when present.
 `
 
+const commandDown = "down"
+const commandUp = "up"
+const commandForce = "force"
+const commandVersion = "version"
+
 type consoleLogger struct{}
 
 func (consoleLogger) Printf(format string, args ...any) { fmt.Printf(format, args...) }
@@ -53,7 +58,7 @@ func Run(ctx context.Context, args []string) error {
 	case "help", "-h", "--help":
 		fmt.Print(usage)
 		return nil
-	case "up", "down", "force", "version":
+	case commandUp, commandDown, commandForce, commandVersion:
 	default:
 		return fmt.Errorf("unknown command %q\n\n%s", command, usage)
 	}
@@ -64,7 +69,7 @@ func Run(ctx context.Context, args []string) error {
 	}
 	defer m.Close()
 
-	if command == "up" || command == "down" {
+	if command == commandUp || command == commandDown {
 		if err := checkDatabaseNotAhead(m); err != nil {
 			return err
 		}
@@ -93,7 +98,7 @@ func Run(ctx context.Context, args []string) error {
 
 func apply(m *migrate.Migrate, command string, args []string) error {
 	switch command {
-	case "up":
+	case commandUp:
 		n, err := parseCount(args, command)
 		if err != nil {
 			return err
@@ -102,7 +107,7 @@ func apply(m *migrate.Migrate, command string, args []string) error {
 			return ignoreNoChange(m.Steps(n))
 		}
 		return ignoreNoChange(m.Up())
-	case "down":
+	case commandDown:
 		n, err := parseCount(args, command)
 		if err != nil {
 			return err
@@ -111,13 +116,13 @@ func apply(m *migrate.Migrate, command string, args []string) error {
 			n = 1
 		}
 		return ignoreNoChange(m.Steps(-n))
-	case "force":
+	case commandForce:
 		version, err := parseVersion(args)
 		if err != nil {
 			return err
 		}
 		return m.Force(version)
-	case "version":
+	case commandVersion:
 		return nil
 	default:
 		return fmt.Errorf("unknown command %q\n\n%s", command, usage)
@@ -167,7 +172,7 @@ func newMigrate() (*migrate.Migrate, error) {
 }
 
 func checkDatabaseNotAhead(m *migrate.Migrate) error {
-	max, err := maxEmbeddedVersion()
+	maxVer, err := maxEmbeddedVersion()
 	if err != nil {
 		return err
 	}
@@ -182,11 +187,11 @@ func checkDatabaseNotAhead(m *migrate.Migrate) error {
 		return nil
 	}
 
-	if uint(version) > max {
+	if version > maxVer {
 		return fmt.Errorf(
 			"database is at migration version %d, but this binary contains migrations only up to %d: the server image is outdated, rebuild it or use a newer image tag",
 			version,
-			max,
+			maxVer,
 		)
 	}
 	return nil
@@ -198,7 +203,7 @@ func maxEmbeddedVersion() (uint, error) {
 		return 0, fmt.Errorf("read embedded migrations: %w", err)
 	}
 
-	var max uint
+	var maxVer uint
 	for _, entry := range entries {
 		name := entry.Name()
 		if !strings.HasSuffix(name, ".up.sql") {
@@ -208,14 +213,14 @@ func maxEmbeddedVersion() (uint, error) {
 		if err != nil {
 			continue
 		}
-		if uint(version) > max {
-			max = uint(version)
+		if uint(version) > maxVer {
+			maxVer = uint(version)
 		}
 	}
-	if max == 0 {
+	if maxVer == 0 {
 		return 0, errors.New("no migrations embedded into the binary")
 	}
-	return max, nil
+	return maxVer, nil
 }
 
 func parseCount(args []string, command string) (int, error) {
@@ -251,8 +256,7 @@ func ignoreNoChange(err error) error {
 }
 
 func explain(err error) error {
-	var dirty migrate.ErrDirty
-	if errors.As(err, &dirty) {
+	if _, ok := errors.AsType[migrate.ErrDirty](err); ok {
 		return fmt.Errorf(
 			"%w\nfix the failed migration, then set the version manually: server migrate force <version>",
 			err,

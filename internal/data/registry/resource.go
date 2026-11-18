@@ -25,7 +25,7 @@ func resourceToModel(r Resource) model.ResourceData {
 	return model.ResourceData{
 		ID:   r.ID,
 		Tags: r.Tags,
-		WorldGen: lo.MapValues(r.WorldGen, func(v ResourceWorldGenParams, k string) model.ResourceDataWorldGenParams {
+		WorldGen: lo.MapValues(r.WorldGen, func(v ResourceWorldGenParams, _ string) model.ResourceDataWorldGenParams {
 			return model.ResourceDataWorldGenParams{
 				Min: v.Min,
 				Max: v.Max,

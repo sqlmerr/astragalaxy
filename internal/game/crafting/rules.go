@@ -42,7 +42,6 @@ func ProcessCraft(
 				"to craft recipe `%s` it is required to have at least %d of `%s` resource: %w",
 				recipe.ID, cost, input.ResourceID, errs.CodeNotEnoughResources,
 			)
-
 		}
 	}
 

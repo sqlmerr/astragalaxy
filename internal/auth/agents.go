@@ -35,9 +35,9 @@ func HashRawAgentToken(rawToken string) string {
 }
 
 func GetAgentIDFromContext(ctx context.Context) uuid.UUID {
-	return ctx.Value(AgentIDContextKey).(uuid.UUID)
+	return ctx.Value(AgentIDContextKey).(uuid.UUID) //nolint:errcheck
 }
 
 func GetAgentFromContext(ctx context.Context) model.Agent {
-	return ctx.Value(AgentContextKey).(model.Agent)
+	return ctx.Value(AgentContextKey).(model.Agent) //nolint:errcheck
 }

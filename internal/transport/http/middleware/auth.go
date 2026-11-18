@@ -15,7 +15,7 @@ import (
 	http_response "github.com/sqlmerr/astragalaxy/internal/transport/http/response"
 )
 
-const AGENT_ID_HEADER = "X-Agent-ID"
+const AgentIDHeader = "X-Agent-Id"
 
 func UserAuth(jwtProcessor auth.JWTProcessor) Middleware {
 	return func(next http.Handler) http.Handler {
@@ -93,12 +93,12 @@ func AgentAuth(jwtProcessor auth.JWTProcessor, agentGetter AgentGetter) Middlewa
 					return
 				}
 
-				agentIDHeader := r.Header.Get(AGENT_ID_HEADER)
+				agentIDHeader := r.Header.Get(AgentIDHeader)
 				agentID, err := uuid.Parse(agentIDHeader)
 				if err != nil {
 					responseHandler.ErrorResponse(
 						fmt.Errorf("parse agent id: %w: %w", errs.CodeInvalidUUID, err),
-						fmt.Sprintf("Failed to parse %s agent id header", AGENT_ID_HEADER),
+						fmt.Sprintf("Failed to parse %s agent id header", AgentIDHeader),
 					)
 					return
 				}

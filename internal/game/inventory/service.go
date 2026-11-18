@@ -73,7 +73,7 @@ func (s *Service) getFullInventory(ctx context.Context, inventoryID uuid.UUID) (
 		Inventory: inv,
 		Resources: lo.Filter(
 			resources,
-			func(i model.Resource, index int) bool {
+			func(i model.Resource, _ int) bool {
 				return i.Amount > 0
 			},
 		),
@@ -310,7 +310,10 @@ func (s *Service) Trash(
 				return fmt.Errorf("can't access this inventory: %w", errs.CodeAccessDenied)
 			}
 
-			tx.Inventories().DeleteItem(ctx, item.ID)
+			err = tx.Inventories().DeleteItem(ctx, item.ID)
+			if err != nil {
+				return fmt.Errorf("delete item: %w", err)
+			}
 		}
 
 		for resourceType, amount := range resources {
@@ -350,7 +353,6 @@ func (s *Service) Trash(
 					return fmt.Errorf("delete resource: %w", err)
 				}
 			}
-
 		}
 
 		cooldown, err = tx.Cooldowns().SetCooldown(ctx, cooldowns_repository.SetCooldown{
@@ -391,8 +393,8 @@ func (s *Service) checkTransferDirection(
 	// active ship -> agent
 	// TODO: agent -> another agent
 	if ownerFrom.OwnerType == model.InventoryOwnerAgent || ownerTo.OwnerType == model.InventoryOwnerAgent {
-		if !((ownerFrom.OwnerType == model.InventoryOwnerAgent && ownerFrom.OwnerID == agentID) ||
-			(ownerTo.OwnerType == model.InventoryOwnerAgent && ownerTo.OwnerID == agentID)) {
+		if (ownerFrom.OwnerType != model.InventoryOwnerAgent || ownerFrom.OwnerID != agentID) &&
+			(ownerTo.OwnerType != model.InventoryOwnerAgent || ownerTo.OwnerID != agentID) {
 			return fmt.Errorf(
 				"can't access this agent's inventory with id='%s': %w",
 				toInventoryID,
@@ -437,7 +439,6 @@ func (s *Service) checkTransferDirection(
 		ownerTo.OwnerType,
 		errs.CodeInvalidTransferDirection,
 	)
-
 }
 
 func (s *Service) GrantResource(
@@ -503,7 +504,6 @@ func (s *Service) GrantResource(
 					return fmt.Errorf("save resource: %w", err)
 				}
 			}
-
 		}
 
 		return nil

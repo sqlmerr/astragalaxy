@@ -17,7 +17,7 @@ type AgentsHTTPHandler struct {
 	cooldownsService  cooldowns.Service
 	miningService     mining.Service
 	craftingService   crafting.Service
-	facilitiesService facilities.FacilitiesService
+	facilitiesService facilities.Service
 }
 
 func NewAgentsHTTPHandler(
@@ -25,7 +25,7 @@ func NewAgentsHTTPHandler(
 	cooldownsService cooldowns.Service,
 	miningService mining.Service,
 	craftingService crafting.Service,
-	facilitiesService facilities.FacilitiesService,
+	facilitiesService facilities.Service,
 ) *AgentsHTTPHandler {
 	return &AgentsHTTPHandler{agentsService, cooldownsService, miningService, craftingService, facilitiesService}
 }

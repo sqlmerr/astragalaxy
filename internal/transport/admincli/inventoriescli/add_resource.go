@@ -17,7 +17,7 @@ func newAddResourceCmd(service *inventory.Service) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:  "add_resource <inventory id> <resource id> <amount>",
 		Args: cobra.ExactArgs(3),
-		RunE: func(cmd *cobra.Command, args []string) error {
+		RunE: func(_ *cobra.Command, args []string) error {
 			inventoryID, err := uuid.Parse(args[0])
 			if err != nil {
 				return fmt.Errorf("invalid inventory ID: %w", err)

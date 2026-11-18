@@ -8,20 +8,20 @@ import (
 	"github.com/sqlmerr/astragalaxy/internal/model"
 )
 
-//type ShipTypeResponseDTO model.ShipType
-//
-//func (s ShipTypeResponseDTO) MarshalJSON() ([]byte, error) {
-//	return json.Marshal(string(s))
-//}
-//
-//func (s *ShipTypeResponseDTO) UnmarshalJSON(b []byte) error {
-//	var str string
-//	if err := json.Unmarshal(b, &str); err != nil {
-//		return err
-//	}
-//	*s = ShipTypeResponseDTO(str)
-//	return nil
-//}
+// type ShipTypeResponseDTO model.ShipType
+
+// func (s ShipTypeResponseDTO) MarshalJSON() ([]byte, error) {
+// 	return json.Marshal(string(s))
+// }
+
+// func (s *ShipTypeResponseDTO) UnmarshalJSON(b []byte) error {
+// 	var str string
+// 	if err := json.Unmarshal(b, &str); err != nil {
+// 		return err
+// 	}
+// 	*s = ShipTypeResponseDTO(str)
+// 	return nil
+// }
 
 type ShipResponseDTO struct {
 	ID          uuid.UUID `json:"id"`

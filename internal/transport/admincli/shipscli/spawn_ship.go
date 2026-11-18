@@ -26,7 +26,7 @@ func newSpawnShipCmd(shipsService ships.Service) *cobra.Command {
 		Args:    cobra.ExactArgs(1),
 		Short:   "Spawn new ship for agent",
 		Example: "admincli ships spawn_ship 2cc37bd1-a16c-487b-b13a-181e33fc5757 --class S --inv-item-slots 45 --modules portable_smelter,portable_printer --name \"Super mega ship ultra best ship ever\" --type trader",
-		RunE: func(cmd *cobra.Command, args []string) error {
+		RunE: func(_ *cobra.Command, args []string) error {
 			ctx := context.Background()
 			agentID, err := uuid.Parse(args[0])
 			if err != nil {

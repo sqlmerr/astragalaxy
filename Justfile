@@ -65,3 +65,6 @@ test:
 
 run-client:
     @cd client && bun dev --host
+
+lint: # requires `ov` to run
+    ov --exec  -- golangci-lint run ./internal/...

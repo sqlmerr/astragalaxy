@@ -15,6 +15,7 @@ type RegisterAgentRequest struct {
 
 type RegisterAgentResponse struct {
 	AgentResponseDTO
+
 	Token string `json:"token"`
 }
 

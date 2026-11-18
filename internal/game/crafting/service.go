@@ -95,7 +95,6 @@ func (s *Service) Craft(
 	}
 
 	if bestFacility == nil {
-		fmt.Println(len(facilities[recipe.RequiredFacility]))
 		return model.Cooldown{}, fmt.Errorf(
 			"cannot find facility of type='%s' with tier greater than or equal to %d: %w",
 			recipe.RequiredFacility,

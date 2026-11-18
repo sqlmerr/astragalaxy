@@ -13,19 +13,19 @@ import (
 	"github.com/sqlmerr/astragalaxy/internal/model"
 )
 
-type FacilitiesService struct {
+type Service struct {
 	store    data.Store
 	gameData registry.GameData
 	worldGen worldgen.WorldGen
 }
 
-func NewService(store data.Store, gameData registry.GameData, worldGen worldgen.WorldGen) *FacilitiesService {
-	return &FacilitiesService{
+func New(store data.Store, gameData registry.GameData, worldGen worldgen.WorldGen) *Service {
+	return &Service{
 		store, gameData, worldGen,
 	}
 }
 
-func (s *FacilitiesService) GatherAvailableFacilities(
+func (s *Service) GatherAvailableFacilities(
 	ctx context.Context,
 	agentID uuid.UUID,
 ) (map[model.FacilityType][]string, error) {
@@ -75,7 +75,6 @@ func (s *FacilitiesService) GatherAvailableFacilities(
 					ship.Coords.SystemY,
 					errs.CodeAnomaly.WithBase(errs.ErrUnprocessableEntity),
 				)
-
 		}
 		if waypoint.Station != nil {
 			for _, id := range waypoint.Station.Facilities {

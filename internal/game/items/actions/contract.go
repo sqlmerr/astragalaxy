@@ -64,5 +64,5 @@ func UseContract(ctx ActionContext, agentID uuid.UUID, item model.Item, input js
 		return nil, fmt.Errorf("delete item: %w", err)
 	}
 
-	return useContactResponse{Units: m.Units, Quarks: m.Quarks}, nil
+	return useContactResponse(m), nil
 }

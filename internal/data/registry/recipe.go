@@ -35,13 +35,13 @@ func recipeToModel(r Recipe) model.Recipe {
 		RequiredFacility: r.RequiredFacility,
 		MinTier:          r.MinTier,
 		Duration:         r.Duration,
-		Inputs: lo.Map(r.Inputs, func(item RecipeInput, index int) model.RecipeInput {
+		Inputs: lo.Map(r.Inputs, func(item RecipeInput, _ int) model.RecipeInput {
 			return model.RecipeInput{
 				ResourceID: item.ResourceID,
 				Amount:     item.Amount,
 			}
 		}),
-		Outputs: lo.Map(r.Outputs, func(item RecipeOutput, index int) model.RecipeOutput {
+		Outputs: lo.Map(r.Outputs, func(item RecipeOutput, _ int) model.RecipeOutput {
 			return model.RecipeOutput{
 				Type:   item.Type,
 				ID:     item.ID,

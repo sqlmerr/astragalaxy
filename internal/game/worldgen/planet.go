@@ -21,7 +21,6 @@ func generatePlanet(
 	basicResources := gameData.Resources.GetAllResourcesByWorldgenParams("planet")
 
 	for _, r := range basicResources {
-
 		deposits = append(deposits, ResourceDeposit{
 			Resource: model.ResourceType(r.ID),
 			Amount:   getRandomIntBetween(rng, r.WorldGen["planet"].Min, r.WorldGen["planet"].Max),
@@ -55,7 +54,7 @@ func generatePlanetName(rng *rand.Rand) string {
 
 	numSyllables := rng.Intn(3) + 2
 
-	for i := 0; i < numSyllables; i++ {
+	for range numSyllables {
 		c := consonants[rng.Intn(len(consonants))]
 		v := vowels[rng.Intn(len(vowels))]
 

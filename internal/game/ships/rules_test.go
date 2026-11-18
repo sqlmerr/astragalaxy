@@ -1,20 +1,22 @@
-package ships
+package ships_test
 
 import (
 	"testing"
 
 	"github.com/google/uuid"
 	errs "github.com/sqlmerr/astragalaxy/internal/errors"
+	"github.com/sqlmerr/astragalaxy/internal/game/ships"
 	"github.com/sqlmerr/astragalaxy/internal/game/worldgen"
 	"github.com/sqlmerr/astragalaxy/internal/model"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestRenameShip(t *testing.T) {
 	agentID := uuid.New()
 	ship := model.Ship{AgentID: agentID, Name: "old-name"}
 
-	renamedShip := RenameShip(ship, "new-name")
+	renamedShip := ships.RenameShip(ship, "new-name")
 	assert.Equal(t, "new-name", renamedShip.Name)
 }
 
@@ -24,7 +26,7 @@ func TestChangeActiveShip(t *testing.T) {
 		oldActiveShip := model.Ship{AgentID: agentID, Active: true}
 		newActiveShip := model.Ship{AgentID: agentID}
 
-		newActiveShip, oldActiveShipToSave, _ := ChangeActiveShip(&oldActiveShip, newActiveShip)
+		newActiveShip, oldActiveShipToSave, _ := ships.ChangeActiveShip(&oldActiveShip, newActiveShip)
 		assert.True(t, newActiveShip.Active)
 		if assert.NotNil(t, oldActiveShipToSave) {
 			assert.False(t, oldActiveShipToSave.Active)
@@ -32,7 +34,7 @@ func TestChangeActiveShip(t *testing.T) {
 	})
 
 	t.Run("success: no old ship", func(t *testing.T) {
-		newActiveShip, oldActiveShipToSave, _ := ChangeActiveShip(nil, model.Ship{AgentID: agentID})
+		newActiveShip, oldActiveShipToSave, _ := ships.ChangeActiveShip(nil, model.Ship{AgentID: agentID})
 		assert.True(t, newActiveShip.Active)
 		assert.Nil(t, oldActiveShipToSave)
 	})
@@ -47,15 +49,15 @@ func TestChangeActiveShip(t *testing.T) {
 			AgentID: agentID,
 			Coords:  model.ShipCoords{SystemX: 4, SystemY: 20, Location: model.ShipLocationPlanet, LocationID: 2},
 		}
-		_, _, err := ChangeActiveShip(&oldActiveShip, newActiveShip)
-		assert.Error(t, err)
+		_, _, err := ships.ChangeActiveShip(&oldActiveShip, newActiveShip)
+		require.Error(t, err)
 	})
 
 	t.Run("invalid ship state", func(t *testing.T) {
 		oldActiveShip := model.Ship{AgentID: agentID, Active: true, Status: model.ShipStatusOrbit}
 		newActiveShip := model.Ship{AgentID: agentID, Status: model.ShipStatusDocked}
-		_, _, err := ChangeActiveShip(&oldActiveShip, newActiveShip)
-		assert.Error(t, err)
+		_, _, err := ships.ChangeActiveShip(&oldActiveShip, newActiveShip)
+		require.Error(t, err)
 	})
 }
 
@@ -63,17 +65,17 @@ func TestOrbitShip(t *testing.T) {
 	ship1 := model.Ship{
 		Status: model.ShipStatusDocked,
 	}
-	ship1, cd, err := OrbitShip(ship1)
-	assert.NoError(t, err)
-	assert.True(t, cd > 0)
-	assert.Equal(t, ship1.Status, model.ShipStatusOrbit)
+	ship1, cd, err := ships.OrbitShip(ship1)
+	require.NoError(t, err)
+	assert.Positive(t, cd)
+	assert.Equal(t, model.ShipStatusOrbit, ship1.Status)
 
 	ship2 := model.Ship{
 		Status: model.ShipStatusOrbit,
 	}
-	_, _, err = OrbitShip(ship2)
-	assert.Error(t, err)
-	assert.ErrorIs(t, err, errs.CodeShipAlreadyInThisState)
+	_, _, err = ships.OrbitShip(ship2)
+	require.Error(t, err)
+	require.ErrorIs(t, err, errs.CodeShipAlreadyInThisState)
 }
 
 func TestDockShip(t *testing.T) {
@@ -166,14 +168,14 @@ func TestDockShip(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			ship, cd, err := DockShip(test.ship, test.system)
+			ship, cd, err := ships.DockShip(test.ship, test.system)
 			if test.expectedErr {
-				assert.Error(t, err)
-				assert.ErrorIs(t, err, test.err)
-				assert.ErrorIs(t, err, test.errCode)
+				require.Error(t, err)
+				require.ErrorIs(t, err, test.err)
+				require.ErrorIs(t, err, test.errCode)
 			} else {
-				assert.NoError(t, err)
-				assert.True(t, cd > 0)
+				require.NoError(t, err)
+				assert.Positive(t, cd)
 				assert.Equal(t, model.ShipStatusDocked, ship.Status)
 			}
 		})

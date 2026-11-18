@@ -1,17 +1,18 @@
-package worldgen
+package worldgen_test
 
 import (
 	"testing"
 
 	"github.com/sqlmerr/astragalaxy/internal/data/registry"
+	"github.com/sqlmerr/astragalaxy/internal/game/worldgen"
 	"github.com/stretchr/testify/assert"
 )
 
-// Tests deterministic generation
+// Tests deterministic generation.
 func TestGenerateSystemByCoords(t *testing.T) {
 	x, y := 42, -99
 	var seed int64 = 123456789
-	worldGen := New(&registry.GameData{}, seed)
+	worldGen := worldgen.New(&registry.GameData{}, seed)
 
 	sys1, found1 := worldGen.GenerateSystemByCoords(x, y)
 	sys2, found2 := worldGen.GenerateSystemByCoords(x, y)

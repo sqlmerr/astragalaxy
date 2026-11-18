@@ -31,7 +31,7 @@ func facilityToModel(f Facility) model.Facility {
 	}
 	return model.Facility{
 		ID:        f.ID,
-		Type:      model.FacilityType(f.Type),
+		Type:      f.Type,
 		Tier:      f.Tier,
 		Modifiers: mods,
 	}
@@ -41,8 +41,9 @@ func (f *Facility) UnmarshalJSON(data []byte) error {
 	// temp
 	type Alias Facility
 	aux := &struct {
-		RawModifiers json.RawMessage `json:"modifiers"`
 		*Alias
+
+		RawModifiers json.RawMessage `json:"modifiers"`
 	}{
 		Alias: (*Alias)(f),
 	}

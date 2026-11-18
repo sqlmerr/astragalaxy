@@ -24,7 +24,7 @@ export function getAuthHeaders(agentId?: string): Record<string, string> {
   if (agentId) {
     return {
       ...headers,
-      "X-Agent-ID": agentId,
+      "X-Agent-Id": agentId,
     }
   }
   return headers

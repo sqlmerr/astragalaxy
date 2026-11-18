@@ -1,4 +1,4 @@
-package mining
+package mining_test
 
 import (
 	"testing"
@@ -6,6 +6,7 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/sqlmerr/astragalaxy/internal/game"
+	"github.com/sqlmerr/astragalaxy/internal/game/mining"
 	"github.com/sqlmerr/astragalaxy/internal/game/worldgen"
 	"github.com/sqlmerr/astragalaxy/internal/model"
 	"github.com/stretchr/testify/assert"
@@ -34,7 +35,7 @@ func TestMine(t *testing.T) {
 
 	t.Run("successful mine", func(t *testing.T) {
 		deposit := baseDeposit(1.0)
-		res, resource, cooldown, err := Mine(
+		res, resource, cooldown, err := mining.Mine(
 			cfg,
 			deposit,
 			baseDepositData(50),
@@ -52,14 +53,14 @@ func TestMine(t *testing.T) {
 		assert.Equal(t, 10, resource.Amount)
 		assert.NotZero(t, res.LastMinedAt)
 
-		expectedCooldown := time.Duration(10 / (1.0 * DefaultMiningSpeed) * float64(time.Second))
+		expectedCooldown := time.Duration(10 / (1.0 * mining.DefaultMiningSpeed) * float64(time.Second))
 		assert.Equal(t, expectedCooldown, cooldown)
 	})
 
 	t.Run("successful mine: modified speed", func(t *testing.T) {
 		deposit := baseDeposit(1.0)
 		speedMultiplier := 1.2
-		_, _, cooldown, err := Mine(
+		_, _, cooldown, err := mining.Mine(
 			cfg,
 			deposit,
 			baseDepositData(50),
@@ -73,13 +74,15 @@ func TestMine(t *testing.T) {
 		)
 		require.NoError(t, err)
 
-		expectedCooldown := time.Duration(10 / (1.0 * DefaultMiningSpeed * speedMultiplier) * float64(time.Second))
+		expectedCooldown := time.Duration(
+			10 / (1.0 * mining.DefaultMiningSpeed * speedMultiplier) * float64(time.Second),
+		)
 		assert.Equal(t, expectedCooldown, cooldown)
 	})
 
 	t.Run("mine adds to existing resource amount", func(t *testing.T) {
 		deposit := baseDeposit(1.0)
-		_, resource, _, err := Mine(
+		_, resource, _, err := mining.Mine(
 			cfg,
 			deposit,
 			baseDepositData(50),
@@ -97,7 +100,7 @@ func TestMine(t *testing.T) {
 
 	t.Run("not enough resources on asteroid", func(t *testing.T) {
 		deposit := baseDeposit(1.0)
-		_, _, _, err := Mine(
+		_, _, _, err := mining.Mine(
 			cfg,
 			deposit,
 			baseDepositData(5),
@@ -115,7 +118,7 @@ func TestMine(t *testing.T) {
 
 	t.Run("inventory full", func(t *testing.T) {
 		deposit := baseDeposit(1.0)
-		_, _, _, err := Mine(
+		_, _, _, err := mining.Mine(
 			cfg,
 			deposit,
 			baseDepositData(50),
@@ -133,7 +136,7 @@ func TestMine(t *testing.T) {
 	t.Run("inventory full but limit disabled", func(t *testing.T) {
 		cfgNoLimit := game.Config{Rules: game.RulesConfig{DisableInventoryLimit: true}}
 		deposit := baseDeposit(1.0)
-		_, resource, _, err := Mine(
+		_, resource, _, err := mining.Mine(
 			cfgNoLimit,
 			deposit,
 			baseDepositData(50),
@@ -153,7 +156,7 @@ func TestMine(t *testing.T) {
 		depositLow := baseDeposit(0.5)
 		depositHigh := baseDeposit(2.0)
 
-		_, _, cdLow, _ := Mine(
+		_, _, cdLow, _ := mining.Mine(
 			cfg,
 			depositLow,
 			baseDepositData(50),
@@ -165,7 +168,7 @@ func TestMine(t *testing.T) {
 			baseShipClass(1),
 			1,
 		)
-		_, _, cdHigh, _ := Mine(
+		_, _, cdHigh, _ := mining.Mine(
 			cfg,
 			depositHigh,
 			baseDepositData(50),
@@ -183,7 +186,7 @@ func TestMine(t *testing.T) {
 
 	t.Run("cooldown scales with amount", func(t *testing.T) {
 		deposit := baseDeposit(1.0)
-		_, _, cd1, _ := Mine(
+		_, _, cd1, _ := mining.Mine(
 			cfg,
 			deposit,
 			baseDepositData(50),
@@ -195,7 +198,7 @@ func TestMine(t *testing.T) {
 			baseShipClass(1),
 			1,
 		)
-		_, _, cd2, _ := Mine(
+		_, _, cd2, _ := mining.Mine(
 			cfg,
 			deposit,
 			baseDepositData(50),
@@ -212,7 +215,7 @@ func TestMine(t *testing.T) {
 
 	t.Run("mine entire deposit", func(t *testing.T) {
 		deposit := baseDeposit(1.0)
-		res, _, _, err := Mine(
+		res, _, _, err := mining.Mine(
 			cfg,
 			deposit,
 			baseDepositData(10),
@@ -230,7 +233,7 @@ func TestMine(t *testing.T) {
 
 	t.Run("exact inventory limit", func(t *testing.T) {
 		deposit := baseDeposit(1.0)
-		_, _, _, err := Mine(
+		_, _, _, err := mining.Mine(
 			cfg,
 			deposit,
 			baseDepositData(50),
@@ -247,7 +250,7 @@ func TestMine(t *testing.T) {
 
 	t.Run("one over inventory limit", func(t *testing.T) {
 		deposit := baseDeposit(1.0)
-		_, _, _, err := Mine(
+		_, _, _, err := mining.Mine(
 			cfg,
 			deposit,
 			baseDepositData(50),
@@ -264,11 +267,11 @@ func TestMine(t *testing.T) {
 
 	t.Run("mining limit", func(t *testing.T) {
 		deposit := baseDeposit(1.0)
-		_, _, _, err := Mine(
+		_, _, _, err := mining.Mine(
 			cfg,
 			deposit,
 			baseDepositData(1000),
-			DefaultLimit+1,
+			mining.DefaultLimit+1,
 			baseInventory(1000),
 			model.Resource{},
 			0,
@@ -281,11 +284,11 @@ func TestMine(t *testing.T) {
 
 	t.Run("ship type miner limit", func(t *testing.T) {
 		deposit := baseDeposit(1.0)
-		_, _, _, err := Mine(
+		_, _, _, err := mining.Mine(
 			cfg,
 			deposit,
 			baseDepositData(1000),
-			DefaultLimit+1,
+			mining.DefaultLimit+1,
 			baseInventory(1000),
 			model.Resource{},
 			0,
@@ -298,11 +301,11 @@ func TestMine(t *testing.T) {
 
 	t.Run("ship class limit modifier", func(t *testing.T) {
 		deposit := baseDeposit(1.0)
-		_, _, _, err := Mine(
+		_, _, _, err := mining.Mine(
 			cfg,
 			deposit,
 			baseDepositData(1000),
-			DefaultLimit+1,
+			mining.DefaultLimit+1,
 			baseInventory(1000),
 			model.Resource{},
 			0,

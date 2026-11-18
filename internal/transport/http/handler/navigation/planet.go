@@ -16,6 +16,7 @@ type NavigatePlanetRequest struct {
 
 type NavigatePlanetResponse struct {
 	NavigationResponseDTO
+
 	Discovery *PlanetDiscoveryDTO `json:"discovery"`
 }
 

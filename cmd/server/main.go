@@ -98,7 +98,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	apiVersionRouter := http_server.NewAPIVersionRouter(http_server.ApiVersionV1)
+	apiVersionRouter := http_server.NewAPIVersionRouter(http_server.APIVersionV1)
 
 	log.Debug("Initializing storage")
 	queries := database.New(data.ExtractSQLCDB(pool))
@@ -146,7 +146,7 @@ func main() {
 	usersService := users.NewService(store)
 	authService := auth.NewService(store, *jwtProcessor)
 	shipsService := ships.NewService(gameConfig, store, *worldGen, *gameData)
-	facilitiesService := facilities.NewService(store, *gameData, *worldGen)
+	facilitiesService := facilities.New(store, *gameData, *worldGen)
 	walletsService := wallets.NewService(store, facilitiesService)
 	agentsService := agents.NewService(store, *worldGen, shipsService, walletsService)
 	cooldownsService := cooldowns.NewService(gameConfig, store)
@@ -210,7 +210,7 @@ func main() {
 		fmt.Fprint(w, html)
 	})
 	log.Debug(fmt.Sprintf("Documentation available at %s/docs", httpConfig.Addr))
-	httpServer := http_server.NewHttpServer(
+	httpServer := http_server.NewHTTPServer(
 		mux,
 		*http_server.LoadConfigMust(),
 		log,

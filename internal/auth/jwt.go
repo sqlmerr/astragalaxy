@@ -38,7 +38,7 @@ func (m JWTProcessorImpl) GenerateToken(userID uuid.UUID) (string, error) {
 }
 func (m JWTProcessorImpl) ValidateToken(tokenString string) (uuid.UUID, error) {
 	claims := &jwt.MapClaims{}
-	token, err := jwt.ParseWithClaims(tokenString, claims, func(token *jwt.Token) (any, error) {
+	token, err := jwt.ParseWithClaims(tokenString, claims, func(_ *jwt.Token) (any, error) {
 		return []byte(m.config.JWTSecret), nil
 	})
 	if err != nil {
@@ -72,5 +72,5 @@ func (m JWTProcessorImpl) ValidateToken(tokenString string) (uuid.UUID, error) {
 }
 
 func GetUserIDFromContext(ctx context.Context) uuid.UUID {
-	return ctx.Value(UserIDContextKey).(uuid.UUID)
+	return ctx.Value(UserIDContextKey).(uuid.UUID) //nolint:errcheck
 }

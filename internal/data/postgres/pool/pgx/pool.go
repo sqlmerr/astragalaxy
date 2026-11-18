@@ -3,6 +3,8 @@ package pgx_pool
 import (
 	"context"
 	"fmt"
+	"net"
+	"strconv"
 	"time"
 
 	"github.com/jackc/pgx/v5/pgxpool"
@@ -11,16 +13,16 @@ import (
 
 type Pool struct {
 	*pgxpool.Pool
+
 	opTimeout time.Duration
 }
 
 func NewPool(ctx context.Context, config Config) (*Pool, error) {
 	connString := fmt.Sprintf(
-		"postgres://%s:%s@%s:%d/%s?sslmode=disable",
+		"postgres://%s:%s@%s/%s?sslmode=disable",
 		config.User,
 		config.Password,
-		config.Host,
-		config.Port,
+		net.JoinHostPort(config.Host, strconv.Itoa(config.Port)),
 		config.Database,
 	)
 

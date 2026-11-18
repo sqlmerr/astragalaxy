@@ -22,10 +22,10 @@ var encoding = base32.NewEncoding(customAlphabet).WithPadding(base32.NoPadding)
 const FeeUnits = 0.01
 const FeeQuarks = 5
 
-// cooldown = (units + quarks) * CooldownPercentage * time.Second
+// cooldown = (units + quarks) * CooldownPercentage * time.Second.
 const CooldownPercentage = 0.1
 
-// GenerateAddress creates unique wallet address (43 characters)
+// GenerateAddress creates unique wallet address (43 characters).
 func GenerateAddress() (string, error) {
 	payload := make([]byte, 20)
 	if _, err := rand.Read(payload); err != nil {
@@ -53,7 +53,7 @@ func ValidateAddress(addr string) error {
 	actualChecksum := decoded[20:]
 	expectedChecksum := calcChecksum(payload)
 
-	for i := 0; i < 4; i++ {
+	for i := range 4 {
 		if actualChecksum[i] != expectedChecksum[i] {
 			return fmt.Errorf("address checksum mismatch (typo detected): %w", errs.CodeInvalidWalletAddress)
 		}

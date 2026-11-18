@@ -103,5 +103,5 @@ components:
     AgentId:
       type: apiKey
       in: header
-      name: X-Agent-ID
+      name: X-Agent-Id
       description: Agent ID. Must be used with UserAuth scheme

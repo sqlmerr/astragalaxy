@@ -58,9 +58,10 @@ func NavigateWarp(
 	return ship, cooldownDuration, resource, amount, nil
 }
 
-// To modify usage of warp fuel, modify this function
-// Tier 1 = distance / 3
-// Tier 2 = distance / 9
+// CalcWarpFuelCost calculates fuel amount needed to perform a warp jump
+// To modify usage of warp fuel, modify this function.
+// Tier 1 = distance / 3.
+// Tier 2 = distance / 9.
 func CalcWarpFuelCost(distance, tier int) int {
 	return int(math.Ceil(float64(distance) / math.Pow(3, float64(tier))))
 }

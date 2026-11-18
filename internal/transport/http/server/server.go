@@ -5,26 +5,27 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"time"
 
 	core_logger "github.com/sqlmerr/astragalaxy/internal/logger"
 	http_middleware "github.com/sqlmerr/astragalaxy/internal/transport/http/middleware"
 	"go.uber.org/zap"
 )
 
-type HttpServer struct {
+type HTTPServer struct {
 	mux        *http.ServeMux
 	config     Config
 	log        *core_logger.Logger
 	middleware []http_middleware.Middleware
 }
 
-func NewHttpServer(
+func NewHTTPServer(
 	mux *http.ServeMux,
 	config Config,
 	log *core_logger.Logger,
 	middleware ...http_middleware.Middleware,
-) *HttpServer {
-	return &HttpServer{
+) *HTTPServer {
+	return &HTTPServer{
 		mux:        mux,
 		config:     config,
 		log:        log,
@@ -32,18 +33,19 @@ func NewHttpServer(
 	}
 }
 
-func (h *HttpServer) Run(ctx context.Context) error {
+func (h *HTTPServer) Run(ctx context.Context) error {
 	mux := http_middleware.ChainMiddleware(h.mux, h.middleware...)
 	server := &http.Server{
-		Addr:    h.config.Addr,
-		Handler: mux,
+		Addr:              h.config.Addr,
+		Handler:           mux,
+		ReadHeaderTimeout: time.Second * 2,
 	}
 
 	ch := make(chan error, 1)
 	go func() {
 		defer close(ch)
 
-		h.log.Warn("starting http server", zap.String("addr", h.config.Addr))
+		h.log.Warn("starting HTTP server", zap.String("addr", h.config.Addr))
 		err := server.ListenAndServe()
 
 		if !errors.Is(err, http.ErrServerClosed) {
@@ -63,7 +65,7 @@ func (h *HttpServer) Run(ctx context.Context) error {
 
 		err := server.Shutdown(shutdownCtx)
 		if err != nil {
-			server.Close()
+			server.Close() //nolint:gosec
 			return fmt.Errorf("shutdown http: %w", err)
 		}
 		h.log.Warn("http server stopped")
@@ -72,7 +74,7 @@ func (h *HttpServer) Run(ctx context.Context) error {
 	return nil
 }
 
-func (h *HttpServer) RegisterRouters(routers ...*APIVersionRouter) {
+func (h *HTTPServer) RegisterRouters(routers ...*APIVersionRouter) {
 	for _, router := range routers {
 		prefix := "/api/" + string(router.apiVersion)
 		h.mux.Handle(prefix+"/", http.StripPrefix(prefix, router))

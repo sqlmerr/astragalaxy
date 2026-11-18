@@ -9,7 +9,6 @@ import (
 
 type PlanetType string
 
-// type StarType string
 type WaypointType string
 
 const (

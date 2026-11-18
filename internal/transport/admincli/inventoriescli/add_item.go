@@ -18,7 +18,7 @@ func newAddItemCmd(itemsService *items.Service) *cobra.Command {
 		Short:   "Adds item to an inventory",
 		Example: "admincli inventories add_item 8264427a-5dc6-4d96-8557-70ce2f5cfa13 portable_smelter -m '{\"durability\": 38}'",
 		Args:    cobra.ExactArgs(2),
-		RunE: func(cmd *cobra.Command, args []string) error {
+		RunE: func(_ *cobra.Command, args []string) error {
 			ctx := context.Background()
 			inventoryID, err := uuid.Parse(args[0])
 			if err != nil {

@@ -381,7 +381,7 @@ func (s *Service) SpawnShip(ctx context.Context, spec SpawnShipSpec, coords *mod
 		shipCoords = *coords
 	}
 
-	_, classExists := s.gameData.ShipClasses.GetShipClass(model.ShipClassID(spec.Class))
+	_, classExists := s.gameData.ShipClasses.GetShipClass(spec.Class)
 	if !classExists {
 		return model.Ship{}, fmt.Errorf("could not find class with id `%s`: %w", spec.Class, errs.CodeInvalidShipClass)
 	}
@@ -389,7 +389,7 @@ func (s *Service) SpawnShip(ctx context.Context, spec SpawnShipSpec, coords *mod
 	var ship model.Ship
 
 	err = s.store.ExecTx(ctx, func(tx data.Store) error {
-		ship, err = s.createShip(ctx, s.store, CreateShipSpec{
+		ship, err = s.createShip(ctx, tx, CreateShipSpec{
 			AgentID:   spec.AgentID,
 			Type:      spec.Type,
 			Name:      spec.Name,

@@ -156,7 +156,7 @@ Best for single-agent clients/bots.
 Use your account JWT with an agent ID header:
 ```
 Authorization: Bearer <user_jwt>
-X-Agent-ID: <agent_uuid>
+X-Agent-Id: <agent_uuid>
 ```
 Best for multi-agent management interfaces.
 

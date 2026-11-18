@@ -161,6 +161,10 @@ func (s *Service) Pay(ctx context.Context, input PayInput) (PayOutput, error) {
 		return nil
 	})
 
+	if err != nil {
+		return PayOutput{}, err
+	}
+
 	return PayOutput{
 		Fee:         fee,
 		Cooldown:    cooldown,

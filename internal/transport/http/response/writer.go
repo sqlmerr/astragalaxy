@@ -6,6 +6,7 @@ const StatusCodeUnitialized = -1
 
 type ResponseWriter struct {
 	http.ResponseWriter
+
 	statusCode int
 }
 

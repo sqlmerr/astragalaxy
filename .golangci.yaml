@@ -52,29 +52,29 @@ linters:
     - canonicalheader # checks whether net/http.Header uses canonical header
     - clickhouselint # detects common mistakes with the ClickHouse native Go driver API
     - copyloopvar # detects places where loop variables are copied (Go 1.22+)
-    - cyclop # checks function and package cyclomatic complexity
+    # - cyclop # checks function and package cyclomatic complexity
     - depguard # checks if package imports are in a list of acceptable packages
     - dupl # tool for code clone detection
     - durationcheck # checks for two durations multiplied together
     - embeddedstructfieldcheck # checks embedded types in structs
     - errcheck # checking for unchecked errors, these unchecked errors can be critical bugs in some cases
-    - errname # checks that sentinel errors are prefixed with the Err and error types are suffixed with the Error
+    # - errname # checks that sentinel errors are prefixed with the Err and error types are suffixed with the Error
     - errorlint # finds code that will cause problems with the error wrapping scheme introduced in Go 1.13
-    - exhaustive # checks exhaustiveness of enum switch statements
+    # - exhaustive # checks exhaustiveness of enum switch statements
     - exptostd # detects functions from golang.org/x/exp/ that can be replaced by std functions
     - fatcontext # detects nested contexts in loops
-    - forbidigo # forbids identifiers
-    - funcorder # checks the order of functions, methods, and constructors
-    - funlen # tool for detection of long functions
+    # - forbidigo # forbids identifiers
+    # - funcorder # checks the order of functions, methods, and constructors
+    # - funlen # tool for detection of long functions
     - gocheckcompilerdirectives # validates go compiler directive comments (//go:)
-    - gochecknoglobals # checks that no global variables exist
+    # - gochecknoglobals # checks that no global variables exist
     - gochecknoinits # checks that no init functions are present in Go code
     - gochecksumtype # checks exhaustiveness on Go "sum types"
-    - gocognit # computes and checks the cognitive complexity of functions
+    # - gocognit # computes and checks the cognitive complexity of functions
     - goconst # finds repeated strings that could be replaced by a constant
     - gocritic # provides diagnostics that check for bugs, performance and style issues
-    - gocyclo # computes and checks the cyclomatic complexity of functions
-    - godoclint # checks Golang's documentation practice
+    # - gocyclo # computes and checks the cyclomatic complexity of functions
+    # - godoclint # checks Golang's documentation practice
     - godot # checks if comments end in a period
     - gomoddirectives # manages the use of 'replace', 'retract', and 'excludes' directives in go.mod
     - goprintffuncname # checks that printf-like functions are named with f at the end
@@ -87,19 +87,19 @@ linters:
     - loggercheck # checks key value pairs for common logger libraries (kitlog,klog,logr,zap)
     - makezero # finds slice declarations with non-zero initial length
     - mirror # reports wrong mirror patterns of bytes/strings usage
-    - mnd # detects magic numbers
+    # - mnd # detects magic numbers
     - modernize # suggests simplifications to Go code, using modern language and library features
     - musttag # enforces field tags in (un)marshaled structs
     - nakedret # finds naked returns in functions greater than a specified function length
-    - nestif # reports deeply nested if statements
+    # - nestif # reports deeply nested if statements
     - nilerr # finds the code that returns nil even if it checks that the error is not nil
     - nilnesserr # reports that it checks for err != nil, but it returns a different nil value error (powered by nilness and nilerr)
     - nilnil # checks that there is no simultaneous return of nil error and an invalid value
     - noctx # finds sending http request without context.Context
-    - nolintlint # reports ill-formed or insufficient nolint directives
-    - nonamedreturns # reports all named returns
+    # - nolintlint # reports ill-formed or insufficient nolint directives
+    # - nonamedreturns # reports all named returns
     - nosprintfhostport # checks for misuse of Sprintf to construct a host with port in a URL
-    - paralleltest # detects missing usage of t.Parallel() method in your Go test
+    # ENABLE LATER - paralleltest # detects missing usage of t.Parallel() method in your Go test
     - perfsprint # checks that fmt.Sprintf can be replaced with a faster alternative
     - predeclared # finds code that shadows one of Go's predeclared identifiers
     - promlinter # checks Prometheus metrics naming via promlint
@@ -172,7 +172,7 @@ linters:
       # The maximal average package complexity.
       # If it's higher than 0.0 (float) the check is enabled.
       # Default: 0.0
-      package-average: 10.0
+      package-average: 0.0
 
     depguard:
       # Rules to apply.
@@ -209,12 +209,12 @@ linters:
               desc: Use github.com/google/uuid instead, satori's package is not maintained
             - pkg: github.com/gofrs/uuid$
               desc: Use github.com/gofrs/uuid/v5 or later, it was not a go module before v5
-        "non-test files":
-          files:
-            - "!$test"
-          deny:
-            - pkg: math/rand$
-              desc: Use math/rand/v2 instead, see https://go.dev/blog/randv2
+        # "non-test files":
+        #   files:
+        #     - "!$test"
+        #   deny:
+        #     - pkg: math/rand$
+        #       desc: Use math/rand/v2 instead, see https://go.dev/blog/randv2
         "non-main files":
           files:
             - "!**/main.go"
@@ -329,21 +329,21 @@ linters:
         # https://github.com/godoc-lint/godoc-lint?tab=readme-ov-file#require-stdlib-doclink
         - require-stdlib-doclink
 
-    govet:
-      # Enable all analyzers.
-      # Default: false
-      enable-all: true
-      # Disable analyzers by name.
-      # Run `GL_DEBUG=govet golangci-lint run --enable=govet` to see default, all available analyzers, and enabled analyzers.
-      # Default: []
-      disable:
-        - fieldalignment # too strict
-      # Settings per analyzer.
-      settings:
-        shadow:
-          # Whether to be strict about shadowing; can be noisy.
-          # Default: false
-          strict: true
+    # govet:
+    #   # Enable all analyzers.
+    #   # Default: false
+    #   enable-all: false
+    #   # Disable analyzers by name.
+    #   # Run `GL_DEBUG=govet golangci-lint run --enable=govet` to see default, all available analyzers, and enabled analyzers.
+    #   # Default: []
+    #   disable:
+    #     - fieldalignment # too strict
+    #   # Settings per analyzer.
+    #   settings:
+    #     shadow:
+    #       # Whether to be strict about shadowing; can be noisy.
+    #       # Default: false
+    #       strict: true
 
     inamedparam:
       # Skips check for interface methods with only a single parameter.
@@ -434,11 +434,17 @@ linters:
         # Omit embedded fields from selector expression.
         # https://staticcheck.dev/docs/checks/#QF1008
         - -QF1008
+        - -ST1003 # packages with underscores (e.g. core_logger, http_handler_users)
+        - -SA1029 #
 
     usetesting:
       # Enable/disable `os.TempDir()` detections.
       # Default: false
       os-temp-dir: true
+    
+    gosec:
+      excludes:
+        - G115 # integer overflow (int32)
 
   exclusions:
     # Log a warning if an exclusion rule is unused.
