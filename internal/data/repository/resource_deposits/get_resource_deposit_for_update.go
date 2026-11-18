@@ -8,7 +8,10 @@ import (
 	"github.com/sqlmerr/astragalaxy/internal/model"
 )
 
-func (r *ResourceDepositsRepositoryImpl) GetResourceDepositForUpdate(ctx context.Context, data GetResourceDeposit) (model.ResourceDeposit, error) {
+func (r *ResourceDepositsRepositoryImpl) GetResourceDepositForUpdate(
+	ctx context.Context,
+	data GetResourceDeposit,
+) (model.ResourceDeposit, error) {
 	ctx, cancel := context.WithTimeout(ctx, r.db.OpTimeout())
 	defer cancel()
 

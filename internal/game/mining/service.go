@@ -24,7 +24,12 @@ type Service struct {
 	gameData   registry.GameData
 }
 
-func NewService(gameConfig game.Config, store data.Store, worldGen worldgen.WorldGen, gameData registry.GameData) *Service {
+func NewService(
+	gameConfig game.Config,
+	store data.Store,
+	worldGen worldgen.WorldGen,
+	gameData registry.GameData,
+) *Service {
 	return &Service{gameConfig, store, worldGen, gameData}
 }
 
@@ -52,7 +57,11 @@ func (s *Service) MineAsteroid(ctx context.Context, agentID uuid.UUID, amount in
 
 	waypoint := system.FindWaypointByID(ship.Coords.LocationID)
 	if waypoint == nil {
-		return model.Cooldown{}, fmt.Errorf("waypoint with id='%d': %w", ship.Coords.LocationID, errs.CodeAnomaly.WithBase(errs.ErrNotFound))
+		return model.Cooldown{}, fmt.Errorf(
+			"waypoint with id='%d': %w",
+			ship.Coords.LocationID,
+			errs.CodeAnomaly.WithBase(errs.ErrNotFound),
+		)
 	}
 
 	if waypoint.Type != worldgen.WaypointAsteroid {
@@ -64,7 +73,8 @@ func (s *Service) MineAsteroid(ctx context.Context, agentID uuid.UUID, amount in
 		return model.Cooldown{}, fmt.Errorf("get ship inventory: %w", err)
 	}
 
-	inventoryResource, err := s.store.Inventories().GetResource(ctx, ship.InventoryID, waypoint.Asteroid.Deposit.Resource)
+	inventoryResource, err := s.store.Inventories().
+		GetResource(ctx, ship.InventoryID, waypoint.Asteroid.Deposit.Resource)
 	resourceExists := true
 	if err != nil {
 		if !errors.Is(err, errs.ErrNotFound) {
@@ -97,7 +107,11 @@ func (s *Service) MineAsteroid(ctx context.Context, agentID uuid.UUID, amount in
 			}
 			item, exists := s.gameData.Items.GetItem(string(itemType))
 			if !exists {
-				return model.Cooldown{}, fmt.Errorf("item %s (ship module) does not exist: %w", itemType, errs.ErrInternal)
+				return model.Cooldown{}, fmt.Errorf(
+					"item %s (ship module) does not exist: %w",
+					itemType,
+					errs.ErrInternal,
+				)
 			}
 
 			if item.ShipModule != nil && item.ShipModule.Mining != nil && item.ShipModule.Mining.SpeedMultiplier != 0 {
@@ -109,13 +123,14 @@ func (s *Service) MineAsteroid(ctx context.Context, agentID uuid.UUID, amount in
 	var cooldown model.Cooldown
 
 	err = s.store.ExecTx(ctx, func(tx data.Store) error {
-		deposit, err := s.store.ResourceDeposits().GetResourceDepositForUpdate(ctx, resource_deposits_repository.GetResourceDeposit{
-			SystemX:      system.X,
-			SystemY:      system.Y,
-			LocationType: model.LocationWaypoint,
-			LocationID:   waypoint.ID,
-			ResourceType: waypoint.Asteroid.Deposit.Resource,
-		})
+		deposit, err := s.store.ResourceDeposits().
+			GetResourceDepositForUpdate(ctx, resource_deposits_repository.GetResourceDeposit{
+				SystemX:      system.X,
+				SystemY:      system.Y,
+				LocationType: model.LocationWaypoint,
+				LocationID:   waypoint.ID,
+				ResourceType: waypoint.Asteroid.Deposit.Resource,
+			})
 		if err != nil {
 			if !errors.Is(err, errs.ErrNotFound) {
 				return fmt.Errorf("get deposit: %w", err)
@@ -131,7 +146,18 @@ func (s *Service) MineAsteroid(ctx context.Context, agentID uuid.UUID, amount in
 		}
 		deposit.Regenerate(waypoint.Asteroid.Deposit.Amount)
 
-		deposit, inventoryResource, cooldownDuration, err := Mine(s.gameConfig, waypoint.Asteroid.Deposit, deposit, amount, inventory, inventoryResource, inventoryVolume, ship, shipClass, speedMultiplier)
+		deposit, inventoryResource, cooldownDuration, err := Mine(
+			s.gameConfig,
+			waypoint.Asteroid.Deposit,
+			deposit,
+			amount,
+			inventory,
+			inventoryResource,
+			inventoryVolume,
+			ship,
+			shipClass,
+			speedMultiplier,
+		)
 		if err != nil {
 			return fmt.Errorf("process mining: %w", err)
 		}
@@ -179,7 +205,12 @@ func (s *Service) MineAsteroid(ctx context.Context, agentID uuid.UUID, amount in
 	return cooldown, err
 }
 
-func (s *Service) MinePlanet(ctx context.Context, agentID uuid.UUID, resourceType model.ResourceType, amount int) (model.Cooldown, error) {
+func (s *Service) MinePlanet(
+	ctx context.Context,
+	agentID uuid.UUID,
+	resourceType model.ResourceType,
+	amount int,
+) (model.Cooldown, error) {
 	if !s.gameConfig.Rules.DisableCooldowns {
 		if err := s.store.Cooldowns().CheckCooldown(ctx, agentID); err != nil {
 			return model.Cooldown{}, fmt.Errorf("cooldown: %w", err)
@@ -193,7 +224,10 @@ func (s *Service) MinePlanet(ctx context.Context, agentID uuid.UUID, resourceTyp
 
 	system, exists := s.worldGen.GenerateSystemByCoords(ship.Coords.SystemX, ship.Coords.SystemY)
 	if !exists {
-		return model.Cooldown{}, fmt.Errorf("your system doesn't exist: %w", errs.CodeAnomaly.WithBase(errs.ErrUnprocessableEntity))
+		return model.Cooldown{}, fmt.Errorf(
+			"your system doesn't exist: %w",
+			errs.CodeAnomaly.WithBase(errs.ErrUnprocessableEntity),
+		)
 	}
 
 	if ship.Coords.Location != model.ShipLocationPlanet {
@@ -206,7 +240,11 @@ func (s *Service) MinePlanet(ctx context.Context, agentID uuid.UUID, resourceTyp
 
 	planet := system.FindPlanetByOrbit(ship.Coords.LocationID)
 	if planet == nil {
-		return model.Cooldown{}, fmt.Errorf("planet with id='%d': %w", ship.Coords.LocationID, errs.CodeAnomaly.WithBase(errs.ErrNotFound))
+		return model.Cooldown{}, fmt.Errorf(
+			"planet with id='%d': %w",
+			ship.Coords.LocationID,
+			errs.CodeAnomaly.WithBase(errs.ErrNotFound),
+		)
 	}
 
 	var deposit worldgen.ResourceDeposit
@@ -219,7 +257,11 @@ func (s *Service) MinePlanet(ctx context.Context, agentID uuid.UUID, resourceTyp
 		}
 	}
 	if !flag {
-		return model.Cooldown{}, fmt.Errorf("resource type=%s deposit: %w", resourceType, errs.CodeResourceDepositNotFound)
+		return model.Cooldown{}, fmt.Errorf(
+			"resource type=%s deposit: %w",
+			resourceType,
+			errs.CodeResourceDepositNotFound,
+		)
 	}
 
 	inventory, err := s.store.Inventories().GetInventory(ctx, ship.InventoryID)
@@ -260,7 +302,11 @@ func (s *Service) MinePlanet(ctx context.Context, agentID uuid.UUID, resourceTyp
 			}
 			item, exists := s.gameData.Items.GetItem(string(itemType))
 			if !exists {
-				return model.Cooldown{}, fmt.Errorf("item %s (ship module) does not exist: %w", itemType, errs.ErrInternal)
+				return model.Cooldown{}, fmt.Errorf(
+					"item %s (ship module) does not exist: %w",
+					itemType,
+					errs.ErrInternal,
+				)
 			}
 
 			if item.ShipModule != nil && item.ShipModule.Mining != nil && item.ShipModule.Mining.SpeedMultiplier != 0 {
@@ -272,13 +318,14 @@ func (s *Service) MinePlanet(ctx context.Context, agentID uuid.UUID, resourceTyp
 	var cooldown model.Cooldown
 
 	err = s.store.ExecTx(ctx, func(tx data.Store) error {
-		depositData, err := tx.ResourceDeposits().GetResourceDepositForUpdate(ctx, resource_deposits_repository.GetResourceDeposit{
-			SystemX:      system.X,
-			SystemY:      system.Y,
-			LocationType: model.LocationPlanet,
-			LocationID:   planet.Orbit,
-			ResourceType: deposit.Resource,
-		})
+		depositData, err := tx.ResourceDeposits().
+			GetResourceDepositForUpdate(ctx, resource_deposits_repository.GetResourceDeposit{
+				SystemX:      system.X,
+				SystemY:      system.Y,
+				LocationType: model.LocationPlanet,
+				LocationID:   planet.Orbit,
+				ResourceType: deposit.Resource,
+			})
 		if err != nil {
 			if !errors.Is(err, errs.ErrNotFound) {
 				return fmt.Errorf("get deposit: %w", err)
@@ -294,7 +341,18 @@ func (s *Service) MinePlanet(ctx context.Context, agentID uuid.UUID, resourceTyp
 		}
 		depositData.Regenerate(deposit.Amount)
 
-		depositData, inventoryResource, cooldownDuration, err := Mine(s.gameConfig, deposit, depositData, amount, inventory, inventoryResource, inventoryVolume, ship, shipClass, speedMultiplier)
+		depositData, inventoryResource, cooldownDuration, err := Mine(
+			s.gameConfig,
+			deposit,
+			depositData,
+			amount,
+			inventory,
+			inventoryResource,
+			inventoryVolume,
+			ship,
+			shipClass,
+			speedMultiplier,
+		)
 		if err != nil {
 			return fmt.Errorf("process mining: %w", err)
 		}

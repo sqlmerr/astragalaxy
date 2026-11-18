@@ -8,7 +8,13 @@ import (
 	"github.com/sqlmerr/astragalaxy/internal/model"
 )
 
-func generatePlanet(gameData *registry.GameData, orbitIndex int, rng *rand.Rand, weights PlanetWeights, archetype SystemArchetype) Planet {
+func generatePlanet(
+	gameData *registry.GameData,
+	orbitIndex int,
+	rng *rand.Rand,
+	weights PlanetWeights,
+	archetype SystemArchetype,
+) Planet {
 	pType := getRandomPlanetType(rng, weights)
 
 	var deposits []ResourceDeposit
@@ -27,7 +33,11 @@ func generatePlanet(gameData *registry.GameData, orbitIndex int, rng *rand.Rand,
 	for _, r := range archetypeResources {
 		deposits = append(deposits, ResourceDeposit{
 			Resource: model.ResourceType(r.ID),
-			Amount:   getRandomIntBetween(rng, r.WorldGen[archetype.PlanetResourcesWorldGenParam].Min, r.WorldGen[archetype.PlanetResourcesWorldGenParam].Max),
+			Amount: getRandomIntBetween(
+				rng,
+				r.WorldGen[archetype.PlanetResourcesWorldGenParam].Min,
+				r.WorldGen[archetype.PlanetResourcesWorldGenParam].Max,
+			),
 			Richness: float64(rng.Intn(100)+1) / 100,
 		})
 	}

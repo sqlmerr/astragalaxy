@@ -18,7 +18,12 @@ type HttpServer struct {
 	middleware []http_middleware.Middleware
 }
 
-func NewHttpServer(mux *http.ServeMux, config Config, log *core_logger.Logger, middleware ...http_middleware.Middleware) *HttpServer {
+func NewHttpServer(
+	mux *http.ServeMux,
+	config Config,
+	log *core_logger.Logger,
+	middleware ...http_middleware.Middleware,
+) *HttpServer {
 	return &HttpServer{
 		mux:        mux,
 		config:     config,

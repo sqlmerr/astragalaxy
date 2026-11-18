@@ -25,7 +25,10 @@ func NewService(store data.Store, gameData registry.GameData, worldGen worldgen.
 	}
 }
 
-func (s *FacilitiesService) GatherAvailableFacilities(ctx context.Context, agentID uuid.UUID) (map[model.FacilityType][]string, error) {
+func (s *FacilitiesService) GatherAvailableFacilities(
+	ctx context.Context,
+	agentID uuid.UUID,
+) (map[model.FacilityType][]string, error) {
 	ship, err := s.store.Ships().GetActiveShipByAgent(ctx, agentID)
 	if err != nil {
 		return nil, fmt.Errorf("get active agent ship: %w", err)
@@ -67,7 +70,10 @@ func (s *FacilitiesService) GatherAvailableFacilities(ctx context.Context, agent
 			return nil,
 				fmt.Errorf(
 					"waypoint with id=%d in system x=%d y=%d does not exists: %w",
-					ship.Coords.LocationID, ship.Coords.SystemX, ship.Coords.SystemY, errs.CodeAnomaly.WithBase(errs.ErrUnprocessableEntity),
+					ship.Coords.LocationID,
+					ship.Coords.SystemX,
+					ship.Coords.SystemY,
+					errs.CodeAnomaly.WithBase(errs.ErrUnprocessableEntity),
 				)
 
 		}

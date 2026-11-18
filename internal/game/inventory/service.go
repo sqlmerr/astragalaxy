@@ -130,7 +130,13 @@ func (s *Service) TransferResources(
 				return fmt.Errorf("get inventory volume: %w", err)
 			}
 
-			resourceFrom, resourceTo, err = TransferResource(resourceFrom, resourceTo, amount, inventoryVolume, inventoryTo)
+			resourceFrom, resourceTo, err = TransferResource(
+				resourceFrom,
+				resourceTo,
+				amount,
+				inventoryVolume,
+				inventoryTo,
+			)
 			if err != nil {
 				return err
 			}
@@ -254,7 +260,13 @@ func (s *Service) TransferItems(ctx context.Context, input TransferItemsInput) e
 	return nil
 }
 
-func (s *Service) Trash(ctx context.Context, agentID uuid.UUID, inventoryID uuid.UUID, items []uuid.UUID, resources map[model.ResourceType]int) (model.Cooldown, error) {
+func (s *Service) Trash(
+	ctx context.Context,
+	agentID uuid.UUID,
+	inventoryID uuid.UUID,
+	items []uuid.UUID,
+	resources map[model.ResourceType]int,
+) (model.Cooldown, error) {
 	if !s.gameConfig.Rules.DisableCooldowns {
 		if err := s.store.Cooldowns().CheckCooldown(ctx, agentID); err != nil {
 			return model.Cooldown{}, fmt.Errorf("cooldown: %w", err)
@@ -303,7 +315,12 @@ func (s *Service) Trash(ctx context.Context, agentID uuid.UUID, inventoryID uuid
 
 		for resourceType, amount := range resources {
 			if amount <= 0 {
-				return fmt.Errorf("resource amount can't be less or equal to 0 (%s %d): %w", resourceType, amount, errs.CodeValidationError)
+				return fmt.Errorf(
+					"resource amount can't be less or equal to 0 (%s %d): %w",
+					resourceType,
+					amount,
+					errs.CodeValidationError,
+				)
 			}
 
 			resource, err := tx.Inventories().GetResource(ctx, inventoryID, resourceType)
@@ -355,7 +372,11 @@ func (s *Service) Trash(ctx context.Context, agentID uuid.UUID, inventoryID uuid
 	return cooldown, nil
 }
 
-func (s *Service) checkTransferDirection(ctx context.Context, agentID uuid.UUID, fromInventoryID, toInventoryID uuid.UUID) error {
+func (s *Service) checkTransferDirection(
+	ctx context.Context,
+	agentID uuid.UUID,
+	fromInventoryID, toInventoryID uuid.UUID,
+) error {
 	ownerFrom, err := s.store.Inventories().GetInventoryOwner(ctx, fromInventoryID)
 	if err != nil {
 		return fmt.Errorf("get inventory owner: %w", err)
@@ -419,7 +440,12 @@ func (s *Service) checkTransferDirection(ctx context.Context, agentID uuid.UUID,
 
 }
 
-func (s *Service) GrantResource(ctx context.Context, inventoryID uuid.UUID, resourceID model.ResourceType, amount int) (model.Resource, error) {
+func (s *Service) GrantResource(
+	ctx context.Context,
+	inventoryID uuid.UUID,
+	resourceID model.ResourceType,
+	amount int,
+) (model.Resource, error) {
 	_, ok := s.gameData.Resources.GetResource(string(resourceID))
 	if !ok {
 		return model.Resource{}, fmt.Errorf("resource type %q does not exist: %w", resourceID, errs.ErrNotFound)
@@ -436,7 +462,12 @@ func (s *Service) GrantResource(ctx context.Context, inventoryID uuid.UUID, reso
 			return model.Resource{}, fmt.Errorf("get resource total amount: %w", err)
 		}
 		if volume+amount > inv.MaxResourceVolume {
-			return model.Resource{}, fmt.Errorf("inventory resource volume limit exceeded (%d > %d): %w", volume+amount, inv.MaxResourceVolume, errs.CodeInventoryIsFull)
+			return model.Resource{}, fmt.Errorf(
+				"inventory resource volume limit exceeded (%d > %d): %w",
+				volume+amount,
+				inv.MaxResourceVolume,
+				errs.CodeInventoryIsFull,
+			)
 		}
 	}
 

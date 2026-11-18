@@ -12,7 +12,12 @@ import (
 	"github.com/sqlmerr/astragalaxy/internal/model"
 )
 
-func (r *InventoryRepositoryImpl) SubstractResource(ctx context.Context, inventoryID uuid.UUID, resourceType model.ResourceType, amount int) (model.Resource, error) {
+func (r *InventoryRepositoryImpl) SubstractResource(
+	ctx context.Context,
+	inventoryID uuid.UUID,
+	resourceType model.ResourceType,
+	amount int,
+) (model.Resource, error) {
 	ctx, cancel := context.WithTimeout(ctx, r.db.OpTimeout())
 	defer cancel()
 
@@ -24,7 +29,12 @@ func (r *InventoryRepositoryImpl) SubstractResource(ctx context.Context, invento
 	err = postgres_pool.TranslateError(err)
 	if err != nil {
 		if errors.Is(err, postgres_pool.ErrNoRows) {
-			return model.Resource{}, fmt.Errorf("resource in inventory %s of type %s: %w", inventoryID, resourceType, errs.CodeResourceNotFound)
+			return model.Resource{}, fmt.Errorf(
+				"resource in inventory %s of type %s: %w",
+				inventoryID,
+				resourceType,
+				errs.CodeResourceNotFound,
+			)
 		}
 		return model.Resource{}, fmt.Errorf("db error: %w", err)
 	}

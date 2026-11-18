@@ -38,7 +38,13 @@ func newAddItemCmd(itemsService *items.Service) *cobra.Command {
 			if err != nil {
 				return fmt.Errorf("failed to add item: %w", err)
 			}
-			fmt.Printf("added item %q to inventory %s\n(id: %s, type: %s)\n", itemID, inventoryID, item.ID, item.ItemType)
+			fmt.Printf(
+				"added item %q to inventory %s\n(id: %s, type: %s)\n",
+				itemID,
+				inventoryID,
+				item.ID,
+				item.ItemType,
+			)
 
 			return nil
 		},

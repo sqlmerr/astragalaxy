@@ -11,11 +11,18 @@ import (
 	"github.com/sqlmerr/astragalaxy/internal/model"
 )
 
-func (r *InventoryRepositoryImpl) DeleteResource(ctx context.Context, inventoryID uuid.UUID, resourceType model.ResourceType) error {
+func (r *InventoryRepositoryImpl) DeleteResource(
+	ctx context.Context,
+	inventoryID uuid.UUID,
+	resourceType model.ResourceType,
+) error {
 	ctx, cancel := context.WithTimeout(ctx, r.db.OpTimeout())
 	defer cancel()
 
-	rowsAffected, err := r.q.DeleteInventoryResource(ctx, database.DeleteInventoryResourceParams{InventoryID: inventoryID, ResourceType: string(resourceType)})
+	rowsAffected, err := r.q.DeleteInventoryResource(
+		ctx,
+		database.DeleteInventoryResourceParams{InventoryID: inventoryID, ResourceType: string(resourceType)},
+	)
 	err = postgres_pool.TranslateError(err)
 	if err != nil {
 		return fmt.Errorf("delete resource: %w", err)

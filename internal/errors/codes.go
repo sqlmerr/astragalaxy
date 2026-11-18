@@ -38,8 +38,11 @@ func (c ErrorCode) Is(target error) bool {
 }
 
 var (
-	CodeInternalServerError          ErrorCode = newCode("INTERNAL_SERVER_ERROR", ErrInternal)
-	CodeAnomaly                      ErrorCode = newCode("ANOMALY", ErrInternal) // something unexpected happened in the game
+	CodeInternalServerError ErrorCode = newCode("INTERNAL_SERVER_ERROR", ErrInternal)
+	CodeAnomaly             ErrorCode = newCode(
+		"ANOMALY",
+		ErrInternal,
+	) // something unexpected happened in the game
 	CodeUnknown                      ErrorCode = newCode("UNKNOWN", ErrInternal)
 	CodeDecodeError                  ErrorCode = newCode("DECODE_ERROR", ErrInvalidArgument)
 	CodeValidationError              ErrorCode = newCode("VALIDATION_ERROR", ErrInvalidArgument)

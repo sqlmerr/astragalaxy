@@ -11,7 +11,10 @@ import (
 	"github.com/sqlmerr/astragalaxy/internal/model"
 )
 
-func (r *DiscoveryRepositoryImpl) GetPlanetDiscoveriesByAgent(ctx context.Context, agentID uuid.UUID) ([]model.PlanetDiscovery, error) {
+func (r *DiscoveryRepositoryImpl) GetPlanetDiscoveriesByAgent(
+	ctx context.Context,
+	agentID uuid.UUID,
+) ([]model.PlanetDiscovery, error) {
 	ctx, cancel := context.WithTimeout(ctx, r.db.OpTimeout())
 	defer cancel()
 

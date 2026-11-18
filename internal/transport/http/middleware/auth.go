@@ -86,7 +86,10 @@ func AgentAuth(jwtProcessor auth.JWTProcessor, agentGetter AgentGetter) Middlewa
 				jwtToken := headerParts[1]
 				userID, err := jwtProcessor.ValidateToken(jwtToken)
 				if err != nil {
-					responseHandler.ErrorResponse(fmt.Errorf("%w: %w", err, errs.CodeInvalidJWTToken), "Invalid jwt token")
+					responseHandler.ErrorResponse(
+						fmt.Errorf("%w: %w", err, errs.CodeInvalidJWTToken),
+						"Invalid jwt token",
+					)
 					return
 				}
 
@@ -111,7 +114,12 @@ func AgentAuth(jwtProcessor auth.JWTProcessor, agentGetter AgentGetter) Middlewa
 				}
 				if agent.UserID != userID {
 					responseHandler.ErrorResponse(
-						fmt.Errorf("agent with id=%s does not belong to user with id=%s: %w", agent.ID, userID, errs.CodeAccessDenied.WithBase(errs.ErrUnauthorized)),
+						fmt.Errorf(
+							"agent with id=%s does not belong to user with id=%s: %w",
+							agent.ID,
+							userID,
+							errs.CodeAccessDenied.WithBase(errs.ErrUnauthorized),
+						),
 						"Failed to access agent control",
 					)
 					return

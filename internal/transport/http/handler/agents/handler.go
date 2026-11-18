@@ -30,7 +30,10 @@ func NewAgentsHTTPHandler(
 	return &AgentsHTTPHandler{agentsService, cooldownsService, miningService, craftingService, facilitiesService}
 }
 
-func (h *AgentsHTTPHandler) Routes(userAuthMiddleware http_middleware.Middleware, agentAuthMiddleware http_middleware.Middleware) []http_server.Route {
+func (h *AgentsHTTPHandler) Routes(
+	userAuthMiddleware http_middleware.Middleware,
+	agentAuthMiddleware http_middleware.Middleware,
+) []http_server.Route {
 	return []http_server.Route{
 		{
 			Method:     http.MethodPost,

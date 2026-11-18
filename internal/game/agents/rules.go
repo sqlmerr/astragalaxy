@@ -16,7 +16,10 @@ func checkUsername(username string) error {
 	}
 
 	if !usernameRegex.MatchString(username) {
-		return fmt.Errorf("invalid username format: must contain only latin letters, digits, and underscores: %w", errs.CodeInvalidUsername)
+		return fmt.Errorf(
+			"invalid username format: must contain only latin letters, digits, and underscores: %w",
+			errs.CodeInvalidUsername,
+		)
 	}
 
 	return nil

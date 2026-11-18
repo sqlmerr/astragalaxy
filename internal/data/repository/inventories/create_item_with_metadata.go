@@ -11,7 +11,10 @@ import (
 	"github.com/sqlmerr/astragalaxy/internal/model"
 )
 
-func (r *InventoryRepositoryImpl) CreateItemWithMetadata(ctx context.Context, data CreateItemWithMetadata) (model.Item, error) {
+func (r *InventoryRepositoryImpl) CreateItemWithMetadata(
+	ctx context.Context,
+	data CreateItemWithMetadata,
+) (model.Item, error) {
 	ctx, cancel := context.WithTimeout(ctx, r.db.OpTimeout())
 	defer cancel()
 

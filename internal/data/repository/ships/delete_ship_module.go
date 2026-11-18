@@ -10,7 +10,11 @@ import (
 	"github.com/sqlmerr/astragalaxy/internal/model"
 )
 
-func (r *ShipRepositoryImpl) DeleteShipModule(ctx context.Context, shipID uuid.UUID, moduleType model.ShipModuleType) error {
+func (r *ShipRepositoryImpl) DeleteShipModule(
+	ctx context.Context,
+	shipID uuid.UUID,
+	moduleType model.ShipModuleType,
+) error {
 	ctx, cancel := context.WithTimeout(ctx, r.db.OpTimeout())
 	defer cancel()
 

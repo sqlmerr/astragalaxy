@@ -14,7 +14,7 @@ const (
 )
 
 type Config struct {
-	JWTSecret     string        `envconfig:"JWT_SECRET" required:"true"`
+	JWTSecret     string        `envconfig:"JWT_SECRET"     required:"true"`
 	TokenDuration time.Duration `envconfig:"TOKEN_DURATION" required:"true"`
 }
 

@@ -10,7 +10,10 @@ import (
 	"github.com/sqlmerr/astragalaxy/internal/model"
 )
 
-func (r *DiscoveryRepositoryImpl) GetPlanetDiscoveriesBySystem(ctx context.Context, systemX, systemY int) ([]model.PlanetDiscovery, error) {
+func (r *DiscoveryRepositoryImpl) GetPlanetDiscoveriesBySystem(
+	ctx context.Context,
+	systemX, systemY int,
+) ([]model.PlanetDiscovery, error) {
 	ctx, cancel := context.WithTimeout(ctx, r.db.OpTimeout())
 	defer cancel()
 

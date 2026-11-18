@@ -10,7 +10,10 @@ import (
 	"github.com/sqlmerr/astragalaxy/internal/model"
 )
 
-func (r *WalletRepositoryImpl) GetTransactionsByAddress(ctx context.Context, address string) ([]model.WalletTransaction, error) {
+func (r *WalletRepositoryImpl) GetTransactionsByAddress(
+	ctx context.Context,
+	address string,
+) ([]model.WalletTransaction, error) {
 	ctx, cancel := context.WithTimeout(ctx, r.db.OpTimeout())
 	defer cancel()
 

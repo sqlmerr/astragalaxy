@@ -50,7 +50,10 @@ func newSpawnShipCmd(shipsService ships.Service) *cobra.Command {
 				AgentID: agentID,
 				Type:    shipType,
 				Name:    shipName,
-				Modules: lo.Map(shipModules, func(item string, _ int) model.ShipModuleType { return model.ShipModuleType(item) }),
+				Modules: lo.Map(
+					shipModules,
+					func(item string, _ int) model.ShipModuleType { return model.ShipModuleType(item) },
+				),
 				Inventory: model.Inventory{
 					MaxItemSlots:      inventoryItemSlots,
 					MaxResourceVolume: inventoryResourceVolume,
@@ -70,8 +73,10 @@ func newSpawnShipCmd(shipsService ships.Service) *cobra.Command {
 	cmd.Flags().StringVar(&shipType, "type", "scout", "ship type (scout, trader, miner)")
 	cmd.Flags().StringVar(&shipName, "name", "Ship", "ship name")
 	cmd.Flags().StringSliceVar(&shipModules, "modules", []string{}, "ship modules separated by comma")
-	cmd.Flags().IntVar(&inventoryItemSlots, "inv-item-slots", 15, "Maximum amount of available slots for ship's inventory. Min: 1")
-	cmd.Flags().IntVar(&inventoryResourceVolume, "inv-resource-volume", 3000, "Maximum resource volume for ship's inventory. Min: 1")
+	cmd.Flags().
+		IntVar(&inventoryItemSlots, "inv-item-slots", 15, "Maximum amount of available slots for ship's inventory. Min: 1")
+	cmd.Flags().
+		IntVar(&inventoryResourceVolume, "inv-resource-volume", 3000, "Maximum resource volume for ship's inventory. Min: 1")
 	cmd.Flags().StringVar(&shipClass, "class", "C", "ship class")
 	// TODO: enter ship location?
 

@@ -185,7 +185,8 @@ func checkDatabaseNotAhead(m *migrate.Migrate) error {
 	if uint(version) > max {
 		return fmt.Errorf(
 			"database is at migration version %d, but this binary contains migrations only up to %d: the server image is outdated, rebuild it or use a newer image tag",
-			version, max,
+			version,
+			max,
 		)
 	}
 	return nil
@@ -252,7 +253,10 @@ func ignoreNoChange(err error) error {
 func explain(err error) error {
 	var dirty migrate.ErrDirty
 	if errors.As(err, &dirty) {
-		return fmt.Errorf("%w\nfix the failed migration, then set the version manually: server migrate force <version>", err)
+		return fmt.Errorf(
+			"%w\nfix the failed migration, then set the version manually: server migrate force <version>",
+			err,
+		)
 	}
 	return err
 }

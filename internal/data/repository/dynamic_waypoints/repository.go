@@ -13,7 +13,11 @@ type DynamicWaypointRepository interface {
 	CreateDynamicWaypoint(ctx context.Context, data CreateDynamicWaypoint) (model.DynamicWaypoint, error)
 	GetDynamicWaypoint(ctx context.Context, id uuid.UUID) (model.DynamicWaypoint, error)
 	GetDynamicWaypointsBySystem(ctx context.Context, systemX, systemY int) ([]model.DynamicWaypoint, error)
-	GetDynamicWaypointsByAgentAndSystem(ctx context.Context, agentID uuid.UUID, systemX, systemY int) ([]model.DynamicWaypoint, error)
+	GetDynamicWaypointsByAgentAndSystem(
+		ctx context.Context,
+		agentID uuid.UUID,
+		systemX, systemY int,
+	) ([]model.DynamicWaypoint, error)
 	// SaveDynamicWaypoint
 	// DeleteDynamicWaypoint
 }

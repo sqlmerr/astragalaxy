@@ -11,7 +11,10 @@ import (
 	"github.com/sqlmerr/astragalaxy/internal/model"
 )
 
-func (r *InventoryRepositoryImpl) GetInventoryResources(ctx context.Context, inventoryID uuid.UUID) ([]model.Resource, error) {
+func (r *InventoryRepositoryImpl) GetInventoryResources(
+	ctx context.Context,
+	inventoryID uuid.UUID,
+) ([]model.Resource, error) {
 	ctx, cancel := context.WithTimeout(ctx, r.db.OpTimeout())
 	defer cancel()
 

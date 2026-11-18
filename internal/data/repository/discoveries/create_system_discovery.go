@@ -11,7 +11,10 @@ import (
 	"github.com/sqlmerr/astragalaxy/internal/model"
 )
 
-func (r *DiscoveryRepositoryImpl) CreateSystemDiscovery(ctx context.Context, data CreateSystemDiscovery) (model.SystemDiscovery, error) {
+func (r *DiscoveryRepositoryImpl) CreateSystemDiscovery(
+	ctx context.Context,
+	data CreateSystemDiscovery,
+) (model.SystemDiscovery, error) {
 	ctx, cancel := context.WithTimeout(ctx, r.db.OpTimeout())
 	defer cancel()
 
@@ -23,7 +26,11 @@ func (r *DiscoveryRepositoryImpl) CreateSystemDiscovery(ctx context.Context, dat
 	err = postgres_pool.TranslateError(err)
 	if err != nil {
 		if errors.Is(err, postgres_pool.ErrViolatesForeignKey) {
-			return model.SystemDiscovery{}, fmt.Errorf("agent with id %s: %w", data.DiscoveredBy, errs.CodeAgentNotFound)
+			return model.SystemDiscovery{}, fmt.Errorf(
+				"agent with id %s: %w",
+				data.DiscoveredBy,
+				errs.CodeAgentNotFound,
+			)
 		}
 
 		return model.SystemDiscovery{}, fmt.Errorf("create system discovery: %w", err)

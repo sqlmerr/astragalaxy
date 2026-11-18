@@ -26,7 +26,12 @@ func NewService(gameConfig game.Config, store data.Store, gameData registry.Game
 	return &Service{gameConfig, store, gameData}
 }
 
-func (s *Service) UseItem(ctx context.Context, agentID uuid.UUID, itemID uuid.UUID, input json.RawMessage) (json.RawMessage, model.Cooldown, error) {
+func (s *Service) UseItem(
+	ctx context.Context,
+	agentID uuid.UUID,
+	itemID uuid.UUID,
+	input json.RawMessage,
+) (json.RawMessage, model.Cooldown, error) {
 	item, err := s.store.Inventories().GetItem(ctx, itemID)
 	if err != nil {
 		return nil, model.Cooldown{}, fmt.Errorf("get item: %w", err)
@@ -92,7 +97,12 @@ func (s *Service) UseItem(ctx context.Context, agentID uuid.UUID, itemID uuid.UU
 	return res.Response(), cooldown, nil
 }
 
-func (s *Service) GrantItem(ctx context.Context, inventoryID uuid.UUID, itemID string, metadata json.RawMessage) (model.Item, error) {
+func (s *Service) GrantItem(
+	ctx context.Context,
+	inventoryID uuid.UUID,
+	itemID string,
+	metadata json.RawMessage,
+) (model.Item, error) {
 	itemData, ok := s.gameData.Items.GetItem(itemID)
 	if !ok {
 		return model.Item{}, fmt.Errorf("item %q: %w", itemID, errs.CodeItemNotFound)
@@ -109,7 +119,12 @@ func (s *Service) GrantItem(ctx context.Context, inventoryID uuid.UUID, itemID s
 			return model.Item{}, fmt.Errorf("get inventory item count: %w", err)
 		}
 		if count+1 > inv.MaxItemSlots {
-			return model.Item{}, fmt.Errorf("inventory item limit exceeded (%d > %d): %w", count+1, inv.MaxItemSlots, errs.CodeInventoryIsFull)
+			return model.Item{}, fmt.Errorf(
+				"inventory item limit exceeded (%d > %d): %w",
+				count+1,
+				inv.MaxItemSlots,
+				errs.CodeInventoryIsFull,
+			)
 		}
 	}
 

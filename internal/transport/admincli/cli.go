@@ -56,7 +56,18 @@ func Execute() error {
 	walletRepo := wallets_repository.New(*queries, pool)
 	dynamicWaypointsRepo := dynamic_waypoints_repository.New(*queries, pool)
 
-	store := data.NewStore(pool, userRepo, agentRepo, shipRepo, inventoryRepo, cooldownRepo, resourceDepositsRepo, discoveryRepo, walletRepo, dynamicWaypointsRepo)
+	store := data.NewStore(
+		pool,
+		userRepo,
+		agentRepo,
+		shipRepo,
+		inventoryRepo,
+		cooldownRepo,
+		resourceDepositsRepo,
+		discoveryRepo,
+		walletRepo,
+		dynamicWaypointsRepo,
+	)
 	gameConfig := game.LoadConfigMust()
 	registryConfig := registry.LoadConfigMust()
 	gameData, err := registry.LoadGameData(registryConfig)

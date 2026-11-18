@@ -12,7 +12,11 @@ import (
 	"github.com/sqlmerr/astragalaxy/internal/model"
 )
 
-func (r *ShipRepositoryImpl) GetShipModule(ctx context.Context, shipID uuid.UUID, moduleType model.ShipModuleType) (model.ShipModule, error) {
+func (r *ShipRepositoryImpl) GetShipModule(
+	ctx context.Context,
+	shipID uuid.UUID,
+	moduleType model.ShipModuleType,
+) (model.ShipModule, error) {
 	ctx, cancel := context.WithTimeout(ctx, r.db.OpTimeout())
 	defer cancel()
 
@@ -23,7 +27,12 @@ func (r *ShipRepositoryImpl) GetShipModule(ctx context.Context, shipID uuid.UUID
 	err = postgres_pool.TranslateError(err)
 	if err != nil {
 		if errors.Is(err, postgres_pool.ErrNoRows) {
-			return model.ShipModule{}, fmt.Errorf("module with type='%s' in ship with id='%s': %w", moduleType, shipID, errs.CodeShipNotFound)
+			return model.ShipModule{}, fmt.Errorf(
+				"module with type='%s' in ship with id='%s': %w",
+				moduleType,
+				shipID,
+				errs.CodeShipNotFound,
+			)
 		}
 
 		return model.ShipModule{}, fmt.Errorf("get ship module: %w", err)

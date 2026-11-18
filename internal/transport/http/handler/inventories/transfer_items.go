@@ -13,8 +13,8 @@ import (
 
 type TransferItemsRequest struct {
 	FromInventoryID uuid.UUID   `json:"from_inventory_id" validate:"required"`
-	ToInventoryID   uuid.UUID   `json:"to_inventory_id" validate:"required"`
-	Items           []uuid.UUID `json:"items" validate:"required"`
+	ToInventoryID   uuid.UUID   `json:"to_inventory_id"   validate:"required"`
+	Items           []uuid.UUID `json:"items"             validate:"required"`
 }
 
 func (h *InventoriesHTTPHandler) TransferItems(w http.ResponseWriter, r *http.Request) {

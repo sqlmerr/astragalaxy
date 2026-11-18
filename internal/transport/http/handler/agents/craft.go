@@ -12,9 +12,9 @@ import (
 )
 
 type CraftRequest struct {
-	RecipeID          string    `json:"recipe_id" validate:"required"`
+	RecipeID          string    `json:"recipe_id"           validate:"required"`
 	TargetInventoryID uuid.UUID `json:"target_inventory_id" validate:"required"`
-	Amount            int       `json:"amount" validate:"required,min=1"`
+	Amount            int       `json:"amount"              validate:"required,min=1"`
 }
 
 type CraftResponse struct {

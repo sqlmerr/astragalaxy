@@ -11,7 +11,10 @@ import (
 	"github.com/sqlmerr/astragalaxy/internal/model"
 )
 
-func (r *DiscoveryRepositoryImpl) CreatePlanetDiscovery(ctx context.Context, data CreatePlanetDiscovery) (model.PlanetDiscovery, error) {
+func (r *DiscoveryRepositoryImpl) CreatePlanetDiscovery(
+	ctx context.Context,
+	data CreatePlanetDiscovery,
+) (model.PlanetDiscovery, error) {
 	ctx, cancel := context.WithTimeout(ctx, r.db.OpTimeout())
 	defer cancel()
 
@@ -24,7 +27,11 @@ func (r *DiscoveryRepositoryImpl) CreatePlanetDiscovery(ctx context.Context, dat
 	err = postgres_pool.TranslateError(err)
 	if err != nil {
 		if errors.Is(err, postgres_pool.ErrViolatesForeignKey) {
-			return model.PlanetDiscovery{}, fmt.Errorf("agent with id %s: %w", data.DiscoveredBy, errs.CodeAgentNotFound)
+			return model.PlanetDiscovery{}, fmt.Errorf(
+				"agent with id %s: %w",
+				data.DiscoveredBy,
+				errs.CodeAgentNotFound,
+			)
 		}
 
 		return model.PlanetDiscovery{}, fmt.Errorf("create planet discovery: %w", err)

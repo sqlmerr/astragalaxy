@@ -11,7 +11,10 @@ import (
 	"github.com/sqlmerr/astragalaxy/internal/model"
 )
 
-func (r *DynamicWaypointRepositoryImpl) GetDynamicWaypoint(ctx context.Context, id uuid.UUID) (model.DynamicWaypoint, error) {
+func (r *DynamicWaypointRepositoryImpl) GetDynamicWaypoint(
+	ctx context.Context,
+	id uuid.UUID,
+) (model.DynamicWaypoint, error) {
 	ctx, cancel := context.WithTimeout(ctx, r.db.OpTimeout())
 	defer cancel()
 
@@ -19,7 +22,11 @@ func (r *DynamicWaypointRepositoryImpl) GetDynamicWaypoint(ctx context.Context, 
 	err = postgres_pool.TranslateError(err)
 	if err != nil {
 		if errors.Is(err, postgres_pool.ErrNoRows) {
-			return model.DynamicWaypoint{}, fmt.Errorf("dynamic waypoint with id = %s: %w", id, errs.CodeWaypointNotFound)
+			return model.DynamicWaypoint{}, fmt.Errorf(
+				"dynamic waypoint with id = %s: %w",
+				id,
+				errs.CodeWaypointNotFound,
+			)
 		}
 
 		return model.DynamicWaypoint{}, fmt.Errorf("get dynamic waypoint: %w", err)

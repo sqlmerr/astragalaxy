@@ -33,7 +33,12 @@ type Service struct {
 	walletProvider walletProvider
 }
 
-func NewService(store data.Store, worldGen worldgen.WorldGen, shipProvider shipProvider, walletProvider walletProvider) *Service {
+func NewService(
+	store data.Store,
+	worldGen worldgen.WorldGen,
+	shipProvider shipProvider,
+	walletProvider walletProvider,
+) *Service {
 	return &Service{
 		store, worldGen, shipProvider, walletProvider,
 	}
@@ -63,7 +68,10 @@ func (s *Service) RegisterAgent(ctx context.Context, userID uuid.UUID, username 
 	}
 
 	if exists {
-		return model.Agent{}, "", fmt.Errorf("agent's username already occupied: %w", errs.CodeAgentUsernameAlreadyOccupied)
+		return model.Agent{}, "", fmt.Errorf(
+			"agent's username already occupied: %w",
+			errs.CodeAgentUsernameAlreadyOccupied,
+		)
 	}
 
 	var tokenHash string

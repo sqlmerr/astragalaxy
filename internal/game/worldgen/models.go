@@ -92,9 +92,45 @@ var (
 )
 
 var (
-	consonants = []string{"b", "c", "d", "f", "g", "k", "l", "m", "n", "p", "r", "s", "t", "v", "x", "z", "kr", "th", "st", "vr", "xl"}
-	vowels     = []string{"a", "e", "i", "o", "u", "y", "ae", "ia", "io", "ou"}
-	suffixes   = []string{" Prime", " Major", " Minor", " Alpha", " Beta", " Gamma", " I", " II", " III", " IV", " V", " X", "-9"}
+	consonants = []string{
+		"b",
+		"c",
+		"d",
+		"f",
+		"g",
+		"k",
+		"l",
+		"m",
+		"n",
+		"p",
+		"r",
+		"s",
+		"t",
+		"v",
+		"x",
+		"z",
+		"kr",
+		"th",
+		"st",
+		"vr",
+		"xl",
+	}
+	vowels   = []string{"a", "e", "i", "o", "u", "y", "ae", "ia", "io", "ou"}
+	suffixes = []string{
+		" Prime",
+		" Major",
+		" Minor",
+		" Alpha",
+		" Beta",
+		" Gamma",
+		" I",
+		" II",
+		" III",
+		" IV",
+		" V",
+		" X",
+		"-9",
+	}
 )
 
 type ResourceGenParams struct {
@@ -148,7 +184,11 @@ var (
 		StationChance:                0.8,
 		MaxAsteroids:                 3,
 		PlanetResourcesWorldGenParam: "planet.habitable",
-		StationFacilities:            map[model.FacilityType]int{model.FacilityPrinter: 3, model.FacilitySmelter: 2, model.FacilityWalletTerminal: 1},
+		StationFacilities: map[model.FacilityType]int{
+			model.FacilityPrinter:        3,
+			model.FacilitySmelter:        2,
+			model.FacilityWalletTerminal: 1,
+		},
 	}
 	ArchetypeDead = SystemArchetype{
 		Name:       "dead",
@@ -197,7 +237,11 @@ var (
 		},
 		MaxAsteroids:                 6,
 		PlanetResourcesWorldGenParam: "planet.frozen",
-		StationFacilities:            map[model.FacilityType]int{model.FacilityPrinter: 2, model.FacilitySmelter: 2, model.FacilityWalletTerminal: 1},
+		StationFacilities: map[model.FacilityType]int{
+			model.FacilityPrinter:        2,
+			model.FacilitySmelter:        2,
+			model.FacilityWalletTerminal: 1,
+		},
 	}
 
 	Archetypes = []SystemArchetype{

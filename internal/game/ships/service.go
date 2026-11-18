@@ -26,7 +26,12 @@ type Service struct {
 	gameData   registry.GameData
 }
 
-func NewService(gameConfig game.Config, store data.Store, worldGen worldgen.WorldGen, gameData registry.GameData) *Service {
+func NewService(
+	gameConfig game.Config,
+	store data.Store,
+	worldGen worldgen.WorldGen,
+	gameData registry.GameData,
+) *Service {
 	return &Service{
 		gameConfig, store, worldGen, gameData,
 	}
@@ -50,7 +55,12 @@ func (s *Service) GetAgentActiveShip(ctx context.Context, agentID uuid.UUID) (mo
 	return ship, nil
 }
 
-func (s *Service) RenameShip(ctx context.Context, agentID uuid.UUID, shipID uuid.UUID, newShipName string) (model.Ship, error) {
+func (s *Service) RenameShip(
+	ctx context.Context,
+	agentID uuid.UUID,
+	shipID uuid.UUID,
+	newShipName string,
+) (model.Ship, error) {
 	ship, err := s.store.Ships().GetShip(ctx, shipID)
 	if err != nil {
 		return model.Ship{}, fmt.Errorf("get ship: %w", err)
@@ -224,7 +234,12 @@ func (s *Service) GetShipModules(ctx context.Context, agentID uuid.UUID, shipID 
 	return modules, nil
 }
 
-func (s *Service) RemoveShipModule(ctx context.Context, agentID uuid.UUID, shipID uuid.UUID, moduleType model.ShipModuleType) error {
+func (s *Service) RemoveShipModule(
+	ctx context.Context,
+	agentID uuid.UUID,
+	shipID uuid.UUID,
+	moduleType model.ShipModuleType,
+) error {
 	ship, err := s.store.Ships().GetShip(ctx, shipID)
 	if err != nil {
 		return fmt.Errorf("get ship: %w", err)
@@ -334,7 +349,11 @@ func (s *Service) createShip(ctx context.Context, tx data.Store, spec CreateShip
 	for _, m := range spec.Modules {
 		_, exists := s.gameData.Items.GetItem(string(m))
 		if !exists {
-			return model.Ship{}, fmt.Errorf("item id `%s` does not exist: %w", m, errs.CodeInvalidShipModuleType.WithBase(errs.ErrNotFound))
+			return model.Ship{}, fmt.Errorf(
+				"item id `%s` does not exist: %w",
+				m,
+				errs.CodeInvalidShipModuleType.WithBase(errs.ErrNotFound),
+			)
 		}
 
 		_, err = tx.Ships().CreateShipModule(ctx, ships_repository.CreateShipModule{

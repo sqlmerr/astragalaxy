@@ -16,7 +16,12 @@ func CalcWarpDistance(x1, y1, x2, y2 int) int {
 	))
 }
 
-func NavigateWarp(ship model.Ship, class model.ShipClass, newSystem worldgen.System, warpCellT1Amount, warpCellT2Amount int) (model.Ship, time.Duration, model.ResourceType, int, error) {
+func NavigateWarp(
+	ship model.Ship,
+	class model.ShipClass,
+	newSystem worldgen.System,
+	warpCellT1Amount, warpCellT2Amount int,
+) (model.Ship, time.Duration, model.ResourceType, int, error) {
 	if ship.Status != model.ShipStatusOrbit {
 		return model.Ship{}, 0, "", 0, fmt.Errorf("ship must be in orbit state: %w", errs.CodeInvalidShipState)
 	}
@@ -142,12 +147,21 @@ func NavigateWaypoint(ship model.Ship, system worldgen.System, waypointID int) (
 
 	waypoint := system.FindWaypointByID(waypointID)
 	if waypoint == nil {
-		return model.Ship{}, 0, fmt.Errorf("waypoint with id=%d: %w", waypointID, errs.CodeInvalidCoordinates.WithBase(errs.ErrNotFound))
+		return model.Ship{}, 0, fmt.Errorf(
+			"waypoint with id=%d: %w",
+			waypointID,
+			errs.CodeInvalidCoordinates.WithBase(errs.ErrNotFound),
+		)
 	}
 
 	cooldownDuration := time.Second * 30
 
-	shipCoords, err := model.NewShipCoords(model.ShipLocationWaypoint, waypointID, ship.Coords.SystemX, ship.Coords.SystemY)
+	shipCoords, err := model.NewShipCoords(
+		model.ShipLocationWaypoint,
+		waypointID,
+		ship.Coords.SystemX,
+		ship.Coords.SystemY,
+	)
 	if err != nil {
 		return model.Ship{}, 0, fmt.Errorf("set coords: %w", err)
 	}

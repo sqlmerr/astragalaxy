@@ -33,7 +33,12 @@ func (s *Service) ShipRadar(ctx context.Context, agentID uuid.UUID) ([]worldgen.
 		return nil, fmt.Errorf("get active ship: %w", err)
 	}
 
-	systems, err := s.worldGen.GetSystemsInBox(ship.Coords.SystemX-10, ship.Coords.SystemY-10, ship.Coords.SystemX+10, ship.Coords.SystemY+10)
+	systems, err := s.worldGen.GetSystemsInBox(
+		ship.Coords.SystemX-10,
+		ship.Coords.SystemY-10,
+		ship.Coords.SystemX+10,
+		ship.Coords.SystemY+10,
+	)
 	if err != nil {
 		return nil, fmt.Errorf("use radar: %w", err)
 	}
@@ -58,7 +63,8 @@ func (s *Service) GetCurrentAgentSystem(ctx context.Context, agentID uuid.UUID) 
 			)
 	}
 
-	resourceDeposits, err := s.store.ResourceDeposits().GetSystemResourceDeposits(ctx, ship.Coords.SystemX, ship.Coords.SystemY)
+	resourceDeposits, err := s.store.ResourceDeposits().
+		GetSystemResourceDeposits(ctx, ship.Coords.SystemX, ship.Coords.SystemY)
 	if err != nil {
 		return FullSystem{}, fmt.Errorf("get deposits: %w", err)
 	}

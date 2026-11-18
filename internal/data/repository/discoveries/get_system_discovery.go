@@ -11,7 +11,10 @@ import (
 	"github.com/sqlmerr/astragalaxy/internal/model"
 )
 
-func (r *DiscoveryRepositoryImpl) GetSystemDiscovery(ctx context.Context, systemX, systemY int) (model.SystemDiscovery, error) {
+func (r *DiscoveryRepositoryImpl) GetSystemDiscovery(
+	ctx context.Context,
+	systemX, systemY int,
+) (model.SystemDiscovery, error) {
 	ctx, cancel := context.WithTimeout(ctx, r.db.OpTimeout())
 	defer cancel()
 
@@ -22,7 +25,12 @@ func (r *DiscoveryRepositoryImpl) GetSystemDiscovery(ctx context.Context, system
 	err = postgres_pool.TranslateError(err)
 	if err != nil {
 		if errors.Is(err, postgres_pool.ErrNoRows) {
-			return model.SystemDiscovery{}, fmt.Errorf("system discovery x=%d y=%d: %w", systemX, systemY, errs.CodePlanetDiscoveryNotFound)
+			return model.SystemDiscovery{}, fmt.Errorf(
+				"system discovery x=%d y=%d: %w",
+				systemX,
+				systemY,
+				errs.CodePlanetDiscoveryNotFound,
+			)
 		}
 		return model.SystemDiscovery{}, fmt.Errorf("get system discovery: %w", err)
 	}

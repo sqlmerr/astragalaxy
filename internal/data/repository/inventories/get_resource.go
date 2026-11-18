@@ -12,11 +12,18 @@ import (
 	"github.com/sqlmerr/astragalaxy/internal/model"
 )
 
-func (r *InventoryRepositoryImpl) GetResource(ctx context.Context, inventoryID uuid.UUID, resourceType model.ResourceType) (model.Resource, error) {
+func (r *InventoryRepositoryImpl) GetResource(
+	ctx context.Context,
+	inventoryID uuid.UUID,
+	resourceType model.ResourceType,
+) (model.Resource, error) {
 	ctx, cancel := context.WithTimeout(ctx, r.db.OpTimeout())
 	defer cancel()
 
-	res, err := r.q.GetInventoryResource(ctx, database.GetInventoryResourceParams{InventoryID: inventoryID, ResourceType: string(resourceType)})
+	res, err := r.q.GetInventoryResource(
+		ctx,
+		database.GetInventoryResourceParams{InventoryID: inventoryID, ResourceType: string(resourceType)},
+	)
 	err = postgres_pool.TranslateError(err)
 	if err != nil {
 		if errors.Is(err, postgres_pool.ErrNoRows) {

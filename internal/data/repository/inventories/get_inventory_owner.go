@@ -11,7 +11,10 @@ import (
 	"github.com/sqlmerr/astragalaxy/internal/model"
 )
 
-func (r *InventoryRepositoryImpl) GetInventoryOwner(ctx context.Context, inventoryID uuid.UUID) (model.InventoryOwner, error) {
+func (r *InventoryRepositoryImpl) GetInventoryOwner(
+	ctx context.Context,
+	inventoryID uuid.UUID,
+) (model.InventoryOwner, error) {
 	ctx, cancel := context.WithTimeout(ctx, r.db.OpTimeout())
 	defer cancel()
 
@@ -19,7 +22,11 @@ func (r *InventoryRepositoryImpl) GetInventoryOwner(ctx context.Context, invento
 	err = postgres_pool.TranslateError(err)
 	if err != nil {
 		if errors.Is(err, postgres_pool.ErrNoRows) {
-			return model.InventoryOwner{}, fmt.Errorf("inventory with id='%s': %w", inventoryID, errs.CodeInventoryNotFound)
+			return model.InventoryOwner{}, fmt.Errorf(
+				"inventory with id='%s': %w",
+				inventoryID,
+				errs.CodeInventoryNotFound,
+			)
 		}
 
 		return model.InventoryOwner{}, fmt.Errorf("get inventory owner: %w", err)

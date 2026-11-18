@@ -48,7 +48,11 @@ func (s *Service) RegisterWallet(ctx context.Context, agentID uuid.UUID) (model.
 	}
 	f, ok := facilities[model.FacilityWalletTerminal]
 	if !ok || len(f) == 0 { // we don't care about wallet_terminal facility tier here
-		return model.Wallet{}, fmt.Errorf("cannot register new wallet: no `%s` facility available: %w", model.FacilityWalletTerminal, errs.CodeCannotRegisterWallet)
+		return model.Wallet{}, fmt.Errorf(
+			"cannot register new wallet: no `%s` facility available: %w",
+			model.FacilityWalletTerminal,
+			errs.CodeCannotRegisterWallet,
+		)
 	}
 
 	addr, err := GenerateAddress()
@@ -177,7 +181,11 @@ func (s *Service) checkWalletViewRights(ctx context.Context, agentID uuid.UUID, 
 
 	f, ok := facilities[model.FacilityWalletTerminal]
 	if !ok || len(f) == 0 { // we don't care about wallet_terminal facility tier here
-		return fmt.Errorf("cannot get this wallet: no `%s` facility available: %w", model.FacilityWalletTerminal, errs.CodeAccessDenied)
+		return fmt.Errorf(
+			"cannot get this wallet: no `%s` facility available: %w",
+			model.FacilityWalletTerminal,
+			errs.CodeAccessDenied,
+		)
 	}
 
 	return nil
@@ -194,7 +202,11 @@ func (s *Service) GetPublicWallet(ctx context.Context, agentID uuid.UUID, addres
 	return wallet, nil
 }
 
-func (s *Service) GetPublicWalletTransactions(ctx context.Context, agentID uuid.UUID, address string) ([]model.WalletTransaction, error) {
+func (s *Service) GetPublicWalletTransactions(
+	ctx context.Context,
+	agentID uuid.UUID,
+	address string,
+) ([]model.WalletTransaction, error) {
 	wallet, err := s.GetPublicWallet(ctx, agentID, address)
 	if err != nil {
 		return nil, err

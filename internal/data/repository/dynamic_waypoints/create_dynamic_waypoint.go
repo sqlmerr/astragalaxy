@@ -11,7 +11,10 @@ import (
 	"github.com/sqlmerr/astragalaxy/internal/model"
 )
 
-func (r *DynamicWaypointRepositoryImpl) CreateDynamicWaypoint(ctx context.Context, data CreateDynamicWaypoint) (model.DynamicWaypoint, error) {
+func (r *DynamicWaypointRepositoryImpl) CreateDynamicWaypoint(
+	ctx context.Context,
+	data CreateDynamicWaypoint,
+) (model.DynamicWaypoint, error) {
 	ctx, cancel := context.WithTimeout(ctx, r.db.OpTimeout())
 	defer cancel()
 

@@ -38,8 +38,15 @@ func TestChangeActiveShip(t *testing.T) {
 	})
 
 	t.Run("invalid ship location", func(t *testing.T) {
-		oldActiveShip := model.Ship{AgentID: agentID, Active: true, Coords: model.ShipCoords{SystemX: 1, SystemY: 1, Location: model.ShipLocationWaypoint, LocationID: 0}}
-		newActiveShip := model.Ship{AgentID: agentID, Coords: model.ShipCoords{SystemX: 4, SystemY: 20, Location: model.ShipLocationPlanet, LocationID: 2}}
+		oldActiveShip := model.Ship{
+			AgentID: agentID,
+			Active:  true,
+			Coords:  model.ShipCoords{SystemX: 1, SystemY: 1, Location: model.ShipLocationWaypoint, LocationID: 0},
+		}
+		newActiveShip := model.Ship{
+			AgentID: agentID,
+			Coords:  model.ShipCoords{SystemX: 4, SystemY: 20, Location: model.ShipLocationPlanet, LocationID: 2},
+		}
 		_, _, err := ChangeActiveShip(&oldActiveShip, newActiveShip)
 		assert.Error(t, err)
 	})

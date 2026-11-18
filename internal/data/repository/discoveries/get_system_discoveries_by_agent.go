@@ -11,7 +11,10 @@ import (
 	"github.com/sqlmerr/astragalaxy/internal/model"
 )
 
-func (r *DiscoveryRepositoryImpl) GetSystemDiscoveriesByAgent(ctx context.Context, agentID uuid.UUID) ([]model.SystemDiscovery, error) {
+func (r *DiscoveryRepositoryImpl) GetSystemDiscoveriesByAgent(
+	ctx context.Context,
+	agentID uuid.UUID,
+) ([]model.SystemDiscovery, error) {
 	ctx, cancel := context.WithTimeout(ctx, r.db.OpTimeout())
 	defer cancel()
 

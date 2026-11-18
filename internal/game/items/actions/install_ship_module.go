@@ -42,7 +42,11 @@ func InstallShipModule(shipModuleType model.ShipModuleType) ItemAction {
 		if slices.ContainsFunc(modules, func(e model.ShipModule) bool {
 			return e.Type == shipModuleType
 		}) {
-			return nil, fmt.Errorf("ship module %s is already installed: %w", shipModuleType, errs.CodeShipModuleAlreadyInstalled)
+			return nil, fmt.Errorf(
+				"ship module %s is already installed: %w",
+				shipModuleType,
+				errs.CodeShipModuleAlreadyInstalled,
+			)
 		}
 
 		_, err = ctx.Store.Ships().CreateShipModule(ctx.Context, ships_repository.CreateShipModule{

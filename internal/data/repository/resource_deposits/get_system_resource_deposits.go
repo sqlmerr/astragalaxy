@@ -10,11 +10,17 @@ import (
 	"github.com/sqlmerr/astragalaxy/internal/model"
 )
 
-func (r *ResourceDepositsRepositoryImpl) GetSystemResourceDeposits(ctx context.Context, x, y int) ([]model.ResourceDeposit, error) {
+func (r *ResourceDepositsRepositoryImpl) GetSystemResourceDeposits(
+	ctx context.Context,
+	x, y int,
+) ([]model.ResourceDeposit, error) {
 	ctx, cancel := context.WithTimeout(ctx, r.db.OpTimeout())
 	defer cancel()
 
-	deposits, err := r.q.GetSystemResourceDeposits(ctx, database.GetSystemResourceDepositsParams{SystemX: int32(x), SystemY: int32(y)})
+	deposits, err := r.q.GetSystemResourceDeposits(
+		ctx,
+		database.GetSystemResourceDepositsParams{SystemX: int32(x), SystemY: int32(y)},
+	)
 	err = postgres_pool.TranslateError(err)
 	if err != nil {
 		return nil, fmt.Errorf("get systtem resource deposits: %w", err)

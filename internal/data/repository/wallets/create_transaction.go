@@ -9,7 +9,10 @@ import (
 	"github.com/sqlmerr/astragalaxy/internal/model"
 )
 
-func (r *WalletRepositoryImpl) CreateTransaction(ctx context.Context, data CreateTransaction) (model.WalletTransaction, error) {
+func (r *WalletRepositoryImpl) CreateTransaction(
+	ctx context.Context,
+	data CreateTransaction,
+) (model.WalletTransaction, error) {
 	ctx, cancel := context.WithTimeout(ctx, r.db.OpTimeout())
 	defer cancel()
 

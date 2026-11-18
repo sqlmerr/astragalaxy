@@ -62,7 +62,10 @@ func DockShip(ship model.Ship, system worldgen.System) (model.Ship, time.Duratio
 			ship.Status = model.ShipStatusOrbit
 			ship.Coords.Location = model.ShipLocationNone
 			ship.Coords.LocationID = 0
-			return ship, 0, fmt.Errorf("something happenned to your location: %w", errs.CodeAnomaly.WithBase(errs.ErrUnprocessableEntity))
+			return ship, 0, fmt.Errorf(
+				"something happenned to your location: %w",
+				errs.CodeAnomaly.WithBase(errs.ErrUnprocessableEntity),
+			)
 		}
 		if !waypoint.Dockable {
 			return model.Ship{}, 0, fmt.Errorf("can't dock ship here: %w", errs.CodeCannotDock)

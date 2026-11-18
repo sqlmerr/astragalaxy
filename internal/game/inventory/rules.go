@@ -8,9 +8,18 @@ import (
 	"github.com/sqlmerr/astragalaxy/internal/model"
 )
 
-func TransferResource(from, to model.Resource, amount, toInventoryVolume int, toInventory model.Inventory) (model.Resource, model.Resource, error) {
+func TransferResource(
+	from, to model.Resource,
+	amount, toInventoryVolume int,
+	toInventory model.Inventory,
+) (model.Resource, model.Resource, error) {
 	if from.Amount < amount {
-		return model.Resource{}, model.Resource{}, fmt.Errorf("have: %d. Must be at least %d: %w", from.Amount, amount, errs.CodeNotEnoughResources)
+		return model.Resource{}, model.Resource{}, fmt.Errorf(
+			"have: %d. Must be at least %d: %w",
+			from.Amount,
+			amount,
+			errs.CodeNotEnoughResources,
+		)
 	}
 
 	if toInventoryVolume+amount > toInventory.MaxResourceVolume {
@@ -33,7 +42,12 @@ func CheckItemCapacity(inventory model.Inventory, currentItemCount, itemsToAdd i
 		return nil
 	}
 
-	return fmt.Errorf("to many items: %d. Maximum: %d: %w", totalItemAmount, inventory.MaxItemSlots, errs.CodeInventoryIsFull)
+	return fmt.Errorf(
+		"to many items: %d. Maximum: %d: %w",
+		totalItemAmount,
+		inventory.MaxItemSlots,
+		errs.CodeInventoryIsFull,
+	)
 }
 
 func TransferItem(item model.Item, fromInventoryID, toInventoryID uuid.UUID) (model.Item, error) {

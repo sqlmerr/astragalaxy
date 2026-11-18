@@ -112,7 +112,18 @@ func main() {
 	walletRepo := wallets_repository.New(*queries, pool)
 	dynamicWaypointsRepo := dynamic_waypoints_repository.New(*queries, pool)
 
-	store := data.NewStore(pool, userRepo, agentRepo, shipRepo, inventoryRepo, cooldownRepo, resourceDepositsRepo, discoveryRepo, walletRepo, dynamicWaypointsRepo)
+	store := data.NewStore(
+		pool,
+		userRepo,
+		agentRepo,
+		shipRepo,
+		inventoryRepo,
+		cooldownRepo,
+		resourceDepositsRepo,
+		discoveryRepo,
+		walletRepo,
+		dynamicWaypointsRepo,
+	)
 
 	bus := eventbus.New(rdb, *log)
 
@@ -151,7 +162,13 @@ func main() {
 	usersHandler := http_handler_users.NewUsersHTTPHandler(*usersService, *authService)
 	apiVersionRouter.AddRoutes(usersHandler.Routes(userAuthMiddleware)...)
 
-	agentsHandler := http_handler_agents.NewAgentsHTTPHandler(*agentsService, *cooldownsService, *miningService, *craftingService, *facilitiesService)
+	agentsHandler := http_handler_agents.NewAgentsHTTPHandler(
+		*agentsService,
+		*cooldownsService,
+		*miningService,
+		*craftingService,
+		*facilitiesService,
+	)
 	apiVersionRouter.AddRoutes(agentsHandler.Routes(userAuthMiddleware, agentAuthMiddleware)...)
 
 	shipsHandler := http_handler_ships.NewShipsHTTPHandler(*shipsService)

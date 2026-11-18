@@ -24,7 +24,13 @@ type Service struct {
 	bus        model.EventBus
 }
 
-func NewService(gameConfig game.Config, store data.Store, worldGen worldgen.WorldGen, gameData registry.GameData, bus model.EventBus) *Service {
+func NewService(
+	gameConfig game.Config,
+	store data.Store,
+	worldGen worldgen.WorldGen,
+	gameData registry.GameData,
+	bus model.EventBus,
+) *Service {
 	return &Service{
 		gameConfig, store, worldGen, gameData, bus,
 	}
@@ -40,12 +46,20 @@ type WarpFuelUsage struct {
 func (s *Service) getShipClass(ship model.Ship) (model.ShipClass, error) {
 	class, ok := s.gameData.ShipClasses.GetShipClass(ship.Class)
 	if !ok {
-		return model.ShipClass{}, fmt.Errorf("unknown ship class %q: %w", ship.Class, errs.CodeAnomaly.WithBase(errs.ErrNotFound))
+		return model.ShipClass{}, fmt.Errorf(
+			"unknown ship class %q: %w",
+			ship.Class,
+			errs.CodeAnomaly.WithBase(errs.ErrNotFound),
+		)
 	}
 	return class, nil
 }
 
-func (s *Service) NavigateWarp(ctx context.Context, agentID uuid.UUID, x, y int) (model.Cooldown, WarpFuelUsage, *model.SystemDiscovery, error) {
+func (s *Service) NavigateWarp(
+	ctx context.Context,
+	agentID uuid.UUID,
+	x, y int,
+) (model.Cooldown, WarpFuelUsage, *model.SystemDiscovery, error) {
 	if !s.gameConfig.Rules.DisableCooldowns {
 		if err := s.store.Cooldowns().CheckCooldown(ctx, agentID); err != nil {
 			return model.Cooldown{}, WarpFuelUsage{}, nil, fmt.Errorf("cooldown: %w", err)
@@ -158,7 +172,11 @@ func (s *Service) NavigateWarp(ctx context.Context, agentID uuid.UUID, x, y int)
 	}, discovery, nil
 }
 
-func (s *Service) NavigatePlanet(ctx context.Context, agentID uuid.UUID, orbit int) (model.Cooldown, *model.PlanetDiscovery, error) {
+func (s *Service) NavigatePlanet(
+	ctx context.Context,
+	agentID uuid.UUID,
+	orbit int,
+) (model.Cooldown, *model.PlanetDiscovery, error) {
 	if !s.gameConfig.Rules.DisableCooldowns {
 		if err := s.store.Cooldowns().CheckCooldown(ctx, agentID); err != nil {
 			return model.Cooldown{}, nil, fmt.Errorf("cooldown: %w", err)

@@ -11,7 +11,10 @@ import (
 	"github.com/sqlmerr/astragalaxy/internal/model"
 )
 
-func (r *DiscoveryRepositoryImpl) GetPlanetDiscovery(ctx context.Context, systemX, systemY, orbit int) (model.PlanetDiscovery, error) {
+func (r *DiscoveryRepositoryImpl) GetPlanetDiscovery(
+	ctx context.Context,
+	systemX, systemY, orbit int,
+) (model.PlanetDiscovery, error) {
 	ctx, cancel := context.WithTimeout(ctx, r.db.OpTimeout())
 	defer cancel()
 
@@ -23,7 +26,13 @@ func (r *DiscoveryRepositoryImpl) GetPlanetDiscovery(ctx context.Context, system
 	err = postgres_pool.TranslateError(err)
 	if err != nil {
 		if errors.Is(err, postgres_pool.ErrNoRows) {
-			return model.PlanetDiscovery{}, fmt.Errorf("planet discovery x=%d y=%d orbit=%d: %w", systemX, systemY, orbit, errs.CodePlanetDiscoveryNotFound)
+			return model.PlanetDiscovery{}, fmt.Errorf(
+				"planet discovery x=%d y=%d orbit=%d: %w",
+				systemX,
+				systemY,
+				orbit,
+				errs.CodePlanetDiscoveryNotFound,
+			)
 		}
 		return model.PlanetDiscovery{}, fmt.Errorf("get planet discovery: %w", err)
 	}

@@ -18,7 +18,13 @@ func CountTotalResourceVolume(resources []model.Resource) int {
 	return amount
 }
 
-func ProcessCraft(recipe *model.Recipe, facilityModifiers *model.FacilityCraftingModifiers, resources []model.Resource, targetInventoryID uuid.UUID, amount int) (updatedResources []model.Resource, createdResources []model.Resource, addedItems []model.Item, err error) {
+func ProcessCraft(
+	recipe *model.Recipe,
+	facilityModifiers *model.FacilityCraftingModifiers,
+	resources []model.Resource,
+	targetInventoryID uuid.UUID,
+	amount int,
+) (updatedResources []model.Resource, createdResources []model.Resource, addedItems []model.Item, err error) {
 	for _, input := range recipe.Inputs {
 		cost := int(math.Ceil(float64(input.Amount*amount) * facilityModifiers.CostMultiplier))
 		flag := false
@@ -43,7 +49,10 @@ func ProcessCraft(recipe *model.Recipe, facilityModifiers *model.FacilityCraftin
 	for _, output := range recipe.Outputs {
 		if output.Type == model.RecipeOutputItem {
 			for range output.Amount * amount {
-				addedItems = append(addedItems, model.Item{InventoryID: targetInventoryID, ItemType: model.ItemType(output.ID)})
+				addedItems = append(
+					addedItems,
+					model.Item{InventoryID: targetInventoryID, ItemType: model.ItemType(output.ID)},
+				)
 			}
 			continue
 		}
@@ -59,7 +68,14 @@ func ProcessCraft(recipe *model.Recipe, facilityModifiers *model.FacilityCraftin
 		}
 
 		if !flag {
-			createdResources = append(createdResources, model.Resource{InventoryID: targetInventoryID, ResourceType: model.ResourceType(output.ID), Amount: output.Amount * amount})
+			createdResources = append(
+				createdResources,
+				model.Resource{
+					InventoryID:  targetInventoryID,
+					ResourceType: model.ResourceType(output.ID),
+					Amount:       output.Amount * amount,
+				},
+			)
 		}
 	}
 

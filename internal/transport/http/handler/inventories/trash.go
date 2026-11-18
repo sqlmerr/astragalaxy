@@ -36,9 +36,15 @@ func (h *InventoriesHTTPHandler) Trash(w http.ResponseWriter, r *http.Request) {
 
 	agentID := auth.GetAgentIDFromContext(ctx)
 
-	cooldown, err := h.inventoryService.Trash(ctx, agentID, req.InventoryID, req.Items, lo.MapEntries(req.Resources, func(k string, v int) (model.ResourceType, int) {
-		return model.ResourceType(k), v
-	}))
+	cooldown, err := h.inventoryService.Trash(
+		ctx,
+		agentID,
+		req.InventoryID,
+		req.Items,
+		lo.MapEntries(req.Resources, func(k string, v int) (model.ResourceType, int) {
+			return model.ResourceType(k), v
+		}),
+	)
 	if err != nil {
 		rh.ErrorResponse(err, "Failed to use trash")
 		return

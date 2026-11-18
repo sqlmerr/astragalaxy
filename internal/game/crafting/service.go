@@ -29,11 +29,23 @@ type Service struct {
 	facilityProvider FacilityProvider
 }
 
-func NewService(gameConfig game.Config, store data.Store, gameData registry.GameData, worldGen worldgen.WorldGen, facilityProvider FacilityProvider) *Service {
+func NewService(
+	gameConfig game.Config,
+	store data.Store,
+	gameData registry.GameData,
+	worldGen worldgen.WorldGen,
+	facilityProvider FacilityProvider,
+) *Service {
 	return &Service{gameConfig, store, gameData, worldGen, facilityProvider}
 }
 
-func (s *Service) Craft(ctx context.Context, agentID uuid.UUID, recipeID string, targetInventoryID uuid.UUID, amount int) (model.Cooldown, error) {
+func (s *Service) Craft(
+	ctx context.Context,
+	agentID uuid.UUID,
+	recipeID string,
+	targetInventoryID uuid.UUID,
+	amount int,
+) (model.Cooldown, error) {
 	if !s.gameConfig.Rules.DisableCooldowns {
 		if err := s.store.Cooldowns().CheckCooldown(ctx, agentID); err != nil {
 			return model.Cooldown{}, fmt.Errorf("cooldown: %w", err)
@@ -51,7 +63,11 @@ func (s *Service) Craft(ctx context.Context, agentID uuid.UUID, recipeID string,
 	}
 
 	if len(facilities[recipe.RequiredFacility]) == 0 {
-		return model.Cooldown{}, fmt.Errorf("facility `%s` not found: %w", recipe.RequiredFacility, errs.CodeFacilityNotFound)
+		return model.Cooldown{}, fmt.Errorf(
+			"facility `%s` not found: %w",
+			recipe.RequiredFacility,
+			errs.CodeFacilityNotFound,
+		)
 	}
 
 	var bestFacility *model.Facility
@@ -71,12 +87,21 @@ func (s *Service) Craft(ctx context.Context, agentID uuid.UUID, recipeID string,
 	}
 	facilityModifiers, ok := bestFacility.CraftingMods()
 	if !ok {
-		return model.Cooldown{}, fmt.Errorf("parse facility crafting modifiers: %v: %w", bestFacility.Modifiers, errs.CodeAnomaly)
+		return model.Cooldown{}, fmt.Errorf(
+			"parse facility crafting modifiers: %v: %w",
+			bestFacility.Modifiers,
+			errs.CodeAnomaly,
+		)
 	}
 
 	if bestFacility == nil {
 		fmt.Println(len(facilities[recipe.RequiredFacility]))
-		return model.Cooldown{}, fmt.Errorf("cannot find facility of type='%s' with tier greater than or equal to %d: %w", recipe.RequiredFacility, recipe.MinTier, errs.CodeFacilityNotFound)
+		return model.Cooldown{}, fmt.Errorf(
+			"cannot find facility of type='%s' with tier greater than or equal to %d: %w",
+			recipe.RequiredFacility,
+			recipe.MinTier,
+			errs.CodeFacilityNotFound,
+		)
 	}
 
 	inventory, err := s.store.Inventories().GetInventory(ctx, targetInventoryID)
@@ -117,7 +142,13 @@ func (s *Service) Craft(ctx context.Context, agentID uuid.UUID, recipeID string,
 		return model.Cooldown{}, fmt.Errorf("get inventory items: %w", err)
 	}
 
-	updatedResources, createdResources, addedItems, err := ProcessCraft(&recipe, facilityModifiers, resources, targetInventoryID, amount)
+	updatedResources, createdResources, addedItems, err := ProcessCraft(
+		&recipe,
+		facilityModifiers,
+		resources,
+		targetInventoryID,
+		amount,
+	)
 	if err != nil {
 		return model.Cooldown{}, err
 	}

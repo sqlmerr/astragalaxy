@@ -11,7 +11,11 @@ import (
 	"github.com/sqlmerr/astragalaxy/internal/model"
 )
 
-func (r *DynamicWaypointRepositoryImpl) GetDynamicWaypointsByAgentAndSystem(ctx context.Context, agentID uuid.UUID, systemX, systemY int) ([]model.DynamicWaypoint, error) {
+func (r *DynamicWaypointRepositoryImpl) GetDynamicWaypointsByAgentAndSystem(
+	ctx context.Context,
+	agentID uuid.UUID,
+	systemX, systemY int,
+) ([]model.DynamicWaypoint, error) {
 	ctx, cancel := context.WithTimeout(ctx, r.db.OpTimeout())
 	defer cancel()
 

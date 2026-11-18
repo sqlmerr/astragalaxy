@@ -12,7 +12,7 @@ import (
 )
 
 type MinePlanetRequest struct {
-	Amount   int    `json:"amount" validate:"required,min=1"`
+	Amount   int    `json:"amount"   validate:"required,min=1"`
 	Resource string `json:"resource" validate:"required"`
 }
 

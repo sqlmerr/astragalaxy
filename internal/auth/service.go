@@ -32,7 +32,10 @@ func checkUsername(username string) error {
 	}
 
 	if !usernameRegex.MatchString(username) {
-		return fmt.Errorf("invalid username format: must contain only latin letters, digits, and underscores: %w", errs.CodeInvalidUsername)
+		return fmt.Errorf(
+			"invalid username format: must contain only latin letters, digits, and underscores: %w",
+			errs.CodeInvalidUsername,
+		)
 	}
 
 	return nil
@@ -49,7 +52,11 @@ func (s *Service) RegisterUser(ctx context.Context, username, password string) (
 	}
 
 	if userExists {
-		return model.User{}, fmt.Errorf("username='%s' already occupied: %w", username, errs.CodeUserUsernameAlreadyOccupied)
+		return model.User{}, fmt.Errorf(
+			"username='%s' already occupied: %w",
+			username,
+			errs.CodeUserUsernameAlreadyOccupied,
+		)
 	}
 
 	hashedPassword, err := HashPassword(password) // TODO: add interface PasswordHasher

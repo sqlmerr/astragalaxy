@@ -29,7 +29,12 @@ func Mine(
 	speedModifier float64,
 ) (model.ResourceDeposit, model.Resource, time.Duration, error) {
 	if depositData.Remaining < amount {
-		return model.ResourceDeposit{}, model.Resource{}, 0, fmt.Errorf("cannot mine %d resources: deposit has %d resources: %w", amount, depositData.Remaining, errs.CodeNotEnoughResources)
+		return model.ResourceDeposit{}, model.Resource{}, 0, fmt.Errorf(
+			"cannot mine %d resources: deposit has %d resources: %w",
+			amount,
+			depositData.Remaining,
+			errs.CodeNotEnoughResources,
+		)
 	}
 
 	if inventoryVolume+amount > inventory.MaxResourceVolume && !gameConfig.Rules.DisableInventoryLimit {
@@ -45,7 +50,12 @@ func Mine(
 	}
 
 	if amount > int(limit) {
-		return model.ResourceDeposit{}, model.Resource{}, 0, fmt.Errorf("cannot mine %d due to mining limit = %d: %w", amount, int(limit), errs.CodeMiningLimitExceeded)
+		return model.ResourceDeposit{}, model.Resource{}, 0, fmt.Errorf(
+			"cannot mine %d due to mining limit = %d: %w",
+			amount,
+			int(limit),
+			errs.CodeMiningLimitExceeded,
+		)
 	}
 
 	resource.Amount += amount

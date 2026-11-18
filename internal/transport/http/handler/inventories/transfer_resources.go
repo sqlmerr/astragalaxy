@@ -15,8 +15,8 @@ import (
 
 type TransferResourcesRequest struct {
 	FromInventoryID uuid.UUID      `json:"from_inventory_id" validate:"required"`
-	ToInventoryID   uuid.UUID      `json:"to_inventory_id" validate:"required"`
-	Resources       map[string]int `json:"resources" validate:"required"`
+	ToInventoryID   uuid.UUID      `json:"to_inventory_id"   validate:"required"`
+	Resources       map[string]int `json:"resources"         validate:"required"`
 }
 
 func (h *InventoriesHTTPHandler) TransferResources(w http.ResponseWriter, r *http.Request) {

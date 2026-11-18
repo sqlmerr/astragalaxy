@@ -13,8 +13,8 @@ import (
 )
 
 type PayRequest struct {
-	To     string `json:"to" validate:"required"`
-	Units  int    `json:"units" validate:"min=0"`
+	To     string `json:"to"     validate:"required"`
+	Units  int    `json:"units"  validate:"min=0"`
 	Quarks int    `json:"quarks" validate:"min=0"`
 }
 

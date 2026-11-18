@@ -67,7 +67,10 @@ func (s ShipLocation) ValidateLocationID(id int) error {
 		}
 	case ShipLocationPlanet, ShipLocationWaypoint:
 		if id < 0 {
-			return fmt.Errorf("location `planet` and location `waypoint` must always have id greater than or equal to 0: %w", errs.CodeInvalidCoordinates)
+			return fmt.Errorf(
+				"location `planet` and location `waypoint` must always have id greater than or equal to 0: %w",
+				errs.CodeInvalidCoordinates,
+			)
 		}
 	}
 
@@ -86,7 +89,11 @@ func NewShipLocation(location string) (ShipLocation, error) {
 	case ShipLocationNone, ShipLocationPlanet, ShipLocationWaypoint:
 		return loc, nil
 	default:
-		return "", fmt.Errorf("invalid location %s: %w", location, errs.CodeInvalidLocation.WithBase(errs.ErrInvalidArgument))
+		return "", fmt.Errorf(
+			"invalid location %s: %w",
+			location,
+			errs.CodeInvalidLocation.WithBase(errs.ErrInvalidArgument),
+		)
 	}
 }
 
