@@ -18,6 +18,9 @@ jobs:
           go-version-file: go.mod
           cache: true
 
+      - name: Prepare config
+        run: cp config.example.yaml config.yaml
+
       - name: Vet
         run: go vet ./...
 
