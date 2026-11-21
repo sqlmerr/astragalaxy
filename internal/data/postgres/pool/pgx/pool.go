@@ -43,6 +43,9 @@ func NewPool(ctx context.Context, config Config) (*Pool, error) {
 }
 
 func (p *Pool) OpTimeout() time.Duration {
+	if p.opTimeout == 0 {
+		return time.Second * 3
+	}
 	return p.opTimeout
 }
 

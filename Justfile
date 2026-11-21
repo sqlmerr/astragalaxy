@@ -61,6 +61,9 @@ admincli *ARGS:
     @go mod tidy && go run ./cmd/admincli/main.go "$@"
 
 test:
+    @go test -short -v ./internal/game/...
+
+test-long:
     @go test -v ./internal/game/...
 
 run-client:
