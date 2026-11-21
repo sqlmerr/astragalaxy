@@ -22,6 +22,10 @@ type InventoryOwner struct {
 	OwnerType InventoryOwnerType
 }
 
+func (o *InventoryOwner) IsAgent(agentID uuid.UUID) bool {
+	return o.OwnerType == InventoryOwnerAgent && o.OwnerID == agentID
+}
+
 func NewInventoryOwner(ownerID uuid.UUID, ownerType InventoryOwnerType) InventoryOwner {
 	return InventoryOwner{OwnerID: ownerID, OwnerType: ownerType}
 }

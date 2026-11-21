@@ -66,5 +66,8 @@ test:
 run-client:
     @cd client && bun dev --host
 
-lint: # requires `ov` to run
+lint: # requires `ov` and `golangci-lint` to run
     ov --exec  -- golangci-lint run ./internal/...
+
+fmt: # requires `golangci-lint` to run
+    golangci-lint fmt

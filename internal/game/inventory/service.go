@@ -389,12 +389,45 @@ func (s *Service) checkTransferDirection(
 		return fmt.Errorf("get inventory owner: %w", err)
 	}
 
-	// agent -> active ship
-	// active ship -> agent
-	// TODO: agent -> another agent
-	if ownerFrom.OwnerType == model.InventoryOwnerAgent || ownerTo.OwnerType == model.InventoryOwnerAgent {
-		if (ownerFrom.OwnerType != model.InventoryOwnerAgent || ownerFrom.OwnerID != agentID) &&
-			(ownerTo.OwnerType != model.InventoryOwnerAgent || ownerTo.OwnerID != agentID) {
+	checkShip := func(shipID uuid.UUID) error {
+		ship, err := s.store.Ships().GetShip(ctx, shipID)
+		if err != nil {
+			return fmt.Errorf("get ship: %w", err)
+		}
+
+		if ship.AgentID != agentID {
+			return fmt.Errorf(
+				"can't access this ship's inventory: %w", errs.CodeAccessDenied,
+			)
+		}
+
+		if !ship.Active { // TODO(?): check ship's location to match agent's so agents could transfer items/resources to their inactive ships
+			return fmt.Errorf(
+				"ship with id='%s' must be active: %w",
+				ship.ID,
+				errs.CodeShipMustBeActive,
+			)
+		}
+
+		return nil
+	}
+
+	if ownerFrom.IsAgent(agentID) && ownerTo.OwnerType == model.InventoryOwnerShip { // 1. agent -> active ship
+		return checkShip(ownerTo.OwnerID)
+	} else if ownerTo.IsAgent(agentID) && ownerFrom.OwnerType == model.InventoryOwnerShip { // 2. active ship -> agent
+		return checkShip(ownerFrom.OwnerID)
+	} else if ownerFrom.IsAgent(agentID) && ownerTo.OwnerType == model.InventoryOwnerAgent { // 3. agent -> another agent
+		fromAgentShip, err := s.store.Ships().GetActiveShipByAgent(ctx, ownerFrom.OwnerID)
+		if err != nil {
+			return fmt.Errorf("get active ship: %w", err)
+		}
+
+		toAgentShip, err := s.store.Ships().GetActiveShipByAgent(ctx, ownerTo.OwnerID)
+		if err != nil {
+			return fmt.Errorf("get active ship: %w", err)
+		}
+
+		if !fromAgentShip.Coords.IsEqual(toAgentShip.Coords) || fromAgentShip.Status != toAgentShip.Status {
 			return fmt.Errorf(
 				"can't access this agent's inventory with id='%s': %w",
 				toInventoryID,
@@ -402,35 +435,9 @@ func (s *Service) checkTransferDirection(
 			)
 		}
 
-		if ownerTo.OwnerType == model.InventoryOwnerShip || ownerFrom.OwnerType == model.InventoryOwnerShip {
-			var shipID uuid.UUID
-			if ownerTo.OwnerType == model.InventoryOwnerShip {
-				shipID = ownerTo.OwnerID
-			} else {
-				shipID = ownerFrom.OwnerID
-			}
-			ship, err := s.store.Ships().GetShip(ctx, shipID)
-			if err != nil {
-				return fmt.Errorf("get ship: %w", err)
-			}
-
-			if ship.AgentID != agentID {
-				return fmt.Errorf(
-					"can't access this ship's inventory: %w", errs.CodeAccessDenied,
-				)
-			}
-
-			if !ship.Active { // TODO: check ship's location to match agent's. Not be active
-				return fmt.Errorf(
-					"ship with id='%s' must be active: %w",
-					ship.ID,
-					errs.CodeShipMustBeActive,
-				)
-			}
-
-			return nil
-		}
+		return nil
 	}
+
 	return fmt.Errorf(
 		"invalid transfer direction: %s -> %s (%s -> %s): %w",
 		fromInventoryID,

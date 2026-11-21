@@ -153,10 +153,11 @@ func NewShipCoords(location ShipLocation, locationID, systemX, systemY int) (Shi
 }
 
 func (c ShipCoords) IsEqual(other ShipCoords) bool {
-	return c.Location == other.Location &&
-		c.LocationID == other.LocationID &&
-		c.SystemX == other.SystemX &&
-		c.SystemY == other.SystemY
+	// return c.Location == other.Location &&
+	// 	c.LocationID == other.LocationID &&
+	// 	c.SystemX == other.SystemX &&
+	// 	c.SystemY == other.SystemY
+	return c == other
 }
 
 func (c ShipCoords) String() string {

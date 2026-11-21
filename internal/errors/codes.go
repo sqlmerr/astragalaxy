@@ -101,13 +101,6 @@ type WithCode struct {
 	Code ErrorCode
 }
 
-func NewWithCode(code ErrorCode, err error) WithCode {
-	return WithCode{
-		Err:  err,
-		Code: code,
-	}
-}
-
 func (e WithCode) Error() string {
 	return e.Err.Error()
 }

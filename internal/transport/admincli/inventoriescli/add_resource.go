@@ -13,7 +13,7 @@ import (
 )
 
 func newAddResourceCmd(service *inventory.Service) *cobra.Command {
-	var substract bool
+	var subtract bool
 	cmd := &cobra.Command{
 		Use:  "add_resource <inventory id> <resource id> <amount>",
 		Args: cobra.ExactArgs(3),
@@ -29,7 +29,7 @@ func newAddResourceCmd(service *inventory.Service) *cobra.Command {
 			if err != nil {
 				return fmt.Errorf("invalid amount (must be integer): %w", err)
 			}
-			if substract {
+			if subtract {
 				amount = -amount
 			}
 
@@ -43,9 +43,9 @@ func newAddResourceCmd(service *inventory.Service) *cobra.Command {
 				return nil
 			}
 
-			if substract {
+			if subtract {
 				fmt.Printf(
-					"substracted %d resource of type %q from inventory %s\n",
+					"subtracted %d resource of type %q from inventory %s\n",
 					int(math.Abs(float64(amount))),
 					resourceID,
 					inventoryID,
@@ -63,7 +63,7 @@ func newAddResourceCmd(service *inventory.Service) *cobra.Command {
 		},
 	}
 
-	cmd.Flags().BoolVarP(&substract, "substract", "s", false, "is true then amount will be lower than 0")
+	cmd.Flags().BoolVarP(&subtract, "subtract", "s", false, "if true then amount will be subtracted")
 
 	return cmd
 }
