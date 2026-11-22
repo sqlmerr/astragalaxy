@@ -779,6 +779,60 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/mail/my": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get My Claimable Mail Packages */
+        get: operations["getMyClaimableMailPackages"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/mail/{id}/claim": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Claim Mail Package */
+        post: operations["claimMailPackage"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/inventories/my/packages/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get My Package Inventory
+         * @description Get current agent's package full inventory
+         */
+        get: operations["getMyPackageInventory"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -1304,6 +1358,19 @@ export interface components {
             fee: number;
             cooldown: components["schemas"]["Cooldown"];
             transaction: components["schemas"]["WalletTransaction"];
+        };
+        MailPackage: {
+            /** Format: uuid */
+            id: string;
+            from_agent: string | null;
+            /** Format: uuid */
+            to_agent: string;
+            /** Format: uuid */
+            inventory_id: string;
+            /** Format: duration */
+            arrive_time: string;
+            /** Format: date-time */
+            created_at: string;
         };
     };
     responses: {
@@ -2454,6 +2521,79 @@ export interface operations {
                     "application/json": {
                         data: components["schemas"]["Wallet"][];
                     };
+                };
+            };
+            401: components["responses"]["InvalidAgentToken"];
+            403: components["responses"]["AccessDenied"];
+        };
+    };
+    getMyClaimableMailPackages: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successfully fetched packages */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["MailPackage"][];
+                    };
+                };
+            };
+            401: components["responses"]["InvalidAgentToken"];
+            403: components["responses"]["AccessDenied"];
+        };
+    };
+    claimMailPackage: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successfully claimed package */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Cooldown"];
+                };
+            };
+            401: components["responses"]["InvalidAgentToken"];
+            403: components["responses"]["AccessDenied"];
+        };
+    };
+    getMyPackageInventory: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description ID of the package */
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successfully got package inventory */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FullInventory"];
                 };
             };
             401: components["responses"]["InvalidAgentToken"];

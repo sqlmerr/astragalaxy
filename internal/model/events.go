@@ -15,9 +15,10 @@ type EventBus interface {
 }
 
 type AgentWarpedEvent struct {
-	AgentID uuid.UUID `json:"agent_id"`
-	SystemX int       `json:"system_x"`
-	SystemY int       `json:"system_y"`
+	AgentID        uuid.UUID `json:"agent_id"`
+	SystemX        int       `json:"system_x"`
+	SystemY        int       `json:"system_y"`
+	IsNewDiscovery bool      `json:"is_new_discovery"`
 }
 
 func (AgentWarpedEvent) EventType() string {

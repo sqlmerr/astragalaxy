@@ -28,7 +28,15 @@ SELECT
     id AS owner_id,
     'ship' AS owner_type
 FROM ships
-WHERE ships.inventory_id = $1;
+WHERE ships.inventory_id = $1
+
+UNION ALL
+
+SELECT
+    id AS owner_id,
+    'mail_package' AS owner_type
+FROM mail_packages
+WHERE mail_packages.inventory_id = $1;
 
 -- name: CreateInventoryResource :one
 INSERT INTO inventory_resources (inventory_id, resource_type, amount)
@@ -113,3 +121,12 @@ UPDATE inventory_resources
 SET amount = amount - $3
 WHERE inventory_id = $1 AND resource_type = $2 AND amount >= $3
 RETURNING *;
+
+-- name: DeleteAllInventoryItems :exec
+DELETE FROM inventory_items WHERE inventory_id = $1;
+
+-- name: DeleteAllInventoryResources :exec
+DELETE FROM inventory_resources WHERE inventory_id = $1;
+
+-- name: DeleteInventory :execrows
+DELETE FROM inventories WHERE id = $1;

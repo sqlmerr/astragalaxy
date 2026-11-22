@@ -20,7 +20,7 @@ func (r *InventoryRepositoryImpl) GetItem(ctx context.Context, id uuid.UUID) (mo
 	if err != nil {
 		if errors.Is(err, postgres_pool.ErrNoRows) {
 			return model.Item{}, fmt.Errorf(
-				"item with id='%s: %w'", id, errs.CodeInventoryNotFound,
+				"item with id='%s: %w'", id, errs.CodeItemNotFound,
 			)
 		}
 

@@ -12,8 +12,10 @@ import (
 type InventoryRepository interface {
 	CreateInventory(ctx context.Context, data CreateInventory) (model.Inventory, error)
 	GetInventory(ctx context.Context, id uuid.UUID) (model.Inventory, error)
+	GetFullInventory(ctx context.Context, id uuid.UUID) (model.FullInventory, error)
 	SaveInventory(ctx context.Context, data model.Inventory) (model.Inventory, error)
 	GetInventoryOwner(ctx context.Context, inventoryID uuid.UUID) (model.InventoryOwner, error)
+	DeleteInventory(ctx context.Context, id uuid.UUID) error
 
 	CreateResource(ctx context.Context, data CreateResource) (model.Resource, error)
 	GetInventoryResources(ctx context.Context, inventoryID uuid.UUID) ([]model.Resource, error)
@@ -27,6 +29,7 @@ type InventoryRepository interface {
 		amount int,
 	) (model.Resource, error)
 	DeleteResource(ctx context.Context, inventoryID uuid.UUID, resourceType model.ResourceType) error
+	DeleteAllResources(ctx context.Context, inventoryID uuid.UUID) error
 
 	CreateItem(ctx context.Context, data CreateItem) (model.Item, error)
 	CreateItemWithMetadata(ctx context.Context, data CreateItemWithMetadata) (model.Item, error)
@@ -35,6 +38,7 @@ type InventoryRepository interface {
 	GetItem(ctx context.Context, id uuid.UUID) (model.Item, error)
 	SaveItem(ctx context.Context, data model.Item) (model.Item, error)
 	DeleteItem(ctx context.Context, id uuid.UUID) error
+	DeleteAllItems(ctx context.Context, inventoryID uuid.UUID) error
 }
 
 type InventoryRepositoryImpl struct {

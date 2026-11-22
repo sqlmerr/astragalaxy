@@ -94,6 +94,8 @@ var (
 	CodeInvalidPaymentAmount         = newCode("INVALID_PAYMENT_AMOUNT", ErrInvalidArgument)
 	CodeWalletLimitExceeded          = newCode("WALLET_LIMIT_EXCEEDED", ErrUnprocessableEntity)
 	CodeCannotRegisterWallet         = newCode("CANNOT_REGISTER_WALLET", ErrUnprocessableEntity)
+	CodeMailPackageNotFound          = newCode("MAIL_PACKAGE_NOT_FOUND", ErrNotFound)
+	CodeCannotClaimPackage           = newCode("CANNOT_CLAIM_PACKAGE", ErrUnprocessableEntity)
 )
 
 type WithCode struct {

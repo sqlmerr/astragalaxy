@@ -1,0 +1,29 @@
+get:
+  operationId: getMyPackageInventory
+  tags:
+    - Inventories
+  summary: Get My Package Inventory
+  description: Get current agent's package full inventory
+  parameters:
+    - in: path
+      schema:
+        type: string
+        format: uuid
+      name: id
+      description: ID of the package
+      required: true
+  responses:
+    '200':
+      description: Successfully got package inventory
+      content:
+        application/json:
+          schema:
+            $ref: "../../components/schemas/FullInventory.yaml"
+    '401':
+      $ref: "../../components/responses/InvalidAgentToken.yaml"
+    '403':
+      $ref: "../../components/responses/AccessDenied.yaml"
+  security:
+    - AgentAuth: []
+    - UserAuth: []
+      AgentId: []

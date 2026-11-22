@@ -110,6 +110,7 @@ func (s *Service) NavigateWarp(
 	var cooldown model.Cooldown
 	var fuelLeft int
 	var discovery *model.SystemDiscovery
+	var isNewDiscovery bool
 
 	err = s.store.ExecTx(ctx, func(tx data.Store) error {
 		_, err := tx.Ships().SaveShip(ctx, ship)
@@ -139,6 +140,8 @@ func (s *Service) NavigateWarp(
 				return fmt.Errorf("create system discovery: %w", err)
 			}
 			discovery = &d
+			isNewDiscovery = true
+			fmt.Println("AAAA NEW DISCOVERY")
 		}
 
 		cooldown, err = tx.Cooldowns().SetCooldown(ctx, cooldowns_repository.SetCooldown{
@@ -159,9 +162,10 @@ func (s *Service) NavigateWarp(
 	}
 
 	s.bus.Publish(ctx, model.AgentWarpedEvent{
-		AgentID: agentID,
-		SystemX: x,
-		SystemY: y,
+		AgentID:        agentID,
+		SystemX:        x,
+		SystemY:        y,
+		IsNewDiscovery: isNewDiscovery,
 	})
 
 	return cooldown, WarpFuelUsage{

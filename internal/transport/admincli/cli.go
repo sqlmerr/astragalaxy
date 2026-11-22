@@ -15,6 +15,7 @@ import (
 	discoveries_repository "github.com/sqlmerr/astragalaxy/internal/data/repository/discoveries"
 	dynamic_waypoints_repository "github.com/sqlmerr/astragalaxy/internal/data/repository/dynamic_waypoints"
 	inventories_repository "github.com/sqlmerr/astragalaxy/internal/data/repository/inventories"
+	mail_repository "github.com/sqlmerr/astragalaxy/internal/data/repository/mail"
 	resource_deposits_repository "github.com/sqlmerr/astragalaxy/internal/data/repository/resource_deposits"
 	ships_repository "github.com/sqlmerr/astragalaxy/internal/data/repository/ships"
 	users_repository "github.com/sqlmerr/astragalaxy/internal/data/repository/users"
@@ -55,6 +56,7 @@ func Execute() error {
 	discoveryRepo := discoveries_repository.New(*queries, pool)
 	walletRepo := wallets_repository.New(*queries, pool)
 	dynamicWaypointsRepo := dynamic_waypoints_repository.New(*queries, pool)
+	mailRepo := mail_repository.New(*queries, pool)
 
 	store := data.NewStore(
 		pool,
@@ -67,6 +69,7 @@ func Execute() error {
 		discoveryRepo,
 		walletRepo,
 		dynamicWaypointsRepo,
+		mailRepo,
 	)
 	gameConfig := game.LoadConfigMust()
 	registryConfig := registry.LoadConfigMust()

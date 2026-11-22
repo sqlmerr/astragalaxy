@@ -84,7 +84,7 @@ func (w *WorldGen) FindSpawnSystem() (*System, error) {
 		y := getRandomCoordinate(-200, 200)
 
 		if sys, found := w.GenerateSystemByCoords(x, y); found {
-			if sys.HasStation() {
+			if sys.HasStation() && sys.Archetype.Name != ArchetypeDead.Name {
 				return sys, nil
 			}
 		}

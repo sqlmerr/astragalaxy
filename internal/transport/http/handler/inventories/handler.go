@@ -56,5 +56,11 @@ func (h *InventoriesHTTPHandler) Routes(agentAuthMiddleware http_middleware.Midd
 			Handler:    h.Trash,
 			Middleware: []http_middleware.Middleware{agentAuthMiddleware},
 		},
+		{
+			Method:     http.MethodGet,
+			Path:       "/inventories/my/packages/{id}",
+			Handler:    h.GetMyPackageInventory,
+			Middleware: []http_middleware.Middleware{agentAuthMiddleware},
+		},
 	}
 }

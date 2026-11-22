@@ -16,6 +16,19 @@ var (
 	ErrRowAlreadyExists   = errors.New("row already exists")
 )
 
+type wrapErr struct {
+	base    error
+	wrapped error
+}
+
+func (e wrapErr) Error() string {
+	return e.base.Error()
+}
+
+func (e wrapErr) Unwrap() error {
+	return e.wrapped
+}
+
 func TranslateError(err error) error {
 	if err == nil {
 		return nil
@@ -31,9 +44,9 @@ func TranslateError(err error) error {
 	if pgErr, ok := errors.AsType[*pgconn.PgError](err); ok {
 		switch pgErr.Code {
 		case postgresViolatesForeignKeyCode:
-			return ErrViolatesForeignKey
+			return wrapErr{base: ErrViolatesForeignKey, wrapped: err}
 		case postgresUniqueViolationCode:
-			return ErrRowAlreadyExists
+			return wrapErr{base: ErrRowAlreadyExists, wrapped: err}
 		}
 	}
 	return fmt.Errorf("%w: %w: %w", ErrUnknown, err, errs.ErrInternal)

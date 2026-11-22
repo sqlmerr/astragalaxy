@@ -63,7 +63,7 @@ admincli *ARGS:
 test:
     @go test -short -v ./internal/game/...
 
-test-long:
+test-all:
     @go test -v ./internal/game/...
 
 run-client:

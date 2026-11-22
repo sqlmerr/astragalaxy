@@ -1,4 +1,13 @@
 version: 2
+overrides:
+  go:
+    overrides:
+      - db_type: "pg_catalog.interval"
+        engine: "postgresql"
+        go_type:
+          import: "time"
+          type: "Duration"
+
 sql:
   - engine: postgresql
     queries: "./internal/data/postgres/database/query"
@@ -11,3 +20,6 @@ sql:
         overrides:
           - db_type: "uuid"
             go_type: "github.com/google/uuid.UUID"
+          - db_type: "uuid"
+            go_type: "*github.com/google/uuid.UUID"
+            nullable: true

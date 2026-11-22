@@ -13,6 +13,7 @@ import (
 	discoveries_repository "github.com/sqlmerr/astragalaxy/internal/data/repository/discoveries"
 	dynamic_waypoints_repository "github.com/sqlmerr/astragalaxy/internal/data/repository/dynamic_waypoints"
 	inventories_repository "github.com/sqlmerr/astragalaxy/internal/data/repository/inventories"
+	mail_repository "github.com/sqlmerr/astragalaxy/internal/data/repository/mail"
 	resource_deposits_repository "github.com/sqlmerr/astragalaxy/internal/data/repository/resource_deposits"
 	ships_repository "github.com/sqlmerr/astragalaxy/internal/data/repository/ships"
 	users_repository "github.com/sqlmerr/astragalaxy/internal/data/repository/users"
@@ -29,6 +30,7 @@ type Store interface {
 	Discoveries() discoveries_repository.DiscoveryRepository
 	Wallets() wallets_repository.WalletRepository
 	DynamicWaypoints() dynamic_waypoints_repository.DynamicWaypointRepository
+	MailPackages() mail_repository.MailRepository
 
 	ExecTx(ctx context.Context, fn func(tx Store) error) error
 }
@@ -45,6 +47,7 @@ type Storage struct {
 	discoveries      discoveries_repository.DiscoveryRepository
 	wallets          wallets_repository.WalletRepository
 	dynamicWaypoints dynamic_waypoints_repository.DynamicWaypointRepository
+	mailPackages     mail_repository.MailRepository
 }
 
 func NewStore(
@@ -58,6 +61,7 @@ func NewStore(
 	discoveries discoveries_repository.DiscoveryRepository,
 	wallets wallets_repository.WalletRepository,
 	dynamicWaypoints dynamic_waypoints_repository.DynamicWaypointRepository,
+	mailPackages mail_repository.MailRepository,
 ) *Storage {
 	return &Storage{
 		pool:             pool,
@@ -70,6 +74,7 @@ func NewStore(
 		discoveries:      discoveries,
 		wallets:          wallets,
 		dynamicWaypoints: dynamicWaypoints,
+		mailPackages:     mailPackages,
 	}
 }
 
@@ -109,6 +114,10 @@ func (s *Storage) DynamicWaypoints() dynamic_waypoints_repository.DynamicWaypoin
 	return s.dynamicWaypoints
 }
 
+func (s *Storage) MailPackages() mail_repository.MailRepository {
+	return s.mailPackages
+}
+
 func (s *Storage) ExecTx(ctx context.Context, fn func(tx Store) error) error {
 	tx, err := s.pool.Begin(ctx)
 	if err != nil {
@@ -129,6 +138,7 @@ func (s *Storage) ExecTx(ctx context.Context, fn func(tx Store) error) error {
 		discoveries:      discoveries_repository.New(*q, tx),
 		wallets:          wallets_repository.New(*q, tx),
 		dynamicWaypoints: dynamic_waypoints_repository.New(*q, tx),
+		mailPackages:     mail_repository.New(*q, tx),
 	}
 
 	err = fn(txStorage)

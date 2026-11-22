@@ -13,8 +13,9 @@ type Inventory struct {
 type InventoryOwnerType string
 
 const (
-	InventoryOwnerAgent InventoryOwnerType = "agent"
-	InventoryOwnerShip  InventoryOwnerType = "ship"
+	InventoryOwnerAgent       InventoryOwnerType = "agent"
+	InventoryOwnerShip        InventoryOwnerType = "ship"
+	InventoryOwnerMailPackage InventoryOwnerType = "mail_package"
 )
 
 type InventoryOwner struct {
@@ -28,4 +29,10 @@ func (o *InventoryOwner) IsAgent(agentID uuid.UUID) bool {
 
 func NewInventoryOwner(ownerID uuid.UUID, ownerType InventoryOwnerType) InventoryOwner {
 	return InventoryOwner{OwnerID: ownerID, OwnerType: ownerType}
+}
+
+type FullInventory struct {
+	Inventory Inventory
+	Resources []Resource
+	Items     []Item
 }

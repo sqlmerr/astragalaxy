@@ -5,12 +5,6 @@ import (
 	"github.com/sqlmerr/astragalaxy/internal/model"
 )
 
-type FullInventory struct {
-	Inventory model.Inventory
-	Resources []model.Resource
-	Items     []model.Item
-}
-
 type TransferResourcesInput struct {
 	AgentID         uuid.UUID
 	FromInventoryID uuid.UUID

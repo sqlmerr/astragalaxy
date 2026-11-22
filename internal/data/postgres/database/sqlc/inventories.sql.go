@@ -97,6 +97,36 @@ func (q *Queries) CreateInventoryResource(ctx context.Context, arg CreateInvento
 	return i, err
 }
 
+const deleteAllInventoryItems = `-- name: DeleteAllInventoryItems :exec
+DELETE FROM inventory_items WHERE inventory_id = $1
+`
+
+func (q *Queries) DeleteAllInventoryItems(ctx context.Context, inventoryID uuid.UUID) error {
+	_, err := q.db.Exec(ctx, deleteAllInventoryItems, inventoryID)
+	return err
+}
+
+const deleteAllInventoryResources = `-- name: DeleteAllInventoryResources :exec
+DELETE FROM inventory_resources WHERE inventory_id = $1
+`
+
+func (q *Queries) DeleteAllInventoryResources(ctx context.Context, inventoryID uuid.UUID) error {
+	_, err := q.db.Exec(ctx, deleteAllInventoryResources, inventoryID)
+	return err
+}
+
+const deleteInventory = `-- name: DeleteInventory :execrows
+DELETE FROM inventories WHERE id = $1
+`
+
+func (q *Queries) DeleteInventory(ctx context.Context, id uuid.UUID) (int64, error) {
+	result, err := q.db.Exec(ctx, deleteInventory, id)
+	if err != nil {
+		return 0, err
+	}
+	return result.RowsAffected(), nil
+}
+
 const deleteInventoryItem = `-- name: DeleteInventoryItem :execrows
 DELETE FROM inventory_items WHERE id = $1
 `
@@ -214,6 +244,14 @@ SELECT
     'ship' AS owner_type
 FROM ships
 WHERE ships.inventory_id = $1
+
+UNION ALL
+
+SELECT
+    id AS owner_id,
+    'mail_package' AS owner_type
+FROM mail_packages
+WHERE mail_packages.inventory_id = $1
 `
 
 type GetInventoryOwnerRow struct {

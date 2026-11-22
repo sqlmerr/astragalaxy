@@ -187,6 +187,7 @@ var (
 			model.FacilityPrinter:        3,
 			model.FacilitySmelter:        2,
 			model.FacilityWalletTerminal: 1,
+			model.FacilityMailTerminal:   1,
 		},
 	}
 	ArchetypeDead = SystemArchetype{
@@ -240,6 +241,7 @@ var (
 			model.FacilityPrinter:        2,
 			model.FacilitySmelter:        2,
 			model.FacilityWalletTerminal: 1,
+			model.FacilityMailTerminal:   1,
 		},
 	}
 

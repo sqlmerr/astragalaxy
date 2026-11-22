@@ -31,45 +31,58 @@ func NewService(gameConfig game.Config, store data.Store, gameData registry.Game
 	}
 }
 
-func (s *Service) GetAgentInventory(ctx context.Context, agentID uuid.UUID) (FullInventory, error) {
+func (s *Service) GetAgentInventory(ctx context.Context, agentID uuid.UUID) (model.FullInventory, error) {
 	agent, err := s.store.Agents().GetAgent(ctx, agentID)
 	if err != nil {
-		return FullInventory{}, fmt.Errorf("get agent: %w", err)
+		return model.FullInventory{}, fmt.Errorf("get agent: %w", err)
 	}
 
 	return s.getFullInventory(ctx, agent.InventoryID)
 }
 
-func (s *Service) GetShipInventory(ctx context.Context, agentID, shipID uuid.UUID) (FullInventory, error) {
+func (s *Service) GetShipInventory(ctx context.Context, agentID, shipID uuid.UUID) (model.FullInventory, error) {
 	ship, err := s.store.Ships().GetShip(ctx, shipID)
 	if err != nil {
-		return FullInventory{}, fmt.Errorf("get ship: %w", err)
+		return model.FullInventory{}, fmt.Errorf("get ship: %w", err)
 	}
 
 	if ship.AgentID != agentID {
-		return FullInventory{}, fmt.Errorf("can't get ship's inventory: %w", errs.CodeAccessDenied)
+		return model.FullInventory{}, fmt.Errorf("can't get ship's inventory: %w", errs.CodeAccessDenied)
 	}
 
 	return s.getFullInventory(ctx, ship.InventoryID)
 }
 
-func (s *Service) getFullInventory(ctx context.Context, inventoryID uuid.UUID) (FullInventory, error) {
+func (s *Service) GetPackageInventory(ctx context.Context, agentID, packageID uuid.UUID) (model.FullInventory, error) {
+	pkg, err := s.store.MailPackages().GetMailPackage(ctx, packageID)
+	if err != nil {
+		return model.FullInventory{}, fmt.Errorf("get package: %w", err)
+	}
+
+	if (pkg.ToAgent != agentID || !pkg.IsDelivered()) && pkg.FromAgent != &agentID {
+		return model.FullInventory{}, fmt.Errorf("cannot access this package inventory: %w", errs.CodeAccessDenied)
+	}
+
+	return s.getFullInventory(ctx, pkg.InventoryID)
+}
+
+func (s *Service) getFullInventory(ctx context.Context, inventoryID uuid.UUID) (model.FullInventory, error) {
 	inv, err := s.store.Inventories().GetInventory(ctx, inventoryID)
 	if err != nil {
-		return FullInventory{}, fmt.Errorf("get inventory: %w", err)
+		return model.FullInventory{}, fmt.Errorf("get inventory: %w", err)
 	}
 
 	resources, err := s.store.Inventories().GetInventoryResources(ctx, inventoryID)
 	if err != nil {
-		return FullInventory{}, fmt.Errorf("get inventory resources: %w", err)
+		return model.FullInventory{}, fmt.Errorf("get inventory resources: %w", err)
 	}
 
 	items, err := s.store.Inventories().GetInventoryItems(ctx, inventoryID)
 	if err != nil {
-		return FullInventory{}, fmt.Errorf("get inventory items: %w", err)
+		return model.FullInventory{}, fmt.Errorf("get inventory items: %w", err)
 	}
 
-	return FullInventory{
+	return model.FullInventory{
 		Inventory: inv,
 		Resources: lo.Filter(
 			resources,

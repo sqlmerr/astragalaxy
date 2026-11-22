@@ -89,6 +89,12 @@ paths:
     $ref: paths/wallets/get-public.yaml
   /api/v1/wallets/{addr}/transactions:
     $ref: paths/wallets/transactions.yaml
+  /api/v1/mail/my:
+    $ref: paths/mail/my.yaml
+  /api/v1/mail/{id}/claim:
+    $ref: paths/mail/claim.yaml
+  /api/v1/inventories/my/packages/{id}:
+    $ref: paths/inventories/my-packages.yaml
 components:
   securitySchemes:
     UserAuth:

@@ -1,0 +1,27 @@
+get:
+  operationId: getMyClaimableMailPackages
+  summary: Get My Claimable Mail Packages
+  tags:
+    - Mail
+  responses:
+    '200':
+      description: Successfully fetched packages
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - data
+            properties: 
+              data:
+                type: array
+                items: 
+                  $ref: ../../components/schemas/MailPackage.yaml
+    '401':
+      $ref: ../../components/responses/InvalidAgentToken.yaml
+    '403':
+      $ref: ../../components/responses/AccessDenied.yaml
+  security:
+    - AgentAuth: []
+    - UserAuth: []
+      AgentId: []

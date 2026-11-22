@@ -12,12 +12,13 @@ const (
 	FacilityPrinter        FacilityType = "printer"
 	FacilitySmelter        FacilityType = "smelter"
 	FacilityWalletTerminal FacilityType = "wallet_terminal"
+	FacilityMailTerminal   FacilityType = "mail_terminal"
 )
 
 func NewFacilityType(facilityType string) (FacilityType, error) {
 	f := FacilityType(facilityType)
 	switch f {
-	case FacilityPrinter, FacilitySmelter, FacilityWalletTerminal:
+	case FacilityPrinter, FacilitySmelter, FacilityWalletTerminal, FacilityMailTerminal:
 		return f, nil
 	default:
 		return "", fmt.Errorf("invalid facility type %s: %w", facilityType, errs.CodeInvalidFacilityType)

@@ -10,6 +10,7 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5/pgtype"
+	"time"
 )
 
 type LocationType string
@@ -219,6 +220,15 @@ type InventoryResource struct {
 	InventoryID  uuid.UUID
 	ResourceType string
 	Amount       int64
+}
+
+type MailPackage struct {
+	ID          uuid.UUID
+	FromAgent   *uuid.UUID
+	ToAgent     uuid.UUID
+	InventoryID uuid.UUID
+	ArriveTime  time.Duration
+	CreatedAt   pgtype.Timestamp
 }
 
 type PlanetDiscovery struct {

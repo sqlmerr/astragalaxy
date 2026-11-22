@@ -1,0 +1,28 @@
+post:
+  operationId: claimMailPackage
+  summary: Claim Mail Package
+  tags:
+    - Mail
+    - Actions
+  parameters:
+    - name: id
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+  responses:
+    '200':
+      description: Successfully claimed package
+      content: 
+        application/json:
+          schema:
+            $ref: ../../components/schemas/Cooldown.yaml
+    '401':
+      $ref: ../../components/responses/InvalidAgentToken.yaml
+    '403':
+      $ref: ../../components/responses/AccessDenied.yaml
+  security:
+    - AgentAuth: []
+    - UserAuth: []
+      AgentId: []

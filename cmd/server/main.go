@@ -25,6 +25,7 @@ import (
 	discoveries_repository "github.com/sqlmerr/astragalaxy/internal/data/repository/discoveries"
 	dynamic_waypoints_repository "github.com/sqlmerr/astragalaxy/internal/data/repository/dynamic_waypoints"
 	inventories_repository "github.com/sqlmerr/astragalaxy/internal/data/repository/inventories"
+	mail_repository "github.com/sqlmerr/astragalaxy/internal/data/repository/mail"
 	resource_deposits_repository "github.com/sqlmerr/astragalaxy/internal/data/repository/resource_deposits"
 	ships_repository "github.com/sqlmerr/astragalaxy/internal/data/repository/ships"
 	users_repository "github.com/sqlmerr/astragalaxy/internal/data/repository/users"
@@ -37,6 +38,7 @@ import (
 	"github.com/sqlmerr/astragalaxy/internal/game/galaxy"
 	"github.com/sqlmerr/astragalaxy/internal/game/inventory"
 	"github.com/sqlmerr/astragalaxy/internal/game/items"
+	"github.com/sqlmerr/astragalaxy/internal/game/mail"
 	"github.com/sqlmerr/astragalaxy/internal/game/mining"
 	"github.com/sqlmerr/astragalaxy/internal/game/navigation"
 	"github.com/sqlmerr/astragalaxy/internal/game/ships"
@@ -47,6 +49,7 @@ import (
 	http_handler_agents "github.com/sqlmerr/astragalaxy/internal/transport/http/handler/agents"
 	http_handler_data "github.com/sqlmerr/astragalaxy/internal/transport/http/handler/data"
 	http_handler_inventories "github.com/sqlmerr/astragalaxy/internal/transport/http/handler/inventories"
+	http_handler_mail "github.com/sqlmerr/astragalaxy/internal/transport/http/handler/mail"
 	http_handler_navigation "github.com/sqlmerr/astragalaxy/internal/transport/http/handler/navigation"
 	http_handler_ships "github.com/sqlmerr/astragalaxy/internal/transport/http/handler/ships"
 	http_handler_systems "github.com/sqlmerr/astragalaxy/internal/transport/http/handler/systems"
@@ -111,6 +114,7 @@ func main() {
 	discoveryRepo := discoveries_repository.New(*queries, pool)
 	walletRepo := wallets_repository.New(*queries, pool)
 	dynamicWaypointsRepo := dynamic_waypoints_repository.New(*queries, pool)
+	mailRepo := mail_repository.New(*queries, pool)
 
 	store := data.NewStore(
 		pool,
@@ -123,6 +127,7 @@ func main() {
 		discoveryRepo,
 		walletRepo,
 		dynamicWaypointsRepo,
+		mailRepo,
 	)
 
 	bus := eventbus.New(rdb, *log)
@@ -152,7 +157,8 @@ func main() {
 	cooldownsService := cooldowns.NewService(gameConfig, store)
 	inventoryService := inventory.NewService(gameConfig, store, *gameData)
 	navigationService := navigation.NewService(gameConfig, store, *worldGen, *gameData, bus)
-	galaxyService := galaxy.NewService(store, *worldGen)
+	mailService := mail.New(store, gameConfig, facilitiesService)
+	galaxyService := galaxy.NewService(store, *worldGen, mailService)
 	miningService := mining.NewService(gameConfig, store, *worldGen, *gameData)
 	itemsService := items.NewService(gameConfig, store, *gameData)
 	craftingService := crafting.NewService(gameConfig, store, *gameData, *worldGen, facilitiesService)
@@ -188,6 +194,9 @@ func main() {
 
 	walletsHandler := http_handler_wallets.New(*walletsService)
 	apiVersionRouter.AddRoutes(walletsHandler.Routes(agentAuthMiddleware)...)
+
+	mailHandler := http_handler_mail.New(*mailService)
+	apiVersionRouter.AddRoutes(mailHandler.Routes(agentAuthMiddleware)...)
 
 	httpConfig := http_server.LoadConfigMust()
 	mux := http.NewServeMux()

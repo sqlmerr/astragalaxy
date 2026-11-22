@@ -1,0 +1,29 @@
+type: object
+required:
+  - id
+  - from_agent
+  - to_agent
+  - inventory_id
+  - arrive_time
+  - created_at
+properties: 
+  id: 
+    type: string
+    format: uuid
+  from_agent:
+    oneOf:
+      - type: string
+        format: uuid
+      - type: "null"
+  to_agent:
+    type: string
+    format: uuid
+  inventory_id:
+    type: string
+    format: uuid
+  arrive_time:
+    type: string
+    format: duration
+  created_at:
+    type: string
+    format: date-time
